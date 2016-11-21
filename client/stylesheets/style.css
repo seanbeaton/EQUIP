@@ -2,14 +2,24 @@
 * Unorganized CSS for many elements of the application
 */
 
-.grid-block, .main, .post, .comments li, .comment-form {
+.navbar {
+  margin-bottom: 10px;
+  background: #005288;
+}
+  /* line 32, ../sass/style.scss */
+  .navbar .navbar-inner {
+    border-radius: 0px 0px 3px 3px; }
+
+
+
+/*.grid-block, .main, .post, .comments li, .comment-form {
   background: #fff;
   border-radius: 3px;
   padding: 10px;
   margin-bottom: 10px;
   -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.15);
   -moz-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.15);
-  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.15); }
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.15); }*/
 
   /*Begin table row numbering*/
   .ftable {
@@ -292,13 +302,7 @@ ul
   width: 100%;
 }
 
-.navbar {
-  margin-bottom: 10px;
-  background: #222222;
-}
-  /* line 32, ../sass/style.scss */
-  .navbar .navbar-inner {
-    border-radius: 0px 0px 3px 3px; }
+
 
 
 #spinner {

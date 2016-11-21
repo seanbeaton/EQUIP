@@ -1,0 +1,62 @@
+.land-1 {
+    background-color: white;
+    font-family: 'Source Sans Pro';
+    font-size: 1.25em;
+    margin-top: -10px;
+}
+
+.land-1 .title {
+    margin-top: 1.5em;
+}
+
+.land-2 {
+    background-color: #4893cf;
+    color: white;
+    font-family: 'Source Sans Pro';
+    font-size: 2em;
+}
+
+.land-2 .title {
+    color: white;
+    margin-bottom: .5em;
+}
+
+.land-3 {
+    background-color: #f68e1f;
+    color: black;
+}
+
+.land-3 p {
+    margin-left: .5em;
+    font-family: 'Source Sans Pro';
+    font-size: 1.75em;
+}
+
+.land-3 .su {
+    float: right;
+    background-color: #4893cf;
+    font-size: 1.75em;
+}
+
+.land-4 {
+    background-color: white;
+    color: black;
+}
+
+.land-4 p {
+    margin-left: .5em;
+    font-family: 'Source Sans Pro';
+    font-size: 1.75em;
+}
+
+.sponsor {
+    color: #075489;
+}
+
+.sponsor:hover {
+    color: #4893cf;
+}
+
+.sponsor:visited {
+    color: #f68e1f;
+}

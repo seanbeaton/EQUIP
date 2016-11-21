@@ -1,79 +1,72 @@
 <!-- Homepage HTML -->
 
 <template name="landingPage">
-  <div class="jumbotron jumbotron-landing-page">
-    <div class="container">
-      <h1>Welcome to EQUIP!</h1>
-      <p>A data observation interface for behavioral environments.</p>
-      <p><a class="btn btn-primary btn-lg" href="mailto:equipappdevelopers@gmail.com" id="feedbackBtn" type="button">Contact Us <i class="fa fa-send-o" aria-hidden="true"></i></a> <a class="btn btn-primary btn-lg" href="#" data-action="signUp" type="button">Get Started <i class="fa fa-angle-double-right" aria-hidden="true"></i></a></p>
-    </div>
-  </div>
-  <div class="modal fade" id="feedbackModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-          <h4 class="modal-title">Contact Us</h4>
+  <section class="section land-1">
+    <div class="columns">
+      <div class="column is-half">
+        <figure class ="image">
+          <img src="equip_hands-01.png" />
+        </figure>
+      </div>
+      <div class="column is-half">
+        <div class="columns">
+          <figure class="column is-half is-offset-one-quarter image">
+          <img src="equip_logo-01.png" />
+          </figure>
         </div>
-        <div class="modal-body modal-cf-center">
-          <div class="control" id="parameter_modal">
-            <form class="feedback-form" method="POST" action="#" accept-charset="UTF-8">
-              <p><label>Your Name<strong>*</strong><br>
-              <input type="text" autofocus required size="48" id="nameCF" name="name" value=""></label></p>
-              <p><label>Email Address<strong>*</strong><br>
-              <input type="email" id="emailCF" required title="Please enter a valid email address" size="48" name="email" value=""></label></p>
-              <p><label>Subject<br>
-              <input type="text" size="48" id="subjectCF" name="subject" value=""></label></p>
-              <p><label>Enquiry / Feedback<strong>*</strong><br>
-              <textarea required name="message" id="textCF" cols="48" rows="8"></textarea></label></p>
-            </form>
-          </div>
-        </div>
-        <div class="modal-footer" onKeyPress="return checkSubmit(event)">
-          <button type="button" class="btn btn-primary" id="sendFeedback">Send</button>
+        <div class="columns has-text-centered">
+          <p class="title is-1">Understanding Classroom Equality by Observing Participation</p>
         </div>
       </div>
     </div>
-  </div>
-  <div class="container">
-    <div class="row">
-      <div class="col-md-4">
-        <h2>Observational Data</h2>
-        <p>
-          EQUIP is designed for collecting observational data in classrooms. EQUIP features custom input parameters as well as a visualized subject environment in order to streamline behavioral experiments.
-        </p>
-      </div>
-      <div class="col-md-4">
-        <h2>EQUIP</h2>
-        <p>
-          EQUIP stands for 'Equity Quantified in Participation'. The EQUIP tool was created to assist classroom observations and is designed to support researchers in tracking behavioral data.
-        </p>
-     </div>
-      <div class="col-md-4">
-        <h2>Analytics</h2>
-        <p>
-          EQUIP lets you view your data or export it as a CSV so that you can quantify your results with custom codes.
-        </p>
+  </section>
+  <section class="section land-2">
+    <div class="columns">
+      <div class="column has-text-centered">
+        <h1 class="title is-1">EQUIP = Equality Quantified in Participation</h1>
       </div>
     </div>
-  </div>
-  <div class="footer-container">
-    <hr>
-    <footer>
-      <div class="footer-image">
-        <img src="equipBlackText.png" alt="EQUIP"  height="80" width="125">
-        <p>
-          &copy; EQUIP 2016
+    <div class="columns">
+      <div class="column is-half">
+        <p>The EQUIP tool was created to support researchers in performing classroom observations. We make it simple to track student contributions during a live observation using custom parameters needed for your research. Once you have data, you can graph, analyze, and export it. EQUIP is NOT a tool for evaluating teachers; rather it is designed to be used for logging student contributions in a classroom.</p>
+      </div>
+      <figure class="column is-half">
+        <img src="http://placehold.it/640x360" />
+      </figure>
+    </div>
+  </section>
+  <section class="section land-3">
+    <div class="columns">
+      <div class="column is-10 is-offset-1">
+        <h1 class="title is-1">How It Works:</h1>
+        <p>1. Create a classroom that gives a context to your observations.
           <br>
-          EQUIP is an open-source project avaliable on
-          <a href="https://github.com/simmeringc/meteor-dataObs">Github</a>.
+          2. Define the demographic parameters you'd like to track on students in the classroom. 
           <br>
-          View the documentation
-          <a href="http://docs.equip.ninja">here</a>.
+          3. Define observataional parameters to track as you watch the students interact in the classroom.
+          <br>
+          4. Add students to the roster so you can track each one as you go.
+          <br>
+          5. Begin an observation for your classroom and record data.
+          <br>
+          6. Once you've gone recorded some good data, analyze the trends!
         </p>
+        <a class="su button is-large" href="#" data-action="signUp">Sign Up</a>
       </div>
-    </footer>
-</div>
+    </div>
+  </section>
+  <section class="section land-4">
+    <div class="column is-10 is-offset-1">
+        <h1 class="title is-1">Sponsored By..</h1>
+        <p>1. <a class="sponsor" href="http://www.colorado.edu/assett/">ASSETT</a> Program at CU-Boulder
+          <br>
+          2. <a class="sponsor" href="http://www.colorado.edu/csl/">Center for STEM Learning</a> at CU-Boulder
+          <br>
+          3. <a class="sponsor" href="http://www.wcer.wisc.edu/About/Project/1113">A3iMS</a> at UW-Madison
+        </p>
+    </div>
+  </section>
+
 <script>
 (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
 (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
