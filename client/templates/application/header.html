@@ -20,17 +20,15 @@
     <div class="column n-item">
       <a href="{{pathFor 'aboutPage'}}">About</a>
     </div>
+
+    {{#if currentUser}}
     <div class="column n-item">
-      <a class="" href="{{pathFor 'obsDashboard'}}">Dashboard</a>
-    </div>
-        {{#if currentUser}}
-      <div class="column n-item">
-      <a href="{{pathFor 'environmentList'}}" id="navEnv" class="">Classrooms</a>
+      <a class="" href="{{pathFor 'environmentList'}}">Dashboard</a>
     </div>
     <div class="column n-item">
       <a class="" href="{{pathFor 'viewData'}}" >Analysis</a>
     </div>
-        {{/if}}
+    {{/if}}
       <div class="column n-item">
       {{> loginButtons}}
       </div>

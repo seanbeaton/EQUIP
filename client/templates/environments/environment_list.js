@@ -12,7 +12,20 @@ Template.environmentList.rendered = function() {
 
 Template.environmentList.helpers({
   environment: function() {
-    return Environments.find({}, {sort: {submitted: -1}});
+    var envs = Environments.find({}, {sort: {submitted: -1}}).fetch();
+    var obs;
+    var subjects;
+    var user = Meteor.user();
+    console.log(user);
+    var total_students = Subjects.find({userId: user._id}).count();
+    var total_obs = Sequences.find({userId: user._id}).count();
+    _.map(envs, function (env) {
+      console.log(env._id);
+    });
+
+    var results = {list: envs, num_env: parseInt(envs.length), num_students: parseInt(total_students), num_obs: parseInt(total_obs)};
+
+    return results;
   },
   needsEnvironment: function() {
     var obj = Environments.find({}).fetch();
@@ -22,34 +35,45 @@ Template.environmentList.helpers({
 });
 
 Template.environmentList.events({
-   'click #createNewEnvironment': function(e) {
-    $('#createEnvPopup').modal({
-      keyboard: true,
-      show: true
-    });
-    $('#createEnvPopup').on('shown.bs.modal', function () {
-      $('#environmentName').focus();
-    })
+   'click #env-create-button': function(e) {
+    $('#env-create-modal').addClass("is-active");
+  },
+    'click #env-close-modal': function(e) {
+    $('#env-create-modal').removeClass("is-active");
+  },
+  'click .modal-card-foot .button': function(e) {
+    $('#env-create-modal').removeClass("is-active");
   },
 
-  'click #saveName': function(e) {
+  //  'click #createNewEnvironment': function(e) {
+  //   $('#createEnvPopup').modal({
+  //     keyboard: true,
+  //     show: true
+  //   });
+  //   $('#createEnvPopup').on('shown.bs.modal', function () {
+  //     $('#environmentName').focus();
+  //   })
+  // },
+
+  'click #save-env-name': function(e) {
+
+
+  // 'click #save-env-name': function(e) {
 
     var environment = {
       envName: $('#environmentName').val()
     };
 
     if ($('#environmentName').val() == "") {
-      $('#environmentName').addClass("requiredValidation")
       alert("Environment name required.");
       return;
     }
-    $('#environmentName').removeClass("requiredValidation")
 
     Meteor.call('environmentInsert', environment, function(error, result) {
       return 0;
     });
 
-    $('#createEnvPopup').modal('hide');
+    $('#env-create-modal').removeClass("is-active");
     $('#environmentName').val('');
   }
 });

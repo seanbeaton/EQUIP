@@ -9,11 +9,19 @@
     margin-top: 1.5em;
 }
 
+body {
+    font-family: 'Source Sans Pro'
+}
+
 .land-2 {
     background-color: #4893cf;
     color: white;
     font-family: 'Source Sans Pro';
     font-size: 2em;
+}
+
+.land-2 p {
+    margin-left: .5em;
 }
 
 .land-2 .title {
@@ -59,4 +67,8 @@
 
 .sponsor:visited {
     color: #f68e1f;
+}
+
+.equip-use {
+    width: 70%;
 }

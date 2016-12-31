@@ -18,9 +18,9 @@ Template.environmentItem.events({
   });
 
 Template.environmentItem.events({
-   'click .deleteEnvironment': function(e) {
+   'click #env-delete': function(e) {
      var result = confirm("Deleting an environment will also delete all observation, subject, and sequence data. Press 'OK' to continue.");
-     envId = this._id
+     var envId = this._id
     if (result) {
       Meteor.call('environmentDelete', envId, function(error, result) {
         return 0;
@@ -30,12 +30,20 @@ Template.environmentItem.events({
  });
 
  Template.environmentItem.helpers({
+  //shim function until database is clean
+  trackModified: function () {
+    if (this.lastModified) {
+      return true;
+    }
+  },
+
    needsSetup: function() {
      var obj = SubjectParameters.find({'children.envId':this._id}).fetch();
      return $.isEmptyObject(obj);
    },
+
    needsSubjects: function() {
      var obj = Subjects.find({envId: this._id}).fetch();
-     return $.isEmptyObject(obj)?"blue-pulse":"";
+     return $.isEmptyObject(obj)?"pulser":"";
    }
  });

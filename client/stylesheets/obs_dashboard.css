@@ -1,0 +1,95 @@
+.dash-head {
+    text-decoration: underline;
+}
+
+.help-button {
+    background: #f68e1f;
+    font-size: 2em;
+    color: white;
+}
+
+.help-button:hover {
+    opacity: .5;
+}
+
+.stat-head {
+    margin-left: 1em;
+}
+
+.dash-stats {
+    font-size: 1.75em;
+}
+
+.dash-stat {
+    font-style: bold;
+    font-size: 2em;
+}
+
+.obs-dash-list {
+    box-shadow: 2px;
+}
+
+
+.obs-dash-stats {
+    border-bottom: 1px solid black;
+}
+
+#analyze-button {
+    margin-left: 1em;
+    background: #4893cf;
+    color: white;
+}
+
+#env-create-modal {
+    font-family: 'Source Sans Pro';
+}
+
+#env-create-modal label{
+    color: black;
+    font-size: 1em;
+}
+
+.dash-env-head {
+    display: inline;
+    margin-right: 1.5em;
+    margin-left: 2em;
+}
+
+.single-env {
+    padding-bottom: 1em;
+    border-bottom: 1px solid black;
+}
+
+.single-env:last-child {
+    border-bottom: none;
+}
+
+.export-tab {
+    background: #4893cf ;
+    color: white;
+    margin-right: 1em;
+}
+
+
+.edit-button {
+    background: #005288;
+    color: white ;
+}
+
+.enter-button {
+    background: #B26300;
+    color: white;
+}
+
+@-webkit-keyframes Pulse {
+  from { opacity: 1; }
+  50% { opacity: .66; }
+  to { background-color: .33;}
+}
+
+.pulser {
+  -webkit-animation-name: Pulse;
+  -webkit-animation-duration: 2s;
+  -webkit-animation-iteration-count: infinite;
+  color: white;
+}

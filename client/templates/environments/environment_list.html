@@ -1,36 +1,64 @@
 <!-- HTML for the environment list -->
 
 <template name="environmentList">
-    <div id="container" class="container-fluid top-spacer card">
-        <h2>Saved Environments
-           <button type="button" class="btn btn-success {{needsEnvironment}}" id="createNewEnvironment" style="position:relative;bottom:2px;" data-toggle="popover2" data-content="Environments represent a single area of observation. Example environments include a classroom or specific class, a venue, or a specific experiment." data-placement="right">Create</button>
-        </h2>
-        <hr>
-        <div class="modal fade" id="createEnvPopup" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-          <div class="modal-dialog" role="document">
-            <div class="modal-content">
-              <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title">Environment</h4>
-              </div>
-              <div class="modal-body">
-                <div class="controls" data-toggle="popoverEnvName" data-content="Example Environment Names: 'Fairview High School', 'UCB CSCI-1300 Fall 2016', 'Eye-contact Experiment', 'Restaurant opening night'." data-placement="bottom">
-                  <input name="nameOfEnvironment"  type="text" value="" id="environmentName" placeholder="Name Your Environment Here" class="form-control"/>
-                </div>
-              </div>
-              <div class="modal-footer" onKeyPress="return checkSubmit(event)">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" id="saveName">Save Changes</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      <div>
-        {{#each environment}}
-          {{> environmentItem}}
-        {{/each}}
+  <section class="section obs-dash-head">
+    <h2 class="dash-head is-pulled-left">Observation Dashboard</h2>
+    <a class="button is-medium help-button is-pulled-right has-text-centered">Help!?</a>
+  </section>
+  <section class="section obs-dash-stats">
+    <h1 class="stat-head">So Far You Have...</h1>
+    <div class="columns dash-stats">
+      <div class="column is-third has-text-centered">
+        <span class="dash-stat">{{environment.num_env}}</span> Classrooms
+      </div>
+      <div class="column is-third has-text-centered">
+        <span class="dash-stat">{{environment.num_students}}</span> Students
+      </div>
+      <div class="column is-third has-text-centered">
+        <span class="dash-stat">{{environment.num_obs}}</span> Data Entries
       </div>
     </div>
+  </section>
+  <section class="section obs-dash-list">
+    <div>
+      <h2 class="dash-env-head">Your Classrooms</h2>
+      <button id="env-create-button" class="button is-success is-medium">Create</button>
+      <button id="analyze-button" class="button is-medium">Analyze Data</button>
+    </div>
+  </section>
+
+  <div id="env-create-modal" class="modal">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+      <header class="modal-card-head">
+        <p class="modal-card-title">Create New Classroom</p>
+        <button id="env-close-modal" class="delete"></button>
+      </header>
+      <section class="modal-card-body">
+        <label class="label">Classroom Name</label>
+          <p class="control">
+            <input class="input" type="text" placeholder="Type Name Here" id="environmentName">
+          </p>
+      </section>
+      <footer class="modal-card-foot">
+        <a id="save-env-name" class="button is-success">Save changes</a>
+        <a class="button">Cancel</a>
+      </footer>
+    </div>
+  </div>
+
+  <section class="section env-list-container">
+    <div class="columns is-multiline is-moble">
+      <div class="column is-offset-1 is-three-quarters box">
+
+        {{#each environment.list}}
+          {{> environmentItem}}
+        {{/each}}
+
+      </div>
+    </div>
+  </section>
+
     <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),

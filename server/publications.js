@@ -6,25 +6,51 @@
 */
 
 Meteor.publish('environments', function() {
-  return Environments.find({userId: this.userId});
+    if (!this.userId) {
+        return this.ready();
+    }
+    
+    return Environments.find(
+    {userId: this.userId}
+    );
 });
 
 Meteor.publish('observations', function() {
+    if (!this.userId) {
+        return this.ready();
+    }
+
   return Observations.find({userId: this.userId});
 });
 
 Meteor.publish('subjects', function() {
+    if (!this.userId) {
+        return this.ready();
+    }
+
   return Subjects.find({userId: this.userId});
 });
 
 Meteor.publish('sequences', function() {
+    if (!this.userId) {
+        return this.ready();
+    }
+
    return Sequences.find({userId: this.userId});
 });
 
 Meteor.publish('subject_parameters', function() {
+    if (!this.userId) {
+        return this.ready();
+    }
+
    return SubjectParameters.find({userId: this.userId});
 });
 
 Meteor.publish('sequence_parameters', function() {
+    if (!this.userId) {
+        return this.ready();
+    }
+    
    return SequenceParameters.find({userId: this.userId});
 });
