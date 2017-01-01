@@ -151,7 +151,7 @@ Template.editSubjectParameters.events({
         }
         Command: toastr["success"]("Save Successful", "Subject Parameters")
       }
-      Router.go('editSequenceParameters', {_envId:Router.current().params._envId, _subjParamsId:result._subjParamsId});
+      Router.go('editSequenceParameters', {_envId:Router.current().params._envId});
     });
   } else {
     Meteor.call('updateSubjParameters', obj, function(error, result) {

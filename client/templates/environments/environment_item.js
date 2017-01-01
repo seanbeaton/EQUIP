@@ -3,15 +3,11 @@
 */
 
 Template.environmentItem.events({
-  'click .viewEnvItem': function(e) {
+  'click #enter-class': function(e) {
      e.preventDefault();
      Router.go('observationList', {_envId:this._id});
   },
-  'click .subjectParameters': function(e) {
-     e.preventDefault();
-     Router.go('subjectParameters', {_envId:this._id});
-  },
-  'click .editParameters': function(e) {
+  'click #edit-class-params': function(e) {
      e.preventDefault();
      Router.go('editSubjectParameters', {_envId:this._id});
   }
@@ -36,12 +32,6 @@ Template.environmentItem.events({
       return true;
     }
   },
-
-   needsSetup: function() {
-     var obj = SubjectParameters.find({'children.envId':this._id}).fetch();
-     return $.isEmptyObject(obj);
-   },
-
    needsSubjects: function() {
      var obj = Subjects.find({envId: this._id}).fetch();
      return $.isEmptyObject(obj)?"pulser":"";
