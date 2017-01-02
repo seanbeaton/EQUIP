@@ -1,0 +1,37 @@
+.back-head-params {
+    text-decoration: underline;
+}
+
+.back-head-params:hover {
+    color: lightgray;
+    cursor: pointer;
+}
+
+.active-params {
+    background-color: #009CFF;
+    color: white;
+}
+
+.inactive-params:hover {
+    background-color: grey;
+}
+
+.param-switcher {
+    margin-top: 1em;
+}
+
+.export-button {
+    background: #4893cf;
+    color: white;
+}
+
+.default-button {
+    background: #FF8E00;
+    color: white;
+}
+
+.single-param {
+    padding-bottom: .5em;
+    border-bottom: 1px solid black;
+    overflow: auto;
+}

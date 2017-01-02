@@ -4,97 +4,171 @@
 */
 
 var serialize = require('form-serialize');
-
+ 
 Template.editSequenceParameters.helpers({
   environment: function() {
-     return Environments.find({_id:Router.current().params._envId});
+     var env = Environments.find({_id:Router.current().params._envId}).fetch();
+     var result = env[0];
+     return result;
   }
 });
 
 function loadDefaultSeqParams() {
+ 
+  $('#paramForm').remove();
+
+  $('<form/>', {
+    id: 'paramForm',
+  }).appendTo('#paramsSection');
+
+  var container = document.getElementById("paramForm");
   labels = ["WCD Type", "Solicitation Method", "Wait Time", "Length of Talk", "Student Talk", "Teacher Soliciation", "Explicit Evaluation"]
-  var container = document.getElementById("formRow");
+
   for (i=0;i<7;i++){
-      var formCounter = $("#container input").length;
-      container.appendChild(document.createTextNode("Parameter " + (formCounter/2)));
-      // var remove = container.appendChild(document.createElement("BUTTON"));
-      // remove.id = "remove" + (formCounter/2);
-      // remove.innerHTML = "x";
-      // remove.className = "remove-button btn btn-xs btn-danger"
-      var inputLabel = document.createElement("input");
-      inputLabel.type = "text";
-      inputLabel.name = "label" + (formCounter/2);
-      inputLabel.className = "form-control"
-      inputLabel.value = labels[i]
-      container.appendChild(inputLabel);
-      var inputParameters = document.createElement("input");
-      inputParameters.type = "text";
-      inputParameters.name = "parameter" + (formCounter/2);
-      inputParameters.className = "form-control"
+     var singleParam = $('<div/>', {
+      class: "single-param control myParam"+i
+      }).appendTo(container);
+
+      $('<label/>', {
+        class: "label",
+        text: "Parameter Name:"
+      }).appendTo(singleParam);
+
+      $('<input/>', {
+        class: "input",
+        type: "text",
+        name: "label"+i,
+        value: labels[i],
+      }).appendTo(singleParam);
+
+      $('<label/>', {
+        class: "label",
+        text: "Options:"
+      }).appendTo(singleParam);
+
+      var inputValue = "";
       if (labels[i] == "WCD Type") {
-        inputParameters.value = "Math,Non-Math"
+        inputValue = "Math,Non-Math"
       }
       if (labels[i] == "Solicitation Method") {
-        inputParameters.value = "Called On,Not Called On"
+        inputValue  = "Called On,Not Called On"
       }
       if (labels[i] == "Wait Time") {
-        inputParameters.value = "Less than 3 seconds,3 or more seconds,N/A"
+        inputValue  = "Less than 3 seconds,3 or more seconds,N/A"
       }
       if (labels[i] == "Length of Talk") {
-        inputParameters.value = "1-4 words,5-20,21 or more"
+        inputValue  = "1-4 words,5-20,21 or more"
       }
       if (labels[i] == "Student Talk") {
-        inputParameters.value = "How,What,Why,Other"
+        inputValue =  "How,What,Why,Other"
       }
       if (labels[i] == "Teacher Soliciation") {
-        inputParameters.value = "How,What,Why,Other"
+        inputValue =  "How,What,Why,Other"
       }
       if (labels[i] == "Explicit Evaluation") {
-        inputParameters.value = "Yes,No"
+        inputValue = "Yes,No"
       }
-      container.appendChild(inputParameters);
-      container.appendChild(document.createElement("br"));
-    }
+
+      $('<input/>', {
+        class: "input",
+        type: "text",
+        style: "margin-bottom: .25em",
+        name: "parameter"+i,
+        value: inputValue
+      }).appendTo(singleParam);
+
+      removeButton = $('<button/>', {
+        class: "button is-small is-danger is-pulled-right remove"+i,
+        text: "Remove Parameter",
+        style: "margin-right: .5em"
+      }).appendTo(singleParam);
+
+      removeButton.click( function (e) {
+        e.preventDefault();
+        var test = $(this).parent().remove();
+      });
+
+      checkbox = $('<label/>', {
+        class: "checkbox",
+        text: "Toggle?"
+      }).appendTo(singleParam);
+
+      $('<input/>', {
+        class: "checkbox",
+        type: "checkbox",
+        style: "margin: .5em",
+        name: "toggle"+i,
+      }).appendTo(checkbox);
+  }
 }
 
 function addSeqFields() {
-  var formCounter = $("#container input").length;
-  var container = document.getElementById("formRow");
-  var paramText = container.appendChild(document.createTextNode("Parameter " + (formCounter/2)));
-  // var remove = container.appendChild(document.createElement("BUTTON"));
-  // remove.id = "remove" + (formCounter/2);
-  // remove.innerHTML = "x";
-  // remove.className = "remove-button btn btn-xs btn-danger"
-  var inputLabel = document.createElement("input");
-  inputLabel.type = "text";
-  inputLabel.name = "label" + (formCounter/2);
-  inputLabel.className = "form-control"
-  inputLabel.placeholder = "Enter the name of the parameter"
-  container.appendChild(inputLabel);
-  var inputParameters = document.createElement("input");
-  inputParameters.type = "text";
-  inputParameters.name = "parameter" + ((formCounter/2));
-  inputParameters.className = "form-control"
-  inputParameters.placeholder = "Enter selection options for the parameter or leave blank to allow for text input"
-  container.appendChild(inputParameters);
-  container.appendChild(document.createElement("br"));
+  var formCounter = $("#paramForm .single-param").length;
+  var container = document.getElementById("paramForm");
+
+  var singleParam = $('<div/>', {
+      class: "single-param control myParam"+formCounter
+    }).appendTo(container);
+
+      $('<label/>', {
+        class: "label",
+        text: "Parameter Name:"
+      }).appendTo(singleParam);
+
+      $('<input/>', {
+        class: "input",
+        type: "text",
+        name: "label"+formCounter,
+        placeholder: "Name of your parameter"
+      }).appendTo(singleParam);
+
+      $('<label/>', {
+        class: "label",
+        text: "Options:"
+      }).appendTo(singleParam);
+
+      $('<input/>', {
+        class: "input",
+        type: "text",
+        style: "margin-bottom: .25em",
+        name: "parameter"+formCounter,
+        placeholder: "List the options for selection separated by commas (e.g. male, female, unspecificied)."
+      }).appendTo(singleParam);
+
+      removeButton = $('<button/>', {
+        class: "button is-small is-danger is-pulled-right remove"+formCounter,
+        text: "Remove Parameter",
+        style: "margin-right: .5em"
+      }).appendTo(singleParam);
+
+      removeButton.click( function (e) {
+        e.preventDefault();
+        var test = $(this).parent().remove();
+      });
+
+      checkbox = $('<label/>', {
+        class: "checkbox",
+        text: "Toggle?"
+      }).appendTo(singleParam);
+
+      $('<input/>', {
+        class: "checkbox",
+        type: "checkbox",
+        style: "margin: .5em",
+        name: "toggle"+formCounter,
+      }).appendTo(checkbox);
 }
 
 Template.editSequenceParameters.events({
-'click .seqParamsGoBack': function(e) {
+'click .demo-param-button': function(e) {
    e.preventDefault();
    Router.go('editSubjectParameters', {_envId:Router.current().params._envId});
  },
-'click #add_sequence_params': function(e) {
+'click #add-seq-param': function(e) {
   e.preventDefault();
   addSeqFields();
  },
-'click #remove_all': function(e) {
-  e.preventDefault();
-  $("#formRow").remove();
-  $("#formSection").append("<form id=formRow></form>");
-},
-'click #load_default_sequence_params': function(e) {
+'click #load-default-seq': function(e) {
   e.preventDefault();
   loadDefaultSeqParams();
 },
@@ -102,11 +176,11 @@ Template.editSequenceParameters.events({
 //   e.preventDefault();
 //   alert("Not Working");
 // },
-'click #save_subj_all': function(e) {
+'click #save-seq-params': function(e) {
   e.preventDefault();
-  var parameterPairs = (($("#container input").length)/2);
-  var form = document.querySelector('#formRow');
-  var obj = serialize(form, { hash: true });
+  var parameterPairs = $("#paramForm .single-param").length;
+  var form = document.querySelector('#paramForm');
+  var obj = serialize(form, { hash: true, empty: true });
   var extendObj = _.extend(obj, {
     envId: Router.current().params._envId,
     parameterPairs: parameterPairs
@@ -132,60 +206,152 @@ Template.editSequenceParameters.events({
         "showMethod": "fadeIn",
         "hideMethod": "fadeOut"
       }
-      Command: toastr["success"]("Save Successful", "Subject Parameters")
+      Command: toastr["success"]("Save Successful", "Observation Parameters")
     }
-    Router.go('environmentList');
   });
 }
 });
 
 Template.editSequenceParameters.rendered = function() {
-  propigateEditSequenceForm();
+  setDefaultSeqParams();
 }
 
-function propigateEditSequenceForm() {
+function setDefaultSeqParams() {
 
-  var envId = Router.current().params._envId
-  var container = document.getElementById("formRow");
+    var envId = Router.current().params._envId;
+
+  $('<form/>', {
+    id: 'paramForm',
+  }).appendTo('#paramsSection');
+
+  var container = document.getElementById("paramForm");
 
   parametersObj = SequenceParameters.find({'children.envId':envId}).fetch();
-  parameterPairs = parametersObj[0]["children"]["parameterPairs"]
 
-  var split = []
-  for (i=0;i<parameterPairs;i++) {
-    if (parametersObj[0]["children"]["parameter"+i] == null) {
-      split[i] = "text";
-      continue;
-    }
-    str = parametersObj[0]["children"]["parameter"+i]
-    var strSplit = str.split(",");
-    split[i] = strSplit
+  console.log(parametersObj);
+  if ($.isEmptyObject(parametersObj) == true) {
+    parameterPairs = 0;
+  } else {
+    parameterPairs = parametersObj[0]["children"]["parameterPairs"];
   }
-  for (i=0;i<parameterPairs;i++) {
-    var formCounter = $("#container input").length;
-    container.appendChild(document.createTextNode("Parameter " + (formCounter/2)));
-    // var remove = container.appendChild(document.createElement("BUTTON"));
-    // remove.id = "remove" + (formCounter/2);
-    // remove.innerHTML = "x";
-    // remove.className = "remove-button btn btn-xs btn-danger"
-    var inputLabel = document.createElement("input");
-    inputLabel.type = "text";
-    inputLabel.name = "label" + (formCounter/2);
-    inputLabel.className = "form-control"
-    inputLabel.value = parametersObj[0]["children"]["label"+i]
-    container.appendChild(inputLabel);
-    var inputParameters = document.createElement("input");
-    inputParameters.type = "text";
-    inputParameters.name = "parameter" + (formCounter/2);
-    inputParameters.className = "form-control"
-    if (split[i] == "text") {
-      inputParameters.placeholder = "Leave blank to allow for text input."
+
+  if (parameterPairs == 0) {
+    var singleParam = $('<div/>', {
+      class: "single-param control myParam0"
+    }).appendTo(container);
+
+      $('<label/>', {
+        class: "label",
+        text: "Parameter Name:"
+      }).appendTo(singleParam);
+
+      $('<input/>', {
+        class: "input",
+        type: "text",
+        name: "label0",
+        placeholder: "Name of your parameter"
+      }).appendTo(singleParam);
+
+      $('<label/>', {
+        class: "label",
+        text: "Options:"
+      }).appendTo(singleParam);
+
+      $('<input/>', {
+        class: "input",
+        type: "text",
+        style: "margin-bottom: .25em",
+        name: "parameter0",
+        placeholder: "List the options for selection separated by commas (e.g. male, female, unspecificied)."
+      }).appendTo(singleParam);
+
+      removeButton = $('<button/>', {
+        class: "button is-small is-danger is-pulled-right remove0",
+        text: "Remove Parameter",
+        style: "margin-right: .5em"
+      }).appendTo(singleParam);
+
+      removeButton.click( function (e) {
+        e.preventDefault();
+        var test = $(this).parent().remove();
+      });
+
+      checkbox = $('<label/>', {
+        class: "checkbox",
+        text: "Toggle?"
+      }).appendTo(singleParam);
+
+      $('<input/>', {
+        class: "checkbox",
+        type: "checkbox",
+        name: "toggle0",
+        style: "margin: .5em",
+      }).appendTo(checkbox);
+
+  } else {
+    for (i=0;i<parameterPairs;i++) {
+      var singleParam = $('<div/>', {
+      class: "single-param control myParam"+i
+      }).appendTo(container);
+
+      $('<label/>', {
+        class: "label",
+        text: "Parameter Name:"
+      }).appendTo(singleParam);
+
+      $('<input/>', {
+        class: "input",
+        type: "text",
+        name: "label"+i,
+        value: parametersObj[0]["children"]["label"+i]
+      }).appendTo(singleParam);
+
+      $('<label/>', {
+        class: "label",
+        text: "Options:"
+      }).appendTo(singleParam);
+
+      $('<input/>', {
+        class: "input",
+        type: "text",
+        style: "margin-bottom: .25em",
+        name: "parameter"+i,
+        value: parametersObj[0]["children"]["parameter"+i]
+      }).appendTo(singleParam);
+
+      var removeButton = $('<button/>', {
+        class: "button is-small is-danger is-pulled-right remove"+i,
+        text: "Remove Parameter",
+        style: "margin-right: .5em"
+      }).appendTo(singleParam);
+
+      removeButton.click( function (e) {
+        e.preventDefault();
+        var test = $(this).parent().remove();
+      });
+
+      checkbox = $('<label/>', {
+        class: "checkbox",
+        text: "Toggle?"
+      }).appendTo(singleParam);
+
+      var checkVal = "false";
+      if (parametersObj[0]["children"]["toggle"+i] == "on") {
+        $('<input/>', {
+          class: "checkbox",
+          type: "checkbox",
+          name: "toggle"+i,
+          checked: checkVal,
+          style: "margin: .5em"
+        }).appendTo(checkbox);
+      } else {
+        $('<input/>', {
+          class: "checkbox",
+          type: "checkbox",
+          name: "toggle"+i,
+          style: "margin: .5em"
+        }).appendTo(checkbox);
+      }
     }
-    else {
-      var array = split[i]
-      inputParameters.value = array.join();
-    }
-    container.appendChild(inputParameters);
-    container.appendChild(document.createElement("br"));
   }
 }

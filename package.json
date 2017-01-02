@@ -1,7 +1,7 @@
 {
   "name": "dataobs",
-  "version": "1.0.0",
-  "description": "Conner and Justin helping Daniel to make EQUIP Observation App",
+  "version": "2.0.0",
+  "description": "Redesign of EQUIP App for UW-Madison.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

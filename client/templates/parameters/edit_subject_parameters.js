@@ -7,127 +7,160 @@ var serialize = require('form-serialize');
 
 Template.editSubjectParameters.helpers({
   environment: function() {
-     return Environments.find({_id:Router.current().params._envId});
+     var env = Environments.find({_id:Router.current().params._envId}).fetch();
+     var result = env[0];
+     return result;
   }
+
 });
 
-function loadNameParam() {
-  var container = document.getElementById("formRow");
-  var formCounter = $("#container input").length;
-  container.appendChild(document.createTextNode("Parameter " + (formCounter/2)));
-  // var remove = container.appendChild(document.createElement("BUTTON"));
-  // remove.id = "remove" + (formCounter/2);
-  // remove.innerHTML = "x";
-  // remove.className = "remove-button btn btn-xs btn-danger"
-  var inputLabel = document.createElement("input");
-  inputLabel.type = "text";
-  inputLabel.name = "label" + (formCounter/2);
-  inputLabel.className = "form-control"
-  parametersObj = SubjectParameters.find({'children.envId':Router.current().params._envId}).fetch();
-  inputNameValue = parametersObj[0]["children"]["label0"]
-  inputLabel.value = inputNameValue
-  container.appendChild(inputLabel);
-  var inputParameters = document.createElement("input");
-  inputParameters.type = "text";
-  inputParameters.name = "parameter" + (formCounter/2);
-  inputParameters.className = "form-control"
-  inputParameters.placeholder = "Leave blank to allow for text input. Name/ID parameter is required."
-  inputParameters.disabled = true;
-  container.appendChild(inputParameters);
-  container.appendChild(document.createElement("br"));
-}
+
+//Helper function for adding defaults
 
 function loadDefaultSubjParams() {
-  labels = ["Age", "Race", "Gender"]
-  var container = document.getElementById("formRow");
+
+  $('#paramForm').remove();
+
+  $('<form/>', {
+    id: 'paramForm',
+  }).appendTo('#paramsSection');
+
+  var container = document.getElementById("paramForm");
+  labels = ["Age", "Race", "Gender"];
+
   for (i=0;i<3;i++){
-      var formCounter = $("#container input").length;
-      container.appendChild(document.createTextNode("Parameter " + (formCounter/2)));
-      // var remove = container.appendChild(document.createElement("BUTTON"));
-      // remove.id = "remove" + (formCounter/2);
-      // remove.innerHTML = "x";
-      // remove.className = "remove-button btn btn-xs btn-danger"
-      var inputLabel = document.createElement("input");
-      inputLabel.type = "text";
-      inputLabel.name = "label" + (formCounter/2);
-      inputLabel.className = "form-control"
-      inputLabel.value = labels[i]
-      container.appendChild(inputLabel);
-      var inputParameters = document.createElement("input");
-      inputParameters.type = "text";
-      inputParameters.name = "parameter" + (formCounter/2);
-      inputParameters.className = "form-control"
+     var singleParam = $('<div/>', {
+      class: "single-param control myParam"+i
+      }).appendTo(container);
+
+      $('<label/>', {
+        class: "label",
+        text: "Parameter Name:"
+      }).appendTo(singleParam);
+
+      $('<input/>', {
+        class: "input",
+        type: "text",
+        name: "label"+i,
+        value: labels[i],
+      }).appendTo(singleParam);
+
+      $('<label/>', {
+        class: "label",
+        text: "Options:"
+      }).appendTo(singleParam);
+
+      var inputValue = "";
       if (labels[i] == "Age") {
-        inputParameters.value = "0 - 10,10 - 15,15 - 20,20 - 25,Unknown"
+        inputValue = "0 - 10,10 - 15,15 - 20,20 - 25,Unknown"
       }
       if (labels[i] == "Race") {
-        inputParameters.value = "American Indian or Alaska Native,Asian,Black or African American,Native Hawaiian or Other Pacific Islander,White,Hispanic or Latino,Unknown"
+        inputValue = "American Indian or Alaska Native,Asian,Black or African American,Native Hawaiian or Other Pacific Islander,White,Hispanic or Latino,Unknown"
       }
       if (labels[i] == "Gender") {
-        inputParameters.value = "Male,Female,Other,Unknown"
+        inputValue = "Male,Female,Other,Unknown"
       }
-      container.appendChild(inputParameters);
-      container.appendChild(document.createElement("br"));
-    }
+
+      $('<input/>', {
+        class: "input",
+        type: "text",
+        style: "margin-bottom: .25em",
+        name: "parameter"+i,
+        value: inputValue
+      }).appendTo(singleParam);
+
+      removeButton = $('<button/>', {
+        class: "button is-small is-danger is-pulled-right remove"+i,
+        text: "Remove Parameter",
+        style: "margin-right: .5em"
+      }).appendTo(singleParam);
+
+      removeButton.click( function (e) {
+        e.preventDefault();
+        var test = $(this).parent().remove();
+      });
+  }
 }
 
+//Helper function for adding a field in the subj
 function addSubjFields() {
-  var formCounter = $("#container input").length;
-  var container = document.getElementById("formRow");
-  var paramText = container.appendChild(document.createTextNode("Parameter " + (formCounter/2)));
-  // var remove = container.appendChild(document.createElement("BUTTON"));
-  // remove.id = "remove" + (formCounter/2);
-  // remove.innerHTML = "x";
-  // remove.className = "remove-button btn btn-xs btn-danger"
-  var inputLabel = document.createElement("input");
-  inputLabel.type = "text";
-  inputLabel.name = "label" + (formCounter/2);
-  inputLabel.className = "form-control"
-  inputLabel.placeholder = "Enter the name of the parameter."
-  container.appendChild(inputLabel);
-  var inputParameters = document.createElement("input");
-  inputParameters.type = "text";
-  inputParameters.name = "parameter" + ((formCounter/2));
-  inputParameters.className = "form-control"
-  inputParameters.placeholder = "Enter selection options for the parameter or leave blank to allow for text input."
-  container.appendChild(inputParameters);
-  container.appendChild(document.createElement("br"));
+  var formCounter = $("#paramForm .single-param").length;
+  var container = document.getElementById("paramForm");
+
+  var singleParam = $('<div/>', {
+      class: "single-param control myParam"+formCounter
+    }).appendTo(container);
+
+      $('<label/>', {
+        class: "label",
+        text: "Parameter Name:"
+      }).appendTo(singleParam);
+
+      $('<input/>', {
+        class: "input",
+        type: "text",
+        name: "label"+formCounter,
+        placeholder: "Name of your parameter"
+      }).appendTo(singleParam);
+
+      $('<label/>', {
+        class: "label",
+        text: "Options:"
+      }).appendTo(singleParam);
+
+      $('<input/>', {
+        class: "input",
+        type: "text",
+        style: "margin-bottom: .25em",
+        name: "parameter"+formCounter,
+        placeholder: "List the options for selection separated by commas (e.g. male, female, unspecificied)."
+      }).appendTo(singleParam);
+
+      removeButton = $('<button/>', {
+        class: "button is-small is-danger is-pulled-right remove"+formCounter,
+        text: "Remove Parameter",
+        style: "margin-right: .5em"
+      }).appendTo(singleParam);
+
+      removeButton.click( function (e) {
+        e.preventDefault();
+        var test = $(this).parent().remove();
+      });
+
 }
 
 Template.editSubjectParameters.events({
-'click .subjParamsGoBack': function(e) {
+'click .back-head-params': function(e) {
    e.preventDefault();
    Router.go('environmentList');
  },
-'click #add_subject_params': function(e) {
+ 'click .obs-param-button': function(e) {
+   e.preventDefault();
+   console.log(this._id);
+   Router.go('editSequenceParameters', {_envId:Router.current().params._envId});
+ },
+'click #add-demo-param': function(e) {
   e.preventDefault();
   addSubjFields();
  },
-'click #load_default_subject_params': function(e) {
+'click #load-default-demo': function(e) {
   e.preventDefault();
   loadDefaultSubjParams();
 },
-'click #remove_all': function(e) {
+
+'click #save-demo-params': function(e) {
   e.preventDefault();
-  $("#formRow").remove();
-  $("#formSection").append("<form id=formRow></form>");
-  loadNameParam();
-},
-// 'click .remove-button': function(e) {
-//   e.preventDefault();
-//   alert("Not Working");
-// },
-'click #save_subj_all': function(e) {
-  e.preventDefault();
-  var parameterPairs = (($("#container input").length)/2);
-  var form = document.querySelector('#formRow');
-  var obj = serialize(form, { hash: true });
+
+  var parameterPairs = $("#paramForm .single-param").length;
+  var form = document.querySelector('#paramForm');
+  var obj = serialize(form, { hash: true, empty: true });
   var extendObj = _.extend(obj, {
     envId: Router.current().params._envId,
     parameterPairs: parameterPairs
   });
+  console.log(obj);
   var existingObj = SequenceParameters.find({'children.envId':obj.envId}).fetch();
-  if ($.isEmptyObject(existingObj) == false) {
+  if ($.isEmptyObject(existingObj) == true) {
     Meteor.call('updateSubjParameters', obj, function(error, result) {
       if (error){
         alert(error.reason);
@@ -149,7 +182,7 @@ Template.editSubjectParameters.events({
           "showMethod": "fadeIn",
           "hideMethod": "fadeOut"
         }
-        Command: toastr["success"]("Save Successful", "Subject Parameters")
+        Command: toastr["success"]("Save Successful", "Demographic Parameters")
       }
       Router.go('editSequenceParameters', {_envId:Router.current().params._envId});
     });
@@ -175,62 +208,118 @@ Template.editSubjectParameters.events({
           "showMethod": "fadeIn",
           "hideMethod": "fadeOut"
         }
-        Command: toastr["success"]("Save Successful", "Subject Parameters")
+        Command: toastr["success"]("Save Successful", "Demographic Parameters")
       }
-      Router.go('sequenceParameters', {_envId:Router.current().params._envId, _subjParamsId:result._subjParamsId});
+
     });
   }
 }
 });
 
 Template.editSubjectParameters.rendered = function() {
-  propigateEditSubjectForm();
+  setDefaultDemographicParams();
 }
 
-function propigateEditSubjectForm() {
+function setDefaultDemographicParams() {
 
-  var envId = Router.current().params._envId
-  var container = document.getElementById("formRow");
+  var envId = Router.current().params._envId;
+
+  $('<form/>', {
+    id: 'paramForm',
+  }).appendTo('#paramsSection');
+
+  var container = document.getElementById("paramForm");
 
   parametersObj = SubjectParameters.find({'children.envId':envId}).fetch();
-  parameterPairs = parametersObj[0]["children"]["parameterPairs"]
 
-  var split = []
-  for (i=0;i<parameterPairs;i++) {
-    if (parametersObj[0]["children"]["parameter"+i] == null) {
-      split[i] = "text";
-      continue;
-    }
-    str = parametersObj[0]["children"]["parameter"+i]
-    var strSplit = str.split(",");
-    split[i] = strSplit
+  console.log(parametersObj);
+  if ($.isEmptyObject(parametersObj) == true) {
+    parameterPairs = 0;
+  } else {
+    parameterPairs = parametersObj[0]["children"]["parameterPairs"];
   }
-  for (i=0;i<parameterPairs;i++) {
-    var formCounter = $("#container input").length;
-    container.appendChild(document.createTextNode("Parameter " + (formCounter/2)));
-    // var remove = container.appendChild(document.createElement("BUTTON"));
-    // remove.id = "remove" + (formCounter/2);
-    // remove.innerHTML = "x";
-    // remove.className = "remove-button btn btn-xs btn-danger"
-    var inputLabel = document.createElement("input");
-    inputLabel.type = "text";
-    inputLabel.name = "label" + (formCounter/2);
-    inputLabel.className = "form-control"
-    inputLabel.value = parametersObj[0]["children"]["label"+i]
-    container.appendChild(inputLabel);
-    var inputParameters = document.createElement("input");
-    inputParameters.type = "text";
-    inputParameters.name = "parameter" + (formCounter/2);
-    inputParameters.className = "form-control"
-    if (split[i] == "text") {
-      inputParameters.placeholder = "Leave blank to allow for text input. Name/ID parameter is required."
-      inputParameters.disabled = true;
+  if (parameterPairs == 0) {
+    var singleParam = $('<div/>', {
+      class: "single-param control myParam0"
+    }).appendTo(container);
+
+      $('<label/>', {
+        class: "label",
+        text: "Parameter Name:"
+      }).appendTo(singleParam);
+
+      $('<input/>', {
+        class: "input",
+        type: "text",
+        name: "label0",
+        placeholder: "Name of your parameter"
+      }).appendTo(singleParam);
+
+      $('<label/>', {
+        class: "label",
+        text: "Options:"
+      }).appendTo(singleParam);
+
+      $('<input/>', {
+        class: "input",
+        type: "text",
+        style: "margin-bottom: .25em",
+        name: "parameter0",
+        placeholder: "List the options for selection separated by commas (e.g. male, female, unspecificied)."
+      }).appendTo(singleParam);
+
+      removeButton = $('<button/>', {
+        class: "button is-small is-danger is-pulled-right remove0",
+        text: "Remove Parameter",
+        style: "margin-right: .5em"
+      }).appendTo(singleParam);
+
+      removeButton.click( function (e) {
+        e.preventDefault();
+        var test = $(this).parent().remove();
+      });
+
+  } else {
+    for (i=0;i<parameterPairs;i++) {
+      var singleParam = $('<div/>', {
+      class: "single-param control myParam"+i
+      }).appendTo(container);
+
+      $('<label/>', {
+        class: "label",
+        text: "Parameter Name:"
+      }).appendTo(singleParam);
+
+      $('<input/>', {
+        class: "input",
+        type: "text",
+        name: "label"+i,
+        value: parametersObj[0]["children"]["label"+i]
+      }).appendTo(singleParam);
+
+      $('<label/>', {
+        class: "label",
+        text: "Options:"
+      }).appendTo(singleParam);
+
+      $('<input/>', {
+        class: "input",
+        type: "text",
+        style: "margin-bottom: .25em",
+        name: "parameter"+i,
+        value: parametersObj[0]["children"]["parameter"+i]
+      }).appendTo(singleParam);
+
+      var removeButton = $('<button/>', {
+        class: "button is-small is-danger is-pulled-right remove"+i,
+        text: "Remove Parameter",
+        style: "margin-right: .5em; margin-bottom: .5em"
+      }).appendTo(singleParam);
+
+      removeButton.click( function (e) {
+        e.preventDefault();
+        var test = $(this).parent().remove();
+      });
     }
-    else {
-      var array = split[i]
-      inputParameters.value = array.join();
-    }
-    container.appendChild(inputParameters);
-    container.appendChild(document.createElement("br"));
   }
 }

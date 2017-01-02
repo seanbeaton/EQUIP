@@ -1,24 +1,40 @@
 <!-- HTML for the edit subject parameters page, requested when the user goes to change parameters after initial setup -->
 
 <template name="editSubjectParameters">
-  <div id="container" class="container-fluid top-spacer card">
-      <h3>
-        <button type="button" class="btn btn-default glyphicon glyphicon-arrow-left subjParamsGoBack"></button> Subject Parameters for Environment: {{#each environment}}{{envName}}{{/each}}
-      </h3>
-    <div>
-        <button type="button" id="load_default_subject_params" class="btn btn-primary">Load Defaults</button>
-        <button type="button" id="add_subject_params" class="btn btn-success">+</button>
+  <section class="section">
+    <div class="shared-heading">
+      <h2 class="title is-4 back-head-params is-pulled-left">&#8592; Back to Dashboard</h2>
+      <a class="button is-medium help-button is-pulled-right has-text-centered">Help!?</a>
+      <!-- CAN FIX UP THIS HELP BUTTON LATER -->
     </div>
-    <br>
-    <div id="formSection">
-      <form id="formRow">
-      </form>
+  </section>
+
+  <section class="section params-control-panel">
+    <h1 class="title is-2 env-label-head">{{environment.envName}}</h1>
+    <div class="columns">
+      <div class="column is-offset-1 param-switcher">
+        <button class="button is-large has-text-centered demo-param-button active-params">Demographic</button>
+        <button class="button is-large has-text-centered obs-param-button inactive-params">Observation</button>
+      </div>
     </div>
-    <div class="modal-footer" onKeyPress="return checkSubmit(event)">
-      <button type="button" id="remove_all" class="btn btn-default" data-dismiss="modal">Remove All</button>
-      <button type="button" class="btn btn-primary" id="save_subj_all">Next</button>
+    <div class="columns">
+      <div class="column is-offset-1">
+        <button id="load-default-demo" class="button is-medium default-button has-text-centered">Load Defaults</button>
+        <button id="add-demo-param" class="button is-medium is-success has-text-centered">+ Add</button>
+        <button class="button is-medium has-text-centered export-button">Export</button>
+        <button id="save-demo-params" class="button is-medium is-outlined is-info is-pulled-right has-text-centered">Save Parameters</button>
+      </div>
     </div>
-  </div>
+  </section>
+
+  <section class="section">
+    <div class="columns">
+      <div id="paramsSection" class="column is-offset-1 is-three-quarters">
+      </div>
+    </div>
+  </section>
+
+  <!-- OLD CODE -->
   <script>
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
   (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
