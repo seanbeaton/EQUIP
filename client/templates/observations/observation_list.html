@@ -1,11 +1,31 @@
 <!-- HTML of observation list holding observation items and the observation environment item -->
 
 <template name="observationList">
+  <section class="section">
+    <div class="shared-heading">
+      <h2 class="title is-4 back-head-params is-pulled-left">&#8592; Back to Dashboard</h2>
+      <a class="button is-medium help-button is-pulled-right has-text-centered">Help!?</a>
+      <!-- CAN FIX UP THIS HELP BUTTON LATER -->
+    </div>
+  </section>
+  <section class="section">
+    <h1 class="title is-2 env-label-head">{{envName}} Observations</h1>
+    <div class="columns">
+      <div class="column is-offset-1">
+        <button id="obs-create-button" class="button is-large is-success has-text-centered">New Observation</button>
+        <button class="button is-large has-text-centered">Edit Parameters</button>
+        <button class="button is-large has-text-centered">Edit Students</button>
+      </div>
+    </div>
+  </section>
+  <section class="section">
+    <h1 class="title is-3 dash-env-head">Observation List</h1>
+    <button id="show-all-observations" class="button is-medium">Contribution Log</button>
+  </section>
+
+
+
   <div id="container" class="container-fluid top-spacer card">
-    <h2>
-      <button type="button" class="btn btn-default glyphicon glyphicon-arrow-left obsGoBack"></button>  Observations for Environment: {{envName}}
-    </h2>
-    <hr>
     <div>
       {{> observationEnvironmentItem}}
     </div>
@@ -14,6 +34,26 @@
         {{> observationItem}}
       {{/each}}
     </div>
+
+    <div id="obs-create-modal" class="modal">
+      <div class="modal-background"></div>
+      <div class="modal-card">
+        <header class="modal-card-head">
+          <p class="modal-card-title">Create a New Observation</p>
+          <button id="obs-close-modal" class="delete"></button>
+        </header>
+      <section class="modal-card-body">
+        <label class="label">Observation Name</label>
+          <p class="control">
+            <input class="input" type="text" placeholder="E.g., 1/14/2017" id="observationName">
+          </p>
+      </section>
+      <footer class="modal-card-foot">
+        <a id="save-obs-name" class="button is-success">Save changes</a>
+        <a class="button">Cancel</a>
+      </footer>
+    </div>
+  </div>
     <script>
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),

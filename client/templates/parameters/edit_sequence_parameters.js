@@ -160,6 +160,10 @@ function addSeqFields() {
 }
 
 Template.editSequenceParameters.events({
+  'click .back-head-params': function(e) {
+   e.preventDefault();
+   Router.go('environmentList');
+ },
 'click .demo-param-button': function(e) {
    e.preventDefault();
    Router.go('editSubjectParameters', {_envId:Router.current().params._envId});

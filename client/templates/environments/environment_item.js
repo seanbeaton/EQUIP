@@ -33,7 +33,9 @@ Template.environmentItem.events({
     }
   },
    needsSubjects: function() {
-     var obj = Subjects.find({envId: this._id}).fetch();
-     return $.isEmptyObject(obj)?"pulser":"";
+     var obj1 = SubjectParameters.find({'children.envId': this._id}).fetch();
+     var obj2 = SequenceParameters.find({'children.envId': this._id}).fetch();
+     console.log(obj2);
+     return ($.isEmptyObject(obj1) || $.isEmptyObject(obj2)) ?"pulser":"";
    }
  });

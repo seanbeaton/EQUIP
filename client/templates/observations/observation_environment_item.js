@@ -22,26 +22,19 @@ Template.observationEnvironmentItem.events({
      Router.go('editSubjects', {_envId:this._id});
   },
 
-  'click #createNewObservation': function(e) {
-    $('#createObsPopup').modal({
-      keyboard: true,
-      show: true
-    });
-    $('#createObsPopup').on('shown.bs.modal', function () {
-      $('#obsName').focus();
-    })
+  'click #env-create-button': function(e) {
+    $('#env-create-modal').addClass("is-active");
   },
 
-  'click #saveName': function(e) {
+  'click #save-obs-name': function(e) {
 
     var observation = {
       name: $('#obsName').val(),
       envId: this._id
     };
 
-    if ($('#obsName').val() == "") {
-      $('#obsName').addClass("requiredValidation")
-      alert("Observation name required.")
+    if ($('#observationName').val() == "") {
+      alert("Observation name required.");
       return;
     }
     $('#obsName').removeClass("requiredValidation")
@@ -73,13 +66,6 @@ Template.observationEnvironmentItem.events({
  }
 });
 
- // Tutorial covers input box
- // Template.observationEnvironmentItem.rendered=function() {
- //    var obj = Observations.find({}).fetch();
- //    if ($.isEmptyObject(obj)) {
- //      $('[data-toggle="popover6"]').popover('show').on('click',function(){ $(this).popover('hide')});
- //    }
- // }
 
  /*End allSequence Delete Block*/
  function propigateSequenceTableBody() {

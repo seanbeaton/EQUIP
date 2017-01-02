@@ -16,7 +16,6 @@ Template.environmentList.helpers({
     var obs;
     var subjects;
     var user = Meteor.user();
-    console.log(user);
     var total_students = Subjects.find({userId: user._id}).count();
     var total_obs = Sequences.find({userId: user._id}).count();
     _.map(envs, function (env) {

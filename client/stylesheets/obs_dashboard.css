@@ -74,12 +74,22 @@
 
 .edit-button {
     background: #005288;
-    color: white ;
+    color: white;
+}
+
+.edit-button:hover {
+    color:white;
+    opacity: .5;
 }
 
 .enter-button {
     background: #B26300;
     color: white;
+}
+
+.enter-button:hover {
+    color: white;
+    opacity: .5;
 }
 
 @-webkit-keyframes Pulse {
