@@ -1,85 +1,52 @@
 <!-- HTML for the observatory -->
 
 <template name="observatory">
-  <div id="container" class="container-fluid top-spacer card">
-    <h4>
-      <button type="button" class="btn btn-default glyphicon glyphicon-arrow-left obsDone"></button>
-       Observatory: <i>{{name}}</i>
-      <button type="button" class="btn btn-default editSequences">View Sequences</button>
-      <div style="float:right;cursor:default;" class="unselectable">Input Style:<br>
-        <form>
-          <div style="float:right;font-size:12px">
-            <input id="selectStyle" class="input-style" type="radio" name="input-style" value="select"> Select<br>
-          </div>
-          <div style="float:right;font-size:12px">
-            <input id="boxStyle" class="input-style" type="radio" name="input-style" value="box"> Box <br>
-          </div>
-        </form>
+  <section class="section">
+    <div class="shared-heading">
+      <h2 class="title is-4 back-head-params is-pulled-left">&#8592; Back to Classroom</h2>
+      <a class="button is-medium help-button is-pulled-right has-text-centered">Help!?</a>
+      <!-- CAN FIX UP THIS HELP BUTTON LATER -->
+    </div>
+  </section>
+  <section class="section">
+    <div class="columns">
+      <div class="column is-three-quarters">
+        <h1 class="title is-2 env-label-head">{{environment.envName}} - Live Observation</h1>
       </div>
-    </h4>
-  </div>
-  <div class="modal fade" id="createBoxModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-    <div class="vertical-alignment-helper">
-       <div class="modal-dialog vertical-align-center">
-        <div class="modal-dialog" role="document">
-          <div class="modal-content seq-modal">
-            <div class="modal-header">
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-              <h4 class="modal-title">{{subjName}}</h4>
-            </div>
-            <div class="modal-body">
-              <div class="control" id=sequence_modal>
-                {{> sequenceFlexButtons}}
-              </div>
-            </div>
-            <div class="modal-footer" onKeyPress="return checkSubmit(event)">
-              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-              <button type="button" class="btn btn-primary" id="saveSequenceBox">Submit</button>
-            </div>
-          </div>
-        </div>
+      <div class="column is-one-quarter">
+        <h2 id="obs-timer" class="subtitle is-4">00:00:00</h2>
       </div>
     </div>
-  </div>
-  <div class="modal fade" id="createSelectModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-          <h4 class="modal-title">{{subjName}}</h4>
-        </div>
-        <div class="modal-body">
-          <div class="control" id=sequence_modal>
-            {{> sequenceParameterItem}}
-          </div>
-        </div>
-        <div class="modal-footer" onKeyPress="return checkSubmit(event)">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary" id="saveSequenceSelect">Submit</button>
-        </div>
-      </div>
+    <div class="columns is-multiline toggle-dash">
+      <h2 class="column subtitle is-3 toggle-label">TOGGLES</h2>
     </div>
-  </div>
-  <div class="modal fade" id="editSequencesPopup" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-    <div class="modal-dialog modal-large" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-          <h4 class="modal-title">Sequence Information for '{{name}}' Observation</h4>
-        </div>
-        <div class="modal-body">
-          {{>sequenceObservatoryTableItem}}
-        </div>
-        <div class="modal-footer" onKeyPress="return checkSubmit(event)">
-          <button type="button" class="btn btn-primary" id="saveSequenceEdits">Save Changes</button>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div>
+  </section>
+  <div class="subjects">
+    <button class="button is-large floating-log is-pulled-left">Contribution Log</button>
     {{#each subject}}
-      {{> subjectItem}}
+      <div id="{{_id}}" style='transform:translate({{data_x}}px, {{data_y}}px);' data-x="{{data_x}}" data-y="{{data_y}}" class="dragger">
+        {{info.name}}
+      </div>
     {{/each}}
+  </div>
+
+
+  <!-- MODAL FOR SEQ PARAMS -->
+  <div id="seq-param-modal" class="modal">
+    <div class="modal-background"></div>
+      <div id="param-modal-content" class="modal-content">
+
+      </div>
+      <button class="modal-close"></button>
+  </div>
+  
+
+  <!-- MODAL FOR CONTRIBUTION LOG -->
+  <div id="seq-data-modal" class="modal">
+    <div class="modal-background"></div>
+      <div id="data-modal-content" class="modal-content">
+      </div>
+      <button class="modal-close"></button>
   </div>
   <script>
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){

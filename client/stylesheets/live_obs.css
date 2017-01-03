@@ -1,0 +1,39 @@
+.toggle-dash {
+    background: #aaaaaa;
+    border-top: 2px solid black;
+    border-bottom: 2px solid black;
+}
+.toggle-label {
+    color: white;
+    text-indent: .25em
+}
+
+.subjects {
+    height: 100%;
+    width: 100%;
+}
+
+.floating-log {
+    position: fixed;
+    bottom: 0px;
+    color: white;
+    background: #FF8E00;
+}
+
+.floating-log:hover {
+    opacity:.5;
+}
+
+.student-modal-head {
+    color: white;
+}
+
+.delete-seq {
+  color: white;
+  background: red;
+  text-align: center;
+}
+
+.delete-seq:hover {
+  opacity: .5;
+}

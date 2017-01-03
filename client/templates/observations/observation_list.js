@@ -39,7 +39,7 @@ Template.observationList.events({
     var observation = {
       name: $('#observationName').val(),
       envId: this._id,
-      active: true
+      timer: 0
     };
 
     if ($('#observationName').val() == "") {
@@ -52,9 +52,77 @@ Template.observationList.events({
     });
 
     $('#observationName').val('');
-  }
+  },
+   'click .delete-seq': function(e) {
+    var result = confirm("Press 'OK' to delete this Subject.");
+      seqId = $(e.target).attr("data_id");
+      Meteor.call('sequenceDelete', seqId, function(error, result) {
+        return 0;
+      });
+      createTableOfContributions(this._id);
+
+  },
+  'click .modal-close': function(e){
+    $('#seq-param-modal').removeClass('is-active');
+    $('#seq-data-modal').removeClass('is-active');
+  },
+  'click #show-all-observations':function (e){
+    createTableOfContributions(this._id);
+    $('#seq-data-modal').addClass('is-active');
+  },
 });
 
 Template.observationList.rendered = function() {
 
+}
+
+function createTableOfContributions() {
+  $('#data-modal-content').children().remove();
+  var envId = Router.current().params._envId
+  var seqs = Sequences.find({envId:envId}).fetch();
+  console.log(seqs);
+  seqParams = SequenceParameters.find({'children.envId':envId}).fetch()[0];
+  parameterPairs = seqParams["children"]["parameterPairs"];
+
+  allParams = ['Name'];
+  for (p = 0; p<parameterPairs; p++) {
+    allParams.push(seqParams['children']['label'+p]);
+  }
+  allParams.push("Delete");
+
+  var modal = $('#data-modal-content');
+
+  var table = $('<table/>', {
+    class: "table is-striped"
+  }).appendTo(modal);
+  // Create heading
+  $('<thead/>', {}).appendTo(modal);
+  var heading = $('<tr/>', {}).appendTo(table);
+
+  for (pa in allParams) {
+    $('<th/>', {
+      text: allParams[pa]
+    }).appendTo(heading);
+  }
+  var body = $('<tbody/>', {}).appendTo(table);
+  //loop over each student
+  for (s in seqs) {
+    var row = $('<tr/>', {}).appendTo(table);
+    //loop over each parameter
+    for (p in allParams) {
+      if (allParams[p] == "Delete") {
+        //Add delete button
+        var td = $('<td/>', {}).appendTo(row);
+        var bye = $('<i/>', {
+          class: "fa fa-times delete-seq",
+          data_id: seqs[s]['_id']
+        }).appendTo(td);
+      }else {
+        attr = seqs[s]['info'][allParams[p]]
+        $('<td/>', {
+          text: attr
+        }).appendTo(row);
+      }
+    }
+  }
 }

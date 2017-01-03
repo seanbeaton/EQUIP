@@ -19,17 +19,6 @@ Template.editSubjects.helpers({
 Template.editSubjects.created = function() {
 Session.set('envId', Router.current().params._envId);
 
-
-// var subjParams = SubjectParameters.find({'children.envId':Router.current().params._envId}).fetch();
-// var parameterPairs = subjParams[0]['children']['parameterPairs'];
-
-// subjLabels = []
-// for (i=0;i<parameterPairs;i++) {
-//   subjLabels[i] = subjParams[0]['children']['label'+i].replace(/\s+/g, '').replace(/[^\w\s]|_/g, "")
-// }
-// aTagSelectArray = []
-
-/* INTERACTJS START */
 // target elements with the "draggable" class
 interact('.draggable')
   .draggable({
@@ -65,19 +54,6 @@ interact('.draggable')
 
 // On rendering, get students and layout classroom with student boxes
 Template.editSubjects.rendered = function() {
-  var env = Environments.find({_id: Router.current().params._envId}).fetch()
-  var inputStyle = env[0]["inputStyle"]
-  var obj = Subjects.find({envId: Router.current().params._envId}).fetch();
-
-  if (inputStyle == "box") {
-    $('#boxStyle').prop("checked",true);
-  } else {
-    $('#selectStyle').prop("checked",true);
-  }
-  var obj = Subjects.find({}).fetch();
-  if ($.isEmptyObject(obj)) {
-    $('[data-toggle="popover5"]').popover('show').on('click',function(){ $(this).popover('hide')});
-  }
 }
 
 //
@@ -132,7 +108,7 @@ Template.editSubjects.events({
       });
 
       $('.subj-drop-params option:selected').each(function () {
-        $(this).val()
+        choices.push($(this).val());
       });
     }
 
@@ -142,7 +118,7 @@ Template.editSubjects.events({
         } else {
           info[labels[label]] = choices[label];
         }
-      }
+    }
 
     var subject = {
       data_x: '',
@@ -259,11 +235,11 @@ function createTableOfStudents() {
     for (p in allParams) {
       if (allParams[p] == "Delete") {
         //Add delete button
-        var bye = $('<td/>', {
-          text: 'X',
-          class: "delete-subject",
+        var td = $('<td/>', {}).appendTo(row);
+        var bye = $('<i/>', {
+          class: "fa fa-times delete-subject",
           data_id: students[s]['_id']
-        }).appendTo(row);
+        }).appendTo(td);
 
       } else {
         attr = students[s]['info'][allParams[p]]
@@ -300,7 +276,7 @@ function populateParamDropdown() {
 
 
   //
-  //BOX CREATION FOR MODAL
+  //DROPDOWN CREATION FOR MODAL
   //
   //go through each parameter pair and create a box
   for (var param = 0; param<parameterPairs; param++) {

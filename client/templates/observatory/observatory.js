@@ -1,6 +1,9 @@
 /*
 * JS file for observatory.js
 */
+var Stopwatch = require('stopwatchjs');
+var timer = new Stopwatch();
+var timerUpdate;
 
 Template.observatory.created = function() {
   Session.set('envId', Router.current().params._envId);
@@ -14,248 +17,562 @@ Template.observatory.created = function() {
   aTagSelectArray = []
 }
 
-Template.observatory.rendered = function() {
-  var env = Environments.find({_id: Router.current().params._envId}).fetch()
-  var inputStyle = env[0]["inputStyle"]
-  if (inputStyle == "box") {
-    $('#boxStyle').prop("checked",true);
-  } else {
-    $('#selectStyle').prop("checked",true);
-  }
-  var obj = Sequences.find({}).fetch();
-  if ($.isEmptyObject(obj)) {
-    $('.subject').addClass("light -blue-pulse");
-  }
+// Updates Timer
+function clockSet() {
+  var secs = timer.value;
+  var hours = Math.floor(secs / (60*60));
+  var divisor_for_minutes = secs % (60 * 60);
+  var minutes = Math.floor(divisor_for_minutes / 60);
+ 
+  var divisor_for_seconds = divisor_for_minutes % 60;
+  var seconds = Math.ceil(divisor_for_seconds);
+
+  $('#obs-timer').text(''+hours+':'+minutes+':'+seconds);
 }
 
+//Create Timer and Toggle Options
+Template.observatory.rendered = function() {
+  var obs = Observations.find({_id: Router.current().params._obsId}).fetch()[0];
+  var seqParams = SequenceParameters.find({'children.envId': Router.current().params._envId}).fetch()[0];
+  var timerVal = obs.timer;
+
+  timer.value = timerVal;
+  timer.start();
+
+  timerUpdate = setInterval(clockSet, 1000);
+
+  var paramPairs = seqParams.children.parameterPairs;
+  for (var p=0; p<paramPairs;p++){
+    if(seqParams['children']['toggle'+p] == "on") {
+      var params = seqParams['children']['parameter'+p]
+      var label = seqParams['children']['label'+p]
+      createToggle(params, label);
+    }
+  }
+  createToggle("Boxes, Dropdown", "Data Input")
+}
+
+function createToggle(params, label) {
+  var choices = params.split(',');
+  togglers = $('.toggle-dash');
+  var wrap = $('<div/>', {class: 'column'}).appendTo(togglers);
+  $("<p/>",{
+    text: label,
+    class: 'label',
+  }).appendTo(wrap);
+  $('<br/>', {}).appendTo(wrap);
+  var span = $('<span/>', {class:'select'}).appendTo(wrap);
+  if( label =="Data Input"){
+    var select = $('<select/>', {
+      class:"input-method"
+    }).appendTo(span);
+  } else {
+    var select = $('<select/>', {
+      class:"toggle-item",
+      data_label: label
+    }).appendTo(span);
+  }
+  for (var c in choices) {
+    $('<option/>', {
+      value: choices[c],
+      text: choices[c]
+    }).appendTo(select);
+  }
+} 
+
 Template.observatory.helpers({
+  environment: function() {
+    var env = Environments.find({_id: Router.current().params._envId}).fetch()[0];
+    return env;
+  },
   subject: function() {
     return Subjects.find({envId: this.envId});
-  },
-  obsSequence: function() {
-    return Sequences.find({obsId: Router.current().params._obsId});
-  },
-  seqParameter: function() {
-    return SequenceParameters.find({'children.envId': this.envId})
-  },
-  subjName: function() {
-    var subjId = Session.get('subjId');
-    var parametersObj = SubjectParameters.find({'children.envId':Router.current().params._envId}).fetch();
-    var subjIdParameter = parametersObj[0]["children"]["label0"]+"Literal"
-    var subjectObj = Subjects.find({_id:subjId}).fetch();
-    var subjName = subjectObj[0][subjIdParameter]
-    return subjName;
   }
 });
 
 Template.observatory.events({
-  'click .obsDone': function(e) {
+  'click .back-head-params': function(e) {
+    //Save stopwatch value
+    timer.stop();
+    clearInterval(timerUpdate);
+    curr_time = timer.value;
+    update = {obsId: Router.current().params._obsId, timer: curr_time};
+    Meteor.call('timerUpdate', update);
     Router.go('observationList', {_envId:Router.current().params._envId});
   },
-  'click .input-style': function(e) {
-    var obj = {
-      envId: Router.current().params._envId,
-      inputStyle: $(e.target).val()
-    };
-    Meteor.call('updateInputStyle', obj, function(error, result) {
-      if (error) {
-        alert(error.reason);
-      } else {
-        return 0;
-      }
-    });
-  },
-  'click .selectable': function(e) {
-     e.preventDefault();
-     eId = $(e.target).attr("aTagId");
-     eValue = $(e.target).attr("aTagValue");
-     $("."+eId).each(function() {
-       if ($(this).hasClass('deselectable')) {
-         $(this).toggleClass("deselectable");
-         $(this).toggleClass("selectable");
-       }
-     });
-     $(e.currentTarget).toggleClass("selectable");
-     $(e.currentTarget).toggleClass("deselectable");
-     aTagSelectionInsert(eId, eValue);
-   },
-   'click .deselectable': function(e) {
-      e.preventDefault();
-      eId = $(e.target).attr("aTagId");
-      eValue = null;
-      $(e.currentTarget).toggleClass("deselectable");
-      $(e.currentTarget).toggleClass("selectable");
-      aTagSelectionInsert(eId, eValue);
-    },
-  //sequence started in subject_item.js
-  'click #saveSequenceBox': function(e) {
-    var subjId = Session.get('subjId');
-    var observation=Observations.find({"_id":Router.current().params._obsId}).fetch();
-    var obsName=observation[0]["name"];
-    var parametersObj = SubjectParameters.find({'children.envId':Router.current().params._envId}).fetch();
-    var subjIdParameter = parametersObj[0]["children"]["label0"]+"Literal"
-    var subjectObj = Subjects.find({_id:subjId}).fetch();
-    var subjName = subjectObj[0][subjIdParameter]
-    Session.set("subjName", subjName);
+  'click .dragger': function(e) {
+    //Create Sequence
+    var myId = $(e.target).attr('id');
 
-   var sequence = {
-     subjId: subjId,
-     subjName: subjName,
-     envId: Router.current().params._envId,
-     obsId: Router.current().params._obsId,
-     obsName: obsName,
-     valueInput: {},
-     valueLiteral: {}
-   };
-
-   var seqSplit = Session.get('seqSplit');
-   for (i=0;i<seqLabels.length;i++) {
-     label = seqLabels[i];
-     literal = seqLabels[i] + "Literal";
-     optionVal = aTagSelectArray[i]
-     sequence["valueInput"][label] = optionVal
-     if (seqSplit[i][optionVal] == undefined) {
-       sequence["valueLiteral"][literal] = $('#'+label+"ITag").val() || "Undefined";
-       continue
-     }
-     sequence["valueLiteral"][literal] = seqSplit[i][optionVal];
+   if ($('.input-method').val() == "Boxes"){
+      populateParamBoxes(myId);
+   } else {
+      populateParamDropdown(myId);
    }
 
-   Meteor.call('sequenceInsert', sequence, function(error, result) {
+  $('#seq-param-modal').addClass('is-active');
+
+  },
+  'click .modal-close': function(e){
+    $('#seq-param-modal').removeClass('is-active');
+    $('#seq-data-modal').removeClass('is-active');
+  },
+  'click .floating-log': function (e) {
+    //Show editable table
+    createTableOfContributions();
+    $('#seq-data-modal').addClass('is-active');
+  },
+  'click #save-seq-params': function(e) {
+    var info = {};
+    info['studentId'] = $('.student-modal-head').attr('data_id');
+    info['Name'] = $('.student-modal-head').attr('data_name');
+    envId = Router.current().params._envId;
+    obsId = Router.current().params._obsId;
+    var choices = [];
+    var labels = [];
+    $('.toggle-item').each(function () {
+      labels.push($(this).attr('data_label'));
+      choices.push($(this).val());
+    });
+    if ($('.input-method').val() == "Boxes"){
+
+      $('.subj-box-labels').each(function () {
+        labels.push(this.textContent);
+      });
+
+      $('.chosen').each(function () {
+        choices.push(this.textContent);
+      });
+    } else {
+      $('.subj-drop-labels').each(function () {
+        labels.push(this.textContent);
+      });
+
+      $('.subj-drop-params option:selected').each(function () {
+        choices.push($(this).val());
+      });
+
+    }
+    for (label in labels) {
+      info[labels[label]] = choices[label];
+    }
+    var sequence = {
+      envId: envId,
+      time: timer.value,
+      info: info,
+      obsId: obsId
+    };
+
+    Meteor.call('sequenceInsert', sequence, function(error, result) {
      if (error) {
        alert(error.reason);
      } else {
-       propigateSequenceTableBody();
-       $('.subject').removeClass("light -blue-pulse");
+      $('#seq-param-modal').removeClass('is-active');
      }
    });
-   //toggle deselect
-   $('a').each(function() {
-     if ($(this).hasClass('deselectable')) {
-       $(this).toggleClass("deselectable");
-       $(this).toggleClass("selectable");
-     }
-   });
-   $('#createBoxModal').modal('hide');
+
   },
-   'click .editSequences': function(e) {
-    propigateSequenceTableBody();
-    $('#editSequencesPopup').modal({
-      keyboard: true,
-      show: true
-    });
-  },
+    
   'click #saveSequenceEdits': function(e) {
     $('#editSequencesPopup').modal('hide');
   },
   'click #saveSequenceSelect': function(e) {
+  },
+   'click .delete-seq': function(e) {
+    var result = confirm("Press 'OK' to delete this Subject.");
+      seqId = $(e.target).attr("data_id");
+      Meteor.call('sequenceDelete', seqId, function(error, result) {
+        return 0;
+      });
+      createTableOfContributions();
 
-   var subjId = Session.get('subjId');
-   var observation=Observations.find({"_id":Router.current().params._obsId}).fetch();
-   var obsName=observation[0]["name"];
-   var parametersObj = SubjectParameters.find({'children.envId':Router.current().params._envId}).fetch();
-   var subjIdParameter = parametersObj[0]["children"]["label0"]+"Literal"
-   var subjectObj = Subjects.find({_id:subjId}).fetch();
-   var subjName = subjectObj[0][subjIdParameter]
-   Session.set(subjName, subjName);
+  },
+  'click .edit-seq': function(e) {
+    seqId = $(e.target).attr('data_id');
+    myId = $(e.target).attr('data_studentId');
+    console.log(myId);
 
-   var sequence = {
-     subjId: subjId,
-     subjName: subjName,
-     envId: Router.current().params._envId,
-     obsId: Router.current().params._obsId,
-     obsName: obsName,
-     valueInput: {},
-     valueLiteral: {}
-   };
-
-   var seqSplit = Session.get('seqSplit');
-   for (i=0;i<seqLabels.length;i++) {
-     label = seqLabels[i];
-     literal = seqLabels[i] + "Literal";
-     optionVal = $("[name="+label+"]").val();
-     sequence["valueInput"][label] = optionVal
-     if (seqSplit[i][optionVal] == undefined) {
-       sequence["valueLiteral"][literal] = optionVal
-       continue
-     }
-     sequence["valueLiteral"][literal] = seqSplit[i][optionVal];
+    if ($('.input-method').val() == "Boxes"){
+      editParamBoxes(seqId, myId);
+   } else {
+      editParamDropdown(seqId, myId);
    }
+    $('#seq-data-modal').removeClass('is-active');
+    $('#seq-param-modal').addClass('is-active');
 
-   Meteor.call('sequenceInsert', sequence, function(error, result) {
-     if (error) {
-       alert(error.reason);
-     } else {
-       propigateSequenceTableBody();
-       $('.subject').removeClass("light -blue-pulse");
-     }
-   });
-   $('#createSelectModal').modal('hide');
+  
   },
+  'click #edit-seq-params': function(e) {
+    seqId = $(e.target).attr('data_seq');
 
-   'click .editSequences': function(e) {
-    propigateSequenceTableBody();
-    $('#editSequencesPopup').modal({
-      keyboard: true,
-      show: true
-    });
-  },
+    var info = {};
+      info['studentId'] = $('.student-modal-head').attr('data_id');
+      info['Name'] = $('.student-modal-head').attr('data_name');
+      envId = Router.current().params._envId;
+      obsId = Router.current().params._obsId;
+      var choices = [];
+      var labels = [];
+      $('.toggle-item').each(function () {
+        labels.push($(this).attr('data_label'));
+        choices.push($(this).val());
+      });
+      if ($('.input-method').val() == "Boxes"){
 
-  'click #saveSequenceEdits': function(e) {
-    $('#editSequencesPopup').modal('hide');
-  },
-  'click .deleteSequence': function(e) {
-    var result = confirm("Press 'OK' to delete this Sequence.");
-    seqId = $(e.target).attr("seqId");
-    Meteor.call('sequenceDelete', seqId, function(error, result) {
-      return 0;
-    });
-    propigateSequenceTableBody();
+        $('.subj-box-labels').each(function () {
+          labels.push(this.textContent);
+        });
+
+        $('.chosen').each(function () {
+          choices.push(this.textContent);
+        });
+      } else {
+        $('.subj-drop-labels').each(function () {
+          labels.push(this.textContent);
+        });
+
+        $('.subj-drop-params option:selected').each(function () {
+          choices.push($(this).val());
+        });
+
+      }
+      for (label in labels) {
+        info[labels[label]] = choices[label];
+      }
+
+      var sequence = {
+        info: info,
+        seqId: seqId
+      };
+
+      Meteor.call('sequenceUpdate', sequence, function(error, result) {
+       if (error) {
+         alert(error.reason);
+       } else {
+        $('#seq-param-modal').removeClass('is-active');
+       }
+     });
+    //This should happen at the end...
+    $('#seq-param-modal').removeClass('is-active');
+    createTableOfContributions();
+    $('#seq-data-modal').addClass('is-active');
   }
 });
 
- function propigateSequenceTableBody() {
-   $(".tbody").remove();
-   $(".ftable").append("<tbody class=tbody></tbody>");
-   var seqTableCounter=1;
-   var envId = Router.current().params._envId
-   var obsId = Router.current().params._obsId
-   var parametersObj = SequenceParameters.find({'children.envId':envId}).fetch();
-   var parameterPairs = parametersObj[0]["children"]["parameterPairs"]
-   var seqCursor = Sequences.find({obsId: obsId})
-   seqCursor.forEach(function(doc, index) {
-     subjName = doc["subjName"]
-     seqId = doc["_id"];
-     newRowContent = "<tr class=trbody id=td"+index+"><tr>";
-     $(".tbody").append(newRowContent);
-     var split = []
-     for (j=0;j<parameterPairs;j++) {
-       split[j] = parametersObj[0]["children"]["label"+j].replace(/\s+/g, '').replace(/[^\w\s]|_/g, "")
-     }
-     var literal = []
-     for (j=0;j<parameterPairs;j++) {
-       literal[j] = doc["valueLiteral"][split[j]+"Literal"]
-     }
-     $("#"+"td"+index).append("<td></td>");
-     $("#"+"td"+index).append("<td>"+subjName+"</td>");
-     for (j=0;j<literal.length;j++) {
-       $("#"+"td"+index).append("<td>"+literal[j]+"</td>");
-     }
-     date = "<td>"+doc["submitted"]+"</td>"
-     $("#"+"td"+index).append(date);
-     removeButton = "<td><button seqId="+seqId+" id=b"+index+">X</button></td>";
-     $("#"+"td"+index).append(removeButton);
-     $("#"+"b"+index).addClass("btn btn-xs btn-danger deleteSequence");
-     $('tr').each(function () {
-          if (!$.trim($(this).text())) $(this).remove();
-     });
-   });
- };
+function createTableOfContributions() {
+  $('#data-modal-content').children().remove();
+  var envId = Router.current().params._envId
+  var seqs = Sequences.find({obsId:Router.current().params._obsId}).fetch();
+  console.log(seqs);
+  seqParams = SequenceParameters.find({'children.envId':envId}).fetch()[0];
+  parameterPairs = seqParams["children"]["parameterPairs"];
 
-function aTagSelectionInsert(eId, eValue) {
-  for (i=0;i<parameterPairs;i++) {
-    if (seqLabels[i] == eId) {
-      aTagSelectArray[i] = eValue;
+  allParams = ['Edit','Name'];
+  for (p = 0; p<parameterPairs; p++) {
+    allParams.push(seqParams['children']['label'+p]);
+  }
+  allParams.push("Delete");
+
+  var modal = $('#data-modal-content');
+
+  var table = $('<table/>', {
+    class: "table is-striped"
+  }).appendTo(modal);
+  // Create heading
+  $('<thead/>', {}).appendTo(modal);
+  var heading = $('<tr/>', {}).appendTo(table);
+
+  for (pa in allParams) {
+    $('<th/>', {
+      text: allParams[pa]
+    }).appendTo(heading);
+  }
+  var body = $('<tbody/>', {}).appendTo(table);
+  //loop over each student
+  for (s in seqs) {
+    var row = $('<tr/>', {}).appendTo(table);
+    //loop over each parameter
+    for (p in allParams) {
+      if (allParams[p] == "Delete") {
+        //Add delete button
+        var td = $('<td/>', {}).appendTo(row);
+        var bye = $('<i/>', {
+          class: "fa fa-times delete-seq",
+          data_id: seqs[s]['_id']
+        }).appendTo(td);
+      } else if (allParams[p] == "Edit") {
+        var td = $('<td/>', {}).appendTo(row);
+        var bye = $('<i/>', {
+          class: "fa fa-pencil-square-o edit-seq",
+          data_id: seqs[s]['_id'],
+          data_studentId: seqs[s]['info']['studentId']
+        }).appendTo(td);
+      }else {
+        attr = seqs[s]['info'][allParams[p]]
+        $('<td/>', {
+          text: attr
+        }).appendTo(row);
+      }
     }
   }
+}
+
+function populateParamBoxes(subjId) {
+  $('#param-modal-content').children().remove();
+  var envId = Router.current().params._envId
+  seqParams = SequenceParameters.find({'children.envId':envId}).fetch()[0];
+  parameterPairs = seqParams["children"]["parameterPairs"];
+  var subj = Subjects.find({_id: subjId}).fetch()[0];
+  var student = subj.info.name;
+
+  var modal = $('#param-modal-content');
+  
+  var name = $("<div/>", {
+      class: "columns  boxes-wrapper"
+    }).appendTo(modal);
+
+    var label = $("<h1/>", {
+      class: "column is-12 has-text-centered title is-3 student-modal-head",
+      text: "Enter Contribution for "+student,
+      data_id: subjId,
+      data_name: student
+    }).appendTo(name);
+
+  //
+  //BOX CREATION FOR MODAL
+  //
+  //go through each parameter pair and create a box
+  for (var param = 0; param<parameterPairs; param++) {
+    if(seqParams['children']['toggle'+param] == "on"){
+      continue;
+    }
+    var wrap = $("<div/>", {
+      class: "columns  boxes-wrapper"
+    }).appendTo(modal);
+
+    var label = $("<div/>", {
+      class: "column has-text-centered subj-box-labels",
+      text: seqParams['children']['label'+param]
+    }).appendTo(wrap);
+
+    var params = seqParams['children']['parameter'+param]
+    var options = params.split(',');
+
+    for (opt in options) {
+  
+        var option = $("<div/>", {
+          class: "column has-text-centered subj-box-params hoverable",
+          text: options[opt]
+        }).appendTo(wrap);
+
+        option.click(function (e) {
+          e.preventDefault();
+          $(this).siblings().removeClass('chosen');
+          $(this).addClass('chosen');
+        });
+    }//end for
+  }//end for
+
+  $("<button/>", {
+    class: "button is-medium is-success",
+    id: "save-seq-params",
+    text: "Save Contribution"
+  }).appendTo(modal);
+
+}
+
+function populateParamDropdown(subjId) {
+  $('#param-modal-content').children().remove();
+  var envId = Router.current().params._envId
+  seqParams = SequenceParameters.find({'children.envId':envId}).fetch()[0];
+  parameterPairs = seqParams["children"]["parameterPairs"];
+  var subj = Subjects.find({_id: subjId}).fetch()[0];
+  var student = subj.info.name;
+
+  var modal = $('#param-modal-content');
+  
+  var name = $("<div/>", {
+      class: "columns  boxes-wrapper"
+    }).appendTo(modal);
+
+    var label = $("<h1/>", {
+      class: "column is-12 has-text-centered title is-3 student-modal-head",
+      text: "Enter Contribution for "+student,
+      data_id: subjId,
+      data_name: student
+    }).appendTo(name);
+
+
+  //
+  //DROPDOWN CREATION FOR MODAL
+  //
+  //go through each parameter pair and create a box
+  for (var param = 0; param<parameterPairs; param++) {
+    if(seqParams['children']['toggle'+param] == "on"){
+      continue;
+    }
+    var wrap = $("<div/>", {
+      class: "columns "
+    }).appendTo(modal);
+
+    var label = $("<h2/>", {
+      class: "column has-text-centered subj-drop-labels title is-5",
+      text: seqParams['children']['label'+param]
+    }).appendTo(wrap);
+
+    var params = seqParams['children']['parameter'+param]
+    var options = params.split(',');
+    var select = $("<select/>", {
+          class: "column has-text-centered select subj-drop-params",
+          name: seqParams['children']['label'+param]
+        }).appendTo(wrap);
+    for (opt in options) {
+        var option = $("<option/>", {
+          value: options[opt],
+          text: options[opt]
+        }).appendTo(select);
+
+        option.select(function (e) {
+          e.preventDefault();
+          $(this).siblings().removeClass('chosen');
+          $(this).addClass('chosen');
+        });
+    }//end for
+  }//end for
+
+  $("<button/>", {
+    class: "button is-medium is-success",
+    id: "save-seq-params",
+    text: "Save Contribution"
+  }).appendTo(modal);
+}
+
+function editParamBoxes(seqId, subjId) {
+  $('#param-modal-content').children().remove();
+  var envId = Router.current().params._envId
+  seqParams = SequenceParameters.find({'children.envId':envId}).fetch()[0];
+  parameterPairs = seqParams["children"]["parameterPairs"];
+  var subj = Subjects.find({_id: subjId}).fetch()[0];
+  var student = subj.info.name;
+
+  var modal = $('#param-modal-content');
+  
+  var name = $("<div/>", {
+      class: "columns  boxes-wrapper"
+    }).appendTo(modal);
+
+    var label = $("<h1/>", {
+      class: "column is-12 has-text-centered title is-3 student-modal-head",
+      text: "Editing Contribution for "+student,
+      data_id: subjId,
+      data_name: student
+    }).appendTo(name);
+
+  //
+  //BOX CREATION FOR MODAL
+  //
+  //go through each parameter pair and create a box
+  for (var param = 0; param<parameterPairs; param++) {
+    if(seqParams['children']['toggle'+param] == "on"){
+      continue;
+    }
+    var wrap = $("<div/>", {
+      class: "columns  boxes-wrapper"
+    }).appendTo(modal);
+
+    var label = $("<div/>", {
+      class: "column has-text-centered subj-box-labels",
+      text: seqParams['children']['label'+param]
+    }).appendTo(wrap);
+
+    var params = seqParams['children']['parameter'+param]
+    var options = params.split(',');
+
+    for (opt in options) {
+  
+        var option = $("<div/>", {
+          class: "column has-text-centered subj-box-params hoverable",
+          text: options[opt]
+        }).appendTo(wrap);
+
+        option.click(function (e) {
+          e.preventDefault();
+          $(this).siblings().removeClass('chosen');
+          $(this).addClass('chosen');
+        });
+    }//end for
+  }//end for
+
+  $("<button/>", {
+    class: "button is-medium is-success",
+    id: "edit-seq-params",
+    data_seq: seqId,
+    text: "Save Revised Contribution"
+  }).appendTo(modal);
+
+}
+function editParamDropdown(seqId, subjId) {
+  $('#param-modal-content').children().remove();
+  var envId = Router.current().params._envId
+  seqParams = SequenceParameters.find({'children.envId':envId}).fetch()[0];
+  parameterPairs = seqParams["children"]["parameterPairs"];
+  var subj = Subjects.find({_id: subjId}).fetch()[0];
+  var student = subj.info.name;
+
+  var modal = $('#param-modal-content');
+  
+  var name = $("<div/>", {
+      class: "columns  boxes-wrapper"
+    }).appendTo(modal);
+
+    var label = $("<h1/>", {
+      class: "column is-12 has-text-centered title is-3 student-modal-head",
+      text: "Enter Contribution for "+student,
+      data_id: subjId,
+      data_name: student
+    }).appendTo(name);
+
+
+  //
+  //DROPDOWN CREATION FOR MODAL
+  //
+  //go through each parameter pair and create a box
+  for (var param = 0; param<parameterPairs; param++) {
+    if(seqParams['children']['toggle'+param] == "on"){
+      continue;
+    }
+    var wrap = $("<div/>", {
+      class: "columns "
+    }).appendTo(modal);
+
+    var label = $("<h2/>", {
+      class: "column has-text-centered subj-drop-labels title is-5",
+      text: seqParams['children']['label'+param]
+    }).appendTo(wrap);
+
+    var params = seqParams['children']['parameter'+param]
+    var options = params.split(',');
+    var select = $("<select/>", {
+          class: "column has-text-centered select subj-drop-params",
+          name: seqParams['children']['label'+param]
+        }).appendTo(wrap);
+    for (opt in options) {
+        var option = $("<option/>", {
+          value: options[opt],
+          text: options[opt]
+        }).appendTo(select);
+
+        option.select(function (e) {
+          e.preventDefault();
+          $(this).siblings().removeClass('chosen');
+          $(this).addClass('chosen');
+        });
+    }//end for
+  }//end for
+
+  $("<button/>", {
+    class: "button is-medium is-success",
+    id: "edit-seq-params",
+    data_seq: seqId,
+    text: "Save Revised Contribution"
+  }).appendTo(modal);
 }
