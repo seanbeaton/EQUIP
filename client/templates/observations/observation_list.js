@@ -4,7 +4,7 @@
 
 Template.observationList.helpers({
   observation: function() {
-    var obs = Observations.find({envId:this._id}, {sort: {submitted: -1}}).fetch();
+    var obs = Observations.find({envId:this._id}, {sort: {lastModified: -1}}).fetch();
     console.log(obs);
     console.log(this);
     return obs;
@@ -16,7 +16,11 @@ Template.observationList.events({
    e.preventDefault();
    Router.go('environmentList');
  },
- 'click .editObsItem': function(e) {
+ 'click #edit-params-button': function (e){
+    e.preventDefault();
+    Router.go('editSubjectParameters', {_envId:this._id});
+ },
+ 'click #edit-students-button': function(e) {
      e.preventDefault();
      Router.go('editSubjects', {_envId:this._id});
   },
@@ -34,7 +38,8 @@ Template.observationList.events({
 
     var observation = {
       name: $('#observationName').val(),
-      envId: this._id
+      envId: this._id,
+      active: true
     };
 
     if ($('#observationName').val() == "") {

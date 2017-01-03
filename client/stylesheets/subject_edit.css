@@ -1,0 +1,68 @@
+.dragger {
+  width: 5em;
+  height: 5em;
+  margin: 1em;
+
+  background-color: #29e;
+  color: white;
+  text-align: center;
+  font-size: 1.25em;
+
+  border-radius: 0.75em;
+  padding: .5em;
+  display: inline-block;
+
+  -webkit-transform: translate(0px, 0px);
+          transform: translate(0px, 0px);
+}
+
+.boxes-wrapper {
+  margin-top:.25em;
+  margin-bottom: .25em;
+}
+
+.subj-box-labels {
+  background: #009CFF;
+  margin: .5em;
+  color: white;
+  -webkit-transition:all .2s linear;
+  transition:all .2s linear;
+}
+
+.subj-drop-labels {
+  color: white;
+}
+
+.subj-box-params {
+  background: #005288;
+  color: white;
+  margin: .25em;
+  -webkit-transition:all .2s linear;
+  transition:all .2s linear;
+}
+
+#param-modal-content {
+  width: 95%;
+  overflow: visible;
+}
+
+.chosen {
+  background: #FF8e00;
+}
+
+.hoverable:hover {
+  -ms-transform:scale(1.2);
+  -webkit-transform:scale(1.2);
+  transform:scale(1.2);
+  margin-bottom: 0px;
+}
+
+.delete-subject {
+  color: white;
+  background: red;
+  text-align: center;
+}
+
+.delete-subject:hover {
+  opacity: .5;
+}

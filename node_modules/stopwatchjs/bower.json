@@ -1,0 +1,25 @@
+{
+	"name" : "stopwatchjs",
+	"version" : "0.1.1",
+	"description" : "simple stopwatch",
+	"author" : "Guillaume Biton",
+	"keywords" : [
+		"stopwatch",
+		"time"
+	],
+	"repository" : {
+		"type" : "git",
+		"url" : "https://github.com/GuillaumeBiton/stopwatch"
+	},
+	"devDependencies" : {
+		"coffee-script" : "lastest",
+		"uglify-js" : "latest"
+	},
+	"licences" : "MIT",
+	"main" : "stopwatch.js",
+	"ignore" : [
+		"Cakefile",
+		"package.json",
+		"stopwatch.coffee"
+	]
+}

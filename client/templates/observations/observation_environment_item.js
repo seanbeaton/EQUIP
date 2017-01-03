@@ -30,7 +30,8 @@ Template.observationEnvironmentItem.events({
 
     var observation = {
       name: $('#obsName').val(),
-      envId: this._id
+      envId: this._id,
+      active: true
     };
 
     if ($('#observationName').val() == "") {

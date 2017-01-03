@@ -2,16 +2,32 @@
 * JS file for edit_subjects.html
 */
 
+Template.editSubjects.helpers({
+  subject: function() {
+    return Subjects.find({envId: this._id});
+  },
+  subjParameter: function() {
+
+    var studentParams = SubjectParameters.find({'children.envId':this._id}).fetch();
+    console.log(studentParams);
+    return studentParams;
+  },
+});
+
+//Used to set up interactJS and get labels for students
+// (and a session for some reason???)
 Template.editSubjects.created = function() {
 Session.set('envId', Router.current().params._envId);
 
-var labelsObj = SubjectParameters.find({'children.envId':Router.current().params._envId}).fetch();
-var parameterPairs = labelsObj[0]['children']['parameterPairs'];
-subjLabels = []
-for (i=0;i<parameterPairs;i++) {
-  subjLabels[i] = labelsObj[0]['children']['label'+i].replace(/\s+/g, '').replace(/[^\w\s]|_/g, "")
-}
-aTagSelectArray = []
+
+// var subjParams = SubjectParameters.find({'children.envId':Router.current().params._envId}).fetch();
+// var parameterPairs = subjParams[0]['children']['parameterPairs'];
+
+// subjLabels = []
+// for (i=0;i<parameterPairs;i++) {
+//   subjLabels[i] = subjParams[0]['children']['label'+i].replace(/\s+/g, '').replace(/[^\w\s]|_/g, "")
+// }
+// aTagSelectArray = []
 
 /* INTERACTJS START */
 // target elements with the "draggable" class
@@ -19,34 +35,16 @@ interact('.draggable')
   .draggable({
     // enable inertial throwing
     inertia: true,
-    // keep the element within the area of it's parent
-    // restrict: {
-    //   restriction: "parent",
-    //   endOnly: true,
-    //   elementRect: { top: 0, left: 0, bottom: 1, right: 1 }
-    // },
-    // enable autoScroll
     autoScroll: true,
-
-    // call this function on every dragmove event
     onmove: dragMoveListener,
-    // call this function on every dragend event
-    // onend: function (e) {
-    //   var textEl = event.target.querySelector('p');
-    //
-    //   textEl && (textEl.textContent =
-    //     'moved a distance of '
-    //     + (Math.sqrt(event.dx * event.dx +
-    //                  event.dy * event.dy)|0) + 'px');
-    //
-    // }
+ 
   });
 
   function dragMoveListener (event) {
     var target = event.target,
         // keep the dragged position in the data_x/data_y attributes
-        x = (parseFloat(target.getAttribute('data_x')) || 0) + event.dx,
-        y = (parseFloat(target.getAttribute('data_y')) || 0) + event.dy;
+        x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx,
+        y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
 
     // translate the element
     target.style.webkitTransform =
@@ -54,8 +52,8 @@ interact('.draggable')
       'translate(' + x + 'px, ' + y + 'px)';
 
     // update the posiion attributes
-    target.setAttribute('data_x', x);
-    target.setAttribute('data_y', y);
+    target.setAttribute('data-x', x);
+    target.setAttribute('data-y', y);
   }
 
 
@@ -65,9 +63,12 @@ interact('.draggable')
 
 };
 
+// On rendering, get students and layout classroom with student boxes
 Template.editSubjects.rendered = function() {
   var env = Environments.find({_id: Router.current().params._envId}).fetch()
   var inputStyle = env[0]["inputStyle"]
+  var obj = Subjects.find({envId: Router.current().params._envId}).fetch();
+
   if (inputStyle == "box") {
     $('#boxStyle').prop("checked",true);
   } else {
@@ -79,267 +80,327 @@ Template.editSubjects.rendered = function() {
   }
 }
 
+//
+// Click events
+//
 Template.editSubjects.events({
-  'click #esGoBack': function(e) {
+
+  'click .back-head-params': function(e) {
     Router.go('observationList', {_envId:Router.current().params._envId});
   },
 
-  'click .deleteSubject': function(e) {
-    Meteor.call('subjectDelete', this._id, function(error, result) {
-      return 0;
-    });
-  },
-  'click .input-style': function(e) {
-    var obj = {
-      envId: Router.current().params._envId,
-      inputStyle: $(e.target).val()
-    };
-    Meteor.call('updateInputStyle', obj, function(error, result) {
-      if (error) {
-        alert(error.reason);
-      } else {
-        return 0;
-      }
-    });
-  },
-  'click .selectable': function(e) {
-     e.preventDefault();
-     eId = $(e.target).attr("aTagId");
-     eValue = $(e.target).attr("aTagValue");
-     $("."+eId).each(function() {
-       if ($(this).hasClass('deselectable')) {
-         $(this).toggleClass("deselectable");
-         $(this).toggleClass("selectable");
-       }
-     });
-     $(e.currentTarget).toggleClass("selectable");
-     $(e.currentTarget).toggleClass("deselectable");
-     aTagSelectionInsert(eId, eValue);
-   },
-   'click .deselectable': function(e) {
-      e.preventDefault();
-      eId = $(e.target).attr("aTagId");
-      eValue = null;
-      $(e.currentTarget).toggleClass("deselectable");
-      $(e.currentTarget).toggleClass("selectable");
-      aTagSelectionInsert(eId, eValue);
-    },
-  'click #moveSubjects': function(e) {
-    $(".subject").addClass("draggable");
-    $("#moveSubjects").html("Save Subject Positions");
-    $("#moveSubjects").attr("id", "saveSubjectsPosition");
-  },
-   'click #saveSubjectsPosition': function(e) {
-     $('.subject').each(function() {
-       console.log($(this).attr('data_x'));
-       var subjectPosition = {
-         data_x: $(this).attr('data_x'),
-         data_y: $(this).attr('data_y'),
-         _id: this.id
-       };
-       console.log(subjectPosition);
-       Meteor.call('subjectPositionUpdate', subjectPosition, function(error, result) {
-         return 0;
-       });
-     });
-     toastr.options = {
-       "closeButton": false,
-       "debug": false,
-       "newestOnTop": false,
-       "progressBar": false,
-       "positionClass": "toast-top-right",
-       "preventDuplicates": false,
-       "onclick": null,
-       "showDuration": "300",
-       "hideDuration": "1000",
-       "timeOut": "2000",
-       "extendedTimeOut": "1000",
-       "showEasing": "swing",
-       "hideEasing": "linear",
-       "showMethod": "fadeIn",
-       "hideMethod": "fadeOut"
-     }
-     Command: toastr["success"]("Save Successful", "Subject Parameters")
-     $(".subject").removeClass("draggable");
-     $("#saveSubjectsPosition").html("Move Subjects");
-     $("#saveSubjectsPosition").attr("id", "moveSubjects");
-   },
+  //Stuff for student parameters modal
 
+  'click .modal-close': function(e){
+    $('#stud-param-modal').removeClass('is-active');
+    $('#stud-data-modal').removeClass('is-active');
+  },
+  'click #add-student': function(e) {
+    $('#param-modal-content').children().remove();
 
-  'click #createNewSubject': function(e) {
-   var envObj = Environments.find({_id:Router.current().params._envId}).fetch();
-   var subjParamsObj = SubjectParameters.find({'children.envId':this._id}).fetch();
-   var subjIdParam = subjParamsObj[0]['children']['label0'].replace(/\s+/g, '').replace(/[^\w\s]|_/g, "");
-   var inputStyle = envObj[0]["inputStyle"];
-   if (inputStyle == "box") {
-     $('#createBoxModal').modal({
-       keyboard: true,
-       show: true
-     });
-   }
-   if (inputStyle == "select") {
-     $('#createSelectModal').modal({
-       keyboard: true,
-       show: true
-     });
-     $('#createSelectModal').on('shown.bs.modal', function () {
-       $('#'+subjIdParam).focus();
-     })
+   $('#stud-param-modal').addClass('is-active');
+   if ($('#selection-style').val() == "Boxes"){
+      populateParamBoxes();
+   } else {
+      populateParamDropdown();
    }
  },
 
-  'click #saveSubjectSelect': function(e) {
+  'click #save-subj-params': function(e) {
 
-   var subjLabels = []
-   var labelsObj = SubjectParameters.find({'children.envId':this._id}).fetch();
-   for (i=0;i<labelsObj[0]['children']['parameterPairs'];i++) {
-     subjLabels[i] = labelsObj[0]['children']['label'+i].replace(/\s+/g, '').replace(/[^\w\s]|_/g, "")
-   }
+    // If using boxes
+    name = $('#student-name').val();
+    var info = {};
+    var choices = [];
+    var labels = [];
+    choices.push(name);
 
-   var subject = {
-     data_x: '',
-     data_y: '',
-     envId: this._id
-   };
+    if ($('#selection-style').val() == "Boxes"){
 
-   var subjSplit = Session.get('subjSplit');
-   for (i=0;i<subjLabels.length;i++) {
-     label = subjLabels[i];
-     literal = subjLabels[i] + "Literal";
-     optionVal = $('#'+label).val();
-     subject[label] = optionVal
-     if (subjSplit[i][optionVal] == undefined) {
-       subject[literal] = optionVal
-       continue
-     }
-     subject[literal] = subjSplit[i][optionVal];
-   }
+      $('.subj-box-labels').each(function () {
+        console.log(this.textContent);
+        labels.push(this.textContent);
+      });
 
-   Meteor.call('subjectInsert', subject, function(error, result) {
+      $('.chosen').each(function () {
+        choices.push(this.textContent);
+      });
+    } else {
+    // if using dropdowns
+    $('.subj-drop-labels').each(function () {
+        labels.push(this.textContent);
+      });
+
+      $('.subj-drop-params option:selected').each(function () {
+        $(this).val()
+      });
+    }
+
+    for (label in labels) {
+        if (label == 0) {
+          info['name'] = choices[label];
+        } else {
+          info[labels[label]] = choices[label];
+        }
+      }
+
+    var subject = {
+      data_x: '',
+      data_y: '',
+      envId: this._id,
+      info: info
+    };
+
+
+    Meteor.call('subjectInsert', subject, function(error, result) {
      if (error) {
        alert(error.reason);
      } else {
-     propigateSubjectTableBody();
+      $('#stud-param-modal').removeClass('is-active');
      }
    });
-
-
-   $('#createSelectModal').modal('hide');
-   for (i=0;i<subjLabels.length;i++) {
-     label = subjLabels[i];
-     $('#'+label).val('');
-   }
  },
- 'click #saveSubjectBox': function(e) {
-
-  var subject = {
-    data_x: '',
-    data_y: '',
-    envId: this._id
-  };
-
-  var subjSplit = Session.get('subjSplit');
-  for (i=0;i<subjLabels.length;i++) {
-    label = subjLabels[i];
-    literal = subjLabels[i] + "Literal";
-    optionVal = aTagSelectArray[i]
-    subject[label] = optionVal
-    if (subjSplit[i][optionVal] == undefined) {
-      subject[literal] = $('#'+label+"ITag").val() || "Undefined";
-      continue
-    }
-    subject[literal] = subjSplit[i][optionVal];
-  }
-
-  Meteor.call('subjectInsert', subject, function(error, result) {
-    if (error) {
-      alert(error.reason);
-    } else {
-    propigateSubjectTableBody();
-    }
-  });
-
-  //toggle deselect
-  $('a').each(function() {
-    if ($(this).hasClass('deselectable')) {
-      $(this).toggleClass("deselectable");
-      $(this).toggleClass("selectable");
-    }
-  });
-  $('#createBoxModal').modal('hide');
-},
-
-'click #editSubjects': function(e) {
-  propigateSubjectTableBody();
-  $('#editSubjPopup').modal({
-    keyboard: true,
-    show: true
-  });
-},
-'click .deleteSubject': function(e) {
-  var result = confirm("Press 'OK' to delete this Subject.");
-  subjId = $(e.target).attr("subjId");
-  Meteor.call('subjectDelete', subjId, function(error, result) {
-    return 0;
-  });
-  propigateSubjectTableBody();
-},
-'click #saveSubjEdits': function(e) {
-  $('#editSubjPopup').modal('hide');
-}
-});
-
-Template.editSubjects.helpers({
-  subject: function() {
-    return Subjects.find({envId: this._id});
+  'click #edit-remove-student': function(e) {
+    createTableOfStudents();
+    $('#stud-data-modal').addClass('is-active');
   },
-  subjParameter: function() {
-    return SubjectParameters.find({'children.envId':this._id})
-  },
-  needsSubjects: function() {
-    var obj = Subjects.find({envId: Router.current().params._envId}).fetch();
-    return $.isEmptyObject(obj)?"green-pulse":"";
-  }
-});
-
-function propigateSubjectTableBody() {
-  $(".tbody").remove();
-  $(".ftable").append("<tbody class=tbody></tbody>");
-  var envId = Router.current().params._envId
-  parametersObj = SubjectParameters.find({'children.envId':envId}).fetch();
-  parameterPairs = parametersObj[0]["children"]["parameterPairs"]
-  var subjCursor = Subjects.find({envId: envId});
-  subjCursor.forEach(function(doc, index) {
-    subjId = doc["_id"];
-    newRowContent = "<tr class=trbody id=td"+index+"><tr>";
-    $(".tbody").append(newRowContent);
-    var split = []
-    for (j=0;j<parameterPairs;j++) {
-      split[j] = parametersObj[0]["children"]["label"+j].replace(/\s+/g, '').replace(/[^\w\s]|_/g, "")
-    }
-    var literal = []
-    for (j=0;j<parameterPairs;j++) {
-      literal[j] = doc[split[j]+"Literal"]
-    }
-
-    $("#"+"td"+index).append("<td></td>");
-    for (j=0;j<literal.length;j++) {
-      $("#"+"td"+index).append("<td>"+literal[j]+"</td>");
-    }
-    removeButton = "<td><button subjId="+subjId+" id=b"+index+">X</button></td>";
-    $("#"+"td"+index).append(removeButton);
-    $("#"+"b"+index).addClass("btn btn-xs btn-danger deleteSubject");
-    $('tr').each(function () {
-         if (!$.trim($(this).text())) $(this).remove();
+  'click #save-locations': function(e) {
+    var subjects = [];
+    $('.draggable').each(function () {
+      id = $(this).attr('id');
+      x = $(this).attr('data-x');
+      y = $(this).attr('data-y');
+      subject = {'id': id, 'x': x, 'y': y};
+      subjects.push(subject);
     });
-  });
-};
 
+    Meteor.call('subjectPositionUpdate', subjects, function(error, result) {
+        if (error) {
+          alert(error.reason);
+        } else {
+          toastr.options = {
+          "closeButton": false,
+          "debug": false,
+          "newestOnTop": false,
+          "progressBar": false,
+          "positionClass": "toast-bottom-right",
+          "preventDuplicates": false,
+          "onclick": null,
+          "showDuration": "300",
+          "hideDuration": "1000",
+          "timeOut": "2000",
+          "extendedTimeOut": "1000",
+          "showEasing": "swing",
+          "hideEasing": "linear",
+          "showMethod": "fadeIn",
+          "hideMethod": "fadeOut"
+        }
+        Command: toastr["success"]("Save Successful", "Student locations saved as they currently are.")
+        }
+      }); 
+  },
 
-function aTagSelectionInsert(eId, eValue) {
-  for (i=0;i<parameterPairs;i++) {
-    if (subjLabels[i] == eId) {
-      aTagSelectArray[i] = eValue;
+  'click #editSubjects': function(e) {
+    propigateSubjectTableBody();
+    $('#editSubjPopup').modal({
+      keyboard: true,
+      show: true
+    });
+  },
+  'click .delete-subject': function(e) {
+    var result = confirm("Press 'OK' to delete this Subject.");
+      subjId = $(e.target).attr("data_id");
+      Meteor.call('subjectDelete', subjId, function(error, result) {
+        return 0;
+      });
+
+      createTableOfStudents();
+  }
+
+});
+
+//
+// Support functions for creating tables/menus
+//
+
+function createTableOfStudents() {
+  $('#data-modal-content').children().remove();
+  var envId = Router.current().params._envId
+  var students = Subjects.find({envId:envId}).fetch();
+  subjParams = SubjectParameters.find({'children.envId':envId}).fetch()[0];
+  parameterPairs = subjParams["children"]["parameterPairs"];
+  console.log(students);
+
+  allParams = ['name'];
+  for (p = 0; p<parameterPairs; p++) {
+    allParams.push(subjParams['children']['label'+p]);
+  }
+  allParams.push("Delete");
+
+  var modal = $('#data-modal-content');
+
+  var table = $('<table/>', {
+    class: "table is-striped"
+  }).appendTo(modal);
+  // Create heading
+  $('<thead/>', {}).appendTo(modal);
+  var heading = $('<tr/>', {}).appendTo(table);
+
+  for (pa in allParams) {
+    $('<th/>', {
+      text: allParams[pa]
+    }).appendTo(heading);
+  }
+  var body = $('<tbody/>', {}).appendTo(table);
+  //loop over each student
+  for (s in students) {
+    var row = $('<tr/>', {}).appendTo(table);
+    //loop over each parameter
+    for (p in allParams) {
+      if (allParams[p] == "Delete") {
+        //Add delete button
+        var bye = $('<td/>', {
+          text: 'X',
+          class: "delete-subject",
+          data_id: students[s]['_id']
+        }).appendTo(row);
+
+      } else {
+        attr = students[s]['info'][allParams[p]]
+        $('<td/>', {
+          text: attr
+        }).appendTo(row);
+      }
     }
   }
 }
+
+function populateParamDropdown() {
+  var envId = Router.current().params._envId
+  subjParams = SubjectParameters.find({'children.envId':envId}).fetch()[0];
+  parameterPairs = subjParams["children"]["parameterPairs"];
+
+  var modal = $('#param-modal-content');
+  
+  var name = $("<div/>", {
+      class: "columns  boxes-wrapper"
+    }).appendTo(modal);
+
+    var label = $("<div/>", {
+      class: "column has-text-centered subj-drop-labels title is-5",
+      text: "Name"
+    }).appendTo(name);
+
+    $('<input/>', {
+        class: "column input",
+        id: "student-name",
+        type: "text",
+        placeholder: "Eg, Joey or Male Student"
+      }).appendTo(name);
+
+
+  //
+  //BOX CREATION FOR MODAL
+  //
+  //go through each parameter pair and create a box
+  for (var param = 0; param<parameterPairs; param++) {
+    var wrap = $("<div/>", {
+      class: "columns "
+    }).appendTo(modal);
+
+    var label = $("<h2/>", {
+      class: "column has-text-centered subj-drop-labels title is-5",
+      text: subjParams['children']['label'+param]
+    }).appendTo(wrap);
+
+    var params = subjParams['children']['parameter'+param]
+    var options = params.split(',');
+    var select = $("<select/>", {
+          class: "column has-text-centered select subj-drop-params",
+          name: subjParams['children']['label'+param]
+        }).appendTo(wrap);
+    for (opt in options) {
+        var option = $("<option/>", {
+          value: options[opt],
+          text: options[opt]
+        }).appendTo(select);
+
+        option.select(function (e) {
+          e.preventDefault();
+          $(this).siblings().removeClass('chosen');
+          $(this).addClass('chosen');
+        });
+    }//end for
+  }//end for
+
+  $("<button/>", {
+    class: "button is-medium is-success",
+    id: "save-subj-params",
+    text: "Add Subject"
+  }).appendTo(modal);
+}
+
+function populateParamBoxes() {
+  var envId = Router.current().params._envId
+  subjParams = SubjectParameters.find({'children.envId':envId}).fetch()[0];
+  parameterPairs = subjParams["children"]["parameterPairs"];
+
+  var modal = $('#param-modal-content');
+  
+  var name = $("<div/>", {
+      class: "columns  boxes-wrapper"
+    }).appendTo(modal);
+
+    var label = $("<div/>", {
+      class: "column has-text-centered subj-box-labels",
+      text: "Name or Identifier for Student"
+    }).appendTo(name);
+
+    $('<input/>', {
+        class: "column input",
+        id: "student-name",
+        type: "text",
+        placeholder: "Eg, Joey or Male Student"
+      }).appendTo(name);
+
+
+  //
+  //BOX CREATION FOR MODAL
+  //
+  //go through each parameter pair and create a box
+  for (var param = 0; param<parameterPairs; param++) {
+    var wrap = $("<div/>", {
+      class: "columns  boxes-wrapper"
+    }).appendTo(modal);
+
+    var label = $("<div/>", {
+      class: "column has-text-centered subj-box-labels",
+      text: subjParams['children']['label'+param]
+    }).appendTo(wrap);
+
+    var params = subjParams['children']['parameter'+param]
+    var options = params.split(',');
+
+    for (opt in options) {
+  
+        var option = $("<div/>", {
+          class: "column has-text-centered subj-box-params hoverable",
+          text: options[opt]
+        }).appendTo(wrap);
+
+        option.click(function (e) {
+          e.preventDefault();
+          $(this).siblings().removeClass('chosen');
+          $(this).addClass('chosen');
+        });
+    }//end for
+  }//end for
+
+  $("<button/>", {
+    class: "button is-medium is-success",
+    id: "save-subj-params",
+    text: "Add Subject"
+  }).appendTo(modal);
+
+}
+

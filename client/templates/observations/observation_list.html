@@ -1,6 +1,7 @@
 <!-- HTML of observation list holding observation items and the observation environment item -->
 
 <template name="observationList">
+  <!-- MAIN PAGE -->
   <section class="section">
     <div class="shared-heading">
       <h2 class="title is-4 back-head-params is-pulled-left">&#8592; Back to Dashboard</h2>
@@ -13,8 +14,8 @@
     <div class="columns">
       <div class="column is-offset-1">
         <button id="obs-create-button" class="button is-large is-success has-text-centered">New Observation</button>
-        <button class="button is-large has-text-centered">Edit Parameters</button>
-        <button class="button is-large has-text-centered">Edit Students</button>
+        <button id="edit-params-button" class="button is-large has-text-centered">Edit Parameters</button>
+        <button id="edit-students-button" class="button is-large has-text-centered">Edit Students</button>
       </div>
     </div>
   </section>
@@ -22,19 +23,17 @@
     <h1 class="title is-3 dash-env-head">Observation List</h1>
     <button id="show-all-observations" class="button is-medium">Contribution Log</button>
   </section>
-
-
-
-  <div id="container" class="container-fluid top-spacer card">
-    <div>
-      {{> observationEnvironmentItem}}
+  <section class="section">
+    <div class="columns is-multiline is-mobile">
+      <div class="column is-offset-1 is-three-quarters box">
+        {{#each observation}}
+          {{> observationItem}}
+        {{/each}}
+      </div>
     </div>
-    <div>
-      {{#each observation}}
-        {{> observationItem}}
-      {{/each}}
-    </div>
+  </section>
 
+  <!-- MODAL FOR CREATE NEW OBSERVATION -->
     <div id="obs-create-modal" class="modal">
       <div class="modal-background"></div>
       <div class="modal-card">
@@ -63,5 +62,4 @@
     ga('create', 'UA-80377470-1', 'auto');
     ga('send', 'pageview');
     </script>
-  </div>
 </template>

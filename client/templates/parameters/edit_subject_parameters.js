@@ -113,7 +113,7 @@ function addSubjFields() {
         type: "text",
         style: "margin-bottom: .25em",
         name: "parameter"+formCounter,
-        placeholder: "List the options for selection separated by commas (e.g. male, female, unspecificied)."
+        placeholder: "List the options for selection separated by commas (e.g. male, female, unspecificied) or leave blank to for text input."
       }).appendTo(singleParam);
 
       removeButton = $('<button/>', {
@@ -265,7 +265,7 @@ function setDefaultDemographicParams() {
         type: "text",
         style: "margin-bottom: .25em",
         name: "parameter0",
-        placeholder: "List the options for selection separated by commas (e.g. male, female, unspecificied)."
+        placeholder: "List the options for selection separated by commas (e.g. male, female, unspecificied) or leave blank to for text input."
       }).appendTo(singleParam);
 
       removeButton = $('<button/>', {

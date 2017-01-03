@@ -1,11 +1,30 @@
 <!-- HTML for observation item on the observation list -->
 
 <template name="observationItem">
-  <div class="alert-custom-obsItem">
-    <div>{{name}}</div>
-    <div>
-      Created On: {{submitted}}&nbsp;&nbsp;<button type="button" class="btn btn-default enterObsItem preform-obs-btn {{needsSequences}}" data-toggle="popover7" data-content="Click 'Preform Observation', then click on your subjects to record an observation related to the specific subject." data-placement="bottom">Perform Observation</button>
-      <button type="button" class="btn btn-xs obs-delete-btn  deleteObsItem">X</button>
+    <div class="single-env">
+        <div class="level">
+          <div class="level-left">
+            <h1 class="title is-3 env-name">{{name}}</h1>
+          </div>
+          <div class="level-right">
+            <button id="delete-obs-button" class="button is-medium is-danger">Delete</button>
+          </div>
+        </div>
+        <div class="columns">
+            <div class="column">
+                <p>Created On: {{submitted}}</p>
+                <p>Last Modified: {{lastModified}} </p>
+            </div>
+        </div>
+        <div class="columns">
+      <div class="column"></div>
+      <div class="column">
+            <button id="enter-class" class="button is-large enter-button">Enter Observation</button>
+      </div>
+      <div class="column">
+            <button id="enter-class" class="button is-large enter-button">View/Edit Contributions</button>
+      </div>
+      <div class="column"></div>
     </div>
-  </div>
+    </div>
 </template>

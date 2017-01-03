@@ -6,7 +6,7 @@ Template.observationItem.events({
    'click .enterObsItem': function(e) {
      Router.go('observatory', {_envId: this.envId, _obsId: this._id});
    },
-   'click .deleteObsItem': function(e) {
+   'click #delete-obs-button': function(e) {
      var result = confirm("Deleting an observation will also delete all sequences taken in the specific observation. Press 'OK' to continue.");
      obsId = this._id
     if (result) {
@@ -18,17 +18,14 @@ Template.observationItem.events({
  });
 
  Template.observationItem.helpers({
+
    needsSequences: function() {
      var obj = Sequences.find({envId: Router.current().params._envId}).fetch();
-     console.log(this._id);
-     console.log(obj);
+     console.log(this)
      return $.isEmptyObject(obj)?"light-green-pulse":"";
    }
   });
 
  Template.observationItem.rendered=function() {
-    var obj = Sequences.find({}).fetch();
-    if ($.isEmptyObject(obj)) {
-      $('[data-toggle="popover7"]').popover('show').on('click',function(){ $(this).popover('hide')});
-    }
+    
  }
