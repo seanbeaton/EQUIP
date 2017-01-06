@@ -26,7 +26,6 @@ Template.observationItem.events({
   'click .edit-seq': function(e) {
     seqId = $(e.target).attr('data_id');
     myId = $(e.target).attr('data_studentId');
-    console.log(myId);
     editParamBoxes(seqId, myId);
   
     $('#seq-data-modal').removeClass('is-active');
@@ -90,7 +89,6 @@ Template.observationItem.events({
 
    needsSequences: function() {
      var obj = Sequences.find({envId: Router.current().params._envId}).fetch();
-     console.log(this)
      return $.isEmptyObject(obj)?"light-green-pulse":"";
    }
   });
@@ -99,7 +97,6 @@ function createTableOfContributions(obsId) {
   $('#data-modal-content').children().remove();
   var envId = Router.current().params._envId
   var seqs = Sequences.find({obsId: obsId}).fetch();
-  console.log(seqs);
   seqParams = SequenceParameters.find({'children.envId':envId}).fetch()[0];
   parameterPairs = seqParams["children"]["parameterPairs"];
 

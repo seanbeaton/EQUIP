@@ -19,7 +19,6 @@ Template.environmentList.helpers({
     var total_students = Subjects.find({userId: user._id}).count();
     var total_obs = Sequences.find({userId: user._id}).count();
     _.map(envs, function (env) {
-      console.log(env._id);
     });
 
     var results = {list: envs, num_env: parseInt(envs.length), num_students: parseInt(total_students), num_obs: parseInt(total_obs)};

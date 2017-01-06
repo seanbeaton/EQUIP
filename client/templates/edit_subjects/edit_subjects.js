@@ -9,7 +9,6 @@ Template.editSubjects.helpers({
   subjParameter: function() {
 
     var studentParams = SubjectParameters.find({'children.envId':this._id}).fetch();
-    console.log(studentParams);
     return studentParams;
   },
 });
@@ -94,7 +93,6 @@ Template.editSubjects.events({
     if ($('#selection-style').val() == "Boxes"){
 
       $('.subj-box-labels').each(function () {
-        console.log(this.textContent);
         labels.push(this.textContent);
       });
 
@@ -205,7 +203,6 @@ function createTableOfStudents() {
   var students = Subjects.find({envId:envId}).fetch();
   subjParams = SubjectParameters.find({'children.envId':envId}).fetch()[0];
   parameterPairs = subjParams["children"]["parameterPairs"];
-  console.log(students);
 
   allParams = ['name'];
   for (p = 0; p<parameterPairs; p++) {

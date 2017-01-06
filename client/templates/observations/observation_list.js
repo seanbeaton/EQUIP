@@ -5,7 +5,6 @@
 Template.observationList.helpers({
   observation: function() {
     var obs = Observations.find({envId:this._id}, {sort: {lastModified: -1}}).fetch();
-    console.log(obs);
     return obs;
   }
 });
@@ -79,7 +78,6 @@ function createTableOfContributions() {
   $('#data-modal-content').children().remove();
   var envId = Router.current().params._envId
   var seqs = Sequences.find({envId:envId}).fetch();
-  console.log(seqs);
   seqParams = SequenceParameters.find({'children.envId':envId}).fetch()[0];
   parameterPairs = seqParams["children"]["parameterPairs"];
 

@@ -134,7 +134,7 @@ Template.editSubjectParameters.events({
  },
  'click .obs-param-button': function(e) {
    e.preventDefault();
-   console.log(this._id);
+
    Router.go('editSequenceParameters', {_envId:Router.current().params._envId});
  },
 'click #add-demo-param': function(e) {
@@ -156,7 +156,6 @@ Template.editSubjectParameters.events({
     envId: Router.current().params._envId,
     parameterPairs: parameterPairs
   });
-  console.log(obj);
   var existingObj = SequenceParameters.find({'children.envId':obj.envId}).fetch();
   if ($.isEmptyObject(existingObj) == true) {
     Meteor.call('updateSubjParameters', obj, function(error, result) {
@@ -230,7 +229,6 @@ function setDefaultDemographicParams() {
 
   parametersObj = SubjectParameters.find({'children.envId':envId}).fetch();
 
-  console.log(parametersObj);
   if ($.isEmptyObject(parametersObj) == true) {
     parameterPairs = 0;
   } else {

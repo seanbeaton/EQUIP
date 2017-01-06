@@ -242,7 +242,6 @@ function setDefaultSeqParams() {
 
   parametersObj = SequenceParameters.find({'children.envId':envId}).fetch();
 
-  console.log(parametersObj);
   if ($.isEmptyObject(parametersObj) == true) {
     parameterPairs = 0;
   } else {
