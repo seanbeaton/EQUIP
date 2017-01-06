@@ -43,7 +43,12 @@
 
 #param-modal-content {
   width: 95%;
-  overflow: visible;
+  overflow: scroll;
+}
+
+#param-modal-content {
+  width: 95%;
+  overflow: scroll;
 }
 
 .chosen {
@@ -65,4 +70,14 @@
 
 .delete-subject:hover {
   opacity: .5;
+}
+
+#student-name {
+  margin-top: 2%;
+}
+
+.drag-label {
+  word-wrap: break-word;
+  max-height: 100%;
+  overflow: hidden;
 }

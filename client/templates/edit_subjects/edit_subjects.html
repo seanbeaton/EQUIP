@@ -30,7 +30,7 @@
   <div class="subjects">
     {{#each subject}}
       <div id="{{_id}}" style='transform:translate({{data_x}}px, {{data_y}}px);' data-x="{{data_x}}" data-y="{{data_y}}" class="draggable dragger">
-        {{info.name}}
+        <p class="drag-label">{{info.name}}</p>
       </div>
     {{/each}}
   </div>

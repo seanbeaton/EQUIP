@@ -328,7 +328,7 @@ function populateParamBoxes() {
     }).appendTo(modal);
 
     var label = $("<div/>", {
-      class: "column has-text-centered subj-box-labels",
+      class: "column is-2 has-text-centered subj-box-labels",
       text: "Name or Identifier for Student"
     }).appendTo(name);
 
@@ -350,7 +350,7 @@ function populateParamBoxes() {
     }).appendTo(modal);
 
     var label = $("<div/>", {
-      class: "column has-text-centered subj-box-labels",
+      class: "column is-2 has-text-centered subj-box-labels",
       text: subjParams['children']['label'+param]
     }).appendTo(wrap);
 

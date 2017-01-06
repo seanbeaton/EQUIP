@@ -37,3 +37,9 @@
 .delete-seq:hover {
   opacity: .5;
 }
+
+.student-box {
+    word-wrap: break-word;
+    max-height: 100%;
+    overflow: hidden;
+}

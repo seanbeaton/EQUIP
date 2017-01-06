@@ -26,7 +26,7 @@ function loadDefaultSubjParams() {
   }).appendTo('#paramsSection');
 
   var container = document.getElementById("paramForm");
-  labels = ["Age", "Race", "Gender"];
+  labels = ["Race", "Gender"];
 
   for (i=0;i<3;i++){
      var singleParam = $('<div/>', {
@@ -51,9 +51,7 @@ function loadDefaultSubjParams() {
       }).appendTo(singleParam);
 
       var inputValue = "";
-      if (labels[i] == "Age") {
-        inputValue = "0 - 10,10 - 15,15 - 20,20 - 25,Unknown"
-      }
+     
       if (labels[i] == "Race") {
         inputValue = "American Indian or Alaska Native,Asian,Black or African American,Native Hawaiian or Other Pacific Islander,White,Hispanic or Latino,Unknown"
       }

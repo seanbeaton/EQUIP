@@ -35,7 +35,6 @@ Template.observatory.rendered = function() {
   var obs = Observations.find({_id: Router.current().params._obsId}).fetch()[0];
   var seqParams = SequenceParameters.find({'children.envId': Router.current().params._envId}).fetch()[0];
   var timerVal = obs.timer;
-
   timer.value = timerVal;
   timer.start();
 
@@ -102,7 +101,12 @@ Template.observatory.events({
   },
   'click .dragger': function(e) {
     //Create Sequence
-    var myId = $(e.target).attr('id');
+    var myId;
+    if ($(e.target).is('p')) {
+      myId = $(e.target).parent().attr('id')
+    } else {
+      myId = $(e.target).attr('id');
+    }
 
    if ($('.input-method').val() == "Boxes"){
       populateParamBoxes(myId);
@@ -128,6 +132,7 @@ Template.observatory.events({
     info['Name'] = $('.student-modal-head').attr('data_name');
     envId = Router.current().params._envId;
     obsId = Router.current().params._obsId;
+    var obsRaw = Observations.find({_id: obsId}).fetch()[0];
     var choices = [];
     var labels = [];
     $('.toggle-item').each(function () {
@@ -160,7 +165,8 @@ Template.observatory.events({
       envId: envId,
       time: timer.value,
       info: info,
-      obsId: obsId
+      obsId: obsId,
+      obsName: obsRaw.name
     };
 
     Meteor.call('sequenceInsert', sequence, function(error, result) {
@@ -173,11 +179,6 @@ Template.observatory.events({
 
   },
     
-  'click #saveSequenceEdits': function(e) {
-    $('#editSequencesPopup').modal('hide');
-  },
-  'click #saveSequenceSelect': function(e) {
-  },
    'click .delete-seq': function(e) {
     var result = confirm("Press 'OK' to delete this Subject.");
       seqId = $(e.target).attr("data_id");
@@ -190,7 +191,6 @@ Template.observatory.events({
   'click .edit-seq': function(e) {
     seqId = $(e.target).attr('data_id');
     myId = $(e.target).attr('data_studentId');
-    console.log(myId);
 
     if ($('.input-method').val() == "Boxes"){
       editParamBoxes(seqId, myId);
@@ -262,11 +262,10 @@ function createTableOfContributions() {
   $('#data-modal-content').children().remove();
   var envId = Router.current().params._envId
   var seqs = Sequences.find({obsId:Router.current().params._obsId}).fetch();
-  console.log(seqs);
   seqParams = SequenceParameters.find({'children.envId':envId}).fetch()[0];
   parameterPairs = seqParams["children"]["parameterPairs"];
 
-  allParams = ['Edit','Name'];
+  allParams = ['Edit','Name', 'Time'];
   for (p = 0; p<parameterPairs; p++) {
     allParams.push(seqParams['children']['label'+p]);
   }
@@ -299,7 +298,12 @@ function createTableOfContributions() {
           class: "fa fa-times delete-seq",
           data_id: seqs[s]['_id']
         }).appendTo(td);
-      } else if (allParams[p] == "Edit") {
+      } else if (allParams[p] == "Time") {
+        attr = seqs[s]['time']
+        $('<td/>', {
+          text: attr
+        }).appendTo(row);
+      }else if (allParams[p] == "Edit") {
         var td = $('<td/>', {}).appendTo(row);
         var bye = $('<i/>', {
           class: "fa fa-pencil-square-o edit-seq",
@@ -350,7 +354,7 @@ function populateParamBoxes(subjId) {
     }).appendTo(modal);
 
     var label = $("<div/>", {
-      class: "column has-text-centered subj-box-labels",
+      class: "column is-2 has-text-centered subj-box-labels",
       text: seqParams['children']['label'+param]
     }).appendTo(wrap);
 
@@ -480,7 +484,7 @@ function editParamBoxes(seqId, subjId) {
     }).appendTo(modal);
 
     var label = $("<div/>", {
-      class: "column has-text-centered subj-box-labels",
+      class: "column is-2 has-text-centered subj-box-labels",
       text: seqParams['children']['label'+param]
     }).appendTo(wrap);
 

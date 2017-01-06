@@ -22,7 +22,7 @@ function loadDefaultSeqParams() {
   }).appendTo('#paramsSection');
 
   var container = document.getElementById("paramForm");
-  labels = ["WCD Type", "Solicitation Method", "Wait Time", "Length of Talk", "Student Talk", "Teacher Soliciation", "Explicit Evaluation"]
+  labels = ["Discourse Type", "Solicitation Method", "Wait Time", "Length of Talk", "Student Talk", "Teacher Soliciation", "Explicit Evaluation"]
 
   for (i=0;i<7;i++){
      var singleParam = $('<div/>', {
@@ -47,8 +47,8 @@ function loadDefaultSeqParams() {
       }).appendTo(singleParam);
 
       var inputValue = "";
-      if (labels[i] == "WCD Type") {
-        inputValue = "Math,Non-Math"
+      if (labels[i] == "Discourse Type") {
+        inputValue = "Logistics, Content"
       }
       if (labels[i] == "Solicitation Method") {
         inputValue  = "Called On,Not Called On"
@@ -93,12 +93,22 @@ function loadDefaultSeqParams() {
         text: "Toggle?"
       }).appendTo(singleParam);
 
-      $('<input/>', {
-        class: "checkbox",
-        type: "checkbox",
-        style: "margin: .5em",
-        name: "toggle"+i,
-      }).appendTo(checkbox);
+      if (labels[i] == "Discourse Type") {
+        $('<input/>', {
+          class: "checkbox",
+          type: "checkbox",
+          style: "margin: .5em",
+          name: "toggle"+i,
+          checked: true
+        }).appendTo(checkbox);
+      } else {
+        $('<input/>', {
+          class: "checkbox",
+          type: "checkbox",
+          style: "margin: .5em",
+          name: "toggle"+i,
+        }).appendTo(checkbox);
+      }
   }
 }
 

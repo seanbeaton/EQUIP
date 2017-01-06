@@ -1,0 +1,9 @@
+#data-modal-content {
+    width: 95%;
+    overflow: scroll;
+}
+
+.modal-content {
+    font-size: 1.33em;
+    overflow: scroll;
+}

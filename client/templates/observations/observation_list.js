@@ -6,7 +6,6 @@ Template.observationList.helpers({
   observation: function() {
     var obs = Observations.find({envId:this._id}, {sort: {lastModified: -1}}).fetch();
     console.log(obs);
-    console.log(this);
     return obs;
   }
 });
@@ -84,7 +83,7 @@ function createTableOfContributions() {
   seqParams = SequenceParameters.find({'children.envId':envId}).fetch()[0];
   parameterPairs = seqParams["children"]["parameterPairs"];
 
-  allParams = ['Name'];
+  allParams = ['Name', "Time", "Observation"];
   for (p = 0; p<parameterPairs; p++) {
     allParams.push(seqParams['children']['label'+p]);
   }
@@ -117,7 +116,17 @@ function createTableOfContributions() {
           class: "fa fa-times delete-seq",
           data_id: seqs[s]['_id']
         }).appendTo(td);
-      }else {
+      } else if (allParams[p] == "Time") {
+        attr = seqs[s]['time']
+        $('<td/>', {
+          text: attr
+        }).appendTo(row);
+      } else if (allParams[p] == "Observation") {
+        attr = seqs[s]['obsName'];
+        $('<td/>', {
+          text: attr
+        }).appendTo(row);
+      } else {
         attr = seqs[s]['info'][allParams[p]]
         $('<td/>', {
           text: attr

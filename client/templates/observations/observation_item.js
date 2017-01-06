@@ -103,7 +103,7 @@ function createTableOfContributions(obsId) {
   seqParams = SequenceParameters.find({'children.envId':envId}).fetch()[0];
   parameterPairs = seqParams["children"]["parameterPairs"];
 
-  allParams = ['Edit','Name'];
+  allParams = ['Edit','Name', 'Time'];
   for (p = 0; p<parameterPairs; p++) {
     allParams.push(seqParams['children']['label'+p]);
   }
@@ -143,6 +143,11 @@ function createTableOfContributions(obsId) {
           data_id: seqs[s]['_id'],
           data_studentId: seqs[s]['info']['studentId']
         }).appendTo(td);
+      }else if (allParams[p] == "Time") {
+        attr = seqs[s]['time']
+        $('<td/>', {
+          text: attr
+        }).appendTo(row);
       }else {
         attr = seqs[s]['info'][allParams[p]]
         $('<td/>', {
@@ -187,7 +192,7 @@ function populateParamBoxes(subjId) {
     }).appendTo(modal);
 
     var label = $("<div/>", {
-      class: "column has-text-centered subj-box-labels",
+      class: "column is-2 has-text-centered subj-box-labels",
       text: seqParams['children']['label'+param]
     }).appendTo(wrap);
 
@@ -249,7 +254,7 @@ function editParamBoxes(seqId, subjId) {
     }).appendTo(modal);
 
     var label = $("<div/>", {
-      class: "column has-text-centered subj-box-labels",
+      class: "column is-2 has-text-centered subj-box-labels",
       text: seqParams['children']['label'+param]
     }).appendTo(wrap);
 
