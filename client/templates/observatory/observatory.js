@@ -4,6 +4,7 @@
 var Stopwatch = require('stopwatchjs');
 var timer = new Stopwatch();
 var timerUpdate;
+var lastChoices = {};
 
 Template.observatory.created = function() {
   Session.set('envId', Router.current().params._envId);
@@ -48,7 +49,6 @@ Template.observatory.rendered = function() {
       createToggle(params, label);
     }
   }
-  createToggle("Boxes, Dropdown", "Data Input")
 }
 
 function createToggle(params, label) {
@@ -61,16 +61,12 @@ function createToggle(params, label) {
   }).appendTo(wrap);
   $('<br/>', {}).appendTo(wrap);
   var span = $('<span/>', {class:'select'}).appendTo(wrap);
-  if( label =="Data Input"){
-    var select = $('<select/>', {
-      class:"input-method"
-    }).appendTo(span);
-  } else {
-    var select = $('<select/>', {
+  
+  var select = $('<select/>', {
       class:"toggle-item",
       data_label: label
     }).appendTo(span);
-  }
+  
   for (var c in choices) {
     $('<option/>', {
       value: choices[c],
@@ -108,11 +104,9 @@ Template.observatory.events({
       myId = $(e.target).attr('id');
     }
 
-   if ($('.input-method').val() == "Boxes"){
+   
       populateParamBoxes(myId);
-   } else {
-      populateParamDropdown(myId);
-   }
+   
 
   $('#seq-param-modal').addClass('is-active');
 
@@ -139,28 +133,22 @@ Template.observatory.events({
       labels.push($(this).attr('data_label'));
       choices.push($(this).val());
     });
-    if ($('.input-method').val() == "Boxes"){
+    
 
-      $('.subj-box-labels').each(function () {
-        labels.push(this.textContent);
-      });
+    $('.subj-box-labels').each(function () {
+      labels.push(this.textContent);
+    });
 
-      $('.chosen').each(function () {
-        choices.push(this.textContent);
-      });
-    } else {
-      $('.subj-drop-labels').each(function () {
-        labels.push(this.textContent);
-      });
-
-      $('.subj-drop-params option:selected').each(function () {
-        choices.push($(this).val());
-      });
-
-    }
+    $('.chosen').each(function () {
+      choices.push(this.textContent);
+    });
+    
     for (label in labels) {
       info[labels[label]] = choices[label];
     }
+
+    lastChoices = info;
+
     var sequence = {
       envId: envId,
       time: timer.value,
@@ -191,12 +179,10 @@ Template.observatory.events({
   'click .edit-seq': function(e) {
     seqId = $(e.target).attr('data_id');
     myId = $(e.target).attr('data_studentId');
-
-    if ($('.input-method').val() == "Boxes"){
+    
+    
       editParamBoxes(seqId, myId);
-   } else {
-      editParamDropdown(seqId, myId);
-   }
+   
     $('#seq-data-modal').removeClass('is-active');
     $('#seq-param-modal').addClass('is-active');
 
@@ -216,7 +202,7 @@ Template.observatory.events({
         labels.push($(this).attr('data_label'));
         choices.push($(this).val());
       });
-      if ($('.input-method').val() == "Boxes"){
+      
 
         $('.subj-box-labels').each(function () {
           labels.push(this.textContent);
@@ -225,16 +211,7 @@ Template.observatory.events({
         $('.chosen').each(function () {
           choices.push(this.textContent);
         });
-      } else {
-        $('.subj-drop-labels').each(function () {
-          labels.push(this.textContent);
-        });
-
-        $('.subj-drop-params option:selected').each(function () {
-          choices.push($(this).val());
-        });
-
-      }
+      
       for (label in labels) {
         info[labels[label]] = choices[label];
       }
@@ -358,15 +335,25 @@ function populateParamBoxes(subjId) {
       text: seqParams['children']['label'+param]
     }).appendTo(wrap);
 
+    var field = seqParams['children']['label'+param];
+
     var params = seqParams['children']['parameter'+param]
     var options = params.split(',');
 
     for (opt in options) {
-  
+      
+      if ( lastChoices[field] == options[opt]) {
         var option = $("<div/>", {
-          class: "column has-text-centered subj-box-params hoverable",
+          class: "column has-text-centered subj-box-params chosen hoverable",
           text: options[opt]
         }).appendTo(wrap);
+        } else {
+  
+          var option = $("<div/>", {
+            class: "column has-text-centered subj-box-params hoverable",
+            text: options[opt]
+          }).appendTo(wrap);
+        }
 
         option.click(function (e) {
           e.preventDefault();
@@ -384,73 +371,9 @@ function populateParamBoxes(subjId) {
 
 }
 
-function populateParamDropdown(subjId) {
-  $('#param-modal-content').children().remove();
-  var envId = Router.current().params._envId
-  seqParams = SequenceParameters.find({'children.envId':envId}).fetch()[0];
-  parameterPairs = seqParams["children"]["parameterPairs"];
-  var subj = Subjects.find({_id: subjId}).fetch()[0];
-  var student = subj.info.name;
-
-  var modal = $('#param-modal-content');
-  
-  var name = $("<div/>", {
-      class: "columns  boxes-wrapper"
-    }).appendTo(modal);
-
-    var label = $("<h1/>", {
-      class: "column is-12 has-text-centered title is-3 student-modal-head",
-      text: "Enter Contribution for "+student,
-      data_id: subjId,
-      data_name: student
-    }).appendTo(name);
-
-
-  //
-  //DROPDOWN CREATION FOR MODAL
-  //
-  //go through each parameter pair and create a box
-  for (var param = 0; param<parameterPairs; param++) {
-    if(seqParams['children']['toggle'+param] == "on"){
-      continue;
-    }
-    var wrap = $("<div/>", {
-      class: "columns "
-    }).appendTo(modal);
-
-    var label = $("<h2/>", {
-      class: "column has-text-centered subj-drop-labels title is-5",
-      text: seqParams['children']['label'+param]
-    }).appendTo(wrap);
-
-    var params = seqParams['children']['parameter'+param]
-    var options = params.split(',');
-    var select = $("<select/>", {
-          class: "column has-text-centered select subj-drop-params",
-          name: seqParams['children']['label'+param]
-        }).appendTo(wrap);
-    for (opt in options) {
-        var option = $("<option/>", {
-          value: options[opt],
-          text: options[opt]
-        }).appendTo(select);
-
-        option.select(function (e) {
-          e.preventDefault();
-          $(this).siblings().removeClass('chosen');
-          $(this).addClass('chosen');
-        });
-    }//end for
-  }//end for
-
-  $("<button/>", {
-    class: "button is-medium is-success",
-    id: "save-seq-params",
-    text: "Save Contribution"
-  }).appendTo(modal);
-}
 
 function editParamBoxes(seqId, subjId) {
+  var seq = Sequences.find({_id: seqId}).fetch()[0]
   $('#param-modal-content').children().remove();
   var envId = Router.current().params._envId
   seqParams = SequenceParameters.find({'children.envId':envId}).fetch()[0];
@@ -488,16 +411,25 @@ function editParamBoxes(seqId, subjId) {
       text: seqParams['children']['label'+param]
     }).appendTo(wrap);
 
-    var params = seqParams['children']['parameter'+param]
+    var field = seqParams['children']['label'+param];
+
+    var params = seqParams['children']['parameter'+param];
     var options = params.split(',');
 
     for (opt in options) {
-  
-        var option = $("<div/>", {
-          class: "column has-text-centered subj-box-params hoverable",
+
+        if (seq['info'][field] == options[opt]) {
+          var option = $("<div/>", {
+          class: "column has-text-centered subj-box-params chosen hoverable",
           text: options[opt]
         }).appendTo(wrap);
-
+        } else {
+  
+          var option = $("<div/>", {
+            class: "column has-text-centered subj-box-params hoverable",
+            text: options[opt]
+          }).appendTo(wrap);
+        }
         option.click(function (e) {
           e.preventDefault();
           $(this).siblings().removeClass('chosen');
@@ -513,70 +445,4 @@ function editParamBoxes(seqId, subjId) {
     text: "Save Revised Contribution"
   }).appendTo(modal);
 
-}
-function editParamDropdown(seqId, subjId) {
-  $('#param-modal-content').children().remove();
-  var envId = Router.current().params._envId
-  seqParams = SequenceParameters.find({'children.envId':envId}).fetch()[0];
-  parameterPairs = seqParams["children"]["parameterPairs"];
-  var subj = Subjects.find({_id: subjId}).fetch()[0];
-  var student = subj.info.name;
-
-  var modal = $('#param-modal-content');
-  
-  var name = $("<div/>", {
-      class: "columns  boxes-wrapper"
-    }).appendTo(modal);
-
-    var label = $("<h1/>", {
-      class: "column is-12 has-text-centered title is-3 student-modal-head",
-      text: "Enter Contribution for "+student,
-      data_id: subjId,
-      data_name: student
-    }).appendTo(name);
-
-
-  //
-  //DROPDOWN CREATION FOR MODAL
-  //
-  //go through each parameter pair and create a box
-  for (var param = 0; param<parameterPairs; param++) {
-    if(seqParams['children']['toggle'+param] == "on"){
-      continue;
-    }
-    var wrap = $("<div/>", {
-      class: "columns "
-    }).appendTo(modal);
-
-    var label = $("<h2/>", {
-      class: "column has-text-centered subj-drop-labels title is-5",
-      text: seqParams['children']['label'+param]
-    }).appendTo(wrap);
-
-    var params = seqParams['children']['parameter'+param]
-    var options = params.split(',');
-    var select = $("<select/>", {
-          class: "column has-text-centered select subj-drop-params",
-          name: seqParams['children']['label'+param]
-        }).appendTo(wrap);
-    for (opt in options) {
-        var option = $("<option/>", {
-          value: options[opt],
-          text: options[opt]
-        }).appendTo(select);
-
-        option.select(function (e) {
-          e.preventDefault();
-          $(this).siblings().removeClass('chosen');
-          $(this).addClass('chosen');
-        });
-    }//end for
-  }//end for
-
-  $("<button/>", {
-    class: "button is-medium is-success",
-    id: "edit-seq-params",
-    data_seq: seqId,
-    text: "Save Revised Contribution"
-  }).appendTo(modal);
 }

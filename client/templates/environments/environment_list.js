@@ -13,14 +13,12 @@ Template.environmentList.rendered = function() {
 Template.environmentList.helpers({
   environment: function() {
     var envs = Environments.find({}, {sort: {submitted: -1}}).fetch();
+    console.log(envs)
     var obs;
     var subjects;
     var user = Meteor.user();
     var total_students = Subjects.find({userId: user._id}).count();
     var total_obs = Sequences.find({userId: user._id}).count();
-    _.map(envs, function (env) {
-    });
-
     var results = {list: envs, num_env: parseInt(envs.length), num_students: parseInt(total_students), num_obs: parseInt(total_obs)};
 
     return results;

@@ -74,11 +74,9 @@ Template.editSubjects.events({
     $('#param-modal-content').children().remove();
 
    $('#stud-param-modal').addClass('is-active');
-   if ($('#selection-style').val() == "Boxes"){
-      populateParamBoxes();
-   } else {
-      populateParamDropdown();
-   }
+   
+    populateParamBoxes();
+  
  },
 
   'click #save-subj-params': function(e) {
@@ -90,25 +88,16 @@ Template.editSubjects.events({
     var labels = [];
     choices.push(name);
 
-    if ($('#selection-style').val() == "Boxes"){
+    
 
-      $('.subj-box-labels').each(function () {
-        labels.push(this.textContent);
-      });
+    $('.subj-box-labels').each(function () {
+      labels.push(this.textContent);
+    });
 
-      $('.chosen').each(function () {
-        choices.push(this.textContent);
-      });
-    } else {
-    // if using dropdowns
-    $('.subj-drop-labels').each(function () {
-        labels.push(this.textContent);
-      });
-
-      $('.subj-drop-params option:selected').each(function () {
-        choices.push($(this).val());
-      });
-    }
+    $('.chosen').each(function () {
+      choices.push(this.textContent);
+    });
+    
 
     for (label in labels) {
         if (label == 0) {
@@ -248,70 +237,7 @@ function createTableOfStudents() {
   }
 }
 
-function populateParamDropdown() {
-  var envId = Router.current().params._envId
-  subjParams = SubjectParameters.find({'children.envId':envId}).fetch()[0];
-  parameterPairs = subjParams["children"]["parameterPairs"];
 
-  var modal = $('#param-modal-content');
-  
-  var name = $("<div/>", {
-      class: "columns  boxes-wrapper"
-    }).appendTo(modal);
-
-    var label = $("<div/>", {
-      class: "column has-text-centered subj-drop-labels title is-5",
-      text: "Name"
-    }).appendTo(name);
-
-    $('<input/>', {
-        class: "column input",
-        id: "student-name",
-        type: "text",
-        placeholder: "Eg, Joey or Male Student"
-      }).appendTo(name);
-
-
-  //
-  //DROPDOWN CREATION FOR MODAL
-  //
-  //go through each parameter pair and create a box
-  for (var param = 0; param<parameterPairs; param++) {
-    var wrap = $("<div/>", {
-      class: "columns "
-    }).appendTo(modal);
-
-    var label = $("<h2/>", {
-      class: "column has-text-centered subj-drop-labels title is-5",
-      text: subjParams['children']['label'+param]
-    }).appendTo(wrap);
-
-    var params = subjParams['children']['parameter'+param]
-    var options = params.split(',');
-    var select = $("<select/>", {
-          class: "column has-text-centered select subj-drop-params",
-          name: subjParams['children']['label'+param]
-        }).appendTo(wrap);
-    for (opt in options) {
-        var option = $("<option/>", {
-          value: options[opt],
-          text: options[opt]
-        }).appendTo(select);
-
-        option.select(function (e) {
-          e.preventDefault();
-          $(this).siblings().removeClass('chosen');
-          $(this).addClass('chosen');
-        });
-    }//end for
-  }//end for
-
-  $("<button/>", {
-    class: "button is-medium is-success",
-    id: "save-subj-params",
-    text: "Add Subject"
-  }).appendTo(modal);
-}
 
 function populateParamBoxes() {
   var envId = Router.current().params._envId

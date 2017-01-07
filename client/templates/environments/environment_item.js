@@ -28,8 +28,11 @@ Template.environmentItem.events({
  Template.environmentItem.helpers({
   //shim function until database is clean
   trackModified: function () {
+    console.log(this);
     if (this.lastModified) {
       return true;
+    } else {
+      return false;
     }
   },
    needsSubjects: function() {

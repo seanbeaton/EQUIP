@@ -1,5 +1,20 @@
+#edit-students-button {
+    background: #009CFF;
+    color: white;
+}
+
+#edit-params-button {
+    background: #005288;
+    color: white;
+}
+
+#show-all-observations {
+    background: #FF8E00;
+    color: white;
+}
+
 #data-modal-content {
-    width: 95%;
+    width: 90%;
     overflow: scroll;
 }
 
@@ -7,3 +22,9 @@
     font-size: 1.33em;
     overflow: scroll;
 }
+
+#view-edit-contributions {
+    background: #005288;
+    color: white;
+}
+

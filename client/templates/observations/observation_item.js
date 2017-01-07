@@ -220,6 +220,7 @@ function populateParamBoxes(subjId) {
 }
 
 function editParamBoxes(seqId, subjId) {
+  var seq = Sequences.find({_id: seqId}).fetch()[0]
   $('#param-modal-content').children().remove();
   var envId = Router.current().params._envId
   seqParams = SequenceParameters.find({'children.envId':envId}).fetch()[0];
@@ -255,16 +256,25 @@ function editParamBoxes(seqId, subjId) {
       text: seqParams['children']['label'+param]
     }).appendTo(wrap);
 
-    var params = seqParams['children']['parameter'+param]
+    var field = seqParams['children']['label'+param];
+
+    var params = seqParams['children']['parameter'+param];
     var options = params.split(',');
 
     for (opt in options) {
   
-        var option = $("<div/>", {
-          class: "column has-text-centered subj-box-params hoverable",
+        if (seq['info'][field] == options[opt]) {
+          var option = $("<div/>", {
+          class: "column has-text-centered subj-box-params chosen hoverable",
           text: options[opt]
         }).appendTo(wrap);
-
+        } else {
+  
+          var option = $("<div/>", {
+            class: "column has-text-centered subj-box-params hoverable",
+            text: options[opt]
+          }).appendTo(wrap);
+        }
         option.click(function (e) {
           e.preventDefault();
           $(this).siblings().removeClass('chosen');

@@ -81,3 +81,13 @@
   max-height: 100%;
   overflow: hidden;
 }
+
+#export-students {
+    background: #005288;
+    color: white;
+}
+
+#save-locations{
+  background: #009CFF;
+  color: white;
+}

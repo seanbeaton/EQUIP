@@ -16,13 +16,12 @@
     <div class="columns">
       <div class="column">
         <p>Created On: {{submitted}}</p>
-        <p>Last Modified: 
-          {{#if trackModified}}
-            {{lastModified}}
-          {{else}}
-           N/A
-          {{/if}}
-        </p>
+        {{#if trackModified}}
+        <p>Last Modified: {{lastModified}} </p>
+        {{else}}
+        <p>Last Parameter/Subject Modification: {{lastModifiedParam}} </p>
+        <p>Last Observation Modification: {{lastModifiedObs}} </p>
+        {{/if}}
       </div>
     </div>
     <div class="columns">

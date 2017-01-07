@@ -28,7 +28,7 @@ function loadDefaultSubjParams() {
   var container = document.getElementById("paramForm");
   labels = ["Race", "Gender"];
 
-  for (i=0;i<3;i++){
+  for (i=0;i<2;i++){
      var singleParam = $('<div/>', {
       class: "single-param control myParam"+i
       }).appendTo(container);
