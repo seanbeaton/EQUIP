@@ -1,6 +1,8 @@
 .dragger {
-  width: 5em;
-  height: 5em;
+  min-width: 5em;
+  min-height: 5em;
+  max-width: 5em;
+  max-width: 5em;
   margin: 1em;
 
   background-color: #29e;
@@ -11,9 +13,18 @@
   border-radius: 0.75em;
   padding: .5em;
   display: inline-block;
+  flex: 1;
+  position: absolute;
 
-  -webkit-transform: translate(0px, 0px);
-          transform: translate(0px, 0px);
+ /* -webkit-transform: translate(0px, 0px);
+          transform: translate(0px, 0px);*/
+}
+
+.subjects {
+  display: flex;
+  position: relative;
+  height: 1000px;
+  overflow-x: scroll;
 }
 
 .boxes-wrapper {
@@ -78,7 +89,7 @@
 
 .drag-label {
   word-wrap: break-word;
-  max-height: 100%;
+  max-height: 50px;
   overflow: hidden;
 }
 

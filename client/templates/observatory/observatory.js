@@ -22,12 +22,19 @@ Template.observatory.created = function() {
 function clockSet() {
   var secs = timer.value;
   var hours = Math.floor(secs / (60*60));
+  if (hours < 10) {
+    hours = '0' + hours;
+  }
   var divisor_for_minutes = secs % (60 * 60);
   var minutes = Math.floor(divisor_for_minutes / 60);
- 
+ if (minutes < 10) {
+    minutes = '0' + minutes;
+  }
   var divisor_for_seconds = divisor_for_minutes % 60;
   var seconds = Math.ceil(divisor_for_seconds);
-
+if (seconds < 10) {
+    seconds = '0' + seconds;
+  }
   $('#obs-timer').text(''+hours+':'+minutes+':'+seconds);
 }
 
@@ -49,6 +56,17 @@ Template.observatory.rendered = function() {
       createToggle(params, label);
     }
   }
+
+  var params = "Blank,Last Choices";
+  var label = "Contribution Defaults"
+  createToggle(params, label);
+
+  $(document).keyup(function(e) {
+     if (e.keyCode == 27) { 
+        $('#seq-param-modal').removeClass('is-active');
+      $('#seq-data-modal').removeClass('is-active');
+    }
+  });
 }
 
 function createToggle(params, label) {
@@ -79,6 +97,10 @@ Template.observatory.helpers({
   environment: function() {
     var env = Environments.find({_id: Router.current().params._envId}).fetch()[0];
     return env;
+  },
+  observation: function () {
+    var obs = Observations.find({_id: Router.current().params._obsId}).fetch()[0];
+    return obs;
   },
   subject: function() {
     return Subjects.find({envId: this.envId});
@@ -111,6 +133,10 @@ Template.observatory.events({
   $('#seq-param-modal').addClass('is-active');
 
   },
+  'click .modal-background': function(e){
+    $('#seq-param-modal').removeClass('is-active');
+    $('#seq-data-modal').removeClass('is-active');
+  },
   'click .modal-close': function(e){
     $('#seq-param-modal').removeClass('is-active');
     $('#seq-data-modal').removeClass('is-active');
@@ -130,6 +156,9 @@ Template.observatory.events({
     var choices = [];
     var labels = [];
     $('.toggle-item').each(function () {
+      if ($(this).attr('data_label') == "Contribution Defaults") {
+        return;
+      }
       labels.push($(this).attr('data_label'));
       choices.push($(this).val());
     });
@@ -168,7 +197,10 @@ Template.observatory.events({
   },
     
    'click .delete-seq': function(e) {
-    var result = confirm("Press 'OK' to delete this Subject.");
+    var result = confirm("Press 'OK' to delete this Contribution.");
+    if (result == false) {
+      return;
+    }
       seqId = $(e.target).attr("data_id");
       Meteor.call('sequenceDelete', seqId, function(error, result) {
         return 0;
@@ -199,6 +231,9 @@ Template.observatory.events({
       var choices = [];
       var labels = [];
       $('.toggle-item').each(function () {
+        if ($(this).attr('data_label') == "Contribution Defaults") {
+          return;
+        }
         labels.push($(this).attr('data_label'));
         choices.push($(this).val());
       });
@@ -278,7 +313,7 @@ function createTableOfContributions() {
       } else if (allParams[p] == "Time") {
         attr = seqs[s]['time']
         $('<td/>', {
-          text: attr
+          text: convertTime(Number(attr))
         }).appendTo(row);
       }else if (allParams[p] == "Edit") {
         var td = $('<td/>', {}).appendTo(row);
@@ -304,6 +339,8 @@ function populateParamBoxes(subjId) {
   parameterPairs = seqParams["children"]["parameterPairs"];
   var subj = Subjects.find({_id: subjId}).fetch()[0];
   var student = subj.info.name;
+
+  var howDefault = $("*[data_label='Contribution Defaults']").val();
 
   var modal = $('#param-modal-content');
   
@@ -342,7 +379,7 @@ function populateParamBoxes(subjId) {
 
     for (opt in options) {
       
-      if ( lastChoices[field] == options[opt]) {
+      if ( lastChoices[field] == options[opt] & howDefault == "Last Choices") {
         var option = $("<div/>", {
           class: "column has-text-centered subj-box-params chosen hoverable",
           text: options[opt]
@@ -358,7 +395,11 @@ function populateParamBoxes(subjId) {
         option.click(function (e) {
           e.preventDefault();
           $(this).siblings().removeClass('chosen');
-          $(this).addClass('chosen');
+          if ( $(this).hasClass('chosen') ){
+            $(this).removeClass('chosen');
+          } else {
+            $(this).addClass('chosen');
+          }
         });
     }//end for
   }//end for
@@ -371,6 +412,24 @@ function populateParamBoxes(subjId) {
 
 }
 
+function convertTime(secs) {
+  var hours = Math.floor(secs / (60*60));
+  if (hours < 10) {
+    hours = '0' + hours;
+  }
+  var divisor_for_minutes = secs % (60 * 60);
+  var minutes = Math.floor(divisor_for_minutes / 60);
+ if (minutes < 10) {
+    minutes = '0' + minutes;
+  }
+  var divisor_for_seconds = divisor_for_minutes % 60;
+  var seconds = Math.ceil(divisor_for_seconds);
+if (seconds < 10) {
+    seconds = '0' + seconds;
+  }
+  final_str = ''+hours+':'+minutes+':'+seconds;
+  return final_str;
+}
 
 function editParamBoxes(seqId, subjId) {
   var seq = Sequences.find({_id: seqId}).fetch()[0]
@@ -433,7 +492,11 @@ function editParamBoxes(seqId, subjId) {
         option.click(function (e) {
           e.preventDefault();
           $(this).siblings().removeClass('chosen');
-          $(this).addClass('chosen');
+          if ( $(this).hasClass('chosen') ){
+            $(this).removeClass('chosen');
+          } else {
+            $(this).addClass('chosen');
+          }
         });
     }//end for
   }//end for

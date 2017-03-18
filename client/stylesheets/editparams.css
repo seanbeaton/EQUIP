@@ -7,6 +7,15 @@
     cursor: pointer;
 }
 
+.back-to-class {
+    text-decoration: underline;
+}
+
+.back-to-class:hover {
+    color: lightgray;
+    cursor: pointer;
+}
+
 .active-params {
     background-color: #009CFF;
     color: white;

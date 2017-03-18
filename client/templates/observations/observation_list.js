@@ -117,7 +117,7 @@ function createTableOfContributions() {
       } else if (allParams[p] == "Time") {
         attr = seqs[s]['time']
         $('<td/>', {
-          text: attr
+          text: convertTime(Number(attr))
         }).appendTo(row);
       } else if (allParams[p] == "Observation") {
         attr = seqs[s]['obsName'];
@@ -132,4 +132,23 @@ function createTableOfContributions() {
       }
     }
   }
+}
+
+function convertTime(secs) {
+  var hours = Math.floor(secs / (60*60));
+  if (hours < 10) {
+    hours = '0' + hours;
+  }
+  var divisor_for_minutes = secs % (60 * 60);
+  var minutes = Math.floor(divisor_for_minutes / 60);
+ if (minutes < 10) {
+    minutes = '0' + minutes;
+  }
+  var divisor_for_seconds = divisor_for_minutes % 60;
+  var seconds = Math.ceil(divisor_for_seconds);
+if (seconds < 10) {
+    seconds = '0' + seconds;
+  }
+  final_str = ''+hours+':'+minutes+':'+seconds;
+  return final_str;
 }

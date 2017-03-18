@@ -10,6 +10,10 @@ Template.environmentItem.events({
   'click #edit-class-params': function(e) {
      e.preventDefault();
      Router.go('editSubjectParameters', {_envId:this._id});
+  },
+  'click #edit-class-studs': function(e) {
+     e.preventDefault();
+     Router.go('editSubjects', {_envId:this._id});
   }
   });
 

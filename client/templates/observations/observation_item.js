@@ -4,6 +4,13 @@
 
 Template.observationItem.events({
    'click #enter-class': function(e) {
+      var obj1 = SubjectParameters.find({'children.envId': this._id}).fetch();
+     var obj2 = SequenceParameters.find({'children.envId': this._id}).fetch();
+     var obj3 = Subjects.find({envId: this._id}).fetch(obj3);
+     if ($.isEmptyObject(obj1) || $.isEmptyObject(obj2) || $.isEmptyObject(obj3)) {
+      alert('You must add students and parameters to the environment to continue to do the observation.');
+      return;
+     }
      Router.go('observatory', {_envId: this.envId, _obsId: this._id});
    },
    'click #delete-obs-button': function(e) {
@@ -20,6 +27,11 @@ Template.observationItem.events({
     $('#seq-data-modal').removeClass('is-active');
   },
   'click #view-edit-contributions':function (e){
+    var obj1 = Sequences.find({obsId: this._id}).fetch();
+    if ($.isEmptyObject(obj1)) {
+      alert('You do not have any sequences yet, please make sure your environment is fully setup.');
+      return;
+    }
     createTableOfContributions(this._id);
     $('#seq-data-modal').addClass('is-active');
   },
@@ -143,7 +155,7 @@ function createTableOfContributions(obsId) {
       }else if (allParams[p] == "Time") {
         attr = seqs[s]['time']
         $('<td/>', {
-          text: attr
+          text: convertTime(Number(attr))
         }).appendTo(row);
       }else {
         attr = seqs[s]['info'][allParams[p]]
@@ -153,6 +165,25 @@ function createTableOfContributions(obsId) {
       }
     }
   }
+}
+
+function convertTime(secs) {
+  var hours = Math.floor(secs / (60*60));
+  if (hours < 10) {
+    hours = '0' + hours;
+  }
+  var divisor_for_minutes = secs % (60 * 60);
+  var minutes = Math.floor(divisor_for_minutes / 60);
+ if (minutes < 10) {
+    minutes = '0' + minutes;
+  }
+  var divisor_for_seconds = divisor_for_minutes % 60;
+  var seconds = Math.ceil(divisor_for_seconds);
+if (seconds < 10) {
+    seconds = '0' + seconds;
+  }
+  final_str = ''+hours+':'+minutes+':'+seconds;
+  return final_str;
 }
 
 function populateParamBoxes(subjId) {

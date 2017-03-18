@@ -125,12 +125,34 @@ function addSubjFields() {
         var test = $(this).parent().remove();
       });
 
+      toastr.options = {
+          "closeButton": false,
+          "debug": false,
+          "newestOnTop": false,
+          "progressBar": false,
+          "positionClass": "toast-bottom-right",
+          "preventDuplicates": false,
+          "onclick": null,
+          "showDuration": "300",
+          "hideDuration": "1000",
+          "timeOut": "2000",
+          "extendedTimeOut": "1000",
+          "showEasing": "swing",
+          "hideEasing": "linear",
+          "showMethod": "fadeIn",
+          "hideMethod": "fadeOut"
+        }
+        Command: toastr["info"]("Scroll to bottom to edit new parameter.","Parameter Added")
 }
 
 Template.editSubjectParameters.events({
 'click .back-head-params': function(e) {
    e.preventDefault();
    Router.go('environmentList');
+ },
+ 'click .back-to-class': function(e) {
+   e.preventDefault();
+   Router.go('observationList', {_envId:Router.current().params._envId});
  },
  'click .obs-param-button': function(e) {
    e.preventDefault();
@@ -149,9 +171,20 @@ Template.editSubjectParameters.events({
 'click #save-demo-params': function(e) {
   e.preventDefault();
 
-  var parameterPairs = $("#paramForm .single-param").length;
+  var parameterPairs = 0;
   var form = document.querySelector('#paramForm');
-  var obj = serialize(form, { hash: true, empty: true });
+  var obj = serialize(form, { hash: true, empty: false });
+  for (key in obj) {
+    if (key.includes('label')){
+      num = key.split('label')[1];
+      if (obj['parameter'+num]){
+        parameterPairs++;
+      } else {
+        alert('One of your parameters has a label but no options. Please fix this issue and try saving again.')
+        return;
+      }
+    }
+  }
   var extendObj = _.extend(obj, {
     envId: Router.current().params._envId,
     parameterPairs: parameterPairs

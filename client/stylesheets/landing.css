@@ -13,6 +13,10 @@ body {
     font-family: 'Source Sans Pro'
 }
 
+.beta {
+    color: red;
+}
+
 .land-2 {
     background-color: #4893cf;
     color: white;

@@ -4,7 +4,9 @@
 
 Template.editSubjects.helpers({
   subject: function() {
-    return Subjects.find({envId: this._id});
+    subs = Subjects.find({envId: this._id});
+    console.log(subs);
+    return subs;
   },
   subjParameter: function() {
 
@@ -21,10 +23,13 @@ Session.set('envId', Router.current().params._envId);
 // target elements with the "draggable" class
 interact('.draggable')
   .draggable({
-    // enable inertial throwing
-    inertia: true,
+    // disable inertial throwing
+    inertia: false,
     autoScroll: true,
     onmove: dragMoveListener,
+    restrict: {
+      restriction: 'parent'
+    }
  
   });
 
@@ -53,6 +58,12 @@ interact('.draggable')
 
 // On rendering, get students and layout classroom with student boxes
 Template.editSubjects.rendered = function() {
+  $(document).keyup(function(e) {
+     if (e.keyCode == 27) { 
+      $('#stud-param-modal').removeClass('is-active');
+      $('#stud-data-modal').removeClass('is-active');
+    }
+  });
 }
 
 //
@@ -67,6 +78,10 @@ Template.editSubjects.events({
   //Stuff for student parameters modal
 
   'click .modal-close': function(e){
+    $('#stud-param-modal').removeClass('is-active');
+    $('#stud-data-modal').removeClass('is-active');
+  },
+  'click .modal-background': function(e){
     $('#stud-param-modal').removeClass('is-active');
     $('#stud-data-modal').removeClass('is-active');
   },
@@ -106,13 +121,23 @@ Template.editSubjects.events({
           info[labels[label]] = choices[label];
         }
     }
+    var students = Subjects.find({envId:Router.current().params._envId}).fetch();
+    count = 0;
+    _.each(students, function (s) {
+      if (s['data_x'] == '0') {
+        count++;
+      }
+    });
 
+    y = count*30 + 30;
     var subject = {
-      data_x: '',
-      data_y: '',
+      data_x: '0',
+      data_y: String(y),
       envId: this._id,
       info: info
     };
+
+
 
 
     Meteor.call('subjectInsert', subject, function(error, result) {
@@ -290,7 +315,11 @@ function populateParamBoxes() {
         option.click(function (e) {
           e.preventDefault();
           $(this).siblings().removeClass('chosen');
-          $(this).addClass('chosen');
+          if ( $(this).hasClass('chosen') ){
+            $(this).removeClass('chosen');
+          } else {
+            $(this).addClass('chosen');
+          }
         });
     }//end for
   }//end for

@@ -92,6 +92,16 @@
     opacity: .5;
 }
 
+.stud-edit-button {
+    background: #f68e1f;
+    color: white;
+}
+
+.stud-edit-button:hover{
+    opacity: .5;
+    color: white;
+}
+
 @-webkit-keyframes Pulse {
   from { opacity: 1; }
   50% { opacity: .66; }
