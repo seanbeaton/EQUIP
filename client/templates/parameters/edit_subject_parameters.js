@@ -159,6 +159,70 @@ Template.editSubjectParameters.events({
 
    Router.go('editSequenceParameters', {_envId:Router.current().params._envId});
  },
+ 'click .import-button': function (e) {
+    var envId = Router.current().params._envId;
+    var element = document.createElement('div');
+    element.innerHTML = '<input type="file">';
+    var fileInput = element.firstChild;
+
+    fileInput.addEventListener('change', function() {
+        var file = fileInput.files[0];
+        var jsonImport = {};
+
+        if (file.name.match(/\.(json)$/)) {
+            var reader = new FileReader();
+
+            reader.onload = function() {
+                var contents = reader.result;
+                jsonImport = JSON.parse(contents);
+                console.log(jsonImport);
+                if ('label0' in jsonImport) {
+                  jsonImport['envId'] = envId;
+
+                  Meteor.call('importSubjParameters', jsonImport, function(error, result) {
+                    setDefaultDemographicParams();
+                    return 0;
+                  });
+                } else {
+                  alert("Incorrectly formatted JSON import. No Subject parameters.");
+                }
+            };
+            reader.readAsText(file);
+        } else {
+            alert("File not supported, .json files only");
+        }
+    });
+    alert("If you select a valid file to import for this classrom, it will overwrite any parameters already set.")
+    fileInput.click(); // opening dialog
+
+ },
+  'click .export-button': function (e) {
+    e.preventDefault();
+    var envId = Router.current().params._envId;
+    var env = Environments.findOne({_id:envId});
+    var name = env['envName'];
+    Meteor.call('exportSubjParameters', envId, function(error, result){
+      if (error){
+        alert(error.reason);
+      } else {
+        // Prompt save file dialogue
+        if ($.isEmptyObject(result)) { 
+          alert("There are no parameters to export. Add parameters to this environment to be able to export."); 
+          return;
+        }
+        var json = JSON.stringify(result);
+        var blob = new Blob([json], {type: "octet/stream"});
+        var url  = window.URL.createObjectURL(blob);
+
+        var a = document.createElement("a");
+        a.href = url;
+        a.download = '' + name + '_subjparams.json';
+        a.click();
+        window.URL.revokeObjectURL(url);
+      }
+    }); 
+  },
+
 'click #add-demo-param': function(e) {
   e.preventDefault();
   addSubjFields();

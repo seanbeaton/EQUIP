@@ -13,7 +13,6 @@ Template.environmentList.rendered = function() {
 Template.environmentList.helpers({
   environment: function() {
     var envs = Environments.find({}, {sort: {submitted: -1}}).fetch();
-    console.log(envs)
     var obs;
     var subjects;
     var user = Meteor.user();

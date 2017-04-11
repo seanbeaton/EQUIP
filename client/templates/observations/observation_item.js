@@ -7,9 +7,7 @@ Template.observationItem.events({
       var obj1 = SubjectParameters.find({'children.envId': Router.current().params._envId}).fetch();
      var obj2 = SequenceParameters.find({'children.envId': Router.current().params._envId}).fetch();
      var obj3 = Subjects.find({envId: Router.current().params._envId}).fetch();
-     console.log(obj1);
-     console.log(obj2);
-     console.log(obj3);
+
      if ($.isEmptyObject(obj1) || $.isEmptyObject(obj2) || $.isEmptyObject(obj3)) {
       alert('You must add students and parameters to the environment to continue to do the observation.');
       return;

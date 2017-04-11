@@ -29,6 +29,11 @@
     margin-top: 1em;
 }
 
+.import-button {
+    background: #23d160;
+    color: white;
+}
+
 .export-button {
     background: #4893cf;
     color: white;
