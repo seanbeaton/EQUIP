@@ -30,6 +30,13 @@ Template.environmentList.helpers({
 });
 
 Template.environmentList.events({
+
+  'click .help-button': function (e) {
+    $('#help-env-modal').addClass("is-active");
+  },
+  'click #help-close-modal': function(e) {
+    $('#help-env-modal').removeClass("is-active");
+  },
    'click #env-create-button': function(e) {
     $('#env-create-modal').addClass("is-active");
   },
@@ -38,6 +45,7 @@ Template.environmentList.events({
   },
   'click .modal-card-foot .button': function(e) {
     $('#env-create-modal').removeClass("is-active");
+    $('#help-env-modal').removeClass("is-active");
   },
 
   //  'click #createNewEnvironment': function(e) {

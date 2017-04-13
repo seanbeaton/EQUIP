@@ -146,6 +146,15 @@ function addSubjFields() {
 }
 
 Template.editSubjectParameters.events({
+  'click .help-button': function (e) {
+    $('#help-env-modal').addClass("is-active");
+  },
+  'click #help-close-modal': function(e) {
+    $('#help-env-modal').removeClass("is-active");
+  },
+  'click .modal-card-foot .button': function(e) {
+    $('#help-env-modal').removeClass("is-active");
+  },
 'click .back-head-params': function(e) {
    e.preventDefault();
    Router.go('environmentList');

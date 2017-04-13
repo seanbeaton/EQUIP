@@ -22,7 +22,12 @@ Template.observationList.events({
      e.preventDefault();
      Router.go('editSubjects', {_envId:this._id});
   },
-
+  'click .help-button': function (e) {
+    $('#help-env-modal').addClass("is-active");
+  },
+  'click #help-close-modal': function(e) {
+    $('#help-env-modal').removeClass("is-active");
+  },
   'click #obs-create-button': function(e) {
     $('#obs-create-modal').addClass("is-active");
   },
@@ -31,6 +36,7 @@ Template.observationList.events({
   },
   'click .modal-card-foot .button': function(e) {
     $('#obs-create-modal').removeClass("is-active");
+    $('#help-env-modal').removeClass("is-active");
   },
   'click #save-obs-name': function(e) {
 
