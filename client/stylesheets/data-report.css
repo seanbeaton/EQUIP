@@ -1,0 +1,67 @@
+.reset-button {
+    color: white;
+    background-color: #FF2B2E;
+    margin-right: 2em;
+}
+
+.export-data-button {
+    background: #4893cf;
+    color: white;
+}
+
+.classroom-selection {
+    color: white;
+    background: #005288;
+    margin: .5em;
+    min-width: 200px;
+    max-width: 300px;
+}
+
+.option-selectors {
+    color: white;
+    background: #005288;
+    margin: .5em;
+}
+
+.dparam-selection {
+    flex-wrap: wrap;
+}
+
+.sparam-selection {
+    flex-wrap: wrap;
+}
+
+.demo-plots {
+    flex-wrap: wrap;
+}
+
+.contribution-plots {
+    flex-wrap: wrap;
+}
+
+.classroom-selection:hover {
+    color: white;
+    opacity: .5;
+}
+
+.report-head {
+    margin-right: 1em;
+}
+
+.report-dash-head {
+    border-bottom: 1px solid black;
+}
+
+.report-body {
+    visibility: hidden;
+}
+
+.arc text {
+  font: 18px;
+  text-anchor: middle;
+  fill: black;
+}
+
+.arc path {
+  stroke: #fff;
+}

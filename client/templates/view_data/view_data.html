@@ -1,23 +1,47 @@
 <!-- HTML for data analyisis page -->
 
 <template name="viewData">
-  <div id="container" class="container-fluid top-spacer card">
-    <h1 id="viewDataTitle">View Data</h1>
-    <hr>
-    <div class="row">
-       <div class="center-export">
-        <h3>Select Environment</h3>
-        <select id="selectEnvironment" class="form-control">
-          {{#each environment}}
-            <option value="{{envName}}">{{envName}}</option>
-          {{/each}}
-          <option value="all">All</option>
-        </select>
-        <button type="button" id="export_CSV_button" class="btn btn-primary" style="margin-top:8px;">Export CSV</button>
-      </div>
-     <br>
+  <section class="section report-dash-head">
+    <h2 class="report-head title is-2 is-pulled-left">Data Report</h2>
+    <button class="button is-medium has-text-centered reset-button">Reset</button>
+    <button class="button is-medium has-text-centered export-data-button">Export CSV</button>
+    <a class="button is-medium help-button is-pulled-right has-text-centered">Help!?</a>
+  </section>
+
+<!-- HTML for selecting what to include in report (visible to start) -->
+  <section class="section option-select">
+    <h1 class="title is-2 env-label-head">Select a Classroom</h1>
+    <div class="columns env-selection is-multiline">
+      
     </div>
-  </div>
+    <h1 class="title is-2 env-label-head">Select Observations</h1>
+    <div class="columns obs-selection">
+      <h2 class="column subtitle is-4">Please select a classroom first</h2>
+    </div>
+    <h1 class="title is-2 env-label-head">Select Demographic Parameters</h1>
+    <div class="columns dparam-selection">
+      <h2 class="column subtitle is-4">Please select a classroom first</h2>
+    </div>
+    <h1 class="title is-2 env-label-head">Select Sequence Parameters</h1>
+    <div class="columns sparam-selection">
+      <h2 class="column subtitle is-4">Please select a classroom first</h2>
+    </div>
+    <button class="button is-large is-success generate-button">Generate Report!</button>
+  </section>
+
+<!-- HTML for displaying graphics (hidden at first) -->
+  <section class="section report-body">
+    <h1 class="title is-2 env-label-head">Classroom Demographic Breakdown</h1>
+    <div class="columns demo-plots">
+    
+    </div>
+    <h1 class="title is-2 env-label-head">Contributions Across Demographics</h1>
+    <div class="columns contribution-plots">
+    
+    </div>
+
+  </section>
+
   <script>
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
   (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
