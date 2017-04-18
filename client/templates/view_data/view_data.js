@@ -267,14 +267,19 @@ function makeContributionGraphs(obsIds, dp, sp) {
       }
     }
   }
+  console.log(data);
 
-  for (key in data) {
-    for (param in data[key]) {
-      var label = ""+param+" by "+key;
-      var dataSlice = d3.entries(data[key][param]);
+  for (demp in data) {
+    for (param in data[demp]) {
+      var label = ""+param+" by "+demp;
+      var dataSlice = d3.entries(data[demp][param]);
+
       if (param == "Wait Time"){
-        console.log(label);
-        console.log(dataSlice);
+        // console.log(label);
+        // console.log(dataSlice);
+        // console.log(data[key][param]);
+      makeStackedBar(dataSlice, label);
+
       }
     }
   }
@@ -331,6 +336,108 @@ function makePieChart(data, label) {
 
 }
 
-function makeStackedBar(data, label) {
-  
+function makeStackedBar(dataEnum, label) {
+
+
+var margin = {top: 20, right: 20, bottom: 30, left: 40},
+    width = 800 - margin.left - margin.right,
+    height = 600 - margin.top - margin.bottom;
+
+  var svg = d3.select(".contribution-plots")
+            .append("svg")
+            .attr('width', width)
+            .attr('height', height);
+    
+  g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+// BarChart Axes
+var x0 = d3.scaleBand()
+    .rangeRound([0, width])
+    .paddingInner(0.1);
+
+// Grouping Axis
+var x1 = d3.scaleBand()
+    .padding(0.05);
+
+// Bars
+var y = d3.scaleLinear()
+    .rangeRound([height, 0]);
+
+//Colors
+var z = d3.scaleOrdinal()
+    .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
+
+//Set Keys
+
+sample = dataEnum[0].value;
+keys = [];
+for (bit in sample) {
+  keys.push(bit);
+}
+console.log("-----------");
+console.log(keys);
+console.log(dataEnum);
+x0.domain(dataEnum.map(function(d) { return d.key; }));
+
+x1.domain(keys).rangeRound([0, x0.bandwidth()]);
+
+
+y.domain([0,10]);
+//y.domain([0, d3.max(dataEnum, function(d) { return d3.max(d.value, function(d, i) { return d[i]; }); })]).nice();
+
+
+  g.append("g")
+    .selectAll("g")
+    .data(dataEnum)
+    .enter().append("g")
+      .attr("transform", function(d) { return "translate(" + x0(d.key) + ",0)"; })
+    .selectAll("rect")
+    .data(function(d) { return keys.map(function(key) { return {key: key, value: d.value[key] }; }) })
+    .enter().append("rect")
+      .attr("x", function(d) { return x1(d.key); })
+      .attr("y", function(d) { return y(d.value); })
+      .attr("width", x1.bandwidth())
+      .attr("height", function(d) { return height - y(d.value); })
+      .attr("fill", function(d) { return z(d.key); });
+
+  g.append("g")
+      .attr("class", "axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(d3.axisBottom(x0));
+
+  g.append("g")
+      .attr("class", "axis")
+      .call(d3.axisLeft(y).ticks(null, "s"))
+    .append("text")
+      .attr("x", 2)
+      .attr("y", y(y.ticks().pop()) + 0.5)
+      .attr("dy", "0.32em")
+      .attr("fill", "#000")
+      .attr("font-weight", "bold")
+      .attr("text-anchor", "start")
+      .text("Population");
+
+  var legend = g.append("g")
+      .attr("font-family", "sans-serif")
+      .attr("font-size", 10)
+      .attr("text-anchor", "end")
+    .selectAll("g")
+    .data(keys.slice().reverse())
+    .enter().append("g")
+      .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+
+  legend.append("rect")
+      .attr("x", width - 19)
+      .attr("width", 19)
+      .attr("height", 19)
+      .attr("fill", z);
+
+  legend.append("text")
+      .attr("x", width - 24)
+      .attr("y", 9.5)
+      .attr("dy", "0.32em")
+      .text(function(d) { return d; });
+
+
+
 }
