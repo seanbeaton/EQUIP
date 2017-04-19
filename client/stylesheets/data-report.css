@@ -56,6 +56,11 @@
     visibility: hidden;
 }
 
+.title.report-label-head {
+    margin-bottom: 2em;
+    font-family: "Roboto Slab";
+}
+
 .arc text {
   font: 18px;
   text-anchor: middle;
@@ -64,4 +69,8 @@
 
 .arc path {
   stroke: #fff;
+}
+
+.axis .domain {
+  display: none;
 }

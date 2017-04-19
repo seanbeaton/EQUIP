@@ -5,7 +5,6 @@
 //Generate classroom buttons immediately
 Template.viewData.rendered = function() {
   var envs = Environments.find({}).fetch();
-  console.log(envs);
   if ($.isEmptyObject(envs)) {
     $('.env-selection').append('<h2 class="subtitle is-2" style="color: red;">You must create classroom data before doing an analysis is possible.</h2>')
   } else {
@@ -159,19 +158,22 @@ Template.viewData.events({
 
    },
    //This should probably be a modal??
-  'click #export_CSV_button': function(e) {
+  'click .export-data-button': function(e) {
 
-     var selectEnvironment = $('#selectEnvironment').val();
+     var envId = $('.env-selection .chosen').attr('data_id');
 
-     if(selectEnvironment!="all")
+     if(envId)
      {
-        var environment=Environments.find({"envName":selectEnvironment}).fetch();
-        var envId=environment[0]["_id"];
+        var environment = Environments.findOne({"_id":envId});
+        var envName = environment['envName'];
         var sequences=Sequences.find({"envId":envId}).fetch();
         var literalArray = []
         for (i=0;i<sequences.length;i++) {
-          sequences[i]["valueLiteral"]["subjName"] = sequences[i]["subjName"]
-          literalArray[i] = sequences[i]["valueLiteral"];
+          new_seq = sequences[i]['info'];
+          new_seq['time'] = sequences[i]['time'];
+          new_seq['obsName'] = sequences[i]['obsName'];
+          new_seq['envName'] = envName;
+          literalArray.push(new_seq);
         }
         var csv = Papa.unparse({
           data: literalArray,
@@ -187,31 +189,12 @@ Template.viewData.events({
         }
         var tempLink = document.createElement('a');
         tempLink.href = csvURL;
-        tempLink.setAttribute('download', selectEnvironment+'_CSV_export.csv');
+        tempLink.setAttribute('download', envName+'_CSV_export.csv');
         tempLink.click();
+      } else {
+        alert("Please select a classroom to export!")
       }
-      else{
-        var sequences=Sequences.find({}).fetch();
-        sequences[0]["valueLiteral"]["subjName"] = sequences[0]["subjName"]
-        var literalArray = []
-        for (i=0;i<sequences.length;i++) {
-          sequences[i]["valueLiteral"]["subjName"] = sequences[i]["subjName"]
-          literalArray[i] = sequences[i]["valueLiteral"];
-        }
-        var csvData = new Blob([csv], {type: 'text/csv;charset=utf-8;'});
-        var csvURL =  null;
-        //IE download API for saving files client side
-        if (navigator.msSaveBlob) {
-            csvURL = navigator.msSaveBlob(csvData, 'download.csv');
-        } else {
-        //Everything else
-            csvURL = window.URL.createObjectURL(csvData);
-        }
-        var tempLink = document.createElement('a');
-        tempLink.href = csvURL;
-        tempLink.setAttribute('download', selectEnvironment+'_CSV_export.csv');
-        tempLink.click();
-      }
+      
     }
 });
 
@@ -267,20 +250,13 @@ function makeContributionGraphs(obsIds, dp, sp) {
       }
     }
   }
-  console.log(data);
 
   for (demp in data) {
     for (param in data[demp]) {
       var label = ""+param+" by "+demp;
       var dataSlice = d3.entries(data[demp][param]);
 
-      if (param == "Wait Time"){
-        // console.log(label);
-        // console.log(dataSlice);
-        // console.log(data[key][param]);
-      makeStackedBar(dataSlice, label);
-
-      }
+        makeStackedBar(dataSlice, label);
     }
   }
 }
@@ -339,51 +315,48 @@ function makePieChart(data, label) {
 function makeStackedBar(dataEnum, label) {
 
 
-var margin = {top: 20, right: 20, bottom: 30, left: 40},
-    width = 800 - margin.left - margin.right,
-    height = 600 - margin.top - margin.bottom;
+  var margin = {top: 20, right: 20, bottom: 30, left: 40},
+    width = 600 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom,
+    fullW = 600,
+    fullH = 500;
 
   var svg = d3.select(".contribution-plots")
             .append("svg")
-            .attr('width', width)
-            .attr('height', height);
+            .attr('width', fullW)
+            .attr('height', fullH);
     
   g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-// BarChart Axes
-var x0 = d3.scaleBand()
-    .rangeRound([0, width])
-    .paddingInner(0.1);
+  // BarChart Axes
+  var x0 = d3.scaleBand()
+      .rangeRound([0, width])
+      .paddingInner(0.1);
 
-// Grouping Axis
-var x1 = d3.scaleBand()
-    .padding(0.05);
+  // Grouping Axis
+  var x1 = d3.scaleBand()
+      .padding(0.05);
 
-// Bars
-var y = d3.scaleLinear()
-    .rangeRound([height, 0]);
+  // Bars
+  var y = d3.scaleLinear()
+      .rangeRound([height, 0]);
 
-//Colors
-var z = d3.scaleOrdinal()
-    .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
+  //Colors
+  var z = d3.scaleOrdinal()
+      .range(["#F17CB0", "#60BD68", "#FAA43A", "#F15854", "#DECF3F", "#B276B2", "#B2912F"]);
 
-//Set Keys
+  //Set Keys
 
-sample = dataEnum[0].value;
-keys = [];
-for (bit in sample) {
-  keys.push(bit);
-}
-console.log("-----------");
-console.log(keys);
-console.log(dataEnum);
-x0.domain(dataEnum.map(function(d) { return d.key; }));
+  sample = dataEnum[0].value;
+  keys = [];
+  for (bit in sample) {
+    keys.push(bit);
+  }
 
-x1.domain(keys).rangeRound([0, x0.bandwidth()]);
+  x0.domain(dataEnum.map(function(d) { return d.key; }));
+  x1.domain(keys).rangeRound([0, x0.bandwidth()]);
 
-
-y.domain([0,10]);
-//y.domain([0, d3.max(dataEnum, function(d) { return d3.max(d.value, function(d, i) { return d[i]; }); })]).nice();
+  y.domain([0, d3.max(dataEnum, function(d) { return d3.max(keys, function(key) { return d.value[key]; }); })]).nice();
 
 
   g.append("g")
@@ -392,7 +365,7 @@ y.domain([0,10]);
     .enter().append("g")
       .attr("transform", function(d) { return "translate(" + x0(d.key) + ",0)"; })
     .selectAll("rect")
-    .data(function(d) { return keys.map(function(key) { return {key: key, value: d.value[key] }; }) })
+    .data(function(d) { return keys.map(function(key) { val = d.value[key] || 0; return {key: key, value: val} }) })
     .enter().append("rect")
       .attr("x", function(d) { return x1(d.key); })
       .attr("y", function(d) { return y(d.value); })
@@ -409,13 +382,13 @@ y.domain([0,10]);
       .attr("class", "axis")
       .call(d3.axisLeft(y).ticks(null, "s"))
     .append("text")
-      .attr("x", 2)
-      .attr("y", y(y.ticks().pop()) + 0.5)
+      .attr("x", -5)
+      .attr("y", y(y.ticks().pop()) - 10)
       .attr("dy", "0.32em")
       .attr("fill", "#000")
       .attr("font-weight", "bold")
       .attr("text-anchor", "start")
-      .text("Population");
+      .text("# of Contributions");
 
   var legend = g.append("g")
       .attr("font-family", "sans-serif")
@@ -427,17 +400,15 @@ y.domain([0,10]);
       .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
 
   legend.append("rect")
-      .attr("x", width - 19)
+      .attr("x", width - 55)
       .attr("width", 19)
       .attr("height", 19)
       .attr("fill", z);
 
   legend.append("text")
-      .attr("x", width - 24)
+      .attr("x", width - 60)
       .attr("y", 9.5)
       .attr("dy", "0.32em")
       .text(function(d) { return d; });
-
-
 
 }
