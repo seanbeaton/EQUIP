@@ -381,17 +381,19 @@ function makeIndividualGraphs(oIds) {
 
 function makePieChart(data, label) {
 
-  var margins = 100, 
-  width = 600 - margins, 
-  height = 500 - margins,
+  var margin = {header: 100, top: 50, right: 50, bottom: 50, left: 50},
+  width = 600 - margin.left - margin.right,
+  height = 600 - margin.top - margin.bottom - margin.header,
+  fullW = 600,
+  fullH = 600,
   radius = Math.min(width, height) / 2;
 
   var svg = d3.select(".demo-plots")
             .append("svg")
-            .attr('width', width)
-            .attr('height', height);
+            .attr('width', fullW)
+            .attr('height', fullH);
 
-  g = svg.append("g").attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+  g = svg.append("g").attr("transform", "translate(" + (fullW/2) + "," + (fullH/2)+ ")");
 
   var color = d3.scaleOrdinal()
     .range(["#F15854", "#DECF3F", "#B276B2", "#B2912F", "#F17CB0", "#60BD68", "#FAA43A"]);
@@ -423,7 +425,7 @@ function makePieChart(data, label) {
       .text(function(d) { return d.data.key; });
 
   svg.append("text")
-    .attr("transform", "translate("+width/2+","+(height-40)+")")
+    .attr("transform", "translate("+fullW/2+","+40+")")
     .attr("font-size", "40px")
     .attr("text-anchor", "middle")
     .text(key);
