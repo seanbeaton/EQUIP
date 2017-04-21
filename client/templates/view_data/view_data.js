@@ -384,8 +384,8 @@ function makePieChart(data, label) {
   var margin = {header: 100, top: 50, right: 50, bottom: 50, left: 50},
   width = 600 - margin.left - margin.right,
   height = 600 - margin.top - margin.bottom - margin.header,
-  fullW = 600,
-  fullH = 600,
+  fullW = 500,
+  fullH = 500,
   radius = Math.min(width, height) / 2;
 
   var svg = d3.select(".demo-plots")
@@ -422,6 +422,7 @@ function makePieChart(data, label) {
   arc.append("text")
       .attr("transform", function(d) { return "translate(" + label.centroid(d) + ")"; })
       .attr("dy", "0.35em")
+      .attr("font-size", "1.25em")
       .text(function(d) { return d.data.key; });
 
   svg.append("text")
