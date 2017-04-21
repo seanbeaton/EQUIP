@@ -71,8 +71,11 @@ Template.viewData.events({
     $('.sparam-selection .chosen').each(function () { sParams.push($(this).attr('data_id')) });
 
     // Start generating graphs
-    makeDemGraphs(envId, dParams);
-    makeContributionGraphs(obsIds, dParams, sParams);
+    demData = makeDemGraphs(envId, dParams);
+    groupCData = makeContributionGraphs(obsIds, dParams, sParams);
+    
+    makeRatioGraphs(groupCData, demData);
+    makeIndividualGraphs(obsIds);
 
     $('.option-select').css('display', 'none');
     $('.report-body').css('visibility', 'visible');
@@ -217,6 +220,9 @@ function makeDemGraphs(env, dparams) {
     makePieChart(d3.entries(data[key]), key);
   }
 
+
+  return data;
+
 }
 
 function makeContributionGraphs(obsIds, dp, sp) {
@@ -256,9 +262,121 @@ function makeContributionGraphs(obsIds, dp, sp) {
       var label = ""+param+" by "+demp;
       var dataSlice = d3.entries(data[demp][param]);
 
-        makeStackedBar(dataSlice, label);
+        makeStackedBar(dataSlice, label, ".contribution-plots", "# of Contributions");
     }
   }
+
+  return data;
+
+}
+
+function makeRatioGraphs(cData, dData) {
+  var statData = {};
+  var total = d3.sum(d3.values(dData[d3.keys(dData)[0]]))
+  
+  
+  for (key in dData) {
+    statData[key] = dData[key];
+    d3.keys(statData[key]).map(function (k, i) { statData[key][k] /= total });
+  }
+
+  var ratioData = {}
+
+  for (demo in cData) {
+    ratioData[demo] = cData[demo];
+    for (param in cData[demo]) {
+      for (c in cData[demo][param]) {
+        var totalCat = d3.sum(d3.values(cData[demo][param][c]));
+        d3.keys(ratioData[demo][param][c]).map(function (k, i) { ratioData[demo][param][c][k] /= totalCat });
+        d3.keys(ratioData[demo][param][c]).map(function (k, i) { ratioData[demo][param][c][k] /= (statData[demo][k]) });
+      }
+    }
+  }
+
+  for (demp in ratioData) {
+    for (param in ratioData[demp]) {
+      var label = ""+param+" by "+demp;
+      var dataSlice = d3.entries(data[demp][param]);
+
+        makeStackedBar(dataSlice, label, ".ratio-plots", "Equity Ratio");
+    }
+  }
+
+}
+
+function makeIndividualGraphs(oIds) {
+
+  var contribs = {};
+  for (id in oIds) {
+    var nc = Sequences.find({"obsId": oIds[id]}).fetch();
+    for (c in nc) {
+      if (contribs[nc[c]['info']["Name"]]) {
+        contribs[nc[c]['info']["Name"]] += 1;
+
+      } else {
+        contribs[nc[c]['info']["Name"]] = 1;
+      }
+    }
+  }
+
+  data = d3.entries(contribs);
+
+  console.log(data);
+
+  var margin = {top: 50, right: 20, bottom: 30, left: 40},
+    width = 900 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom,
+    fullW = 900,
+    fullH = 500;
+
+  var svg = d3.select(".individual-plots")
+            .append("svg")
+            .attr('width', fullW)
+            .attr('height', fullH);
+
+
+  var g = svg.append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+  var x = d3.scaleBand().rangeRound([0, fullW]).padding(0.5),
+    y = d3.scaleLinear().rangeRound([height, 0]);
+
+
+  x.domain(data.map(function(d) { return d.key.slice(0,10); }));
+  y.domain([0, d3.max(data, function(d) { return d.value; })]);
+
+  g.append("g")
+      .attr("class", "axis axis--x")
+      .attr("transform", "translate(0," + height + ")")
+      .call(d3.axisBottom(x));
+
+  g.append("g")
+      .attr("class", "axis axis--y")
+      .call(d3.axisLeft(y).ticks())
+    .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6)
+      .attr("dy", "0.71em")
+      .attr("text-anchor", "end")
+      .text("Frequency");
+
+  g.selectAll(".bar")
+    .data(data)
+    .enter().append("rect")
+      .attr("class", "single-bar")
+      .attr("x", function(d) { return x(d.key.slice(0,10)); })
+      .attr("y", function(d) { return y(d.value); })
+      .attr("width", x.bandwidth())
+      .attr("height", function(d) { return height - y(d.value); });
+
+  g.append("text")
+      .attr("x", width/2)
+      .attr("y", -20)
+      .attr("dy", "0.32em")
+      .attr("font-weight", "bold")
+      .attr("text-anchor", "middle")
+      .text("Contributions over Students");
+
 }
 
 function makePieChart(data, label) {
@@ -312,16 +430,16 @@ function makePieChart(data, label) {
 
 }
 
-function makeStackedBar(dataEnum, label) {
+function makeStackedBar(dataEnum, label, selector, yLabel) {
 
 
-  var margin = {top: 20, right: 20, bottom: 30, left: 40},
+  var margin = {top: 50, right: 20, bottom: 30, left: 40},
     width = 600 - margin.left - margin.right,
     height = 500 - margin.top - margin.bottom,
     fullW = 600,
     fullH = 500;
 
-  var svg = d3.select(".contribution-plots")
+  var svg = d3.select(selector)
             .append("svg")
             .attr('width', fullW)
             .attr('height', fullH);
@@ -356,7 +474,7 @@ function makeStackedBar(dataEnum, label) {
   x0.domain(dataEnum.map(function(d) { return d.key; }));
   x1.domain(keys).rangeRound([0, x0.bandwidth()]);
 
-  y.domain([0, d3.max(dataEnum, function(d) { return d3.max(keys, function(key) { return d.value[key]; }); })]).nice();
+  y.domain([0, 1.25*d3.max(dataEnum, function(d) { return d3.max(keys, function(key) { return d.value[key]; }); })]).nice();
 
 
   g.append("g")
@@ -388,7 +506,7 @@ function makeStackedBar(dataEnum, label) {
       .attr("fill", "#000")
       .attr("font-weight", "bold")
       .attr("text-anchor", "start")
-      .text("# of Contributions");
+      .text(yLabel);
 
   var legend = g.append("g")
       .attr("font-family", "sans-serif")
@@ -410,5 +528,13 @@ function makeStackedBar(dataEnum, label) {
       .attr("y", 9.5)
       .attr("dy", "0.32em")
       .text(function(d) { return d; });
+
+    g.append("text")
+      .attr("x", fullW/2)
+      .attr("y", -20)
+      .attr("dy", "0.32em")
+      .attr("font-weight", "bold")
+      .attr("text-anchor", "middle")
+      .text(label);
 
 }

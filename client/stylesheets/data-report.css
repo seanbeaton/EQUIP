@@ -39,6 +39,14 @@
     flex-wrap: wrap;
 }
 
+.ratio-plots {
+    flex-wrap: wrap;
+}
+
+.individual-plots {
+    flex-wrap: wrap;
+}
+
 .classroom-selection:hover {
     color: white;
     opacity: .5;
@@ -73,4 +81,28 @@
 
 .axis .domain {
   display: none;
+}
+
+.single-bar {
+  fill: steelblue;
+}
+
+.single-bar:hover {
+  fill: brown;
+}
+
+.axis--x path {
+  display: none;
+}
+
+
+.plots {
+    border-top: 1px solid black;
+    padding: 2em;
+    border-bottom: 1px dashed black;
+    margin-bottom: 1em;
+}
+
+.plots > svg {
+    margin: 2em;
 }
