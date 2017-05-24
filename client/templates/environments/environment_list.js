@@ -30,7 +30,9 @@ Template.environmentList.helpers({
 });
 
 Template.environmentList.events({
-
+  'click #analyze-button': function (e){
+    Router.go('viewData');
+  },
   'click .help-button': function (e) {
     $('#help-env-modal').addClass("is-active");
   },

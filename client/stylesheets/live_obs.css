@@ -14,8 +14,8 @@
 }
 
 .floating-log {
-    position: fixed;
-    bottom: 0px;
+    /*position: fixed;
+    bottom: 0px;*/
     color: white;
     background: #FF8E00;
 }

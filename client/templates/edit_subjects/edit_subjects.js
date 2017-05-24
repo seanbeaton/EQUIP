@@ -96,6 +96,15 @@ Template.editSubjects.events({
     $('#help-env-modal').removeClass("is-active");
   },
   'click #add-student': function(e) {
+    var envId = Router.current().params._envId
+    var subjParams = SubjectParameters.findOne({'children.envId':envId});
+
+    if ($.isEmptyObject(subjParams)) {
+      alert("You must add demographic parameters before you can add a student!");
+      return;
+    }
+
+
     $('#param-modal-content').children().remove();
 
    $('#stud-param-modal').addClass('is-active');
@@ -158,6 +167,13 @@ Template.editSubjects.events({
      }
    });
  },
+  'click .edit-stud' : function (e) {
+    studId = $(e.target).attr('data_id');
+    editParamBoxes(studId);
+  
+    $('#stud-data-modal').removeClass('is-active');
+    $('#stud-param-modal').addClass('is-active');
+  },
   'click #edit-remove-student': function(e) {
     createTableOfStudents();
     $('#stud-data-modal').addClass('is-active');
@@ -198,13 +214,6 @@ Template.editSubjects.events({
       }); 
   },
 
-  'click #editSubjects': function(e) {
-    propigateSubjectTableBody();
-    $('#editSubjPopup').modal({
-      keyboard: true,
-      show: true
-    });
-  },
   'click .delete-subject': function(e) {
     var result = confirm("Press 'OK' to delete this Subject.");
       subjId = $(e.target).attr("data_id");
@@ -213,6 +222,47 @@ Template.editSubjects.events({
       });
 
       createTableOfStudents();
+  },
+  'click #edit-subj-params': function (e){
+    subjId = $(e.target).attr('data_id');
+
+    var info = {};
+      info['name'] = $('.student-modal-head').attr('data_name');
+      envId = Router.current().params._envId;
+      var choices = [];
+      var labels = [];
+      //Do this always in the case of editing from obs list
+
+        $('.subj-box-labels').each(function () {
+          labels.push(this.textContent);
+          var c = $(this).siblings('.chosen')[0];
+          if (c) {
+            choices.push(c.textContent);
+          } else {
+            choices.push(null);
+          }
+        });
+      
+      for (label in labels) {
+        info[labels[label]] = choices[label];
+      }
+
+      var subject = {
+        info: info,
+        subId: subjId
+      };
+
+      Meteor.call('subjectUpdate', subject, function(error, result) {
+       if (error) {
+         alert(error.reason);
+       } else {
+        $('#stud-param-modal').removeClass('is-active');
+       }
+     });
+    //This should happen at the end...
+    $('#stud-param-modal').removeClass('is-active');
+    createTableOfStudents()
+    $('#stud-data-modal').addClass('is-active');
   }
 
 });
@@ -228,7 +278,7 @@ function createTableOfStudents() {
   subjParams = SubjectParameters.find({'children.envId':envId}).fetch()[0];
   parameterPairs = subjParams["children"]["parameterPairs"];
 
-  allParams = ['name'];
+  allParams = ['Edit','name'];
   for (p = 0; p<parameterPairs; p++) {
     allParams.push(subjParams['children']['label'+p]);
   }
@@ -262,7 +312,13 @@ function createTableOfStudents() {
           data_id: students[s]['_id']
         }).appendTo(td);
 
-      } else {
+      } else if (allParams[p] == "Edit") {
+        var td = $('<td/>', {}).appendTo(row);
+        var bye = $('<i/>', {
+          class: "fa fa-pencil-square-o edit-stud",
+          data_id: students[s]['_id'],
+        }).appendTo(td);
+      }else {
         attr = students[s]['info'][allParams[p]]
         $('<td/>', {
           text: attr
@@ -338,6 +394,82 @@ function populateParamBoxes() {
     class: "button is-medium is-success",
     id: "save-subj-params",
     text: "Add Subject"
+  }).appendTo(modal);
+
+}
+
+function editParamBoxes(subjId) {
+  $('#param-modal-content').children().remove();
+  var envId = Router.current().params._envId
+  subParams = SubjectParameters.find({'children.envId':envId}).fetch()[0];
+  parameterPairs = subParams["children"]["parameterPairs"];
+  var subj = Subjects.find({_id: subjId}).fetch()[0];
+  var student = subj.info.name;
+
+  var modal = $('#param-modal-content');
+  
+  var name = $("<div/>", {
+      class: "columns  boxes-wrapper"
+    }).appendTo(modal);
+
+    var label = $("<h1/>", {
+      class: "column is-12 has-text-centered title is-3 student-modal-head",
+      text: "Editing Info for "+student,
+      data_id: subjId,
+      data_name: student
+    }).appendTo(name);
+
+  //
+  //BOX CREATION FOR MODAL
+  //
+  //go through each parameter pair and create a box
+  for (var param = 0; param<parameterPairs; param++) {
+
+    var wrap = $("<div/>", {
+      class: "columns  boxes-wrapper"
+    }).appendTo(modal);
+
+    var label = $("<div/>", {
+      class: "column is-2 has-text-centered subj-box-labels",
+      text: subParams['children']['label'+param]
+    }).appendTo(wrap);
+
+    var field = subParams['children']['label'+param];
+
+    var params = subParams['children']['parameter'+param];
+    var options = params.split(',');
+
+    for (opt in options) {
+  
+        if (subj['info'][field] == options[opt]) {
+          var option = $("<div/>", {
+          class: "column has-text-centered subj-box-params chosen hoverable",
+          text: options[opt]
+        }).appendTo(wrap);
+        } else {
+  
+          var option = $("<div/>", {
+            class: "column has-text-centered subj-box-params hoverable",
+            text: options[opt]
+          }).appendTo(wrap);
+        }
+        option.click(function (e) {
+          e.preventDefault();
+          $(this).siblings().removeClass('chosen');
+          if ( $(this).hasClass('chosen') ){
+            $(this).removeClass('chosen');
+          } else {
+            $(this).addClass('chosen');
+          }
+        });
+    }//end for
+  }//end for
+
+  $("<button/>", {
+    class: "button is-medium is-success",
+    id: "edit-subj-params",
+    data_id: subjId,
+    text: "Save Revised Student Info"
   }).appendTo(modal);
 
 }

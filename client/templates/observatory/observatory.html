@@ -14,7 +14,8 @@
         <h1 class="title is-2 env-label-head">{{environment.envName}} - {{observation.name}} - Live Observation</h1>
       </div>
       <div class="column is-one-quarter">
-        <h2 id="obs-timer" class="subtitle is-4">00:00:00</h2>
+        <button class="button is-large floating-log">Contribution Log</button>
+        <!-- <h2 id="obs-timer" class="subtitle is-4">00:00:00</h2> -->
       </div>
     </div>
     <div class="columns is-multiline toggle-dash">
@@ -22,7 +23,6 @@
     </div>
   </section>
   <div class="subjects">
-    <button class="button is-large floating-log is-pulled-left">Contribution Log</button>
     {{#each subject}}
       <div id="{{_id}}" style='transform:translate({{data_x}}px, {{data_y}}px);' data-x="{{data_x}}" data-y="{{data_y}}" class="dragger">
         <p class="student-box">{{info.name}}</p>

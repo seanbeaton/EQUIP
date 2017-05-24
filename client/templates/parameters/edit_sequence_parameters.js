@@ -4,6 +4,16 @@
 */
 
 var serialize = require('form-serialize');
+
+//Try to short circuit "enter" button?
+Template.editSequenceParameters.rendered = function() {
+  $(document).keypress(function(e) {
+     if (e.keyCode == 13) { 
+      e.preventDefault();
+      return;
+    }
+  });
+}
  
 Template.editSequenceParameters.helpers({
   environment: function() {
@@ -22,7 +32,7 @@ function loadDefaultSeqParams() {
   }).appendTo('#paramsSection');
 
   var container = document.getElementById("paramForm");
-  labels = ["Discourse Type", "Solicitation Method", "Wait Time", "Length of Talk", "Student Talk", "Teacher Soliciation", "Explicit Evaluation"]
+  labels = ["Discourse Type", "Teacher Soliciation","Wait Time", "Solicitation Method", "Length of Talk", "Student Talk",  "Explicit Evaluation"]
 
   for (i=0;i<7;i++){
      var singleParam = $('<div/>', {
@@ -48,7 +58,7 @@ function loadDefaultSeqParams() {
 
       var inputValue = "";
       if (labels[i] == "Discourse Type") {
-        inputValue = "Logistics, Content"
+        inputValue = "Logistics,Content"
       }
       if (labels[i] == "Solicitation Method") {
         inputValue  = "Called On,Not Called On"

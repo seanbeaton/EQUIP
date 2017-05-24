@@ -3,7 +3,7 @@
 */
 var Stopwatch = require('stopwatchjs');
 var timer = new Stopwatch();
-var timerUpdate;
+//var timerUpdate;
 var lastChoices = {};
 
 Template.observatory.created = function() {
@@ -32,10 +32,10 @@ function clockSet() {
   }
   var divisor_for_seconds = divisor_for_minutes % 60;
   var seconds = Math.ceil(divisor_for_seconds);
-if (seconds < 10) {
+  if (seconds < 10) {
     seconds = '0' + seconds;
   }
-  $('#obs-timer').text(''+hours+':'+minutes+':'+seconds);
+  //$('#obs-timer').text(''+hours+':'+minutes+':'+seconds);
 }
 
 //Create Timer and Toggle Options
@@ -46,7 +46,7 @@ Template.observatory.rendered = function() {
   timer.value = timerVal;
   timer.start();
 
-  timerUpdate = setInterval(clockSet, 1000);
+  //timerUpdate = setInterval(clockSet, 1000);
 
   var paramPairs = seqParams.children.parameterPairs;
   for (var p=0; p<paramPairs;p++){
@@ -111,7 +111,7 @@ Template.observatory.events({
   'click .back-head-params': function(e) {
     //Save stopwatch value
     timer.stop();
-    clearInterval(timerUpdate);
+    //clearInterval(timerUpdate);
     curr_time = timer.value;
     update = {obsId: Router.current().params._obsId, timer: curr_time};
     Meteor.call('timerUpdate', update);
@@ -206,7 +206,7 @@ Template.observatory.events({
 
   },
     
-   'click .delete-seq': function(e) {
+  'click .delete-seq': function(e) {
     var result = confirm("Press 'OK' to delete this Contribution.");
     if (result == false) {
       return;
@@ -251,11 +251,14 @@ Template.observatory.events({
 
         $('.subj-box-labels').each(function () {
           labels.push(this.textContent);
+          var c = $(this).siblings('.chosen')[0];
+          if (c) {
+            choices.push(c.textContent);
+          } else {
+            choices.push(null);
+          }
         });
 
-        $('.chosen').each(function () {
-          choices.push(this.textContent);
-        });
       
       for (label in labels) {
         info[labels[label]] = choices[label];

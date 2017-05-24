@@ -15,13 +15,13 @@ Template.observationItem.events({
      Router.go('observatory', {_envId: this.envId, _obsId: this._id});
    },
    'click #delete-obs-button': function(e) {
-     var result = confirm("Deleting an observation will also delete all sequences taken in the specific observation. Press 'OK' to continue.");
-     obsId = this._id
-    if (result) {
-      Meteor.call('observationDelete', obsId, function(error, result) {
-        return 0;
-      });
-    }
+       var result = confirm("Deleting an observation will also delete all sequences taken in the specific observation. Press 'OK' to continue.");
+       obsId = this._id
+       if (result) {
+        Meteor.call('observationDelete', obsId, function(error, result) {
+          return 0;
+        });
+      }
   },
   'click .modal-close': function(e){
     $('#seq-param-modal').removeClass('is-active');
@@ -49,10 +49,12 @@ Template.observationItem.events({
   'click .delete-seq': function(e) {
     var result = confirm("Press 'OK' to delete this Subject.");
       seqId = $(e.target).attr("data_id");
+      seq = Sequences.findOne({_id: seqId});
+      obsId = seq['obsId'];
       Meteor.call('sequenceDelete', seqId, function(error, result) {
         return 0;
       });
-      createTableOfContributions(this._id);
+      createTableOfContributions(obsId);
 
   },
   'click #edit-seq-params': function(e) {
@@ -62,17 +64,19 @@ Template.observationItem.events({
       info['studentId'] = $('.student-modal-head').attr('data_id');
       info['Name'] = $('.student-modal-head').attr('data_name');
       envId = Router.current().params._envId;
-      obsId = Router.current().params._obsId;
+      obsId = this._id;
       var choices = [];
       var labels = [];
       //Do this always in the case of editing from obs list
 
         $('.subj-box-labels').each(function () {
           labels.push(this.textContent);
-        });
-
-        $('.chosen').each(function () {
-          choices.push(this.textContent);
+          var c = $(this).siblings('.chosen')[0];
+          if (c) {
+            choices.push(c.textContent);
+          } else {
+            choices.push(null);
+          }
         });
       
       for (label in labels) {
@@ -92,8 +96,10 @@ Template.observationItem.events({
        }
      });
     //This should happen at the end...
+    seq = Sequences.findOne({_id: seqId});
+    obsId = seq['obsId'];
     $('#seq-param-modal').removeClass('is-active');
-    createTableOfContributions(this._id);
+    createTableOfContributions(obsId);
     $('#seq-data-modal').addClass('is-active');
   }
  });
@@ -109,11 +115,13 @@ Template.observationItem.events({
 function createTableOfContributions(obsId) {
   $('#data-modal-content').children().remove();
   var envId = Router.current().params._envId
+  console.log(obsId);
   var seqs = Sequences.find({obsId: obsId}).fetch();
-  seqParams = SequenceParameters.find({'children.envId':envId}).fetch()[0];
-  parameterPairs = seqParams["children"]["parameterPairs"];
+  var seqParams = SequenceParameters.find({'children.envId':envId}).fetch()[0];
+  console.log(seqs);
+  var parameterPairs = seqParams["children"]["parameterPairs"];
 
-  allParams = ['Edit','Name', 'Time'];
+  var allParams = ['Edit','Name', 'Time'];
   for (p = 0; p<parameterPairs; p++) {
     allParams.push(seqParams['children']['label'+p]);
   }
@@ -180,7 +188,7 @@ function convertTime(secs) {
   }
   var divisor_for_seconds = divisor_for_minutes % 60;
   var seconds = Math.ceil(divisor_for_seconds);
-if (seconds < 10) {
+  if (seconds < 10) {
     seconds = '0' + seconds;
   }
   final_str = ''+hours+':'+minutes+':'+seconds;
@@ -238,7 +246,11 @@ function populateParamBoxes(subjId) {
         option.click(function (e) {
           e.preventDefault();
           $(this).siblings().removeClass('chosen');
-          $(this).addClass('chosen');
+          if ( $(this).hasClass('chosen') ){
+            $(this).removeClass('chosen');
+          } else {
+            $(this).addClass('chosen');
+          }
         });
     }//end for
   }//end for
@@ -310,7 +322,11 @@ function editParamBoxes(seqId, subjId) {
         option.click(function (e) {
           e.preventDefault();
           $(this).siblings().removeClass('chosen');
-          $(this).addClass('chosen');
+          if ( $(this).hasClass('chosen') ){
+            $(this).removeClass('chosen');
+          } else {
+            $(this).addClass('chosen');
+          }
         });
     }//end for
   }//end for

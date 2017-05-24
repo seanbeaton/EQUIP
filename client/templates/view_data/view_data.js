@@ -1,7 +1,7 @@
 /*
 * JS file for view_data.js
 */
-
+var d3 = require('d3');
 //Generate classroom buttons immediately
 Template.viewData.rendered = function() {
   var envs = Environments.find({}).fetch();
@@ -74,7 +74,7 @@ Template.viewData.events({
     demData = makeDemGraphs(envId, dParams);
     groupCData = makeContributionGraphs(obsIds, dParams, sParams);
     
-    makeRatioGraphs(groupCData, demData);
+    makeRatioGraphs(envId, groupCData, demData);
     makeIndividualGraphs(obsIds);
 
     $('.option-select').css('display', 'none');
@@ -113,6 +113,17 @@ Template.viewData.events({
         });
     }
 
+    var SA = $('<button>', {
+        class: "button is-medium option-selectors",
+        text: "Select All",
+        data_id: 999
+      }).appendTo(obsButtons);
+
+    SA.click(function (e) {
+      e.preventDefault();
+      $(this).siblings().addClass('chosen');
+    });
+
     var demButtons = $('.dparam-selection');
     dpairs = dparams['children']['parameterPairs'];
     for (var d = 0; d < dpairs; d++) {
@@ -136,6 +147,17 @@ Template.viewData.events({
         });
     }
 
+    var DSA = $('<button>', {
+        class: "button is-medium option-selectors",
+        text: "Select All",
+        data_id: 999
+      }).appendTo(demButtons);
+
+    DSA.click(function (e) {
+      e.preventDefault();
+      $(this).siblings().addClass('chosen');
+    });
+
     var seqButtons = $('.sparam-selection');
     spairs = sparams['children']['parameterPairs'];
     for (var s = 0; s < spairs; s++) {
@@ -158,9 +180,53 @@ Template.viewData.events({
           }
         });
     }
+    var SSA = $('<button>', {
+        class: "button is-medium option-selectors",
+        text: "Select All",
+        data_id: 999
+      }).appendTo(seqButtons);
+
+    SSA.click(function (e) {
+      e.preventDefault();
+      $(this).siblings().addClass('chosen');
+    });
 
    },
    //This should probably be a modal??
+  'click .export-class-button': function(e){
+    
+    var envId = $('.env-selection .chosen').attr('data_id');
+    if(envId)
+     {
+        var environment = Environments.findOne({"_id":envId});
+        var envName = environment['envName'];
+        var subjects=Subjects.find({"envId":envId}).fetch();
+        var literalArray = []
+        for (i=0;i<subjects.length;i++) {
+          new_sub = subjects[i]['info'];
+          new_sub['envName'] = envName;
+          literalArray.push(new_sub);
+        }
+        var csv = Papa.unparse({
+          data: literalArray,
+        });
+        var csvData = new Blob([csv], {type: 'text/csv;charset=utf-8;'});
+        var csvURL =  null;
+        //IE download API for saving files client side
+        if (navigator.msSaveBlob) {
+            csvURL = navigator.msSaveBlob(csvData, 'download.csv');
+        } else {
+        //Everything else
+            csvURL = window.URL.createObjectURL(csvData);
+        }
+        var tempLink = document.createElement('a');
+        tempLink.href = csvURL;
+        tempLink.setAttribute('download', envName+'_classroom_export.csv');
+        tempLink.click();
+      } else {
+        alert("Please select a classroom to export!")
+      }
+  },
   'click .export-data-button': function(e) {
 
      var envId = $('.env-selection .chosen').attr('data_id');
@@ -192,7 +258,7 @@ Template.viewData.events({
         }
         var tempLink = document.createElement('a');
         tempLink.href = csvURL;
-        tempLink.setAttribute('download', envName+'_CSV_export.csv');
+        tempLink.setAttribute('download', envName+'_sequence_export.csv');
         tempLink.click();
       } else {
         alert("Please select a classroom to export!")
@@ -270,11 +336,11 @@ function makeContributionGraphs(obsIds, dp, sp) {
 
 }
 
-function makeRatioGraphs(cData, dData) {
+function makeRatioGraphs(envId, cData, dData) {
   var statData = {};
   var total = d3.sum(d3.values(dData[d3.keys(dData)[0]]))
-  
-  
+  var allParams = SubjectParameters.findOne({"children.envId": envId});
+    
   for (key in dData) {
     statData[key] = dData[key];
     d3.keys(statData[key]).map(function (k, i) { statData[key][k] /= total });
@@ -297,7 +363,27 @@ function makeRatioGraphs(cData, dData) {
     for (param in ratioData[demp]) {
       var label = ""+param+" by "+demp;
       var dataSlice = d3.entries(data[demp][param]);
-
+      //new
+      console.log('context');
+      console.log(demp);
+        for (obj in dataSlice) {
+          for (var x=0; x < allParams['children']['parameterPairs']; x++) {
+            if (allParams['children']['label'+x] == demp) {
+              selection = allParams['children']['parameter'+x];
+              listedParams = selection.split(',');
+              for (p in listedParams) {
+                if (listedParams[p] in dataSlice[obj].value) {
+                  continue;
+                } else {
+                  dataSlice[obj]['value'][listedParams[p]] = 0.0;
+                }
+              }
+            }
+          }
+        }
+        //
+        console.log('data before graphing');
+        console.log(dataSlice);
         makeStackedBar(dataSlice, label, ".ratio-plots", "Equity Ratio");
     }
   }
@@ -319,9 +405,9 @@ function makeIndividualGraphs(oIds) {
     }
   }
 
-  data = d3.entries(contribs);
 
-  console.log(data);
+  data = d3.entries(contribs);
+  data = _(data).sortBy('value')
 
   var margin = {top: 50, right: 20, bottom: 30, left: 40},
     width = 900 - margin.left - margin.right,
@@ -456,7 +542,7 @@ function makeStackedBar(dataEnum, label, selector, yLabel) {
 
   // Grouping Axis
   var x1 = d3.scaleBand()
-      .padding(0.05);
+      .padding(0.5);
 
   // Bars
   var y = d3.scaleLinear()
@@ -473,11 +559,10 @@ function makeStackedBar(dataEnum, label, selector, yLabel) {
   for (bit in sample) {
     keys.push(bit);
   }
-
   x0.domain(dataEnum.map(function(d) { return d.key; }));
   x1.domain(keys).rangeRound([0, x0.bandwidth()]);
 
-  y.domain([0, 1.25*d3.max(dataEnum, function(d) { return d3.max(keys, function(key) { return d.value[key]; }); })]).nice();
+  y.domain([-.001, 1.25*d3.max(dataEnum, function(d) { return d3.max(keys, function(key) { return d.value[key]; }); })]).nice();
 
 
   g.append("g")
@@ -521,13 +606,13 @@ function makeStackedBar(dataEnum, label, selector, yLabel) {
       .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
 
   legend.append("rect")
-      .attr("x", width - 55)
+      .attr("x", width - 25)
       .attr("width", 19)
       .attr("height", 19)
       .attr("fill", z);
 
   legend.append("text")
-      .attr("x", width - 60)
+      .attr("x", width - 30)
       .attr("y", 9.5)
       .attr("dy", "0.32em")
       .text(function(d) { return d; });
@@ -538,6 +623,7 @@ function makeStackedBar(dataEnum, label, selector, yLabel) {
       .attr("dy", "0.32em")
       .attr("font-weight", "bold")
       .attr("text-anchor", "middle")
+      .attr("font-size", 24)
       .text(label);
 
 }

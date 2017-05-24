@@ -85,6 +85,8 @@
 
 #student-name {
   margin-top: 2%;
+  font-size: 2em;
+  height: 2em;
 }
 
 .drag-label {

@@ -9,6 +9,11 @@
     color: white;
 }
 
+.export-class-button {
+    background: #4893cf;
+    color: white;
+}
+
 .classroom-selection {
     color: white;
     background: #005288;
@@ -65,8 +70,12 @@
 }
 
 .title.report-label-head {
-    margin-bottom: 2em;
+    margin-bottom: 1em;
     font-family: "Roboto Slab";
+}
+
+.report-description {
+    margin-bottom: .5em;
 }
 
 .arc text {
@@ -105,4 +114,5 @@
 
 .plots > svg {
     margin: 2em;
+    border: 1px dashed grey;
 }

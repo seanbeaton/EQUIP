@@ -19,7 +19,11 @@
   "dependencies": {
     "babel-runtime": "^6.18.0",
     "bcrypt": "^0.8.7",
+    "d3": "^4.9.1",
     "form-serialize": "^0.7.1",
     "stopwatchjs": "^0.1.1"
+  },
+  "devDependencies": {
+    "d3": "^4.9.1"
   }
 }
