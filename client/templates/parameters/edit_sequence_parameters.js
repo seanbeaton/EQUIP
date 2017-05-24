@@ -32,7 +32,7 @@ function loadDefaultSeqParams() {
   }).appendTo('#paramsSection');
 
   var container = document.getElementById("paramForm");
-  labels = ["Discourse Type", "Teacher Soliciation","Wait Time", "Solicitation Method", "Length of Talk", "Student Talk",  "Explicit Evaluation"]
+  labels = ["Discourse Type", "Teacher Solicitation","Wait Time", "Solicitation Method", "Length of Talk", "Student Talk",  "Explicit Evaluation"]
 
   for (i=0;i<7;i++){
      var singleParam = $('<div/>', {

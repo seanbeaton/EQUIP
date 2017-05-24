@@ -73,6 +73,8 @@ Template.viewData.events({
     // Start generating graphs
     demData = makeDemGraphs(envId, dParams);
     groupCData = makeContributionGraphs(obsIds, dParams, sParams);
+
+    classStats(envId);
     
     makeRatioGraphs(envId, groupCData, demData);
     makeIndividualGraphs(obsIds);
@@ -267,6 +269,54 @@ Template.viewData.events({
     }
 });
 
+function classStats(envId) {
+  var studs = Subjects.find({"envId": envId}).fetch();
+  var totalStuds = studs.length;
+  var studTrack = new Set();
+  var studTalk = {};
+  var teachTalk = {};
+  var conts = Sequences.find({'envId': envId}).fetch();
+  var totalCont = conts.length;
+  for (con in conts) {
+    var next = conts[con]['info'];
+    studTrack.add(next['studentId']);
+    if (next['Length of Talk']) {
+      if (next['Length of Talk'] in studTalk) {
+        studTalk[next['Length of Talk']] += 1;
+      } else {
+        studTalk[next['Length of Talk']] = 1;
+      }
+    }
+    if (next["Student Talk"]) {
+      if (next["Student Talk"] in studTalk) {
+        studTalk[next["Student Talk"]] += 1;
+      } else {
+        studTalk[next["Student Talk"]] = 1;
+      }
+    }
+    if (next["Teacher Solicitation"]) {
+      if (next["Teacher Solicitation"] in teachTalk) {
+        teachTalk[next["Teacher Solicitation"]] += 1;
+      } else {
+        teachTalk[next["Teacher Solicitation"]] = 1;
+      }
+    } else if (next["Teacher Soliciation"]) { // Eliminate later!!
+      if (next["Teacher Soliciation"] in teachTalk) {
+        teachTalk[next["Teacher Soliciation"]] += 1;
+      } else {
+        teachTalk[next["Teacher Soliciation"]] = 1;
+      }
+    } 
+  }
+  console.log('CLASS STATS');
+  console.log(totalStuds);
+  console.log(totalCont);
+  console.log(studTrack.size);
+  console.log(studTalk);
+  console.log(teachTalk);
+  //Append to .class-stats
+}
+
 function makeDemGraphs(env, dparams) {
   var subs = Subjects.find({"envId": env}).fetch();
   var data = {}
@@ -327,8 +377,9 @@ function makeContributionGraphs(obsIds, dp, sp) {
     for (param in data[demp]) {
       var label = ""+param+" by "+demp;
       var dataSlice = d3.entries(data[demp][param]);
-
-        makeStackedBar(dataSlice, label, ".contribution-plots", "# of Contributions");
+        //Commenting out until final decision
+        //No need for now!!
+        //makeStackedBar(dataSlice, label, ".contribution-plots", "# of Contributions");
     }
   }
 
@@ -364,8 +415,6 @@ function makeRatioGraphs(envId, cData, dData) {
       var label = ""+param+" by "+demp;
       var dataSlice = d3.entries(data[demp][param]);
       //new
-      console.log('context');
-      console.log(demp);
         for (obj in dataSlice) {
           for (var x=0; x < allParams['children']['parameterPairs']; x++) {
             if (allParams['children']['label'+x] == demp) {
@@ -381,9 +430,6 @@ function makeRatioGraphs(envId, cData, dData) {
             }
           }
         }
-        //
-        console.log('data before graphing');
-        console.log(dataSlice);
         makeStackedBar(dataSlice, label, ".ratio-plots", "Equity Ratio");
     }
   }
@@ -595,6 +641,13 @@ function makeStackedBar(dataEnum, label, selector, yLabel) {
       .attr("font-weight", "bold")
       .attr("text-anchor", "start")
       .text(yLabel);
+
+  g.append("line")
+    .style("stroke", "black")
+    .attr("x1", 0)
+    .attr("y1", y(1.0))
+    .attr("x2", width)
+    .attr("y2", y(1.0));
 
   var legend = g.append("g")
       .attr("font-family", "sans-serif")
