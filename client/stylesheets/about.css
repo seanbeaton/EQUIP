@@ -1,0 +1,16 @@
+.about-text {
+    font-size: 24px;
+    font-family: 'Open Sans';
+}
+
+.about-text a {
+    color: #4893cf;
+}
+
+.about-text a:hover {
+    opacity: .5;
+}
+
+/*.staff {
+    width: 200px;
+}*/

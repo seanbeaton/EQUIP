@@ -104,6 +104,11 @@
   display: none;
 }
 
+.stat-head {
+    margin-top: .5em;
+    text-decoration: underline;
+}
+
 
 .plots {
     border-top: 1px solid black;
@@ -115,4 +120,8 @@
 .plots > svg {
     margin: 2em;
     border: 1px dashed grey;
+}
+
+.class-stats {
+    margin-bottom: 1em;
 }

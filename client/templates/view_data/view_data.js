@@ -314,6 +314,71 @@ function classStats(envId) {
   console.log(studTrack.size);
   console.log(studTalk);
   console.log(teachTalk);
+
+  var stats = $('.class-stats');
+  var fh = $('<h3/>', {
+    class: "stat-head title is-5",
+    text: "Classroom Summary"
+  }).appendTo(stats);
+  var bullets = $('<ul/>', {
+    class: "stat-list"
+  }).appendTo(stats);
+  var tc = $('<li/>', {
+    text: "Students who Contributed: "+studTrack.size,
+    class: "single-stat"
+  }).appendTo(bullets)
+  var ts = $('<li/>', {
+    text: "Total Students: "+totalStuds,
+    class: "single-stat"
+  }).appendTo(bullets)
+  var perc = parseFloat(studTrack.size/totalStuds).toFixed(2);
+  var pp = $('<li/>', {
+    text: "Percent Contributing: "+(perc*100)+" %",
+    class: "single-stat"
+  }).appendTo(bullets)
+  var ac = $('<li/>', {
+    text: "Total Contributions: "+totalCont,
+    class: "single-stat"
+  }).appendTo(bullets)
+  var ps = $('<li/>', {
+    text: "Contributions per student: "+parseFloat(totalCont/studTrack.size).toFixed(2),
+    class: "single-stat"
+  }).appendTo(bullets)
+
+  if (!$.isEmptyObject(teachTalk)) {
+
+    var sh = $('<h3/>', {
+      class: "stat-head title is-5",
+      text: "Teacher Solicitation"
+    }).appendTo(stats);
+    var bullets2 = $('<ul/>', {
+      class: "stat-list"
+    }).appendTo(stats);
+    for (key in teachTalk) {
+      var ac = $('<li/>', {
+        text: ""+key+": "+teachTalk[key],
+        class: "single-stat"
+      }).appendTo(bullets2)
+    }
+  }
+
+  if (!$.isEmptyObject(studTalk)) {
+    var th = $('<h3/>', {
+      class: "stat-head title is-5",
+      text: "Student Talk Type and Length"
+    }).appendTo(stats);
+    var bullets3 = $('<ul/>', {
+      class: "stat-list"
+    }).appendTo(stats);
+    for (key in studTalk) {
+      var ac = $('<li/>', {
+        text: ""+key+": "+studTalk[key],
+        class: "single-stat"
+      }).appendTo(bullets3)
+    }
+  }
+
+
   //Append to .class-stats
 }
 
