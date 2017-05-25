@@ -308,12 +308,6 @@ function classStats(envId) {
       }
     } 
   }
-  console.log('CLASS STATS');
-  console.log(totalStuds);
-  console.log(totalCont);
-  console.log(studTrack.size);
-  console.log(studTalk);
-  console.log(teachTalk);
 
   var stats = $('.class-stats');
   var fh = $('<h3/>', {
@@ -333,7 +327,7 @@ function classStats(envId) {
   }).appendTo(bullets)
   var perc = parseFloat(studTrack.size/totalStuds).toFixed(2);
   var pp = $('<li/>', {
-    text: "Percent Contributing: "+(perc*100)+" %",
+    text: "Percent Contributing: "+parseFloat(perc*100).toFixed(2)+" %",
     class: "single-stat"
   }).appendTo(bullets)
   var ac = $('<li/>', {
