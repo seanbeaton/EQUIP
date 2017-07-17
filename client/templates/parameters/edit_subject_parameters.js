@@ -53,7 +53,7 @@ function loadDefaultSubjParams() {
       var inputValue = "";
      
       if (labels[i] == "Race") {
-        inputValue = "Black, Latinx,White,Other"
+        inputValue = "Black,Latinx,White,Other"
       }
       if (labels[i] == "Gender") {
         inputValue = "Male,Female,Other"
