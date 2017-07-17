@@ -60,6 +60,16 @@ Template.viewData.events({
     location.reload()  
   },
 
+  'click .help-button': function (e) {
+    $('#help-env-modal').addClass("is-active");
+  },
+  'click #help-close-modal': function(e) {
+    $('#help-env-modal').removeClass("is-active");
+  },
+  'click .modal-card-foot .button': function(e) {
+    $('#help-env-modal').removeClass("is-active");
+  },   
+
   'click .generate-button': function (e) {
     // Get classroom, obs, and all params.
     obsIds = [];
@@ -300,11 +310,11 @@ function classStats(envId) {
       } else {
         teachTalk[next["Teacher Solicitation"]] = 1;
       }
-    } else if (next["Teacher Soliciation"]) { // Eliminate later!!
-      if (next["Teacher Soliciation"] in teachTalk) {
-        teachTalk[next["Teacher Soliciation"]] += 1;
+    } else if (next["Teacher Solicitation"]) { // Eliminate later!!
+      if (next["Teacher Solicitation"] in teachTalk) {
+        teachTalk[next["Teacher Solicitation"]] += 1;
       } else {
-        teachTalk[next["Teacher Soliciation"]] = 1;
+        teachTalk[next["Teacher Solicitation"]] = 1;
       }
     } 
   }

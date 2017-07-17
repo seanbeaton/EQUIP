@@ -10,20 +10,17 @@
     </div>
   </section>
   <section class="section">
-    <h1 class="title is-2 env-label-head">{{envName}} Observations</h1>
+    <h1 class="title is-2 env-label-head">Your observations for {{envName}}</h1>
     <div class="columns">
       <div class="column is-offset-1">
-        <button id="obs-create-button" class="button is-large is-success has-text-centered">New Observation</button>
-        <button id="edit-params-button" class="button is-large has-text-centered">Edit Classroom Parameters</button>
-        <button id="edit-students-button" class="button is-large has-text-centered">Add/Edit Student Roster</button>
+        <button id="obs-create-button" class="button is-medium is-success has-text-centered">New Observation</button>
+        <button id="edit-params-button" class="button is-medium has-text-centered">Edit Demographics / Dimensions</button>
+        <button id="edit-students-button" class="button is-medium has-text-centered">Edit Student Roster </button>
+    <button id="show-all-observations" class="button is-medium">Contribution History</button>
         
         
       </div>
     </div>
-  </section>
-  <section class="section">
-    <h1 class="title is-3 dash-env-head">Observation List</h1>
-    <button id="show-all-observations" class="button is-medium">Contribution Log</button>
   </section>
   <section class="section">
     <div class="columns is-multiline is-mobile">
@@ -74,7 +71,7 @@
         <button id="help-close-modal" class="delete"></button>
       </header>
       <section class="modal-card-body">
-                
+      Each classroom corresponds to a physical environment, with a particular teacher and set of students. Within this classroom, you may have a number of observations, corresponding to individual class sessions. To start a new session, click on "new observation." Once you have created this session, you can actually perform the observation by clicking on "enter observation." Remember, before you can perform your observations, you must (1) setup the demographic and observation parameters (using the "edit classroom parameters" button) and (2) add students (using the "add/edit student roster" button).
       </section>
       <footer class="modal-card-foot">
         <a class="button">Cancel</a>

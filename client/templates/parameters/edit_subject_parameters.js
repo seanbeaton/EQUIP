@@ -53,10 +53,10 @@ function loadDefaultSubjParams() {
       var inputValue = "";
      
       if (labels[i] == "Race") {
-        inputValue = "American Indian or Alaska Native,Asian,Black or African American,Native Hawaiian or Other Pacific Islander,White,Hispanic or Latino,Unknown"
+        inputValue = "Black, Latinx,White,Other"
       }
       if (labels[i] == "Gender") {
-        inputValue = "Male,Female,Other,Unknown"
+        inputValue = "Male,Female,Other"
       }
 
       $('<input/>', {
