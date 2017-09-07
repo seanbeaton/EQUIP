@@ -72,7 +72,7 @@ function loadDefaultSeqParams() {
       if (labels[i] == "Student Talk") {
         inputValue =  "How,What,Why,Other"
       }
-      if (labels[i] == "Teacher Soliciation") {
+      if (labels[i] == "Teacher Solicitation") {
         inputValue =  "How,What,Why,Other"
       }
       if (labels[i] == "Explicit Evaluation") {

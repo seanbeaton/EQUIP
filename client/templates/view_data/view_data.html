@@ -4,8 +4,8 @@
   <section class="section report-dash-head">
     <h2 class="report-head title is-2 is-pulled-left">Data Report</h2>
     <button class="button is-medium has-text-centered reset-button">Reset</button>
-    <button class="button is-medium has-text-centered export-data-button">Export Observations</button>
-    <button class="button is-medium has-text-centered export-class-button">Export Classroom</button>
+    <button class="button is-medium has-text-centered export-data-button">Export All Contributions</button>
+    <button class="button is-medium has-text-centered export-class-button">Export Student Roster</button>
     <a class="button is-medium help-button is-pulled-right has-text-centered">Help!?</a>
   </section>
 
@@ -34,14 +34,14 @@
   <section class="section report-body">
     <div>
       <h1 class="title is-2 report-label-head">Classroom Demographic Breakdown</h1>
-      <p class="subtitle is-4 report-description">Brief demographic breakdown of the classroom by demographics.</p>
+      <p class="subtitle is-4 report-description">Demographics of the class.</p>
     </div>
     <div class="columns plots demo-plots">
     
     </div>
     <div>
       <h1 class="title is-2 report-label-head">Classroom Statistics</h1>
-      <p class="subtitle is-4 report-description">Below you will find brief summary statistics of the classroom you are analyzing.</p>
+      <p class="subtitle is-4 report-description">This is a summary of the participation at the classroom level.</p>
     </div>
     <div class="class-stats">
     
@@ -55,7 +55,7 @@
     </div>
     <div>
       <h1 class="title is-2 report-label-head">Contribution Ratios Across Demographics</h1>
-      <p class="subtitle is-4 report-description">Bar graphs showing equity factor for contributions across all demographic categories chosen. (Dan and Niral can add more here).</p>
+      <p class="subtitle is-4 report-description">Bar graphs showing equity factor for contributions across all demographic categories chosen. The equity factor describes the ratio of actual participation over expected participation, based on demographics (e.g., if Latinx students make up 30% of the class, one would expect that they have 30% of the contributions). An equity factor greater than 1 indicates the group is participating more than one would expect in an "equal" classroom, 1 is what one would expect, and less than 1 is less than one would expect (underrepreseted). </p>
     </div>
     <div class="columns plots ratio-plots">
     
@@ -69,6 +69,23 @@
     </div> -->
 
   </section>
+
+    <!-- HELP MODAL -->
+  <div id="help-env-modal" class="modal">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+      <header class="modal-card-head">
+        <p class="modal-card-title">How to Generate Analytics</p>
+        <button id="help-close-modal" class="delete"></button>
+      </header>
+      <section class="modal-card-body">
+	This interface will allow you to generate analytics for the observations you have already performed. Simply click on the classroom, observations, demographics, and observation parameters you wish to include, and then click on "generate report." You may also use the "export observations" and "export classroom" buttons to generate .csv files containing your observed data, so that you can work with them using external statistical software.
+      </section>
+      <footer class="modal-card-foot">
+        <a class="button">Cancel</a>
+      </footer>
+    </div>
+  </div>
 
   <script>
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
