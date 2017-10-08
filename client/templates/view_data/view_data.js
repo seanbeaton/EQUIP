@@ -57,7 +57,7 @@ Template.viewData.helpers({
 Template.viewData.events({
 
   'click .reset-button': function (e) {
-    location.reload()  
+    location.reload()
   },
 
   'click .help-button': function (e) {
@@ -68,13 +68,14 @@ Template.viewData.events({
   },
   'click .modal-card-foot .button': function(e) {
     $('#help-env-modal').removeClass("is-active");
-  },   
+  },
 
   'click .generate-button': function (e) {
     // Get classroom, obs, and all params.
     obsIds = [];
     dParams = [];
     sParams = [];
+
     envId = $('.env-selection .chosen').attr('data_id');
     $('.obs-selection .chosen').each(function () { obsIds.push($(this).attr('data_id')) });
     $('.dparam-selection .chosen').each(function () { dParams.push($(this).attr('data_id')) });
@@ -84,15 +85,15 @@ Template.viewData.events({
     demData = makeDemGraphs(envId, dParams);
     groupCData = makeContributionGraphs(obsIds, dParams, sParams);
 
-    classStats(envId);
-    
+    classStats(envId, sParams);
+
     makeRatioGraphs(envId, groupCData, demData);
     makeIndividualGraphs(obsIds);
 
     $('.option-select').css('display', 'none');
     $('.report-body').css('visibility', 'visible');
   },
-   
+
   'click .classroom-selection': function(e) {
     envId = $(e.target).attr('data_id');
     obs = Observations.find({"envId": envId}).fetch();
@@ -206,7 +207,7 @@ Template.viewData.events({
    },
    //This should probably be a modal??
   'click .export-class-button': function(e){
-    
+
     var envId = $('.env-selection .chosen').attr('data_id');
     if(envId)
      {
@@ -275,58 +276,71 @@ Template.viewData.events({
       } else {
         alert("Please select a classroom to export!")
       }
-      
+
     }
 });
 
-function classStats(envId) {
+function renderStats(stats, data, name, total) {
+  var rowTwo = $('<div/>', {
+    class: "category-list",
+  }).appendTo(stats);
+
+  var sh = $('<h3/>', {
+    class: "stat-head title is-5",
+    text: name
+  }).appendTo(rowTwo);
+  var bullets4 = $('<ul/>', {
+    class: "stat-list"
+  }).appendTo(rowTwo);
+  for (key in data) {
+    var pct = (data[key] / total) * 100
+    var ac = $('<li/>', {
+      text: ""+key+": " + pct + "%",
+      class: "single-stat"
+    }).appendTo(bullets4)
+  }
+}
+
+
+function classStats(envId, sParams) {
   var studs = Subjects.find({"envId": envId}).fetch();
   var totalStuds = studs.length;
   var studTrack = new Set();
-  var studTalk = {};
-  var teachTalk = {};
+  var selectedData = {};
   var conts = Sequences.find({'envId': envId}).fetch();
   var totalCont = conts.length;
-  for (con in conts) {
-    var next = conts[con]['info'];
-    studTrack.add(next['studentId']);
-    if (next['Length of Talk']) {
-      if (next['Length of Talk'] in studTalk) {
-        studTalk[next['Length of Talk']] += 1;
-      } else {
-        studTalk[next['Length of Talk']] = 1;
-      }
-    }
-    if (next["Student Talk"]) {
-      if (next["Student Talk"] in studTalk) {
-        studTalk[next["Student Talk"]] += 1;
-      } else {
-        studTalk[next["Student Talk"]] = 1;
-      }
-    }
-    if (next["Teacher Solicitation"]) {
-      if (next["Teacher Solicitation"] in teachTalk) {
-        teachTalk[next["Teacher Solicitation"]] += 1;
-      } else {
-        teachTalk[next["Teacher Solicitation"]] = 1;
-      }
-    } else if (next["Teacher Solicitation"]) { // Eliminate later!!
-      if (next["Teacher Solicitation"] in teachTalk) {
-        teachTalk[next["Teacher Solicitation"]] += 1;
-      } else {
-        teachTalk[next["Teacher Solicitation"]] = 1;
-      }
-    } 
-  }
 
   var stats = $('.class-stats');
+  var classRoomSummary = $('<div/>', {
+      class: "category-summary",
+  }).appendTo(stats);
   var fh = $('<h3/>', {
     class: "stat-head title is-5",
     text: "Classroom Summary"
-  }).appendTo(stats);
+  }).appendTo(classRoomSummary);
+
+  sParams.map(function(param) {
+    var newObject = {};
+    for (con in conts) {
+      var next = conts[con]['info'];
+      studTrack.add(next['studentId']);
+      if (next[param]) {
+        if (next[param] in newObject) {
+          newObject[next[param]] += 1;
+        } else {
+          newObject[next[param]] = 1;
+        }
+      }
+    }
+    var name = param;
+    var total = studTrack.size;
+    renderStats(stats, newObject, name, total);
+    newObject = {};
+  });
+
   var bullets = $('<ul/>', {
     class: "stat-list"
-  }).appendTo(stats);
+  }).appendTo(classRoomSummary);
   var tc = $('<li/>', {
     text: "Students who Contributed: "+studTrack.size,
     class: "single-stat"
@@ -348,42 +362,6 @@ function classStats(envId) {
     text: "Contributions per student: "+parseFloat(totalCont/studTrack.size).toFixed(2),
     class: "single-stat"
   }).appendTo(bullets)
-
-  if (!$.isEmptyObject(teachTalk)) {
-
-    var sh = $('<h3/>', {
-      class: "stat-head title is-5",
-      text: "Teacher Solicitation"
-    }).appendTo(stats);
-    var bullets2 = $('<ul/>', {
-      class: "stat-list"
-    }).appendTo(stats);
-    for (key in teachTalk) {
-      var ac = $('<li/>', {
-        text: ""+key+": "+teachTalk[key],
-        class: "single-stat"
-      }).appendTo(bullets2)
-    }
-  }
-
-  if (!$.isEmptyObject(studTalk)) {
-    var th = $('<h3/>', {
-      class: "stat-head title is-5",
-      text: "Student Talk Type and Length"
-    }).appendTo(stats);
-    var bullets3 = $('<ul/>', {
-      class: "stat-list"
-    }).appendTo(stats);
-    for (key in studTalk) {
-      var ac = $('<li/>', {
-        text: ""+key+": "+studTalk[key],
-        class: "single-stat"
-      }).appendTo(bullets3)
-    }
-  }
-
-
-  //Append to .class-stats
 }
 
 function makeDemGraphs(env, dparams) {
@@ -400,7 +378,7 @@ function makeDemGraphs(env, dparams) {
       }
     }
   }
-  
+
   for (key in data){
     makePieChart(d3.entries(data[key]), key);
   }
@@ -460,7 +438,7 @@ function makeRatioGraphs(envId, cData, dData) {
   var statData = {};
   var total = d3.sum(d3.values(dData[d3.keys(dData)[0]]))
   var allParams = SubjectParameters.findOne({"children.envId": envId});
-    
+
   for (key in dData) {
     statData[key] = dData[key];
     d3.keys(statData[key]).map(function (k, i) { statData[key][k] /= total });
@@ -647,7 +625,7 @@ function makeStackedBar(dataEnum, label, selector, yLabel) {
             .append("svg")
             .attr('width', fullW)
             .attr('height', fullH);
-    
+
   g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
   // BarChart Axes

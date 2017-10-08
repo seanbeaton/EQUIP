@@ -124,4 +124,19 @@
 
 .class-stats {
     margin-bottom: 1em;
+    width: 960px;
+}
+
+.category-list {
+    width: 25%;
+    float: left;
+    margin-bottom: 25px;
+}
+
+.category-summary {
+    margin-bottom: 25px;
+}
+
+.single-stat {
+    margin-left: 1em
 }
