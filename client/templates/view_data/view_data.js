@@ -304,13 +304,13 @@ function renderStats(stats, data, name, total) {
 
 function classStats(envId, sParams) {
   var studs = Subjects.find({"envId": envId}).fetch();
+  var conts = Sequences.find({'envId': envId}).fetch();
+
   var totalStuds = studs.length;
   var studTrack = new Set();
-  var selectedData = {};
-  var conts = Sequences.find({'envId': envId}).fetch();
   var totalCont = conts.length;
-
   var stats = $('.class-stats');
+
   var classRoomSummary = $('<div/>', {
       class: "category-summary",
   }).appendTo(stats);
@@ -654,7 +654,7 @@ function makeStackedBar(dataEnum, label, selector, yLabel) {
 
   y.domain([0, 1.25*d3.max(dataEnum, function(d) { return d3.max(keys, function(key) { return d.value[key]; }); })]).nice();
 
-  var rect = g.append("g")
+  g.append("g")
     .selectAll("g")
     .data(dataEnum)
     .enter().append("g")
