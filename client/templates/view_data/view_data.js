@@ -295,7 +295,7 @@ function renderStats(stats, data, name, total) {
   for (key in data) {
     var pct = (data[key] / total) * 100
     var ac = $('<li/>', {
-      text: ""+key+": " + pct + "%",
+      text: ""+key+": " + data[key] + " / "+ pct + "%",
       class: "single-stat"
     }).appendTo(bullets4)
   }
@@ -484,7 +484,6 @@ function makeRatioGraphs(envId, cData, dData) {
 }
 
 function makeIndividualGraphs(oIds) {
-
   var contribs = {};
   for (id in oIds) {
     var nc = Sequences.find({"obsId": oIds[id]}).fetch();
@@ -497,7 +496,6 @@ function makeIndividualGraphs(oIds) {
       }
     }
   }
-
 
   data = d3.entries(contribs);
   data = _(data).sortBy('value')
@@ -614,7 +612,6 @@ function makePieChart(data, label) {
 
 function makeStackedBar(dataEnum, label, selector, yLabel) {
 
-
   var margin = {top: 50, right: 20, bottom: 30, left: 40},
     width = 600 - margin.left - margin.right,
     height = 500 - margin.top - margin.bottom,
@@ -655,22 +652,31 @@ function makeStackedBar(dataEnum, label, selector, yLabel) {
   x0.domain(dataEnum.map(function(d) { return d.key; }));
   x1.domain(keys).rangeRound([0, x0.bandwidth()]);
 
-  y.domain([-.001, 1.25*d3.max(dataEnum, function(d) { return d3.max(keys, function(key) { return d.value[key]; }); })]).nice();
+  y.domain([0, 1.25*d3.max(dataEnum, function(d) { return d3.max(keys, function(key) { return d.value[key]; }); })]).nice();
 
-
-  g.append("g")
+  var rect = g.append("g")
     .selectAll("g")
     .data(dataEnum)
     .enter().append("g")
       .attr("transform", function(d) { return "translate(" + x0(d.key) + ",0)"; })
+      .attr('class', "bar-chart")
     .selectAll("rect")
-    .data(function(d) { return keys.map(function(key) { val = d.value[key] || 0; return {key: key, value: val} }) })
+    .data(function(d) { return keys.map(function(key) { val = d.value[key] || .01; return {key: key, value: val} }) })
     .enter().append("rect")
+      .attr('class', 'rect')
       .attr("x", function(d) { return x1(d.key); })
       .attr("y", function(d) { return y(d.value); })
       .attr("width", x1.bandwidth())
       .attr("height", function(d) { return height - y(d.value); })
-      .attr("fill", function(d) { return z(d.key); });
+      .attr("fill", function(d) { return z(d.key); })
+      .enter().append("g")
+      .attr("font-size", "20px")
+      .data(function(d) { return keys.map(function(key) { val = d.value[key] || 0; return {key: key, value: val} }) })
+      .enter().append("text")
+      .text(function(d) { if (d.value == 0) return d.value })
+        .attr("x", function(d) { return x1(d.key); })
+        .attr("y", function(d) { return y(d.value) - 10; })
+        .attr("width", x1.bandwidth())
 
   g.append("g")
       .attr("class", "axis")
