@@ -674,9 +674,9 @@ function makeStackedBar(dataEnum, label, selector, yLabel) {
       .data(function(d) { return keys.map(function(key) { val = d.value[key] || 0; return {key: key, value: val} }) })
       .enter().append("text")
       .text(function(d) { if (d.value == 0) return d.value })
-        .attr("x", function(d) { return x1(d.key); })
-        .attr("y", function(d) { return y(d.value) - 10; })
         .attr("width", x1.bandwidth())
+        .attr("x", function(d) { return x1(d.key) + ((x1.bandwidth() / 2) - 3); })
+        .attr("y", function(d) { return y(d.value) - 10; })
 
   g.append("g")
       .attr("class", "axis")
