@@ -80,12 +80,11 @@ Template.viewData.events({
     $('.obs-selection .chosen').each(function () { obsIds.push($(this).attr('data_id')) });
     $('.dparam-selection .chosen').each(function () { dParams.push($(this).attr('data_id')) });
     $('.sparam-selection .chosen').each(function () { sParams.push($(this).attr('data_id')) });
-
     // Start generating graphs
     demData = makeDemGraphs(envId, dParams);
     groupCData = makeContributionGraphs(obsIds, dParams, sParams);
 
-    classStats(envId, sParams);
+    classStats(envId, sParams, obsIds, dParams);
 
     makeRatioGraphs(envId, groupCData, demData);
     makeIndividualGraphs(obsIds);
@@ -281,6 +280,9 @@ Template.viewData.events({
 });
 
 function renderStats(stats, data, name, total) {
+  var sumValues = obj => Object.values(obj).reduce((a, b) => a + b);
+  var totalValue = sumValues(data);
+
   var rowTwo = $('<div/>', {
     class: "category-list",
   }).appendTo(stats);
@@ -293,7 +295,7 @@ function renderStats(stats, data, name, total) {
     class: "stat-list"
   }).appendTo(rowTwo);
   for (key in data) {
-    var pct = (data[key] / total) * 100
+    var pct = (data[key] / totalValue) * 100;
     var ac = $('<li/>', {
       text: ""+key+": " + data[key] + " / "+ pct + "%",
       class: "single-stat"
@@ -302,14 +304,21 @@ function renderStats(stats, data, name, total) {
 }
 
 
-function classStats(envId, sParams) {
+function classStats(envId, sParams, obsId) {
   var studs = Subjects.find({"envId": envId}).fetch();
   var conts = Sequences.find({'envId': envId}).fetch();
-
   var totalStuds = studs.length;
   var studTrack = new Set();
   var totalCont = conts.length;
   var stats = $('.class-stats');
+
+  var filteredResults = conts.filter(function(result) {
+      for (var i = 0; i < obsId.length; i++ ) {
+        if (obsId[i] === result.obsId) {
+          return result;
+        }
+      }
+  });
 
   var classRoomSummary = $('<div/>', {
       class: "category-summary",
@@ -321,8 +330,8 @@ function classStats(envId, sParams) {
 
   sParams.map(function(param) {
     var newObject = {};
-    for (con in conts) {
-      var next = conts[con]['info'];
+    for (con in filteredResults) {
+      var next = filteredResults[con]['info'];
       studTrack.add(next['studentId']);
       if (next[param]) {
         if (next[param] in newObject) {
@@ -332,9 +341,8 @@ function classStats(envId, sParams) {
         }
       }
     }
-    var name = param;
     var total = studTrack.size;
-    renderStats(stats, newObject, name, total);
+    renderStats(stats, newObject, param, total);
     newObject = {};
   });
 
