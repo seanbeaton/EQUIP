@@ -297,7 +297,7 @@ function renderStats(stats, data, name, total) {
   for (key in data) {
     var pct = (data[key] / totalValue) * 100;
     var ac = $('<li/>', {
-      text: ""+key+": " + data[key] + " / "+ pct + "%",
+      text: ""+key+": " + data[key] + " / "+ parseFloat(pct.toFixed(2)) + "%",
       class: "single-stat"
     }).appendTo(bullets4)
   }
