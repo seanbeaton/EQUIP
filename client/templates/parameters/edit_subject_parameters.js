@@ -258,13 +258,27 @@ Template.editSubjectParameters.events({
       }
     }
   }
-  var extendObj = _.extend(obj, {
+  var clean_obj = {}
+  var count = 0;
+  for (key in obj) {
+    if (key.includes('label')){
+      var n = key.split('label')[1];
+      clean_obj['label'+count] = obj[key];
+      clean_obj['parameter'+count] = obj['parameter'+n];
+      if (obj['toggle'+n]){
+        clean_obj['toggle'+count] = obj['toggle'+n];
+      }
+      count++;
+    }
+  }
+
+  var extendObj = _.extend(clean_obj, {
     envId: Router.current().params._envId,
     parameterPairs: parameterPairs
   });
-  var existingObj = SequenceParameters.find({'children.envId':obj.envId}).fetch();
+  var existingObj = SequenceParameters.find({'children.envId':clean_obj.envId}).fetch();
   if ($.isEmptyObject(existingObj) == true) {
-    Meteor.call('updateSubjParameters', obj, function(error, result) {
+    Meteor.call('updateSubjParameters', clean_obj, function(error, result) {
       if (error){
         alert(error.reason);
       } else {
@@ -290,7 +304,7 @@ Template.editSubjectParameters.events({
       Router.go('editSequenceParameters', {_envId:Router.current().params._envId});
     });
   } else {
-    Meteor.call('updateSubjParameters', obj, function(error, result) {
+    Meteor.call('updateSubjParameters', clean_obj, function(error, result) {
       if (error){
         alert(error.reason);
       } else {
