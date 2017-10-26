@@ -54,13 +54,16 @@ Template.observatory.rendered = function() {
   //timerUpdate = setInterval(clockSet, 1000);
 
   var paramPairs = seqParams.children.parameterPairs;
-  for (var p=0; p<paramPairs;p++){
-    if(seqParams['children']['toggle'+p] == "on") {
-      var params = seqParams['children']['parameter'+p]
-      var label = seqParams['children']['label'+p]
-      createToggle(params, label);
-    }
+  if (paramPairs) {
+      for (var p=0; p<paramPairs;p++){
+        if(seqParams['children']['toggle'+p] == "on") {
+          var params = seqParams['children']['parameter'+p]
+          var label = seqParams['children']['label'+p]
+          createToggle(params, label);
+        }
+      }
   }
+
 
   var params = "Blank,Last Choices";
   var label = "Contribution Defaults"
@@ -75,26 +78,28 @@ Template.observatory.rendered = function() {
 }
 
 function createToggle(params, label) {
-  var choices = params.split(',');
-  togglers = $('.toggle-dash');
-  var wrap = $('<div/>', {class: 'column'}).appendTo(togglers);
-  $("<p/>",{
-    text: label,
-    class: 'label',
-  }).appendTo(wrap);
-  $('<br/>', {}).appendTo(wrap);
-  var span = $('<span/>', {class:'select'}).appendTo(wrap);
+  if (params) {
+    var choices = params.split(',');
+    togglers = $('.toggle-dash');
+    var wrap = $('<div/>', {class: 'column'}).appendTo(togglers);
+    $("<p/>",{
+      text: label,
+      class: 'label',
+    }).appendTo(wrap);
+    $('<br/>', {}).appendTo(wrap);
+    var span = $('<span/>', {class:'select'}).appendTo(wrap);
 
-  var select = $('<select/>', {
-      class:"toggle-item",
-      data_label: label
-    }).appendTo(span);
+    var select = $('<select/>', {
+        class:"toggle-item",
+        data_label: label
+      }).appendTo(span);
 
-  for (var c in choices) {
-    $('<option/>', {
-      value: choices[c],
-      text: choices[c]
-    }).appendTo(select);
+    for (var c in choices) {
+      $('<option/>', {
+        value: choices[c],
+        text: choices[c]
+      }).appendTo(select);
+    }
   }
 }
 
@@ -392,34 +397,35 @@ function populateParamBoxes(subjId) {
 
     var field = seqParams['children']['label'+param];
 
-    var params = seqParams['children']['parameter'+param]
-    var options = params.split(',');
+    var params = seqParams['children']['parameter'+param];
+    if (params) {
+        var options = params.split(',');
+        for (opt in options) {
 
-    for (opt in options) {
+          if ( lastChoices[field] == options[opt] & howDefault == "Last Choices") {
+            var option = $("<div/>", {
+              class: "column has-text-centered subj-box-params chosen hoverable",
+              text: options[opt]
+            }).appendTo(wrap);
+            } else {
 
-      if ( lastChoices[field] == options[opt] & howDefault == "Last Choices") {
-        var option = $("<div/>", {
-          class: "column has-text-centered subj-box-params chosen hoverable",
-          text: options[opt]
-        }).appendTo(wrap);
-        } else {
+              var option = $("<div/>", {
+                class: "column has-text-centered subj-box-params hoverable",
+                text: options[opt]
+              }).appendTo(wrap);
+            }
 
-          var option = $("<div/>", {
-            class: "column has-text-centered subj-box-params hoverable",
-            text: options[opt]
-          }).appendTo(wrap);
-        }
-
-        option.click(function (e) {
-          e.preventDefault();
-          $(this).siblings().removeClass('chosen');
-          if ( $(this).hasClass('chosen') ){
-            $(this).removeClass('chosen');
-          } else {
-            $(this).addClass('chosen');
-          }
-        });
-    }//end for
+            option.click(function (e) {
+              e.preventDefault();
+              $(this).siblings().removeClass('chosen');
+              if ( $(this).hasClass('chosen') ){
+                $(this).removeClass('chosen');
+              } else {
+                $(this).addClass('chosen');
+              }
+            });
+        }//end for
+    }
   }//end for
 
   $("<button/>", {
@@ -491,32 +497,35 @@ function editParamBoxes(seqId, subjId) {
     var field = seqParams['children']['label'+param];
 
     var params = seqParams['children']['parameter'+param];
-    var options = params.split(',');
 
-    for (opt in options) {
+    if (params) {
+      var options = params.split(',');
 
-        if (seq['info'][field] == options[opt]) {
-          var option = $("<div/>", {
-          class: "column has-text-centered subj-box-params chosen hoverable",
-          text: options[opt]
-        }).appendTo(wrap);
-        } else {
+      for (opt in options) {
 
-          var option = $("<div/>", {
-            class: "column has-text-centered subj-box-params hoverable",
+          if (seq['info'][field] == options[opt]) {
+            var option = $("<div/>", {
+            class: "column has-text-centered subj-box-params chosen hoverable",
             text: options[opt]
           }).appendTo(wrap);
-        }
-        option.click(function (e) {
-          e.preventDefault();
-          $(this).siblings().removeClass('chosen');
-          if ( $(this).hasClass('chosen') ){
-            $(this).removeClass('chosen');
           } else {
-            $(this).addClass('chosen');
+
+            var option = $("<div/>", {
+              class: "column has-text-centered subj-box-params hoverable",
+              text: options[opt]
+            }).appendTo(wrap);
           }
-        });
-    }//end for
+          option.click(function (e) {
+            e.preventDefault();
+            $(this).siblings().removeClass('chosen');
+            if ( $(this).hasClass('chosen') ){
+              $(this).removeClass('chosen');
+            } else {
+              $(this).addClass('chosen');
+            }
+          });
+      }//end for
+    }
   }//end for
 
   $("<button/>", {

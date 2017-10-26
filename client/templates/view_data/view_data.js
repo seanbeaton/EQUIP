@@ -280,8 +280,13 @@ Template.viewData.events({
 });
 
 function renderStats(stats, data, name, total) {
-  var sumValues = obj => Object.values(obj).reduce((a, b) => a + b);
-  var totalValue = sumValues(data);
+  // var sumValues = obj => Object.values(obj).reduce((a, b) => a + b);
+  //
+  // if (!data) {
+  //   return;
+  // }
+  //
+  // var totalValue = sumValues(data);
 
   var rowTwo = $('<div/>', {
     class: "category-list",
@@ -295,9 +300,9 @@ function renderStats(stats, data, name, total) {
     class: "stat-list"
   }).appendTo(rowTwo);
   for (key in data) {
-    var pct = (data[key] / totalValue) * 100;
+    // var pct = (data[key] / totalValue) * 100;
     var ac = $('<li/>', {
-      text: ""+key+": " + data[key] + " / "+ parseFloat(pct.toFixed(2)) + "%",
+      text: ""+key+": " + data[key], // + " / "+ parseFloat(pct.toFixed(2)) + "%",
       class: "single-stat"
     }).appendTo(bullets4)
   }
