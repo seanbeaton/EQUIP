@@ -109,7 +109,6 @@
     text-decoration: underline;
 }
 
-
 .plots {
     border-top: 1px solid black;
     padding: 2em;
@@ -131,7 +130,7 @@
     width: 25%;
     float: left;
     margin-bottom: 25px;
-    height: 125px;
+    height: 100%;
 }
 
 .category-summary {

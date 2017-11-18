@@ -205,7 +205,7 @@ Template.observatory.events({
       obsId: obsId,
       obsName: obsRaw.name
     };
-    debugger;
+    
     Meteor.call('sequenceInsert', sequence, function(error, result) {
      if (error) {
        alert(error.reason);

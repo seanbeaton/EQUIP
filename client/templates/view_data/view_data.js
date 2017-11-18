@@ -280,13 +280,12 @@ Template.viewData.events({
 });
 
 function renderStats(stats, data, name, total) {
-  // var sumValues = obj => Object.values(obj).reduce((a, b) => a + b);
-  //
-  // if (!data) {
-  //   return;
-  // }
-  //
-  // var totalValue = sumValues(data);
+  if (!data) {
+    return;
+  }
+
+  var sumValues = obj => Object.values(obj).reduce((a, b) => a + b);
+  var totalValue = sumValues(data);
 
   var rowTwo = $('<div/>', {
     class: "category-list",
@@ -300,14 +299,15 @@ function renderStats(stats, data, name, total) {
     class: "stat-list"
   }).appendTo(rowTwo);
   for (key in data) {
-    // var pct = (data[key] / totalValue) * 100;
-    var ac = $('<li/>', {
-      text: ""+key+": " + data[key], // + " / "+ parseFloat(pct.toFixed(2)) + "%",
-      class: "single-stat"
-    }).appendTo(bullets4)
+    if (data.hasOwnProperty(key)) {
+        var pct = (data[key] / totalValue) * 100;
+        var ac = $('<li/>', {
+          text: ""+key+": " + data[key] + " / "+ parseFloat(pct.toFixed(2)) + "%",
+          class: "single-stat"
+        }).appendTo(bullets4)
+    }
   }
 }
-
 
 function classStats(envId, sParams, obsId) {
   var studs = Subjects.find({"envId": envId}).fetch();
@@ -524,7 +524,6 @@ function makeIndividualGraphs(oIds) {
             .attr('width', fullW)
             .attr('height', fullH);
 
-
   var g = svg.append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
@@ -549,14 +548,14 @@ function makeIndividualGraphs(oIds) {
       .attr("dy", "0.71em")
       .attr("text-anchor", "end")
       .text("Frequency");
-
+      
   g.selectAll(".bar")
     .data(data)
     .enter().append("rect")
       .attr("class", "single-bar")
       .attr("x", function(d) { return x(d.key.slice(0,10)); })
       .attr("y", function(d) { return y(d.value); })
-      .attr("width", x.bandwidth())
+      .attr("width", 70)
       .attr("height", function(d) { return height - y(d.value); });
 
   g.append("text")
