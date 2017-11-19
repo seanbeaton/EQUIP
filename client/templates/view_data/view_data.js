@@ -512,24 +512,24 @@ function makeIndividualGraphs(oIds) {
 
   data = d3.entries(contribs);
   data = _(data).sortBy('value')
-
+  var newWidth = data.length * 80;
+  var containerWidth = newWidth * 1.05;
   var margin = {top: 50, right: 20, bottom: 30, left: 40},
-    width = 900 - margin.left - margin.right,
+    width = newWidth - margin.left - margin.right,
     height = 500 - margin.top - margin.bottom,
-    fullW = 900,
+    fullW = newWidth,
     fullH = 500;
 
   var svg = d3.select(".individual-plots")
             .append("svg")
-            .attr('width', fullW)
+            .attr('width', containerWidth.toString())
             .attr('height', fullH);
 
   var g = svg.append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
   var x = d3.scaleBand().rangeRound([0, fullW]).padding(0.5),
-    y = d3.scaleLinear().rangeRound([height, 0]);
-
+      y = d3.scaleLinear().rangeRound([height, 0]);
 
   x.domain(data.map(function(d) { return d.key.slice(0,10); }));
   y.domain([0, d3.max(data, function(d) { return d.value; })]);
@@ -537,7 +537,9 @@ function makeIndividualGraphs(oIds) {
   g.append("g")
       .attr("class", "axis axis--x")
       .attr("transform", "translate(0," + height + ")")
-      .call(d3.axisBottom(x));
+      .call(d3.axisBottom(x))
+      // .selectAll(".tick text")
+      // .call(wrap, x.bandwidth());
 
   g.append("g")
       .attr("class", "axis axis--y")
@@ -548,23 +550,71 @@ function makeIndividualGraphs(oIds) {
       .attr("dy", "0.71em")
       .attr("text-anchor", "end")
       .text("Frequency");
-      
+
   g.selectAll(".bar")
     .data(data)
     .enter().append("rect")
       .attr("class", "single-bar")
-      .attr("x", function(d) { return x(d.key.slice(0,10)); })
+      .attr("x", function(d) {
+        return x(d.key.slice(0,10));
+      })
       .attr("y", function(d) { return y(d.value); })
       .attr("width", 70)
-      .attr("height", function(d) { return height - y(d.value); });
+      .attr("height", function(d) { return height - y(d.value); })
+
+
 
   g.append("text")
-      .attr("x", width/2)
+      .attr("x", 100)
       .attr("y", -20)
       .attr("dy", "0.32em")
       .attr("font-weight", "bold")
       .attr("text-anchor", "middle")
       .text("Contributions over Students");
+
+
+      function wrap (text, width) {
+
+        text.each(function() {
+
+          var breakChars = ['/', '&', '-'],
+            text = d3.select(this),
+            textContent = text.text(),
+            spanContent;
+
+          breakChars.forEach(char => {
+            // Add a space after each break char for the function to use to determine line breaks
+            textContent = textContent.replace(char, char + ' ');
+          });
+
+          var words = textContent.split(/\s+/).reverse(),
+            word,
+            line = [],
+            lineNumber = 0,
+            lineHeight = 1.1, // ems
+            x = text.attr('x'),
+            y = text.attr('y'),
+            dy = parseFloat(text.attr('dy') || 0),
+            tspan = text.text(null).append('tspan').attr('x', x).attr('y', y).attr('dy', dy + 'em');
+
+          while (word = words.pop()) {
+            line.push(word);
+            tspan.text(line.join(' '));
+            if (tspan.node().getComputedTextLength() > width) {
+              line.pop();
+              spanContent = line.join(' ');
+              breakChars.forEach(char => {
+                // Remove spaces trailing breakChars that were added above
+                spanContent = spanContent.replace(char + ' ', char);
+              });
+              tspan.text(spanContent);
+              line = [word];
+              tspan = text.append('tspan').attr('x', x).attr('y', y).attr('dy', ++lineNumber * lineHeight + dy + 'em').text(word);
+            }
+          }
+        });
+
+      }
 
 }
 
