@@ -40,11 +40,11 @@ Template.observationItem.events({
     seqId = $(e.target).attr('data_id');
     myId = $(e.target).attr('data_studentId');
     editParamBoxes(seqId, myId);
-  
+
     $('#seq-data-modal').removeClass('is-active');
     $('#seq-param-modal').addClass('is-active');
 
-  
+
   },
   'click .delete-seq': function(e) {
     var result = confirm("Press 'OK' to delete this Subject.");
@@ -78,7 +78,7 @@ Template.observationItem.events({
             choices.push(null);
           }
         });
-      
+
       for (label in labels) {
         info[labels[label]] = choices[label];
       }
@@ -204,7 +204,7 @@ function populateParamBoxes(subjId) {
   var student = subj.info.name;
 
   var modal = $('#param-modal-content');
-  
+
   var name = $("<div/>", {
       class: "columns  boxes-wrapper"
     }).appendTo(modal);
@@ -237,7 +237,7 @@ function populateParamBoxes(subjId) {
     var options = params.split(',');
 
     for (opt in options) {
-  
+
         var option = $("<div/>", {
           class: "column has-text-centered subj-box-params hoverable",
           text: options[opt]
@@ -273,7 +273,7 @@ function editParamBoxes(seqId, subjId) {
   var student = subj.info.name;
 
   var modal = $('#param-modal-content');
-  
+
   var name = $("<div/>", {
       class: "columns  boxes-wrapper"
     }).appendTo(modal);
@@ -306,14 +306,14 @@ function editParamBoxes(seqId, subjId) {
     var options = params.split(',');
 
     for (opt in options) {
-  
+
         if (seq['info'][field] == options[opt]) {
           var option = $("<div/>", {
           class: "column has-text-centered subj-box-params chosen hoverable",
           text: options[opt]
         }).appendTo(wrap);
         } else {
-  
+
           var option = $("<div/>", {
             class: "column has-text-centered subj-box-params hoverable",
             text: options[opt]
@@ -339,5 +339,3 @@ function editParamBoxes(seqId, subjId) {
   }).appendTo(modal);
 
 }
-
-

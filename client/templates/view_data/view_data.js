@@ -497,7 +497,11 @@ function makeRatioGraphs(envId, cData, dData) {
 }
 
 function makeIndividualGraphs(oIds) {
+  var subjects = Subjects.find({"envId":envId}).fetch();
   var contribs = {};
+  var filteredNamesObj = {};
+  var names = [];
+
   for (id in oIds) {
     var nc = Sequences.find({"obsId": oIds[id]}).fetch();
     for (c in nc) {
@@ -506,19 +510,32 @@ function makeIndividualGraphs(oIds) {
 
       } else {
         contribs[nc[c]['info']["Name"]] = 1;
+        names.push(nc[c]['info']["Name"]);
       }
     }
   }
 
-  data = d3.entries(contribs);
+  var filteredNames = subjects.filter(function(e) {
+      return names.indexOf(e.info.name) === -1;
+  });
+
+  filteredNames.map(function(name){
+      var newName = name.info.name;
+      filteredNamesObj[newName] = 0.1;
+  })
+
+  var completeContrib = Object.assign({}, contribs, filteredNamesObj);
+
+  data = d3.entries(completeContrib);
   data = _(data).sortBy('value')
   var newWidth = data.length * 80;
   var containerWidth = newWidth * 1.05;
+  var x1 = d3.scaleBand().padding(0.5);
   var margin = {top: 50, right: 20, bottom: 30, left: 40},
-    width = newWidth - margin.left - margin.right,
-    height = 500 - margin.top - margin.bottom,
-    fullW = newWidth,
-    fullH = 500;
+      width = newWidth - margin.left - margin.right,
+      height = 500 - margin.top - margin.bottom,
+      fullW = newWidth,
+      fullH = 500;
 
   var svg = d3.select(".individual-plots")
             .append("svg")
@@ -538,8 +555,6 @@ function makeIndividualGraphs(oIds) {
       .attr("class", "axis axis--x")
       .attr("transform", "translate(0," + height + ")")
       .call(d3.axisBottom(x))
-      // .selectAll(".tick text")
-      // .call(wrap, x.bandwidth());
 
   g.append("g")
       .attr("class", "axis axis--y")
@@ -561,6 +576,19 @@ function makeIndividualGraphs(oIds) {
       .attr("y", function(d) { return y(d.value); })
       .attr("width", 70)
       .attr("height", function(d) { return height - y(d.value); })
+
+  g.selectAll(".bar")
+    .data(data)
+    .enter().append("text")
+    .text(function(d) { if (d.value === 0.1) return 0; })
+    .attr("text-anchor", "middle")
+      .attr("x", function(d) {
+        return (x(d.key.slice(0,10))) + 30;
+      })
+     .attr("y", function(d) { return y(d.value) - 20; })
+     .attr("font-family", "sans-serif")
+     .attr("font-size", "11px")
+     .attr("fill", "black");
 
   g.append("text")
       .attr("x", 100)
