@@ -542,6 +542,11 @@ function makeIndividualGraphs(oIds) {
             .attr('width', containerWidth.toString())
             .attr('height', fullH);
 
+  var svgY = d3.select('.vert-ind')
+    .append('svg')
+    .attr('height', fullH)
+    .attr("width", 50);
+
   var g = svg.append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
@@ -556,9 +561,11 @@ function makeIndividualGraphs(oIds) {
       .attr("transform", "translate(0," + height + ")")
       .call(d3.axisBottom(x))
 
-  g.append("g")
+  svgY.append("g")
       .attr("class", "axis axis--y")
+      .attr("transform", "translate(50," + 63 + ")")
       .call(d3.axisLeft(y).ticks())
+
     .append("text")
       .attr("transform", "rotate(-90)")
       .attr("y", 6)
@@ -585,9 +592,9 @@ function makeIndividualGraphs(oIds) {
       .attr("x", function(d) {
         return (x(d.key.slice(0,10))) + 30;
       })
-     .attr("y", function(d) { return y(d.value) - 20; })
+     .attr("y", function(d) { return y(d.value) - 10; })
      .attr("font-family", "sans-serif")
-     .attr("font-size", "11px")
+     .attr("font-size", "15px")
      .attr("fill", "black");
 
   g.append("text")
