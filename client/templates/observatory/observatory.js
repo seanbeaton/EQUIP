@@ -183,13 +183,20 @@ Template.observatory.events({
       choices.push($(this).val());
     });
 
-
     $('.subj-box-labels').each(function () {
+      var chosenElement = false;
+      var chosenElements = this.parentElement.querySelectorAll('.subj-box-params');
       labels.push(this.textContent);
-    });
+      chosenElements.forEach(function(ele) {
+        if ($(ele).hasClass('chosen')) {
+            choices.push(ele.textContent);
+            chosenElement = true;
+        }
+      })
 
-    $('.chosen').each(function () {
-      choices.push(this.textContent);
+      if (chosenElement === false) {
+          choices.push(undefined);
+      }
     });
 
     for (label in labels) {
