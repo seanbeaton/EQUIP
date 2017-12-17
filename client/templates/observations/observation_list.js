@@ -4,10 +4,19 @@
 
 Template.observationList.helpers({
   observation: function() {
-    var obs = Observations.find({envId:this._id}, {sort: {lastModified: -1}}).fetch();
-    return obs;
+      var obs = Observations.find({envId:this._id}, {sort: {lastModified: -1}}).fetch();
+      return obs;
+  },
+  hasObsMade: function() {
+      var obs = Observations.find({envId:this._id}, {sort: {lastModified: -1}}).fetch();
+      if (obs.length === 0) {
+          return true
+      }
   }
 });
+
+
+
 
 Template.observationList.events({
 'click .back-head-params': function(e) {

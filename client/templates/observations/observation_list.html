@@ -14,11 +14,13 @@
     <div class="columns">
       <div class="column is-offset-1">
         <button id="obs-create-button" class="button is-medium is-success has-text-centered">New Observation</button>
-        <button id="edit-params-button" class="button is-medium has-text-centered">Edit Demographics / Dimensions</button>
+        {{ #if hasObsMade }}
+            <button id="edit-params-button" class="button is-medium has-text-centered">Edit Demographics / Dimensions</button>
+        {{ /if }}
         <button id="edit-students-button" class="button is-medium has-text-centered">Edit Student Roster </button>
-    <button id="show-all-observations" class="button is-medium">Contribution History</button>
-        
-        
+        <button id="show-all-observations" class="button is-medium">Contribution History</button>
+
+
       </div>
     </div>
   </section>
@@ -61,7 +63,7 @@
       </div>
       <button class="modal-close"></button>
   </div>
-  
+
   <!-- HELP MODAL -->
   <div id="help-env-modal" class="modal">
     <div class="modal-background"></div>

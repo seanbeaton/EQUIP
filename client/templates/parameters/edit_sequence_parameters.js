@@ -8,13 +8,13 @@ var serialize = require('form-serialize');
 //Try to short circuit "enter" button?
 Template.editSequenceParameters.rendered = function() {
   $(document).keypress(function(e) {
-     if (e.keyCode == 13) { 
+     if (e.keyCode == 13) {
       e.preventDefault();
       return;
     }
   });
 }
- 
+
 Template.editSequenceParameters.helpers({
   environment: function() {
      var env = Environments.find({_id:Router.current().params._envId}).fetch();
@@ -24,7 +24,7 @@ Template.editSequenceParameters.helpers({
 });
 
 function loadDefaultSeqParams() {
- 
+
   $('#paramForm').remove();
 
   $('<form/>', {
@@ -259,8 +259,8 @@ Template.editSequenceParameters.events({
         alert(error.reason);
       } else {
         // Prompt save file dialogue
-        if ($.isEmptyObject(result)) { 
-          alert("There are no parameters to export. Add parameters to this environment to be able to export."); 
+        if ($.isEmptyObject(result)) {
+          alert("There are no parameters to export. Add parameters to this environment to be able to export.");
           return;
         }
         var json = JSON.stringify(result);
@@ -273,7 +273,7 @@ Template.editSequenceParameters.events({
         a.click();
         window.URL.revokeObjectURL(url);
       }
-    }); 
+    });
   },
 
  'click .back-to-class': function(e) {
@@ -330,7 +330,7 @@ Template.editSequenceParameters.events({
     envId: Router.current().params._envId,
     parameterPairs: parameterPairs
   });
-  console.log(clean_obj);
+
   Meteor.call('updateSeqParameters', clean_obj, function(error, result) {
     if (error){
       alert(error.reason);
@@ -345,14 +345,14 @@ Template.editSequenceParameters.events({
         "onclick": null,
         "showDuration": "300",
         "hideDuration": "1000",
-        "timeOut": "2000",
+        "timeOut": "4000",
         "extendedTimeOut": "1000",
         "showEasing": "swing",
         "hideEasing": "linear",
         "showMethod": "fadeIn",
         "hideMethod": "fadeOut"
       }
-      Command: toastr["success"]("Save Successful", "Observation Parameters")
+      Command: toastr["success"]("NOTE: After the first observation is created, you will not be able to edit discourse dimensions or demographics.","Save Successful","Observation Parameters");
     }
   });
 }

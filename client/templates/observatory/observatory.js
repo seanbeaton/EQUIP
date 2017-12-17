@@ -173,6 +173,7 @@ Template.observatory.events({
     envId = Router.current().params._envId;
     obsId = Router.current().params._obsId;
     var obsRaw = Observations.find({_id: obsId}).fetch()[0];
+    var seqs = Sequences.find({envId:envId}).fetch();
     var choices = [];
     var labels = [];
     $('.toggle-item').each(function () {
@@ -213,16 +214,40 @@ Template.observatory.events({
       obsName: obsRaw.name
     };
 
-    Meteor.call('sequenceInsert', sequence, function(error, result) {
-     if (error) {
-       alert(error.reason);
-     } else {
-      $('#seq-param-modal').removeClass('is-active');
-     }
-   });
+    if (seqs.length === 0 || seqs === undefined) {
+        let confirmation = getConfirmation();
+        if (confirmation) {
+            Meteor.call('sequenceInsert', sequence, function(error, result) {
+             if (error) {
+               alert(error.reason);
+             } else {
+              $('#seq-param-modal').removeClass('is-active');
+             }
+           });
+        } else {
+              $('#seq-param-modal').removeClass('is-active');
+        }
+    } else {
+          Meteor.call('sequenceInsert', sequence, function(error, result) {
+           if (error) {
+             alert(error.reason);
+           } else {
+            $('#seq-param-modal').removeClass('is-active');
+           }
+         });
+        $('#seq-param-modal').removeClass('is-active');
+    }
 
+      function getConfirmation() {
+          var retVal = confirm("Are you sure? After the first observation is created, you will not be able to edit discourse dimensions or demographics.");
+          if (retVal === true) {
+              return true;
+          }
+          else {
+              return false;
+          }
+      }
   },
-
   'click .delete-seq': function(e) {
     var result = confirm("Press 'OK' to delete this Contribution.");
     if (result == false) {

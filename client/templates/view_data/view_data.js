@@ -536,6 +536,9 @@ function makeIndividualGraphs(oIds) {
       height = 500 - margin.top - margin.bottom,
       fullW = newWidth,
       fullH = 500;
+  if (containerWidth < 960 ) {
+      containerWidth = 960;
+  }
 
   var svg = d3.select(".individual-plots")
             .append("svg")

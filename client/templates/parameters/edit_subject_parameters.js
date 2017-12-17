@@ -51,7 +51,7 @@ function loadDefaultSubjParams() {
       }).appendTo(singleParam);
 
       var inputValue = "";
-     
+
       if (labels[i] == "Race") {
         inputValue = "Black,Latinx,White,Other"
       }
@@ -215,8 +215,8 @@ Template.editSubjectParameters.events({
         alert(error.reason);
       } else {
         // Prompt save file dialogue
-        if ($.isEmptyObject(result)) { 
-          alert("There are no parameters to export. Add parameters to this environment to be able to export."); 
+        if ($.isEmptyObject(result)) {
+          alert("There are no parameters to export. Add parameters to this environment to be able to export.");
           return;
         }
         var json = JSON.stringify(result);
@@ -229,7 +229,7 @@ Template.editSubjectParameters.events({
         a.click();
         window.URL.revokeObjectURL(url);
       }
-    }); 
+    });
   },
 
 'click #add-demo-param': function(e) {
@@ -292,14 +292,14 @@ Template.editSubjectParameters.events({
           "onclick": null,
           "showDuration": "300",
           "hideDuration": "1000",
-          "timeOut": "2000",
+          "timeOut": "4000",
           "extendedTimeOut": "1000",
           "showEasing": "swing",
           "hideEasing": "linear",
           "showMethod": "fadeIn",
           "hideMethod": "fadeOut"
         }
-        Command: toastr["success"]("Save Successful", "Demographic Parameters")
+        Command: toastr["success"]("NOTE: After the first observation is created, you will not be able to edit discourse dimensions or demographics.","Save Successful","Demographic Parameters");
       }
       Router.go('editSequenceParameters', {_envId:Router.current().params._envId});
     });
@@ -318,14 +318,14 @@ Template.editSubjectParameters.events({
           "onclick": null,
           "showDuration": "300",
           "hideDuration": "1000",
-          "timeOut": "2000",
+          "timeOut": "4000",
           "extendedTimeOut": "1000",
           "showEasing": "swing",
           "hideEasing": "linear",
           "showMethod": "fadeIn",
           "hideMethod": "fadeOut"
         }
-        Command: toastr["success"]("Save Successful", "Demographic Parameters")
+        Command: toastr["success"]("NOTE: After the first observation is created, you will not be able to edit discourse dimensions or demographics.","Save Successful","Demographic Parameters");
       }
 
     });
