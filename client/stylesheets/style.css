@@ -437,3 +437,11 @@ ul
   margin-bottom: 5px;
   pointer-events: auto;
 }
+
+#toast-container>div {
+    opacity: 1 !important;
+}
+
+.toast-message {
+    font-size: 18px !important;
+}

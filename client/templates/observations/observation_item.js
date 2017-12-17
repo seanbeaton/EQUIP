@@ -9,7 +9,7 @@ Template.observationItem.events({
      var obj3 = Subjects.find({envId: Router.current().params._envId}).fetch();
 
      if ($.isEmptyObject(obj1) || $.isEmptyObject(obj2) || $.isEmptyObject(obj3)) {
-      alert('You must add students and parameters to the environment to continue to do the observation.');
+      alert('You must add students to the environment to continue to do the observation.');
       return;
      }
      Router.go('observatory', {_envId: this.envId, _obsId: this._id});

@@ -55,16 +55,46 @@ Template.observationList.events({
       timer: 0
     };
 
+    var sequenceParams = SequenceParameters.findOne({'children.envId': this._id});
+    var demographicParams = SubjectParameters.findOne({'children.envId': this._id});
+    var observations = Observations.find({"envId": this._id}).fetch();
+
     if ($('#observationName').val() == "") {
       alert("Observation name required.");
       return;
     }
 
-    Meteor.call('observationInsert', observation, function(error, result) {
-      return 0;
-    });
+    if (sequenceParams === undefined || demographicParams === undefined) {
+        alert("You must add students and parameters to the environment to continue to do the observation.")
+        return;
+    }
 
-    $('#observationName').val('');
+    if (observations.length === 0 ) {
+        var confirmation = getConfirmation();
+        if (confirmation) {
+            Meteor.call('observationInsert', observation, function(error, result) {
+              return 0;
+            });
+
+            $('#observationName').val('');
+        }
+    } else {
+        Meteor.call('observationInsert', observation, function(error, result) {
+          return 0;
+        });
+
+        $('#observationName').val('');
+    }
+
+    function getConfirmation() {
+        var retVal = confirm("Are you sure? After the first observation is created, you will not be able to edit discourse dimensions or demographics.");
+        if (retVal === true) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
   },
    'click .delete-seq': function(e) {
     var result = confirm("Press 'OK' to delete this Subject.");
