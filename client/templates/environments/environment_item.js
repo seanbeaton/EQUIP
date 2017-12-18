@@ -16,8 +16,8 @@ Template.environmentItem.events({
         alert(error.reason);
       } else {
         // Prompt save file dialogue
-        if ($.isEmptyObject(result)) { 
-          alert("There are no parameters to export. Add parameters to this environment to be able to export."); 
+        if ($.isEmptyObject(result)) {
+          alert("There are no parameters to export. Add parameters to this environment to be able to export.");
           return;
         }
         var json = JSON.stringify(result);
@@ -30,7 +30,7 @@ Template.environmentItem.events({
         a.click();
         window.URL.revokeObjectURL(url);
       }
-    }); 
+    });
   },
   'click .import-tab': function (e) {
     var envId = this._id;
@@ -114,5 +114,11 @@ Template.environmentItem.events({
      var obj1 = SubjectParameters.find({'children.envId': this._id}).fetch();
      var obj2 = SequenceParameters.find({'children.envId': this._id}).fetch();
      return ($.isEmptyObject(obj1) || $.isEmptyObject(obj2)) ?"pulser":"";
+   },
+   hasObsMade: function() {
+       var obs = Observations.find({envId:this._id}, {sort: {lastModified: -1}}).fetch();
+       if (obs.length === 0) {
+           return true
+       }
    }
  });

@@ -16,6 +16,8 @@
         <button id="obs-create-button" class="button is-medium is-success has-text-centered">New Observation</button>
         {{ #if hasObsMade }}
             <button id="edit-params-button" class="button is-medium has-text-centered">Edit Demographics / Dimensions</button>
+        {{else}}
+            <button id="edit-params-button" class="button is-medium has-text-centered">View Demographics / Dimensions</button>
         {{ /if }}
         <button id="edit-students-button" class="button is-medium has-text-centered">Edit Student Roster </button>
         <button id="show-all-observations" class="button is-medium">Contribution History</button>

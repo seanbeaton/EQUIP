@@ -19,6 +19,7 @@
 
       </div>
     </div>
+    {{ #if hasObsMade }}
     <div class="columns">
       <div class="column is-offset-1">
         <button id="load-default-demo" class="button is-medium default-button has-text-centered">Load Defaults</button>
@@ -29,6 +30,9 @@
         <button id="save-demo-params" class="button is-medium is-outlined is-info is-pulled-right has-text-centered">Save Parameters</button>
       </div>
     </div>
+    {{ else }}
+        <div id="obsMade"></div>
+    {{ /if }}
   </section>
 
   <section class="section">
@@ -47,7 +51,7 @@
         <button id="help-close-modal" class="delete"></button>
       </header>
       <section class="modal-card-body">
-      There are two types of parameters to set up. Demographic parameters are social markers like race, gender, etc. Discourse dimensions are the aspects of classroom talk that you wish to track, like the length of talk or types of things students say. For both of these parameter types, you may click on "load defaults" to get a basic set of parameters to work with. Modify these as appropriate, separating each level of the paramter with a comma. Remember, you must click "save parameters" when you are finished for your changes to remain. When you are working with observation parameters, you can create a special type of parameter called a "toggle." This is for something that stays relatively constant throughout a class session. For instance, you might wish to track if the classroom is in "whole class" or "small group" mode. You could make this a toggle, so that you do not need to code this everytime a student contributes. Instead, you can just click on the toggle whenever it changes, and it will be coded automatically.               
+      There are two types of parameters to set up. Demographic parameters are social markers like race, gender, etc. Discourse dimensions are the aspects of classroom talk that you wish to track, like the length of talk or types of things students say. For both of these parameter types, you may click on "load defaults" to get a basic set of parameters to work with. Modify these as appropriate, separating each level of the paramter with a comma. Remember, you must click "save parameters" when you are finished for your changes to remain. When you are working with observation parameters, you can create a special type of parameter called a "toggle." This is for something that stays relatively constant throughout a class session. For instance, you might wish to track if the classroom is in "whole class" or "small group" mode. You could make this a toggle, so that you do not need to code this everytime a student contributes. Instead, you can just click on the toggle whenever it changes, and it will be coded automatically.
       </section>
       <footer class="modal-card-foot">
         <a class="button">Cancel</a>

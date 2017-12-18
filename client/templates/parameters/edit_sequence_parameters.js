@@ -20,6 +20,13 @@ Template.editSequenceParameters.helpers({
      var env = Environments.find({_id:Router.current().params._envId}).fetch();
      var result = env[0];
      return result;
+  },
+  hasObsMade: function() {
+      var env = Environments.find({_id:Router.current().params._envId}).fetch();
+      var obs = Observations.find({envId:env[0]._id}, {sort: {lastModified: -1}}).fetch();
+      if (obs.length === 0) {
+          return true
+      }
   }
 });
 
@@ -88,7 +95,7 @@ function loadDefaultSeqParams() {
       }).appendTo(singleParam);
 
       removeButton = $('<button/>', {
-        class: "button is-small is-danger is-pulled-right remove"+i,
+        class: "button is-small is-danger is-pulled-right removeSeq remove"+i ,
         text: "Remove Parameter",
         style: "margin-right: .5em"
       }).appendTo(singleParam);
@@ -156,7 +163,7 @@ function addSeqFields() {
       }).appendTo(singleParam);
 
       removeButton = $('<button/>', {
-        class: "button is-small is-danger is-pulled-right remove"+formCounter,
+        class: "button is-small is-danger is-pulled-right removeSeq remove"+formCounter,
         text: "Remove Parameter",
         style: "margin-right: .5em"
       }).appendTo(singleParam);
@@ -360,6 +367,18 @@ Template.editSequenceParameters.events({
 
 Template.editSequenceParameters.rendered = function() {
   setDefaultSeqParams();
+  hideRemoveButtons();
+}
+
+function hideRemoveButtons() {
+    var obsMade = document.getElementById('obsMade');
+
+    if (obsMade) {
+        var allRemoveButtons = document.querySelectorAll('.removeSeq');
+        Array.prototype.map.call(allRemoveButtons, function(btn) {
+             btn.style.display = "none";
+        })
+    }
 }
 
 function setDefaultSeqParams() {
@@ -411,7 +430,7 @@ function setDefaultSeqParams() {
       }).appendTo(singleParam);
 
       removeButton = $('<button/>', {
-        class: "button is-small is-danger is-pulled-right remove0",
+        class: "button is-small is-danger is-pulled-right remove0 removeSeq",
         text: "Remove Parameter",
         style: "margin-right: .5em"
       }).appendTo(singleParam);
@@ -465,7 +484,7 @@ function setDefaultSeqParams() {
       }).appendTo(singleParam);
 
       var removeButton = $('<button/>', {
-        class: "button is-small is-danger is-pulled-right remove"+i,
+        class: "button is-small is-danger is-pulled-right removeSeq remove"+i,
         text: "Remove Parameter",
         style: "margin-right: .5em"
       }).appendTo(singleParam);

@@ -19,6 +19,7 @@
 
       </div>
     </div>
+    {{ #if hasObsMade }}
     <div class="columns">
       <div class="column is-offset-1">
         <button id="load-default-seq" class="button is-medium default-button has-text-centered">Load Defaults</button>
@@ -28,6 +29,9 @@
         <button id="save-seq-params" class="button is-medium is-outlined is-info is-pulled-right has-text-centered">Save Parameters</button>
       </div>
     </div>
+    {{ else }}
+        <div id="obsMade"></div>
+    {{ /if }}
   </section>
 
   <section class="section">
