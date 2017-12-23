@@ -84,7 +84,7 @@ Template.viewData.events({
     demData = makeDemGraphs(envId, dParams);
     groupCData = makeContributionGraphs(obsIds, dParams, sParams);
 
-    classStats(envId, sParams, obsIds, dParams);
+    classStats(envId, sParams, obsIds);
 
     makeRatioGraphs(envId, groupCData, demData);
     makeIndividualGraphs(obsIds);
@@ -314,15 +314,13 @@ function classStats(envId, sParams, obsId) {
   var conts = Sequences.find({'envId': envId}).fetch();
   var totalStuds = studs.length;
   var studTrack = new Set();
-  var totalCont = conts.length;
+  var totalCont = conts.filter(function(contribution) {
+     return obsId.includes(contribution.obsId);
+ }).length;
   var stats = $('.class-stats');
 
   var filteredResults = conts.filter(function(result) {
-      for (var i = 0; i < obsId.length; i++ ) {
-        if (obsId[i] === result.obsId) {
-          return result;
-        }
-      }
+      return obsId.includes(result.obsId);
   });
 
   var classRoomSummary = $('<div/>', {
