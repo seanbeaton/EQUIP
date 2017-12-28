@@ -331,7 +331,7 @@ function classStats(envId, sParams, obsId) {
     text: "Classroom Summary"
   }).appendTo(classRoomSummary);
 
-  sParams.map(function(param, idx) {
+  sParams.forEach(function(param, idx) {
     var newObject = {};
     var paramWithData = [];
     for (con in filteredResults) {
@@ -350,7 +350,7 @@ function classStats(envId, sParams, obsId) {
     var sequenceParameters = SequenceParameters.find({'children.envId':envId}).fetch()[0];
     var paramPosition = `parameter${idx}`;
     var parameters = sequenceParameters.children[paramPosition].split(",");
-    parameters.filter((obj) => { return paramWithData.indexOf(obj) == -1; }).map((item) => { newObject[item] = 0; })
+    parameters.filter((obj) => { return paramWithData.indexOf(obj) == -1; }).forEach((item) => { newObject[item] = 0; })
 
     var total = studTrack.size;
     renderStats(stats, newObject, param, total);
@@ -524,7 +524,7 @@ function makeIndividualGraphs(oIds) {
       return names.indexOf(e.info.name) === -1;
   });
 
-  filteredNames.map(function(name){
+  filteredNames.forEach(function(name){
       var newName = name.info.name;
       filteredNamesObj[newName] = 0.1;
   })
