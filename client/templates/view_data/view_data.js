@@ -331,8 +331,9 @@ function classStats(envId, sParams, obsId) {
     text: "Classroom Summary"
   }).appendTo(classRoomSummary);
 
-  sParams.map(function(param) {
+  sParams.forEach(function(param, idx) {
     var newObject = {};
+    var paramWithData = [];
     for (con in filteredResults) {
       var next = filteredResults[con]['info'];
       studTrack.add(next['studentId']);
@@ -340,13 +341,19 @@ function classStats(envId, sParams, obsId) {
         if (next[param] in newObject) {
           newObject[next[param]] += 1;
         } else {
+          paramWithData.push(next[param]);
           newObject[next[param]] = 1;
         }
       }
     }
+
+    var sequenceParameters = SequenceParameters.find({'children.envId':envId}).fetch()[0];
+    var paramPosition = `parameter${idx}`;
+    var parameters = sequenceParameters.children[paramPosition].split(",");
+    parameters.filter((obj) => { return paramWithData.indexOf(obj) == -1; }).forEach((item) => { newObject[item] = 0; })
+
     var total = studTrack.size;
     renderStats(stats, newObject, param, total);
-    newObject = {};
   });
 
   var bullets = $('<ul/>', {
@@ -517,7 +524,7 @@ function makeIndividualGraphs(oIds) {
       return names.indexOf(e.info.name) === -1;
   });
 
-  filteredNames.map(function(name){
+  filteredNames.forEach(function(name){
       var newName = name.info.name;
       filteredNamesObj[newName] = 0.1;
   })
