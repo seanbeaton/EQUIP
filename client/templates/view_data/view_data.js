@@ -331,6 +331,7 @@ function classStats(envId, sParams, obsId) {
     text: "Classroom Summary"
   }).appendTo(classRoomSummary);
 
+
   sParams.forEach(function(param, idx) {
     var newObject = {};
     var paramWithData = [];
@@ -347,12 +348,19 @@ function classStats(envId, sParams, obsId) {
       }
     }
 
+    function getKeyByValue(object, value) {
+        return Object.keys(object).find(key => object[key] === value);
+    }
+
     var sequenceParameters = SequenceParameters.find({'children.envId':envId}).fetch()[0];
-    var paramPosition = `parameter${idx}`;
+    var paramkey = getKeyByValue(sequenceParameters.children, param);
+    var position = paramkey.split("").pop();
+    var paramPosition = `parameter${position}`;
     var parameters = sequenceParameters.children[paramPosition].split(",");
     parameters.filter((obj) => { return paramWithData.indexOf(obj) == -1; }).forEach((item) => { newObject[item] = 0; })
 
     var total = studTrack.size;
+
     renderStats(stats, newObject, param, total);
   });
 
@@ -447,7 +455,6 @@ function makeContributionGraphs(obsIds, dp, sp) {
         //makeStackedBar(dataSlice, label, ".contribution-plots", "# of Contributions");
     }
   }
-
   return data;
 
 }
@@ -477,7 +484,7 @@ function makeRatioGraphs(envId, cData, dData) {
 
   for (demp in ratioData) {
     for (param in ratioData[demp]) {
-      var label = ""+param+" by "+demp;
+      var label = param + " by " + demp;
       var dataSlice = d3.entries(data[demp][param]);
       //new
         for (obj in dataSlice) {
@@ -495,10 +502,27 @@ function makeRatioGraphs(envId, cData, dData) {
             }
           }
         }
-        makeStackedBar(dataSlice, label, ".ratio-plots", "Equity Ratio");
+
+        var sortedData = [];
+
+        function getKeyByValue(object, value) {
+            return Object.keys(object).find(key => object[key] === value);
+        }
+        var sequenceParameters = SequenceParameters.find({'children.envId':envId}).fetch()[0];
+        var paramkey = getKeyByValue(sequenceParameters.children, param);
+        var position = paramkey.split("").pop();
+        var paramPosition = `parameter${position}`;
+        var barParams = sequenceParameters.children[paramPosition].split(",");
+        for (var i = 0; i < barParams.length; i++) {
+            for (var j = 0; j < dataSlice.length; j++) {
+                if (barParams[i] === dataSlice[j].key) {
+                    sortedData.push(dataSlice[j]);
+                }
+            }
+        }
+        makeStackedBar(sortedData, label, ".ratio-plots", "Equity Ratio");
     }
   }
-
 }
 
 function makeIndividualGraphs(oIds) {
@@ -669,7 +693,6 @@ function makePieChart(data, label) {
 }
 
 function makeStackedBar(dataEnum, label, selector, yLabel) {
-
   var margin = {top: 50, right: 20, bottom: 30, left: 40},
     width = 600 - margin.left - margin.right,
     height = 500 - margin.top - margin.bottom,
@@ -701,7 +724,6 @@ function makeStackedBar(dataEnum, label, selector, yLabel) {
       .range(["#F17CB0", "#60BD68", "#FAA43A", "#F15854", "#DECF3F", "#B276B2", "#B2912F"]);
 
   //Set Keys
-
   sample = dataEnum[0].value;
   keys = [];
   for (bit in sample) {
@@ -765,7 +787,7 @@ function makeStackedBar(dataEnum, label, selector, yLabel) {
       .attr("font-size", 10)
       .attr("text-anchor", "end")
     .selectAll("g")
-    .data(keys.slice().reverse())
+    .data(keys.slice())
     .enter().append("g")
       .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
 
