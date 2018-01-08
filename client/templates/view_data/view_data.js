@@ -729,10 +729,13 @@ function makeStackedBar(dataEnum, label, selector, yLabel) {
   for (bit in sample) {
     keys.push(bit);
   }
-  x0.domain(dataEnum.map(function(d) { return d.key; }));
-  x1.domain(keys).rangeRound([0, x0.bandwidth()]);
 
-  y.domain([0, 1.25*d3.max(dataEnum, function(d) { return d3.max(keys, function(key) { return d.value[key]; }); })]).nice();
+  var sortedKeys = keys.sort();
+
+  x0.domain(dataEnum.map(function(d) { return d.key; }));
+  x1.domain(sortedKeys).rangeRound([0, x0.bandwidth()]);
+
+  y.domain([0, 1.25*d3.max(dataEnum, function(d) { return d3.max(sortedKeys, function(key) { return d.value[key]; }); })]).nice();
 
   g.append("g")
     .selectAll("g")
@@ -741,7 +744,7 @@ function makeStackedBar(dataEnum, label, selector, yLabel) {
       .attr("transform", function(d) { return "translate(" + x0(d.key) + ",0)"; })
       .attr('class', "bar-chart")
     .selectAll("rect")
-    .data(function(d) { return keys.map(function(key) { val = d.value[key] || .01; return {key: key, value: val} }) })
+    .data(function(d) { return sortedKeys.map(function(key) { val = d.value[key] || .01; return {key: key, value: val} }) })
     .enter().append("rect")
       .attr('class', 'rect')
       .attr("x", function(d) { return x1(d.key); })
@@ -751,7 +754,7 @@ function makeStackedBar(dataEnum, label, selector, yLabel) {
       .attr("fill", function(d) { return z(d.key); })
       .enter().append("g")
       .attr("font-size", "20px")
-      .data(function(d) { return keys.map(function(key) { val = d.value[key] || 0; return {key: key, value: val} }) })
+      .data(function(d) { return sortedKeys.map(function(key) { val = d.value[key] || 0; return {key: key, value: val} }) })
       .enter().append("text")
       .text(function(d) { if (d.value == 0) return d.value })
         .attr("width", x1.bandwidth())
@@ -787,7 +790,7 @@ function makeStackedBar(dataEnum, label, selector, yLabel) {
       .attr("font-size", 10)
       .attr("text-anchor", "end")
     .selectAll("g")
-    .data(keys.slice())
+    .data(sortedKeys.slice())
     .enter().append("g")
       .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
 
@@ -801,10 +804,10 @@ function makeStackedBar(dataEnum, label, selector, yLabel) {
       .attr("x", width - 30)
       .attr("y", 9.5)
       .attr("dy", "0.32em")
-      .text(function(d) { return d; });
+      .text(function(d) { console.log(d); return d; });
 
     g.append("text")
-      .attr("x", fullW/2)
+      .attr("x", fullW / 2)
       .attr("y", -20)
       .attr("dy", "0.32em")
       .attr("font-weight", "bold")
