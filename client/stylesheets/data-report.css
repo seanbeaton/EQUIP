@@ -79,7 +79,7 @@
 }
 
 .arc text {
-  font: 18px;
+  font: 18px !important;
   text-anchor: middle;
   fill: black;
 }

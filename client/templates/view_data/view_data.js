@@ -612,7 +612,7 @@ function makeIndividualGraphs(oIds) {
       .attr("x", function(d) {
         return x(d.key.slice(0,10));
       })
-      .attr("y", function(d) { return y(d.value); })
+      .attr("y", function(d) { return y(d.value) })
       .attr("width", 70)
       .attr("height", function(d) { return height - y(d.value); })
 
@@ -639,13 +639,14 @@ function makeIndividualGraphs(oIds) {
 }
 
 function makePieChart(data, label) {
-
   var margin = {header: 100, top: 50, right: 50, bottom: 50, left: 50},
-  width = 600 - margin.left - margin.right,
-  height = 600 - margin.top - margin.bottom - margin.header,
-  fullW = 500,
-  fullH = 500,
-  radius = Math.min(width, height) / 2;
+  width = 700
+  height = 700 - margin.top - margin.bottom - margin.header,
+  fullW = 700,
+  fullH = 700,
+  radius = Math.min(width, height) / 2,
+  arc = d3.arc().innerRadius(radius * .6).outerRadius(radius),
+  labelr = radius + 30;
 
   var svg = d3.select(".demo-plots")
             .append("svg")
@@ -669,27 +670,64 @@ function makePieChart(data, label) {
     .outerRadius(radius - 40)
     .innerRadius(radius - 70);
 
-  var arc = g.selectAll('.arc')
+  var arcs = g.selectAll('.arc')
       .data(pie(data))
       .enter().append("g")
-        .attr('class', 'arc');
+      .attr('class', 'arc');
 
-  arc.append("path")
+  arcs.append("path")
     .attr('d', path)
     .attr('fill', function (d) { return color(d.data.key); });
 
-  arc.append("text")
-      .attr("transform", function(d) { return "translate(" + label.centroid(d) + ")"; })
-      .attr("dy", "0.35em")
-      .attr("font-size", "1.25em")
-      .text(function(d) { return d.data.key; });
+  var textLabels = arcs.append("text")
+      .attr("transform", function(d) {
+          var c = arc.centroid(d),
+              x = c[0],
+              y = c[1],
+              // pythagorean theorem for hypotenuse
+              h = Math.sqrt(x * x + y * y) - 20;
+          return "translate(" + (x / h * labelr) +  ',' +
+             (y / h * labelr) +  ")";
+      })
+      .attr("dy", "1em")
+      .attr("font-size", "14px")
+      .attr("text-anchor", function(d) {
+          return (d.endAngle + d.startAngle) / 2 > Math.PI ? "end" : "start";
+      })
+      .text(function(d, i) { return d.data.key; })
+      .selectAll(".arc text").call(wrap, 30);
 
   svg.append("text")
-    .attr("transform", "translate("+fullW/2+","+40+")")
-    .attr("font-size", "40px")
-    .attr("text-anchor", "middle")
-    .text(key);
+     .attr("transform", "translate(" + fullW / 2 + "," + 20 +")")
+     .attr("font-size", "25px")
+     .attr("text-anchor", "middle")
+     .text(key);
 
+   function wrap(text, width) {
+    var elements = text._parents;
+
+    elements.forEach(function(ele) {
+      var text = d3.select(ele),
+          words = text.text().trim().split(/\s+/).reverse(),
+          word,
+          line = [],
+          lineNumber = 0,
+          lineHeight = .1, // em
+          y = text.attr("y"),
+          dy = parseFloat(text.attr("dy")),
+          tspan = text.text(null).append("tspan").attr("x", 0).attr("y", y).attr("dy", dy + "em");
+      while (word = words.pop()) {
+        line.push(word);
+        tspan.text(line.join(" "));
+        if (tspan.node().getComputedTextLength() > width) {
+          line.pop();
+          tspan.text(line.join(" "));
+          line = [word];
+          tspan = text.append("tspan").attr("x", 0).attr("y", y).attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
+        }
+      }
+    });
+  }
 }
 
 function makeStackedBar(dataEnum, label, selector, yLabel) {
@@ -735,8 +773,10 @@ function makeStackedBar(dataEnum, label, selector, yLabel) {
   x0.domain(dataEnum.map(function(d) { return d.key; }));
   x1.domain(sortedKeys).rangeRound([0, x0.bandwidth()]);
 
-  y.domain([0, 1.25*d3.max(dataEnum, function(d) { return d3.max(sortedKeys, function(key) { return d.value[key]; }); })]).nice();
+  // y.domain([0, 1.25 * d3.max(dataEnum, function(d) { return d3.max(sortedKeys, function(key) { return d.value[key]; }); })]).nice();
 
+  // caps equity ratio to 4  vs having it dynamiclly populated based on value as above.
+  y.domain([0,4]);
   g.append("g")
     .selectAll("g")
     .data(dataEnum)
