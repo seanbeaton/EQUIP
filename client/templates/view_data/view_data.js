@@ -804,7 +804,7 @@ function makeStackedBar(dataEnum, label, selector, yLabel) {
       .attr("transform", function(d) { return "translate(" + x0(d.key) + ",0)"; })
       .attr('class', "bar-chart")
     .selectAll("rect")
-    .data(function(d) { return sortedKeys.map(function(key) { val = d.value[key] || .01; val = val >= 4 ? 3 : val; return {key: key, value: val} }) })
+    .data(function(d) { return sortedKeys.map(function(key) { val = d.value[key] || .01; val = val >= 3 ? 3 : val; return {key: key, value: val} }) })
     .enter().append("rect")
       .attr('class', 'rect')
       .attr("x", function(d) { return x1(d.key); })
@@ -816,11 +816,11 @@ function makeStackedBar(dataEnum, label, selector, yLabel) {
       .attr("font-size", "20px")
       .data(function(d) { return sortedKeys.map(function(key) { val = d.value[key] || 0; return {key: key, value: val} }) })
       .enter().append("text")
-      .text(function(d) { if (d.value == 0 || d.value >= 4) return d.value })
+      .text(function(d) { if (d.value == 0 || d.value >= 3) return Math.round(d.value) })
         .attr("width", x1.bandwidth())
         .attr("x", function(d) { return x1(d.key) + ((x1.bandwidth() / 2) - 3); })
         .attr("y", function(d) {
-            if (d.value >=  4 ) {
+            if (d.value >=  3 ) {
                 return y(3) - 10;
             } else {
                 return y(d.value) - 10;
