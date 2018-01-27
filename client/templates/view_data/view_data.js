@@ -677,7 +677,20 @@ function makePieChart(data, label) {
 
   arcs.append("path")
     .attr('d', path)
-    .attr('fill', function (d) { return color(d.data.key); });
+    .attr('fill', function (d) { return color(d.data.key); })
+    .on('mouseover', function(d) {
+    $("#toolTip")
+      .html(d.data.key + ": " + d.data.value )
+      .show();
+    })
+    .on('mousemove', function(d) {
+        $("#toolTip")
+          .css('left', "50%")
+          .css('top', "50%")
+    })
+    .on('mouseout', function(d) {
+        $("#toolTip").html('').hide();
+    });
 
   var textLabels = arcs.append("text")
       .attr("transform", function(d) {
@@ -685,7 +698,7 @@ function makePieChart(data, label) {
               x = c[0],
               y = c[1],
               // pythagorean theorem for hypotenuse
-              h = Math.sqrt(x * x + y * y) - 20;
+              h = Math.sqrt(x * x + y * y) - 10;
           return "translate(" + (x / h * labelr) +  ',' +
              (y / h * labelr) +  ")";
       })
@@ -694,7 +707,14 @@ function makePieChart(data, label) {
       .attr("text-anchor", function(d) {
           return (d.endAngle + d.startAngle) / 2 > Math.PI ? "end" : "start";
       })
-      .text(function(d, i) { return d.data.key; })
+      .text(function(d, i) {
+          if (d.data.key.length > 15 ) {
+              var slicedKey = d.data.key.slice(0,10) + "...";
+              return slicedKey
+          } else {
+              return d.data.key;
+          }
+      })
       .selectAll(".arc text").call(wrap, 30);
 
   svg.append("text")
@@ -746,7 +766,7 @@ function makeStackedBar(dataEnum, label, selector, yLabel) {
 
   // BarChart Axes
   var x0 = d3.scaleBand()
-      .rangeRound([0, width])
+      .rangeRound([0, width - 60])
       .paddingInner(0.1);
 
   // Grouping Axis
@@ -755,7 +775,7 @@ function makeStackedBar(dataEnum, label, selector, yLabel) {
 
   // Bars
   var y = d3.scaleLinear()
-      .rangeRound([height, 0]);
+      .rangeRound([height, 20]);
 
   //Colors
   var z = d3.scaleOrdinal()
@@ -776,7 +796,7 @@ function makeStackedBar(dataEnum, label, selector, yLabel) {
   // y.domain([0, 1.25 * d3.max(dataEnum, function(d) { return d3.max(sortedKeys, function(key) { return d.value[key]; }); })]).nice();
 
   // caps equity ratio to 4  vs having it dynamiclly populated based on value as above.
-  y.domain([0,4]);
+  y.domain([0,3]);
   g.append("g")
     .selectAll("g")
     .data(dataEnum)
@@ -784,7 +804,7 @@ function makeStackedBar(dataEnum, label, selector, yLabel) {
       .attr("transform", function(d) { return "translate(" + x0(d.key) + ",0)"; })
       .attr('class', "bar-chart")
     .selectAll("rect")
-    .data(function(d) { return sortedKeys.map(function(key) { val = d.value[key] || .01; return {key: key, value: val} }) })
+    .data(function(d) { return sortedKeys.map(function(key) { val = d.value[key] || .01; val = val >= 4 ? 3 : val; return {key: key, value: val} }) })
     .enter().append("rect")
       .attr('class', 'rect')
       .attr("x", function(d) { return x1(d.key); })
@@ -796,10 +816,16 @@ function makeStackedBar(dataEnum, label, selector, yLabel) {
       .attr("font-size", "20px")
       .data(function(d) { return sortedKeys.map(function(key) { val = d.value[key] || 0; return {key: key, value: val} }) })
       .enter().append("text")
-      .text(function(d) { if (d.value == 0) return d.value })
+      .text(function(d) { if (d.value == 0 || d.value >= 4) return d.value })
         .attr("width", x1.bandwidth())
         .attr("x", function(d) { return x1(d.key) + ((x1.bandwidth() / 2) - 3); })
-        .attr("y", function(d) { return y(d.value) - 10; })
+        .attr("y", function(d) {
+            if (d.value >=  4 ) {
+                return y(3) - 10;
+            } else {
+                return y(d.value) - 10;
+            }
+        })
 
   g.append("g")
       .attr("class", "axis")
@@ -844,7 +870,7 @@ function makeStackedBar(dataEnum, label, selector, yLabel) {
       .attr("x", width - 30)
       .attr("y", 9.5)
       .attr("dy", "0.32em")
-      .text(function(d) { console.log(d); return d; });
+      .text(function(d) { return d; });
 
     g.append("text")
       .attr("x", fullW / 2)
