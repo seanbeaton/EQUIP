@@ -8,12 +8,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>EQUIP App</title>
 <meta name="description" content="Tool for educational researchers to do equity-based observations in classrooms">
-<link href="https://fonts.googleapis.com/css?family=Catamaran|Noto+Sans|Roboto+Slab|Source+Sans+Pro" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
 </head>
 
 <!-- Navbar  -->
 
-<nav class="columns nav-wrap has-text-centered">
+<!-- <nav class="columns nav-wrap has-text-centered">
     <div class="column n-item">
     <a class="" href="{{pathFor 'landingPage'}}" id="navHome">Home</a>
   </div>
@@ -32,5 +32,40 @@
       <div class="column n-item">
       {{> loginButtons}}
       </div>
-</nav>
+</nav> -->
+
+
+<header>
+    <div class="header-container">
+        <a  class="header-links" href="/" >
+            <img alt="Brand" class="equip-logo" src="refresh/equip-beta.svg">
+            <img alt="Brand" class="equip-hands" src="refresh/equip-hands.svg">
+        </a>
+        {{#if currentUser}}
+        <nav class="main-menu">
+            <div class="dropdown-wrapper menu-button">
+                <a class="menu-button menu-button-header" href="#">{{currentUser.username}}
+                    <i class="fa fa-caret-down"></i>
+                    <i class="fa fa-caret-up hide"></i>
+                </a>
+                <div class="drop-menu fade-in effect">
+                     <a class="menu-button">
+                         {{> loginButtons}}
+                    </a>
+                    <a class="menu-button" id="signOut" href="#">Sign Out</a>
+                    <a class="menu-button" href="{{pathFor 'environmentList'}}">Dashboard</a>
+                    <a class="menu-button" href="{{pathFor 'viewData'}}" >Analysis</a>
+                    <a class="menu-button" href="{{pathFor 'aboutPage'}}">About</a>
+                    <a class="menu-button" href="/">EQUIP HOME</a>
+                </div>
+            </div>
+        </nav>
+        {{else}}
+            <div class="column n-item">
+            {{> loginButtons}}
+            </div>
+        {{/if}}
+    </div>
+</header>
+
 </template>
