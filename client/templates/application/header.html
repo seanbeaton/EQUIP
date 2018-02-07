@@ -37,7 +37,7 @@
 
 <header>
     <div class="header-container">
-        <a  class="header-links" href="/" >
+        <a class="header-links" href="/" >
             <img alt="Brand" class="equip-logo" src="refresh/equip-beta.svg">
             <img alt="Brand" class="equip-hands" src="refresh/equip-hands.svg">
         </a>
@@ -49,21 +49,28 @@
                     <i class="fa fa-caret-up hide"></i>
                 </a>
                 <div class="drop-menu fade-in effect">
-                     <a class="menu-button">
-                         {{> loginButtons}}
+                    <a class="menu-button">
+                        {{> loginButtons}}
                     </a>
                     <a class="menu-button" id="signOut" href="#">Sign Out</a>
                     <a class="menu-button" href="{{pathFor 'environmentList'}}">Dashboard</a>
-                    <a class="menu-button" href="{{pathFor 'viewData'}}" >Analysis</a>
+                    <a class="menu-button" href="{{pathFor 'viewData'}}">Analysis</a>
                     <a class="menu-button" href="{{pathFor 'aboutPage'}}">About</a>
                     <a class="menu-button" href="/">EQUIP HOME</a>
                 </div>
             </div>
         </nav>
         {{else}}
-            <div class="column n-item">
-            {{> loginButtons}}
+        <nav class="c-main-menu__not-signed-in">
+            <ul class="c-main-menu__not-signed-in--ul">
+                <li class="c-main-menu__not-signed-in--li"><a href="/">HOME</a></li>
+                <li class="c-main-menu__not-signed-in--li"><a href="{{pathFor 'aboutPage'}}">About</a></li>
+                <li class="c-main-menu__not-signed-in--li"><a href="#">Help</a></li>
+            </ul>
+            <div class="c-main-menu__not-signed-in-login-button">
+                {{> loginButtons}}
             </div>
+        </nav>
         {{/if}}
     </div>
 </header>

@@ -15,7 +15,7 @@ header {
   height: 75px;
   margin: auto;
   display: flex;
-  flex-direction: column; 
+  flex-direction: column;
   align-items: center;
 }
 
@@ -77,6 +77,48 @@ header {
     height: 100%;
 }
 
+.c-main-menu__not-signed-in {
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 45%;
+}
+
+.c-main-menu__not-signed-in--ul {
+    display: inline-flex;
+}
+
+.c-main-menu__not-signed-in--li {
+    padding-right: 40px;
+}
+
+.c-main-menu__not-signed-in--li a {
+    font-family: 'Roboto', sans-serif;
+    font-weight: bold;
+    font-size: 20px;
+    color: white;
+    text-transform: uppercase;
+    transition: color .4s;
+}
+
+.c-main-menu__not-signed-in--li a:hover {
+    background-color: #000;
+    color: #F25F3D;
+}
+
+.c-main-menu__not-signed-in-login-button {
+    font-family: 'Roboto', sans-serif;
+    font-weight: bold;
+    font-size: 24px;
+    display: flex;
+    width: 150px;
+    height: 75px;
+    align-items: center;
+    justify-content: center;
+    background-color: #F25F3D;
+    color: #fff;
+}
+
 #login-buttons .login-link-text {
     color: #fff;
     border: 0;
@@ -85,10 +127,12 @@ header {
     visibility: hidden;
     word-spacing:-999px;
     letter-spacing: -999px;
+    transition: color .4s;
 }
 
 #login-buttons .login-link-text:after {
-    content: "Edit Password";
+    content: "Sign In";
+    text-transform: uppercase;
     line-height: initial;
     visibility: visible;
     word-spacing:normal;
@@ -96,13 +140,83 @@ header {
 }
 
 #login-buttons .login-link-text:hover {
-    background-color: #000;
+    color: #000;
 }
 
 i {
     position: relative;
     top: 5px;
     left: 5px;
+}
+
+#login-dropdown-list {
+    width: 240px;
+    height: 280px;
+    border-radius: 0;
+    border: 1px solid #C3BF94;
+}
+
+#login-username-or-email-label-and-input {
+    text-align: center;
+}
+
+#login-password-label-and-input {
+    text-align: center;
+    padding-top: 10px;
+}
+
+#login-buttons-password {
+    font-family: 'Roboto', sans-serif !important;
+    font-weight: bold;
+    font-size: 24px !important;
+    display: flex;
+    width: 100%;
+    height: 40px;
+    margin-top: 20px !important;
+    align-items: center;
+    justify-content: center;
+    background-color: #F25F3D !important;
+    text-transform: uppercase;
+    border-radius: 0 !important;
+    border: 0 !important;
+    color: #fff !important;
+    transition: color .4s !important;
+}
+
+#login-buttons-password:hover {
+    color: #000 !important;
+}
+
+#login-username-or-email-label, #login-password-label {
+    font-family: 'Roboto', sans-serif;
+    color: #34C4C4;
+    text-align: center;
+    font-size: 16px;
+    letter-spacing: .4px;
+}
+
+.additional-link-container a {
+    font-family: 'Roboto', sans-serif !important;
+    color: #F25F3D !important;
+    padding-top: 10px !important;
+    letter-spacing: .4px !important;
+    transition: color .4s !important;
+}
+
+.additional-link-container a:hover {
+    color: black !important;
+    background-color: white !important;
+}
+
+input:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0 1000px #f2f2f2 inset !important;
+    font-family: 'Roboto', sans-serif !important;
+    font-size: 14px !important;
+    letter-spacing: .4px !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    height: 40px !important;
+    padding-left: 10px !important;
 }
 
 /*====================================
