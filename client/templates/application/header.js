@@ -16,7 +16,7 @@ Template.header.events({
              var loginLink = document.getElementById('login-name-link');
              loginLink.innerHTML = "";
              loginLink.classList.remove("login-link-text");
-             loginLink.classList.add("login-link-text-sign-in")
+             loginLink.classList.add("login-link-text-sign-in");
          }
      },
      'mouseleave .dropdown-wrapper': function(e) {
@@ -30,6 +30,14 @@ Template.header.events({
                  signInCloseBtn.innerHTML = "X";
              }
          }, 0);
+     },
+     'click #login-name-link': function(e) {
+         setTimeout(function(){
+             if (Meteor.userId()) {
+                 var dropDownSignIn = document.getElementById('login-dropdown-list');
+                 dropDownSignIn.classList.add("login-dropdown-list-sign-in");
+             }
+         },0)
      }
 });
 
