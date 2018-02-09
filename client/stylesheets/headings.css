@@ -12,6 +12,7 @@ header {
 
 .header-container {
   width: 100%;
+  max-width: 1215px;
   height: 75px;
   margin: auto;
   display: flex;
@@ -24,13 +25,30 @@ header {
     align-items: center;
 }
 
+.logo-container {
+    position: relative;
+    top: 10px;
+}
+
 .equip-logo {
     width: 200px;
+    position: relative;
+    top: 8px;
 }
 
 .equip-hands {
     width: 125px;
 }
+
+.logo-text {
+    position: relative;
+    top: 15px;
+    text-transform: uppercase;
+    font-family: 'Roboto', sans-serif;
+    font-weight: bold;
+    z-index: 10;
+}
+
 
 
 /*====================================
@@ -63,7 +81,6 @@ header {
 
 .main-menu .menu-button-header {
     font-family: 'Roboto', sans-serif;
-    font-weight: bold;
     font-size: 24px;
     background-color: #F25F3D;
     color: #fff;
@@ -94,7 +111,6 @@ header {
 
 .c-main-menu__not-signed-in--li a {
     font-family: 'Roboto', sans-serif;
-    font-weight: bold;
     font-size: 20px;
     color: white;
     text-transform: uppercase;
@@ -108,7 +124,6 @@ header {
 
 .c-main-menu__not-signed-in-login-button {
     font-family: 'Roboto', sans-serif;
-    font-weight: bold;
     font-size: 24px;
     display: flex;
     width: 150px;
@@ -119,7 +134,8 @@ header {
     color: #fff;
 }
 
-#login-buttons .login-link-text {
+#login-buttons .login-link-text,
+#login-buttons .login-link-text-sign-in {
     color: #fff;
     border: 0;
     text-decoration: none;
@@ -128,10 +144,6 @@ header {
     word-spacing:-999px;
     letter-spacing: -999px;
     transition: color .4s;
-}
-
-#login-buttons .login-link-text:after {
-    content: "Sign In";
     text-transform: uppercase;
     line-height: initial;
     visibility: visible;
@@ -139,8 +151,14 @@ header {
     letter-spacing:normal;
 }
 
-#login-buttons .login-link-text:hover {
+#login-buttons .login-link-text-sign-in:after {
+    content: "Edit Profile";
+}
+
+#login-buttons .login-link-text:hover,
+#login-buttons .login-link-text-sign-in:hover {
     color: #000;
+    background-color: #F25F3D;
 }
 
 i {
@@ -151,9 +169,26 @@ i {
 
 #login-dropdown-list {
     width: 240px;
-    height: 280px;
+    top: -16px;
+    height: auto;
     border-radius: 0;
     border: 1px solid #C3BF94;
+}
+
+#login-dropdown-list .login-close-text {
+    font-family: 'Roboto', sans-serif;
+    font-weight: bold;
+    color: #fff;
+    text-decoration: none;
+    background-color: #000;
+    opacity: .2;
+    text-align: center;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    padding-top: 2px;
+    left: 90%;
+    top: 3px;
 }
 
 #login-username-or-email-label-and-input {
@@ -165,10 +200,12 @@ i {
     padding-top: 10px;
 }
 
-#login-buttons-password {
+#login-buttons-password, #login-buttons-forgot-password,
+#login-buttons-open-change-password, #login-buttons-logout,
+#login-buttons-do-change-password {
     font-family: 'Roboto', sans-serif !important;
     font-weight: bold;
-    font-size: 24px !important;
+    font-size: 16px !important;
     display: flex;
     width: 100%;
     height: 40px;
@@ -187,12 +224,18 @@ i {
     color: #000 !important;
 }
 
-#login-username-or-email-label, #login-password-label {
+#login-username-or-email-label, #login-password-label,
+#login-email-label, #login-username-label, #login-old-password-label {
     font-family: 'Roboto', sans-serif;
     color: #34C4C4;
-    text-align: center;
+    text-align: center !important;
     font-size: 16px;
     letter-spacing: .4px;
+    text-transform: capitalize;
+}
+
+#login-email-label-and-input, #login-username-label-and-input {
+    text-align: center;
 }
 
 .additional-link-container a {
@@ -242,7 +285,6 @@ input:-webkit-autofill {
   background: #000; /* Makes the menu effects visible on close */
   color: white;
   font-family: Roboto, sans-serif;
-  font-weight: bold;
   height: 50px;
   align-items: center;
   display: flex;
