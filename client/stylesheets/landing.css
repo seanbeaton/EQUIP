@@ -1,78 +1,174 @@
-.land-1 {
-    background-color: white;
-    font-family: 'Source Sans Pro';
-    font-size: 1.25em;
-    /*margin-top: -10px;*/
+.c--landing-page__outer {
+    max-width: 1215px;
+    margin: 0 auto;
+    margin-bottom: 40px;
 }
 
-.land-1 .title {
-    /*margin-top: 1.5em;*/
+.c--landing-page__logo-container {
+    text-align: center;
+    padding-bottom: 20px;
+    padding-top: 80px;
 }
 
-body {
-    font-family: 'Source Sans Pro'
+.c--landing-page__logo {
+    font-family: 'Fredericka the Great', cursive;
+    font-size: 64px;
+    text-transform: uppercase;
 }
 
-.beta {
-    color: red;
+.c--landing-page__main-container {
+    margin: 0 auto;
+    width: 100%;
+    height: auto;
+    display: inline-flex;
 }
 
-.land-2 {
-    background-color: #4893cf;
-    color: white;
-    font-family: 'Source Sans Pro';
-    font-size: 2em;
+.c--landing-page__main-container--left {
+    background: url("refresh/classroom-top@2x.jpg");
+    background-size: cover;
+    background-repeat: no-repeat;
+    width: 50%;
+    height: 605px;
 }
 
-.land-2 p {
-    margin-left: .5em;
+.c--landing-page__main-container--right {
+    background-color: #000;
+    color: #fff;
+    width: 50%;
+    height: 605px;
 }
 
-.land-2 .title {
-    color: white;
-    margin-bottom: .5em;
+.c--landing-page__main-container--right p {
+    padding: 40px 30px;
+    font-size: 27px;
+    line-height: 200%;
 }
 
-.land-3 {
-    background-color: #f68e1f;
-    color: black;
+.c--landing-page__c2a-container {
+    display: inline-flex;
+    justify-content: center;
+    width: 100%;
+    margin: 40px 0;
 }
 
-.land-3 p {
-    margin-left: .5em;
-    font-family: 'Source Sans Pro';
-    font-size: 1.75em;
+.c--landing-page__c2a-learn-more-button,
+.c--landing-page__c2a-sign-in-button {
+    font-family: 'Roboto', sans-serif !important;
+    font-size: 24px !important;
+    display: flex;
+    width: 200px;
+    height: 60px;
+    margin-left: 20px;
+    margin-right: 20px;
+    margin-top: 20px !important;
+    align-items: center;
+    justify-content: center;
+    background-color: #F25F3D !important;
+    text-transform: uppercase;
+    border-radius: 0 !important;
+    border: 0 !important;
+    color: #fff !important;
+    transition: color .4s !important;
 }
 
-.land-3 .su {
-    float: right;
-    background-color: #4893cf;
-    font-size: 1.75em;
+.c--landing-page__get-started-title {
+    font-family: 'Fredericka the Great', cursive;
+    font-size: 64px;
+    text-align: center;
 }
 
-.land-4 {
-    background-color: white;
-    color: black;
+.c--landing-page__get-started-outer {
+    width: 100%;
+    background-color: #34C4C4;
 }
 
-.land-4 p {
-    margin-left: .5em;
-    font-family: 'Source Sans Pro';
-    font-size: 1.75em;
+.c--landing-page__get-started {
+    width: 100%;
+    max-width: 1215px;
+    margin: 0 auto;
 }
 
-.sponsor {
-    color: #075489;
+.c--landing-page__get-started-inner {
+    display: inline-flex;
+    width: 100%;
 }
 
-.sponsor:hover {
-    color: #4893cf;
+.c--landing-page__get-started-left {
+    width: 50%;
+    margin: 40px 0
 }
 
-.sponsor:visited {
-    color: #f68e1f;
+.c--landing-page__get-started-right {
+    width: 50%;
+    background: url("refresh/classroom-bottom@2x.jpg");
+    background-size: cover;
+    background-repeat: no-repeat;
 }
 
-.equip-use {
-    width: 70%;
+.c--landing-page__get-started-left-list-item {
+    margin: 30px 0;
+}
+
+.c--landing-page__get-started-left-title {
+    font-family: 'Fredericka the Great', cursive;
+    font-size: 32px;
+}
+
+.c--landing-page__get-started-left-content {
+    font-family: 'Roboto', sans-serif !important;
+    font-size: 21px !important;
+    color: #fff;
+    width: 95%;
+    line-height: 200%;
+}
+
+.c--landing-page__faq-outer {
+    max-width: 900px;
+    margin: 0 auto;
+    margin-bottom: 40px;
+}
+
+.c--landing-page__faq-inner {
+    display: inline-flex;
+    width: 100%;
+    justify-content: space-around;
+}
+
+.c--landing-page__faq-title {
+    font-family: 'Fredericka the Great', cursive;
+    font-size: 64px;
+    text-transform: uppercase;
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.c--landing-page__faq-item {
+    width: 30%;
+}
+
+.c--landing-page__faq-item-top {
+    background-color: #F25F3D;
+    padding: 20px;
+}
+
+.c--landing-page__faq-item-top-content {
+    color: #fff;
+    font-family: 'Roboto', sans-serif !important;
+    font-size: 18px !important;
+    line-height: 200%;
+}
+
+.c--landing-page__faq-item-top-date {
+    color: #000;
+    font-family: 'Roboto', sans-serif !important;
+    font-weight: bold;
+    font-size: 18px !important;
+    line-height: 200%;
+}
+
+.c--landing__faq-item-bottom {
+    padding: 20px;
+    background-color: #000;
+    color: #34C4C4;
+    text-transform: uppercase;
 }
