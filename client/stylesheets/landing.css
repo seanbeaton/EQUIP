@@ -69,6 +69,21 @@
     border: 0 !important;
     color: #fff !important;
     transition: color .4s !important;
+    cursor: pointer;
+}
+
+.c--landing-page__c2a-learn-more-button:hover,
+.c--landing-page__c2a-sign-in-button:hover {
+    color: #000 !important;
+}
+
+.c--landing-page__c2a-learn-more-link {
+    color: #fff;
+    transition: color .4s !important;
+}
+
+.c--landing-page__c2a-learn-more-link:hover {
+    color: #000;
 }
 
 .c--landing-page__get-started-title {
