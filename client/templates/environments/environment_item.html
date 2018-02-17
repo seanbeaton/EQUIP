@@ -1,48 +1,48 @@
 <!-- HTML for environment items in the environment list -->
 
 <template name="environmentItem">
-  <div class="single-env">
-    <div class="level">
-      <div class="level-left">
-        <h1 class="title is-3 env-name">{{envName}}</h1>
-      </div>
-      <div class="level-right">
-        <!-- Add in functionality for export later -->
-        <!-- 12/31/2016 -->
-        <button class="button is-medium export-tab">Export</button>
-        <button class="button is-medium import-tab">Import</button>
-        <button class="button is-medium is-danger" id="env-delete">Delete</button>
-      </div>
-    </div>
-    <div class="columns">
-      <div class="column">
-        <p>Created On: {{submitted}}</p>
-        {{#if trackModified}}
-        <p>Last Modified: {{lastModified}} </p>
-        {{else}}
-        <p>Last Parameter/Subject Modification: {{lastModifiedParam}} </p>
-        <p>Last Observation Modification: {{lastModifiedObs}} </p>
-        {{/if}}
-      </div>
-    </div>
-    <div class="columns">
-      <div class="column">
-        <button id="enter-class" class="button is-large enter-button">Observation List</button>
-      </div>
+    <li class="single-env">
 
-      <div class="column">
-        <button id="edit-class-studs" class="button is-large stud-edit-button {{needsSubjects}}">Edit Students</button>
-      </div>
-      <div class="column">
-        {{ #if hasObsMade }}
-            <button id="edit-class-params" class="button is-large edit-button {{needsSubjects}}">Edit Parameters</button>
-        {{else}}
-            <button id="edit-class-params" class="button is-large edit-button {{needsSubjects}}">View Parameters</button>
-        {{ /if }}
+        <div class="toggle">
+            {{envName}}
+            <div class="toggle-sub">
+                <p id="analyze-button">Analyze</p>
+                <p class="export-tab">Export</p>
+                <p class="import-tab">Import</p>
+                <p id="env-delete">Delete</p>
+            </div>
 
-      </div>
-      <div class="column">
-      </div>
-    </div>
-  </div>
+        </div>
+
+        <ul class="inner show">
+        <li class="columns">
+          <div class="column">
+            <p>Created On: {{submitted}}</p>
+            {{#if trackModified}}
+            <p>Last Modified: {{lastModified}} </p>
+            {{else}}
+            <p>Last Parameter/Subject Modification: {{lastModifiedParam}} </p>
+            <p>Last Observation Modification: {{lastModifiedObs}} </p>
+            {{/if}}
+          </div>
+      </li>
+        <li class="columns">
+          <div class="column">
+            <button id="enter-class" class="button is-large enter-button">Observation List</button>
+          </div>
+
+          <div class="column">
+            <button id="edit-class-studs" class="button is-large stud-edit-button {{needsSubjects}}">Edit Students</button>
+          </div>
+          <div class="column">
+            {{ #if hasObsMade }}
+                <button id="edit-class-params" class="button is-large edit-button {{needsSubjects}}">Edit Parameters</button>
+            {{else}}
+                <button id="edit-class-params" class="button is-large edit-button {{needsSubjects}}">View Parameters</button>
+            {{ /if }}
+          </div>
+          <div class="column"></div>
+      </li>
+    </ul>
+  </li>
 </template>

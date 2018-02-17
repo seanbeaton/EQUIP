@@ -1,0 +1,59 @@
+.c-dashboard__container--outer {
+    max-width: 1185px;
+    margin: 0 auto;
+    padding-top: 20px;
+}
+
+.c-dashboard__container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 20px 0px;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+}
+
+.inner {
+    padding-left: 1em;
+    overflow: hidden;
+    display: none;
+}
+
+.inner .show {
+    display: block;
+}
+
+.toggle {
+    display: inline-flex;
+    font-family: 'Roboto', sans-serif;
+    font-size: 24px;
+    text-transform: uppercase;
+    width: 100%;
+    background-color: #000;
+    color: #fff;
+    height: 50px;
+    align-items: center;
+    justify-content: space-between;
+    padding-left: 15px;
+    cursor: pointer;
+}
+
+.toggle-sub {
+    display: inline-flex;
+    justify-content: space-between;
+    width: 35%;
+    padding-right: 35px;
+}
+
+.toggle-sub p {
+    font-family: 'Roboto', sans-serif;
+    color: #F25F3D;
+    font-weight: bold;
+    font-size: 16px;
+    text-transform: uppercase;
+    padding-right: 15px;
+    cursor: pointer;
+}

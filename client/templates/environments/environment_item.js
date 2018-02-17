@@ -86,7 +86,23 @@ Template.environmentItem.events({
   'click #edit-class-studs': function(e) {
      e.preventDefault();
      Router.go('editSubjects', {_envId:this._id});
+  },
+  'click .toggle': function(e) {
+      e.preventDefault();
+
+      var ele = e.target;
+
+      if ($(ele).next().hasClass('show')) {
+          $(ele).next().removeClass('show');
+          $(ele).next().slideUp(350);
+      } else {
+          $(ele).parent().parent().find('li .inner').removeClass('show');
+          $(ele).parent().parent().find('li .inner').slideUp(350);
+          $(ele).next().toggleClass('show');
+          $(ele).next().slideToggle(350);
+      }
   }
+
   });
 
 Template.environmentItem.events({

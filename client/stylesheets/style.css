@@ -1,4 +1,38 @@
 /*
+* Global Element Styling
+*/
+
+h1 {
+    font-family: 'Fredericka the Great', cursive;
+    font-size: 60px;
+    color: #000000;
+    line-height: 180%;
+}
+
+h3 {
+    font-family: 'Roboto', sans-serif;
+    font-weight: bold;
+    font-size: 24px;
+    line-height: 180%;
+    color: #34C0C1;
+}
+
+.u-header-links {
+    font-family: 'Roboto', sans-serif;
+    font-weight: bold;
+    font-size: 24px;
+    color: #F25F3D;
+    cursor: pointer;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: color .4s #000000
+}
+
+.u-header-links:hover {
+    color: #000;
+}
+
+/*
 * Unorganized CSS for many elements of the application
 */
 
