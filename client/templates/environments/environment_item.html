@@ -3,8 +3,8 @@
 <template name="environmentItem">
     <li class="environmentList">
         <!-- acccordion header -->
-        <div class="toggle">
-            {{envName}}
+        <div class="toggle-accordion">
+            {{getEnvName}}
             <div class="toggle-sub">
                 <p id="analyze-button">Analyze</p>
                 <p class="export-tab">Export</p>
@@ -13,7 +13,7 @@
             </div>
         </div>
         <!-- accordion contents -->
-        <ul class="inner">
+        <ul class="inner-container">
             <li class="c--accordion-item">
                 <div class="c--accordion-item__inner">
                     <h3 class="c--accordion-item__title">Demographics</h3>
@@ -42,15 +42,19 @@
                 </div>
             </li>
             <li class="c--accordion-item">
-                <div class="c--accordion-item__inner">
+                <div class="c--accordion-item__inner toggle-accordion toggle-nested">
                     <h3 class="c--accordion-item__title">Observations</h3>
-                    <p class="c--accordion-item__edit" id="obs-create-button" data-id={{getEnvironmentId}}>Edit</p>
+                    <p class="c--accordion-item__edit" id="obs-create-button" data-id={{getEnvironmentId}}>Create New Observations</p>
                 </div>
-                <div class="c--accordion-item__inner--labels">
-                    {{#each observation in getObservations}}
-                        <p id="enter-class" class="demographic-labels" data-id={{observation._id}}>{{observation.name}}</p>
-                    {{/each}}
-                </div>
+                <ul class="inner-container">
+                    <li>
+                        <div class="c--accordion-item__inner--observations">
+                            {{#each observation in getObservations}}
+                                <p id="enter-class" class="observation-labels" data-id={{observation._id}}>({{@index}}) {{observation.name}}</p>
+                            {{/each}}
+                        </div>
+                    </li>
+                </ul>
             </li>
         </ul>
   </li>

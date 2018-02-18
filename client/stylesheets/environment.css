@@ -16,17 +16,17 @@ ul {
     padding: 0;
 }
 
-.inner {
+.inner-container {
     padding-left: 1em;
     overflow: hidden;
     display: none;
 }
 
-.inner .show {
+/*.inner .show {
     display: block;
-}
+}*/
 
-.toggle {
+.toggle-accordion {
     display: inline-flex;
     font-family: 'Roboto', sans-serif;
     font-size: 24px;
@@ -40,6 +40,14 @@ ul {
     padding-left: 15px;
     cursor: pointer;
     margin-top: 20px;
+}
+
+/*.show {
+    display: block;
+}*/
+
+.toggle-nested {
+    background-color: #C9EFEF
 }
 
 .toggle-sub {
@@ -75,13 +83,39 @@ ul {
     align-items: center;
 }
 
+.c--accordion-item__edit {
+    color: #F25F3D;
+    font-weight: bold;
+    font-size: 16px;
+    padding-right: 30px;
+}
+
 .c--accordion-item__inner--labels {
     display: inline-flex;
     width: 95%;
     margin-bottom: 30px;
 }
 
+.c--accordion-item__inner--observations {
+    display: flex;
+    flex-flow: column;
+    flex-wrap: wrap;
+    padding-left: 20px;
+    max-height: 220px;
+}
+
 .demographic-labels {
     width: 80%;
     text-align: left;
+}
+
+.observation-labels {
+    width: 20%;
+    height: 50px;
+    text-align: left;
+    background-color: #d3d3d3;
+    margin-bottom: 20px;
+    padding-left: 15px;
+    color: #F25F3D;
+    cursor: pointer;
 }

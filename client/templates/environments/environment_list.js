@@ -151,3 +151,7 @@ Template.environmentList.events({
     $('#environmentName').val('');
   }
 });
+
+Template.environmentList.rendered = function () {
+    document.querySelectorAll('.toggle-accordion')[0].click();
+}

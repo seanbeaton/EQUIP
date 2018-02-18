@@ -90,22 +90,22 @@ Template.environmentItem.events({
      e.preventDefault();
      Router.go('editSubjects', {_envId:this._id});
   },
-  'click .toggle': function(e) {
+  'click .toggle-accordion': function(e) {
       e.preventDefault();
-
       var ele = e.target;
+
+      if (ele.innerText === "OBSERVATIONS") {
+          ele = ele.parentElement;
+      }
 
       if ($(ele).next().hasClass('show')) {
           $(ele).next().removeClass('show');
           $(ele).next().slideUp(350);
       } else {
-          $(ele).parent().parent().find('li .inner').removeClass('show');
-          $(ele).parent().parent().find('li .inner').slideUp(350);
           $(ele).next().toggleClass('show');
           $(ele).next().slideToggle(350);
       }
     }
-
   });
 
 Template.environmentItem.events({
@@ -120,7 +120,14 @@ Template.environmentItem.events({
   }
  });
 
+
 Template.environmentItem.helpers({
+    isIndexZero: function() {
+        debugger;
+        if (index == 0 ) {
+            return true;
+        }
+    },
     getEnvironmentId: function() {
         return this._id;
     },
@@ -156,5 +163,10 @@ Template.environmentItem.helpers({
     },
     getObservations: function() {
         return Observations.find({envId:this._id}, {sort: {lastModified: -1}}).fetch();
+    },
+    getEnvName: function() {
+        return this.envName;
     }
 });
+
+; 
