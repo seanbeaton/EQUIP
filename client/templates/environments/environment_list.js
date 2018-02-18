@@ -49,6 +49,75 @@ Template.environmentList.events({
     $('#env-create-modal').removeClass("is-active");
     $('#help-env-modal').removeClass("is-active");
   },
+  'click #obs-create-button': function(e) {
+    var id = e.target.getAttribute('data-id');
+    $('#obs-create-modal').addClass("is-active");
+    $('#obs-create-modal').attr("data-id", id);
+  },
+  'click #obs-close-modal': function(e) {
+    $('#obs-create-modal').removeClass("is-active");
+  },
+  'click #save-obs-name': function(e) {
+    var id = $('#obs-create-modal').attr("data-id");
+
+    var observation = {
+      name: $('#observationName').val(),
+      envId: id,
+      timer: 0
+    };
+
+    var sequenceParams = SequenceParameters.findOne({'children.envId': id});
+    var demographicParams = SubjectParameters.findOne({'children.envId': id});
+    var observations = Observations.find({"envId": id}).fetch();
+
+    if ($('#observationName').val() == "") {
+      alert("Observation name required.");
+      return;
+    }
+
+    if (sequenceParams === undefined || demographicParams === undefined) {
+        alert("You must add students and parameters to the environment to continue to do the observation.")
+        return;
+    }
+
+    if (observations.length === 0 ) {
+        var confirmation = getConfirmation();
+        if (confirmation) {
+            Meteor.call('observationInsert', observation, function(error, result) {
+              return 0;
+            });
+
+            $('#observationName').val('');
+        }
+    } else {
+        Meteor.call('observationInsert', observation, function(error, result) {
+          return 0;
+        });
+
+        $('#observationName').val('');
+    }
+
+    function getConfirmation() {
+        var retVal = confirm("Are you sure? After the first observation is created, you will not be able to edit discourse dimensions or demographics.");
+        if (retVal === true) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+},
+'click #enter-class': function(e) {
+  // var obj1 = SubjectParameters.find({'children.envId': this._id}).fetch();
+  // var obj2 = SequenceParameters.find({'children.envId': this._id}).fetch();
+  // debugger;
+  // if ($.isEmptyObject(obj1) || $.isEmptyObject(obj2) || $.isEmptyObject(obj3)) {
+  //  alert('You must add students to the environment to continue to do the observation.');
+  //  return;
+  // }
+    var obsId = $(e.target).attr("data-id");
+    Router.go('observatory', {_envId: this._id, _obsId: obsId});
+},
 
   //  'click #createNewEnvironment': function(e) {
   //   $('#createEnvPopup').modal({

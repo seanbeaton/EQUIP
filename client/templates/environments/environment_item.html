@@ -1,8 +1,8 @@
 <!-- HTML for environment items in the environment list -->
 
 <template name="environmentItem">
-    <li class="single-env">
-
+    <li class="environmentList">
+        <!-- acccordion header -->
         <div class="toggle">
             {{envName}}
             <div class="toggle-sub">
@@ -11,38 +11,47 @@
                 <p class="import-tab">Import</p>
                 <p id="env-delete">Delete</p>
             </div>
-
         </div>
-
-        <ul class="inner show">
-        <li class="columns">
-          <div class="column">
-            <p>Created On: {{submitted}}</p>
-            {{#if trackModified}}
-            <p>Last Modified: {{lastModified}} </p>
-            {{else}}
-            <p>Last Parameter/Subject Modification: {{lastModifiedParam}} </p>
-            <p>Last Observation Modification: {{lastModifiedObs}} </p>
-            {{/if}}
-          </div>
-      </li>
-        <li class="columns">
-          <div class="column">
-            <button id="enter-class" class="button is-large enter-button">Observation List</button>
-          </div>
-
-          <div class="column">
-            <button id="edit-class-studs" class="button is-large stud-edit-button {{needsSubjects}}">Edit Students</button>
-          </div>
-          <div class="column">
-            {{ #if hasObsMade }}
-                <button id="edit-class-params" class="button is-large edit-button {{needsSubjects}}">Edit Parameters</button>
-            {{else}}
-                <button id="edit-class-params" class="button is-large edit-button {{needsSubjects}}">View Parameters</button>
-            {{ /if }}
-          </div>
-          <div class="column"></div>
-      </li>
-    </ul>
+        <!-- accordion contents -->
+        <ul class="inner">
+            <li class="c--accordion-item">
+                <div class="c--accordion-item__inner">
+                    <h3 class="c--accordion-item__title">Demographics</h3>
+                    <p class="c--accordion-item__edit" id="edit-class-params">Edit</p>
+                </div>
+                <div class="c--accordion-item__inner--labels">
+                    <p class="demographic-labels">{{getSubjectParameters}}</p>
+                </div>
+            </li>
+            <li class="c--accordion-item">
+                <div class="c--accordion-item__inner">
+                    <h3 class="c--accordion-item__title">Discource Dimensions</h3>
+                    <p class="c--accordion-item__edit" id="edit-sequence-params">Edit</p>
+                </div>
+                <div class="c--accordion-item__inner--labels">
+                    <p class="demographic-labels">{{getDiscourceParameters}}</p>
+                </div>
+            </li>
+            <li class="c--accordion-item">
+                <div class="c--accordion-item__inner">
+                    <h3 class="c--accordion-item__title">Student Roster</h3>
+                    <p class="c--accordion-item__edit" id="edit-class-studs">Edit</p>
+                </div>
+                <div class="c--accordion-item__inner--labels">
+                    <p class="demographic-labels">{{getStudents}}</p>
+                </div>
+            </li>
+            <li class="c--accordion-item">
+                <div class="c--accordion-item__inner">
+                    <h3 class="c--accordion-item__title">Observations</h3>
+                    <p class="c--accordion-item__edit" id="obs-create-button" data-id={{getEnvironmentId}}>Edit</p>
+                </div>
+                <div class="c--accordion-item__inner--labels">
+                    {{#each observation in getObservations}}
+                        <p id="enter-class" class="demographic-labels" data-id={{observation._id}}>{{observation.name}}</p>
+                    {{/each}}
+                </div>
+            </li>
+        </ul>
   </li>
 </template>

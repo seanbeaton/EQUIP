@@ -17,6 +17,13 @@ h3 {
     color: #34C0C1;
 }
 
+p {
+    font-family: 'Roboto', sans-serif;
+    font-size: 21px;
+    line-height: 200%;
+    color: #000;
+}
+
 .u-header-links {
     font-family: 'Roboto', sans-serif;
     font-weight: bold;

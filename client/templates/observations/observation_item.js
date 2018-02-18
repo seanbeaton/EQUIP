@@ -12,6 +12,7 @@ Template.observationItem.events({
       alert('You must add students to the environment to continue to do the observation.');
       return;
      }
+     debugger;
      Router.go('observatory', {_envId: this.envId, _obsId: this._id});
    },
    'click #delete-obs-button': function(e) {

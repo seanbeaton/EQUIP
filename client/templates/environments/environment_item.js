@@ -78,7 +78,10 @@ Template.environmentItem.events({
     fileInput.click(); // opening dialog
 
   },
-
+  'click #edit-sequence-params': function(e) {
+     e.preventDefault();
+     Router.go('editSequenceParameters', {_envId:this._id});
+  },
   'click #edit-class-params': function(e) {
      e.preventDefault();
      Router.go('editSubjectParameters', {_envId:this._id});
@@ -117,24 +120,40 @@ Template.environmentItem.events({
   }
  });
 
- Template.environmentItem.helpers({
-  //shim function until database is clean
-  trackModified: function () {
-    if (this.lastModified) {
-      return true;
-    } else {
-      return false;
+Template.environmentItem.helpers({
+    getEnvironmentId: function() {
+        return this._id;
+    },
+    getSubjectParameters: function() {
+        var subjectParameters =  SubjectParameters.find({'children.envId': this._id}).fetch();
+        var parsedSubjectParameters = subjectParameters[0].children;
+        var labels = [];
+        for (student in parsedSubjectParameters) {
+            if (student.includes("label")) {
+                labels.push(parsedSubjectParameters[student]);
+            }
+        }
+        return labels.join(", ")
+    },
+    getDiscourceParameters: function() {
+        var sequenceParameters = SequenceParameters.find({'children.envId': this._id}).fetch();
+        var parsedDiscourseParameters = sequenceParameters[0].children;
+        var labels = [];
+
+        for (type in parsedDiscourseParameters) {
+            if (type.includes("label")) {
+                labels.push(parsedDiscourseParameters[type]);
+            }
+        }
+        return labels.join(", ")
+    },
+    getStudents: function() {
+        var user = Meteor.user();
+        var students = Subjects.find({userId: user._id}).fetch();
+
+        return students.map((student) => student.info.name).join(", ");
+    },
+    getObservations: function() {
+        return Observations.find({envId:this._id}, {sort: {lastModified: -1}}).fetch();
     }
-  },
-   needsSubjects: function() {
-     var obj1 = SubjectParameters.find({'children.envId': this._id}).fetch();
-     var obj2 = SequenceParameters.find({'children.envId': this._id}).fetch();
-     return ($.isEmptyObject(obj1) || $.isEmptyObject(obj2)) ?"pulser":"";
-   },
-   hasObsMade: function() {
-       var obs = Observations.find({envId:this._id}, {sort: {lastModified: -1}}).fetch();
-       if (obs.length === 0) {
-           return true
-       }
-   }
- });
+});

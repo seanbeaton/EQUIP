@@ -39,6 +39,7 @@ ul {
     justify-content: space-between;
     padding-left: 15px;
     cursor: pointer;
+    margin-top: 20px;
 }
 
 .toggle-sub {
@@ -56,4 +57,31 @@ ul {
     text-transform: uppercase;
     padding-right: 15px;
     cursor: pointer;
+}
+
+.c--accordion-item {
+    display: block;
+    width: 100%;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.c--accordion-item__inner {
+    margin: 20px 0;
+    display: inline-flex;
+    width: 95%;
+    border-bottom: 1px solid gray;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.c--accordion-item__inner--labels {
+    display: inline-flex;
+    width: 95%;
+    margin-bottom: 30px;
+}
+
+.demographic-labels {
+    width: 80%;
+    text-align: left;
 }

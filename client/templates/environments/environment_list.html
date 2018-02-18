@@ -92,7 +92,25 @@
         </div>
     </section>
 
-
+    <div id="obs-create-modal" class="modal">
+      <div class="modal-background"></div>
+      <div class="modal-card">
+        <header class="modal-card-head">
+          <p class="modal-card-title">Create a New Observation</p>
+          <button id="obs-close-modal" class="delete"></button>
+        </header>
+        <section class="modal-card-body">
+          <label class="label">Observation Name</label>
+            <p class="control">
+              <input class="input" type="text" placeholder="E.g., 1/14/2017" id="observationName">
+            </p>
+        </section>
+        <footer class="modal-card-foot">
+          <a id="save-obs-name" class="button is-success">Save changes</a>
+          <a class="button">Cancel</a>
+        </footer>
+      </div>
+    </div>
 
 
     <!-- CREATE NEW CLASSROOM MODAL -->

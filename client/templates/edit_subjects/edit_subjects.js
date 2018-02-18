@@ -5,6 +5,7 @@
 Template.editSubjects.helpers({
   subject: function() {
     subs = Subjects.find({envId: this._id});
+    debugger;
     console.log(subs);
     return subs;
   },
@@ -30,7 +31,7 @@ interact('.draggable')
     restrict: {
       restriction: 'parent'
     }
- 
+
   });
 
   function dragMoveListener (event) {
@@ -59,7 +60,7 @@ interact('.draggable')
 // On rendering, get students and layout classroom with student boxes
 Template.editSubjects.rendered = function() {
   $(document).keyup(function(e) {
-     if (e.keyCode == 27) { 
+     if (e.keyCode == 27) {
       $('#stud-param-modal').removeClass('is-active');
       $('#stud-data-modal').removeClass('is-active');
     }
@@ -108,9 +109,9 @@ Template.editSubjects.events({
     $('#param-modal-content').children().remove();
 
    $('#stud-param-modal').addClass('is-active');
-   
+
     populateParamBoxes();
-  
+
  },
 
   'click #save-subj-params': function(e) {
@@ -122,7 +123,7 @@ Template.editSubjects.events({
     var labels = [];
     choices.push(name);
 
-    
+
 
     $('.subj-box-labels').each(function () {
       labels.push(this.textContent);
@@ -131,7 +132,7 @@ Template.editSubjects.events({
     $('.chosen').each(function () {
       choices.push(this.textContent);
     });
-    
+
 
     for (label in labels) {
         if (label == 0) {
@@ -170,7 +171,7 @@ Template.editSubjects.events({
   'click .edit-stud' : function (e) {
     studId = $(e.target).attr('data_id');
     editParamBoxes(studId);
-  
+
     $('#stud-data-modal').removeClass('is-active');
     $('#stud-param-modal').addClass('is-active');
   },
@@ -211,7 +212,7 @@ Template.editSubjects.events({
         }
         Command: toastr["success"]("Save Successful", "Student locations saved as they currently are.")
         }
-      }); 
+      });
   },
 
   'click .delete-subject': function(e) {
@@ -242,7 +243,7 @@ Template.editSubjects.events({
             choices.push(null);
           }
         });
-      
+
       for (label in labels) {
         info[labels[label]] = choices[label];
       }
@@ -336,7 +337,7 @@ function populateParamBoxes() {
   parameterPairs = subjParams["children"]["parameterPairs"];
 
   var modal = $('#param-modal-content');
-  
+
   var name = $("<div/>", {
       class: "columns  boxes-wrapper"
     }).appendTo(modal);
@@ -372,7 +373,7 @@ function populateParamBoxes() {
     var options = params.split(',');
 
     for (opt in options) {
-  
+
         var option = $("<div/>", {
           class: "column has-text-centered subj-box-params hoverable",
           text: options[opt]
@@ -407,7 +408,7 @@ function editParamBoxes(subjId) {
   var student = subj.info.name;
 
   var modal = $('#param-modal-content');
-  
+
   var name = $("<div/>", {
       class: "columns  boxes-wrapper"
     }).appendTo(modal);
@@ -440,14 +441,14 @@ function editParamBoxes(subjId) {
     var options = params.split(',');
 
     for (opt in options) {
-  
+
         if (subj['info'][field] == options[opt]) {
           var option = $("<div/>", {
           class: "column has-text-centered subj-box-params chosen hoverable",
           text: options[opt]
         }).appendTo(wrap);
         } else {
-  
+
           var option = $("<div/>", {
             class: "column has-text-centered subj-box-params hoverable",
             text: options[opt]
@@ -473,4 +474,3 @@ function editParamBoxes(subjId) {
   }).appendTo(modal);
 
 }
-
