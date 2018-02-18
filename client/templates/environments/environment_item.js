@@ -104,7 +104,7 @@ Template.environmentItem.events({
           $(ele).next().toggleClass('show');
           $(ele).next().slideToggle(350);
       }
-  }
+    }
 
   });
 
@@ -151,7 +151,8 @@ Template.environmentItem.helpers({
         var user = Meteor.user();
         var students = Subjects.find({userId: user._id}).fetch();
 
-        return students.map((student) => student.info.name).join(", ");
+        return students.filter(student => student.envId === this._id)
+            .map(student => student.info.name ).join(", ");
     },
     getObservations: function() {
         return Observations.find({envId:this._id}, {sort: {lastModified: -1}}).fetch();
