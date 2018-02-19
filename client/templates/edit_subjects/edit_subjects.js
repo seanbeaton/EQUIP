@@ -5,8 +5,6 @@
 Template.editSubjects.helpers({
   subject: function() {
     subs = Subjects.find({envId: this._id});
-    debugger;
-    console.log(subs);
     return subs;
   },
   subjParameter: function() {

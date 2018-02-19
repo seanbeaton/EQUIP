@@ -1,3 +1,8 @@
+ul {
+    list-style: none;
+    padding: 0;
+}
+
 .c-dashboard__container--outer {
     max-width: 1185px;
     margin: 0 auto;
@@ -11,9 +16,9 @@
     margin: 20px 0px;
 }
 
-ul {
-    list-style: none;
-    padding: 0;
+.c-dashboard__accordion--outer {
+    max-width: 960px;
+    margin: 0 auto;
 }
 
 .inner-container {
@@ -42,10 +47,6 @@ ul {
     margin-top: 20px;
 }
 
-/*.show {
-    display: block;
-}*/
-
 .toggle-nested {
     background-color: #C9EFEF
 }
@@ -65,6 +66,25 @@ ul {
     text-transform: uppercase;
     padding-right: 15px;
     cursor: pointer;
+}
+
+#carat-obs {
+    color: #F25F3D;
+    padding-top: 4px;
+}
+
+.carat {
+    color: white;
+    float: right;
+    font-size: 10px;
+    position: relative;
+    top: 10px;
+    left: 7px;
+}
+
+.carat-show {
+    transform: rotate(180deg);
+    top: 7px;
 }
 
 .c--accordion-item {
@@ -88,10 +108,12 @@ ul {
     font-weight: bold;
     font-size: 16px;
     padding-right: 30px;
+    cursor: pointer;
 }
 
 .c--accordion-item__inner--labels {
     display: inline-flex;
+    flex-flow: column;
     width: 95%;
     margin-bottom: 30px;
 }
@@ -101,12 +123,17 @@ ul {
     flex-flow: column;
     flex-wrap: wrap;
     padding-left: 20px;
-    max-height: 220px;
+    max-height: 600px;
 }
 
 .demographic-labels {
     width: 80%;
     text-align: left;
+}
+
+.c--accordion-item_inner--count {
+    text-align: left;
+    font-size: 14px;
 }
 
 .observation-labels {

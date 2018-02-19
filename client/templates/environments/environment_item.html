@@ -4,7 +4,7 @@
     <li class="environmentList">
         <!-- acccordion header -->
         <div class="toggle-accordion">
-            {{getEnvName}}
+             <span>{{getEnvName}} <p class="carat"> &#9660;</p></span>
             <div class="toggle-sub">
                 <p id="analyze-button">Analyze</p>
                 <p class="export-tab">Export</p>
@@ -17,7 +17,9 @@
             <li class="c--accordion-item">
                 <div class="c--accordion-item__inner">
                     <h3 class="c--accordion-item__title">Demographics</h3>
-                    <p class="c--accordion-item__edit" id="edit-class-params">Edit</p>
+                    <p class="c--accordion-item__edit" id="edit-class-params">
+                        Edit <i style="color:gray;" class="far fa-question-circle"></i>
+                    </p>
                 </div>
                 <div class="c--accordion-item__inner--labels">
                     <p class="demographic-labels">{{getSubjectParameters}}</p>
@@ -26,7 +28,9 @@
             <li class="c--accordion-item">
                 <div class="c--accordion-item__inner">
                     <h3 class="c--accordion-item__title">Discource Dimensions</h3>
-                    <p class="c--accordion-item__edit" id="edit-sequence-params">Edit</p>
+                    <p class="c--accordion-item__edit" id="edit-sequence-params">
+                        Edit <i style="color:gray;" class="far fa-question-circle"></i>
+                    </p>
                 </div>
                 <div class="c--accordion-item__inner--labels">
                     <p class="demographic-labels">{{getDiscourceParameters}}</p>
@@ -35,15 +39,18 @@
             <li class="c--accordion-item">
                 <div class="c--accordion-item__inner">
                     <h3 class="c--accordion-item__title">Student Roster</h3>
-                    <p class="c--accordion-item__edit" id="edit-class-studs">Edit</p>
+                    <p class="c--accordion-item__edit" id="edit-class-studs">
+                        Edit <i style="color:gray;" class="far fa-question-circle"></i>
+                    </p>
                 </div>
                 <div class="c--accordion-item__inner--labels">
-                    <p class="demographic-labels">{{getStudents}}</p>
+                    <p class="demographic-labels">{{getStudents.names}}</p>
+                    <p class="c--accordion-item_inner--count">Students: {{getStudents.count}}</p>
                 </div>
             </li>
             <li class="c--accordion-item">
-                <div class="c--accordion-item__inner toggle-accordion toggle-nested">
-                    <h3 class="c--accordion-item__title">Observations</h3>
+                <div class="c--accordion-item__inner toggle-accordion toggle-nested" data-id={{getEnvironmentId}}>
+                    <h3 class="c--accordion-item__title">Observations ({{getObservationsCount}}) <p class="carat" id="carat-obs"> &#9660;</p></h3>
                     <p class="c--accordion-item__edit" id="obs-create-button" data-id={{getEnvironmentId}}>Create New Observations</p>
                 </div>
                 <ul class="inner-container">
@@ -52,6 +59,8 @@
                             {{#each observation in getObservations}}
                                 <p id="enter-class" class="observation-labels" data-id={{observation._id}}>({{@index}}) {{observation.name}}</p>
                             {{/each}}
+
+                            <p class="c--accordion-item_inner--count">Observations: {{getObservationsCount}}</p>
                         </div>
                     </li>
                 </ul>

@@ -93,18 +93,14 @@ Template.environmentItem.events({
   'click .toggle-accordion': function(e) {
       e.preventDefault();
       var ele = e.target;
-
-      if (ele.innerText === "OBSERVATIONS") {
+      // Bubble up to parent element so accordion toggles correctly
+      if (ele.nodeName === "H3" || ele.nodeName === "SPAN") {
           ele = ele.parentElement;
       }
 
-      if ($(ele).next().hasClass('show')) {
-          $(ele).next().removeClass('show');
-          $(ele).next().slideUp(350);
-      } else {
-          $(ele).next().toggleClass('show');
-          $(ele).next().slideToggle(350);
-      }
+      $(ele).next().toggleClass('show');
+      $(ele).next().slideToggle(350);
+      $(ele).find(".carat").toggleClass("carat-show");
     }
   });
 
@@ -122,12 +118,6 @@ Template.environmentItem.events({
 
 
 Template.environmentItem.helpers({
-    isIndexZero: function() {
-        debugger;
-        if (index == 0 ) {
-            return true;
-        }
-    },
     getEnvironmentId: function() {
         return this._id;
     },
@@ -158,15 +148,26 @@ Template.environmentItem.helpers({
         var user = Meteor.user();
         var students = Subjects.find({userId: user._id}).fetch();
 
-        return students.filter(student => student.envId === this._id)
-            .map(student => student.info.name ).join(", ");
+        let filteredStudents = students.filter(student => student.envId === this._id)
+            .map(student => student.info.name)
+
+        return {
+            names: filteredStudents.join(", "),
+            count: filteredStudents.length
+            }
+    },
+    getStudentCount: function() {
+        var user = Meteor.user();
+
+        return Subjects.find({userId: user._id}).count();
     },
     getObservations: function() {
         return Observations.find({envId:this._id}, {sort: {lastModified: -1}}).fetch();
+    },
+    getObservationsCount: function() {
+        return Observations.find({envId:this._id}, {sort: {lastModified: -1}}).count();
     },
     getEnvName: function() {
         return this.envName;
     }
 });
-
-; 

@@ -59,16 +59,16 @@ Template.environmentList.events({
   },
   'click #save-obs-name': function(e) {
     var id = $('#obs-create-modal').attr("data-id");
+    var sequenceParams = SequenceParameters.findOne({'children.envId': id});
+    var demographicParams = SubjectParameters.findOne({'children.envId': id});
+    var observations = Observations.find({"envId": id}).fetch();
+    var obsAccordion = $(`.c--accordion-item__inner[data-id=${id}]`);
 
     var observation = {
       name: $('#observationName').val(),
       envId: id,
       timer: 0
     };
-
-    var sequenceParams = SequenceParameters.findOne({'children.envId': id});
-    var demographicParams = SubjectParameters.findOne({'children.envId': id});
-    var observations = Observations.find({"envId": id}).fetch();
 
     if ($('#observationName').val() == "") {
       alert("Observation name required.");
@@ -86,15 +86,22 @@ Template.environmentList.events({
             Meteor.call('observationInsert', observation, function(error, result) {
               return 0;
             });
-
             $('#observationName').val('');
+            $('#obs-close-modal').click();
+            if (!$(obsAccordion).next().hasClass("show")) {
+                $(obsAccordion).click();
+            }
         }
     } else {
         Meteor.call('observationInsert', observation, function(error, result) {
           return 0;
         });
-
         $('#observationName').val('');
+        $('#obs-close-modal').click();
+
+        if (!$(obsAccordion).next().hasClass("show")) {
+            $(obsAccordion).click();
+        }
     }
 
     function getConfirmation() {
@@ -110,7 +117,6 @@ Template.environmentList.events({
 'click #enter-class': function(e) {
   // var obj1 = SubjectParameters.find({'children.envId': this._id}).fetch();
   // var obj2 = SequenceParameters.find({'children.envId': this._id}).fetch();
-  // debugger;
   // if ($.isEmptyObject(obj1) || $.isEmptyObject(obj2) || $.isEmptyObject(obj3)) {
   //  alert('You must add students to the environment to continue to do the observation.');
   //  return;
@@ -130,10 +136,6 @@ Template.environmentList.events({
   // },
 
   'click #save-env-name': function(e) {
-
-
-  // 'click #save-env-name': function(e) {
-
     var environment = {
       envName: $('#environmentName').val()
     };
@@ -153,5 +155,7 @@ Template.environmentList.events({
 });
 
 Template.environmentList.rendered = function () {
-    document.querySelectorAll('.toggle-accordion')[0].click();
+    // opens the accordion in the first classroom.
+    document.querySelectorAll('.toggle-accordion')[0].click(); // main
+    document.querySelectorAll('.toggle-accordion')[1].click(); // observations
 }
