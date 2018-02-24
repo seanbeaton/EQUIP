@@ -2,60 +2,60 @@
 
 <template name="header">
 <!-- Bootstrap core CSS, JS dependancies included in Meteor Bootstrap package -->
-<head>
-<meta charset="utf-8">
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>EQUIP App</title>
-<meta name="description" content="Tool for educational researchers to do equity-based observations in classrooms">
-<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css?family=Fredericka+the+Great" rel="stylesheet">
-<script defer src="https://use.fontawesome.com/releases/v5.0.6/js/all.js"></script>
-</head>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>EQUIP App</title>
+        <meta name="description" content="Tool for educational researchers to do equity-based observations in classrooms">
+        <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css?family=Fredericka+the+Great" rel="stylesheet">
+        <script defer src="https://use.fontawesome.com/releases/v5.0.6/js/all.js"></script>
+    </head>
 
-<header>
-    <div class="header-container">
-        <div class="brand-container">
-            <div class="logo-container">
-                <a class="header-links" href="/" >
-                    <img alt="Brand" class="equip-logo" src="refresh/equip-beta.svg">
-                    <img alt="Brand" class="equip-hands" src="refresh/equip-hands.svg">
-                </a>
-            </div>
-            <p class="logo-text">Understanding Classroom Equity By Observing Participation</p>
-        </div>
-        {{#if currentUser}}
-        <nav class="main-menu">
-            <div class="dropdown-wrapper menu-button">
-                <a class="menu-button menu-button-header" href="#">{{currentUser.username}}
-                    <i class="fa fa-caret-down"></i>
-                    <i class="fa fa-caret-up hide"></i>
-                </a>
-                <div class="drop-menu fade-in effect">
-                    <a class="menu-button">
-                        {{> loginButtons}}
+    <header>
+        <div class="header-container">
+            <div class="brand-container">
+                <div class="logo-container">
+                    <a class="header-links" href="/" >
+                        <img alt="Brand" class="equip-logo" src="refresh/equip-beta.svg">
+                        <img alt="Brand" class="equip-hands" src="refresh/equip-hands.svg">
                     </a>
-                    <a class="menu-button" id="signOut" href="#">Sign Out</a>
-                    <a class="menu-button" href="{{pathFor 'environmentList'}}">Dashboard</a>
-                    <a class="menu-button" href="{{pathFor 'viewData'}}">Analysis</a>
-                    <a class="menu-button" href="{{pathFor 'aboutPage'}}">About</a>
-                    <a class="menu-button" href="/">EQUIP HOME</a>
                 </div>
+                <p class="logo-text">Understanding Classroom Equity By Observing Participation</p>
             </div>
-        </nav>
-        {{else}}
-        <nav class="c-main-menu__not-signed-in">
-            <ul class="c-main-menu__not-signed-in--ul">
-                <li class="c-main-menu__not-signed-in--li"><a href="/">HOME</a></li>
-                <li class="c-main-menu__not-signed-in--li"><a href="{{pathFor 'aboutPage'}}">About</a></li>
-                <li class="c-main-menu__not-signed-in--li"><a href="#">Help</a></li>
-            </ul>
-            <div class="c-main-menu__not-signed-in-login-button">
-                {{> loginButtons}}
-            </div>
-        </nav>
-        {{/if}}
-    </div>
-</header>
+            {{#if currentUser}}
+            <nav class="main-menu">
+                <div class="dropdown-wrapper menu-button">
+                    <a class="menu-button menu-button-header" href="#">{{currentUser.username}}
+                        <i class="fa fa-caret-down"></i>
+                        <i class="fa fa-caret-up hide"></i>
+                    </a>
+                    <div class="drop-menu fade-in effect">
+                        <a class="menu-button">
+                            {{> loginButtons}}
+                        </a>
+                        <a class="menu-button" id="signOut" href="#">Sign Out</a>
+                        <a class="menu-button" href="{{pathFor 'environmentList'}}">Dashboard</a>
+                        <a class="menu-button" href="{{pathFor 'viewData'}}">Analysis</a>
+                        <a class="menu-button" href="{{pathFor 'aboutPage'}}">About</a>
+                        <a class="menu-button" href="/">EQUIP HOME</a>
+                    </div>
+                </div>
+            </nav>
+            {{else}}
+            <nav class="c-main-menu__not-signed-in">
+                <ul class="c-main-menu__not-signed-in--ul">
+                    <li class="c-main-menu__not-signed-in--li"><a href="/">HOME</a></li>
+                    <li class="c-main-menu__not-signed-in--li"><a href="{{pathFor 'aboutPage'}}">About</a></li>
+                    <li class="c-main-menu__not-signed-in--li"><a href="{{pathFor 'helpFaq'}}">Help</a></li>
+                </ul>
+                <div class="c-main-menu__not-signed-in-login-button">
+                    {{> loginButtons}}
+                </div>
+            </nav>
+            {{/if}}
+        </div>
+    </header>
 
 </template>

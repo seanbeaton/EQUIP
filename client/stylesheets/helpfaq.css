@@ -1,0 +1,51 @@
+.c-help-faq-header__container {
+    margin-left: 110px;
+    margin-top: 60px;
+}
+
+.c-help-faq-create__outer {
+    max-width: 960px;
+    margin: 0 auto;
+}
+
+.c-help-faq-create__container,
+.c-help-faq-customize__container {
+    margin: 60px 0px;
+}
+
+.c-help-faq-create__image-container,
+.c-help-faq-customize__image-container {
+    display: flex;
+    height: 325px;
+    align-items: center;
+}
+
+.c-help-faq-create__image,
+.c-help-faq-customize__image {
+    width: 50%;
+}
+
+.c-help-faq-create__title,
+.c-help-faq-customize__title {
+    font-size: 50px;
+    text-transform: uppercase;
+    color: #000;
+}
+
+.c-help-faq-grid__container {
+  display: grid;
+  grid-template-columns: auto auto;
+  grid-column-gap: 10px;
+  grid-row-gap: 10px;
+  margin-top: 30px;
+}
+
+.c-help-faq-grid__item {
+  background-color: rgba(255, 255, 255, 0.8);
+  padding: 20px;
+  font-size: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 234px;
+}
