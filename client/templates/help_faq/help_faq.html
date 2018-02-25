@@ -64,6 +64,18 @@
                     <h3>Content Four</h3>
                 </div>
             </div>
+
+            {{#each accordion}}
+              {{> helpAccordionItem }}
+            {{/each}}
         </section>
+
+        <section>
+            <h1>FAQ</h1>
+            {{#each accordion}}
+              {{> helpAccordionItem }}
+            {{/each}}
+        </section>
+
     </section>
 </template>

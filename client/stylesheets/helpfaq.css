@@ -49,3 +49,15 @@
   align-items: center;
   height: 234px;
 }
+
+.c-faq-accordion__container {
+    background-color: #C9EFEF;
+}
+
+.c-faq-accordion__title {
+    color: #34C4C4;
+}
+
+.c--accordion-item-copy {
+    text-align: left;
+}
