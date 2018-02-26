@@ -1,7 +1,6 @@
 <!-- HTML for the environment list -->
 
 <template name="environmentList">
-  <!-- Will want to add help modal later -->
     <section class="c-dashboard__container--outer">
         <!-- DASHBOARD HEADER SECTION -->
         <div class="c-dashboard__container">
@@ -16,6 +15,9 @@
                 {{/each}}
             </ul>
         </div>
+        <a href="{{pathFor 'helpFaq'}}">
+            <div class="help-icon"></div>
+        </a>
     </section>
 
     <div id="obs-create-modal" class="modal">

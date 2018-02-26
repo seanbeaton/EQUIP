@@ -49,6 +49,23 @@ header {
     z-index: 10;
 }
 
+.c-beta-thank-you__container {
+    width: 100%;
+    background-color: #34C4C4;
+    display: flex;
+    align-items: center;
+    height: 50px;
+}
+
+.c-beta-thank-you__title {
+    max-width: 1215px;
+    padding-left: 30px;
+    width: 100%;
+    color: #fff;
+    margin: 0 auto;
+    text-align: center;
+}
+
 
 
 /*====================================
@@ -371,7 +388,6 @@ input:-webkit-autofill {
     max-height: 130px;
     margin-top: 15px;
   }
-
 }
 
 @media (min-width: 850px) {

@@ -485,3 +485,12 @@ ul
 .hide {
     display: none;
 }
+
+.help-icon {
+    background-image: url("/refresh/help-btn.svg");
+    height: 70px;
+    width: 70px;
+    position: fixed;
+    top: 50%;
+    right: 12%;
+}

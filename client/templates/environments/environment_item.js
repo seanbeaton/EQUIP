@@ -154,7 +154,7 @@ Template.environmentItem.helpers({
         return {
             names: filteredStudents.join(", "),
             count: filteredStudents.length
-            }
+        }
     },
     getStudentCount: function() {
         var user = Meteor.user();

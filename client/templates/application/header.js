@@ -41,11 +41,44 @@ Template.header.events({
      }
 });
 
+Template.header.helpers({
+    isBetaThankYou: function() {
+        var user = Meteor.user();
+
+        if (!user) return false;
+
+        return !user.profile.betaThankYou ? true : false;
+    }
+});
+
 Template.header.rendered = function() {
     setTimeout(function(){
         var loginText = document.getElementById('login-name-link');
         if (loginText) {
             loginText.innerHTML = "";
         }
+        setBetaThankYouFlag();
     },100)
+
+
+}
+
+var setBetaThankYouFlag = function() {
+    var user = Meteor.user();
+    var counter = 5;
+
+    // retry until a user is returned.
+    while (counter > 0 ) {
+        if (!user) {
+            counter--;
+        } else {
+            break;
+        };
+    }
+
+    if (!user) return;
+
+    if (!user.profile.betaThankYou) {
+        Meteor.users.update(Meteor.userId(),{$set: {profile: {betaThankYou:true}}});
+    }
 }
