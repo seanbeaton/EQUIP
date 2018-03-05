@@ -43,11 +43,15 @@ Template.header.events({
 
 Template.header.helpers({
     isBetaThankYou: function() {
-        var user = Meteor.user();
+        var routerLength = Router.current().route.path();
+        var getLocalStorage = window.localStorage.getItem("firstSession");
 
-        if (!user) return false;
-
-        return !user.profile.betaThankYou ? true : false;
+        if (routerLength === "/" && !getLocalStorage) {
+            window.localStorage.setItem("firstSession", true);
+            return true;
+        } else {
+            return false;
+        }
     }
 });
 
@@ -57,7 +61,6 @@ Template.header.rendered = function() {
         if (loginText) {
             loginText.innerHTML = "";
         }
-        setBetaThankYouFlag();
     },100)
 
 
@@ -75,8 +78,7 @@ var setBetaThankYouFlag = function() {
             break;
         };
     }
-
-    if (!user) return;
+    if (!user || Router.current().route.path().length > 2) return;
 
     if (!user.profile.betaThankYou) {
         Meteor.users.update(Meteor.userId(),{$set: {profile: {betaThankYou:true}}});

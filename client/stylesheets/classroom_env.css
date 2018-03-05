@@ -16,6 +16,9 @@
 #data-modal-content {
     width: 90%;
     overflow: scroll;
+    background-color: white;
+    max-width: 960px;
+    text-align: center;
 }
 
 .modal-content {
@@ -27,4 +30,3 @@
     background: #005288;
     color: white;
 }
-

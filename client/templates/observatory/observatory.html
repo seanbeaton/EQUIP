@@ -14,7 +14,7 @@
         <h1 class="title is-2 env-label-head">{{environment.envName}} - {{observation.name}} - Live Observation</h1>
       </div>
       <div class="column is-one-quarter">
-        <button class="button is-large floating-log">Contribution Log</button>
+        <button class="button is-large floating-log" id="show-all-observations">Contribution Log</button>
         <!-- <h2 id="obs-timer" class="subtitle is-4">00:00:00</h2> -->
       </div>
     </div>
@@ -39,7 +39,7 @@
       </div>
       <button class="modal-close"></button>
   </div>
-  
+
 
   <!-- MODAL FOR CONTRIBUTION LOG -->
   <div id="seq-data-modal" class="modal">
@@ -58,7 +58,7 @@
         <button id="help-close-modal" class="delete"></button>
       </header>
       <section class="modal-card-body">
-      This is your main observation interface for when you are in the classroom. Each time a student participates, you click on their name and fill out the characteristics of their contribution. By clicking on the "contribution log" you can see what you have already coded, and also edit your codes in case you made a mistake. Each toggle has a dropdown menu that allows you to change its current setting. Whatever value the toggle has will automatically be coded when you click on a student. The special toggle "contribution defaults" is an application setting. If you choose "blank," each time you click on a student you will start from scratch with coding. If you choose "Last Choice," whatever you coded last will already be highlighted.          
+      This is your main observation interface for when you are in the classroom. Each time a student participates, you click on their name and fill out the characteristics of their contribution. By clicking on the "contribution log" you can see what you have already coded, and also edit your codes in case you made a mistake. Each toggle has a dropdown menu that allows you to change its current setting. Whatever value the toggle has will automatically be coded when you click on a student. The special toggle "contribution defaults" is an application setting. If you choose "blank," each time you click on a student you will start from scratch with coding. If you choose "Last Choice," whatever you coded last will already be highlighted.
       </section>
       <footer class="modal-card-foot">
         <a class="button">Cancel</a>

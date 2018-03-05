@@ -8,12 +8,11 @@ var lastChoices = {};
 
 Template.observatory.created = function() {
   Session.set('envId', Router.current().params._envId);
-  createTableOfContributions()
+  // createTableOfContributions()
   var labelsObj = SequenceParameters.find({'children.envId':Router.current().params._envId}).fetch();
   var parameterPairs = labelsObj[0]['children']['parameterPairs'];
   seqLabels = []
   for (i=0;i<parameterPairs;i++) {
-    console.log("label " + labelsObj[0]['children']['label'+i]);
     if (!labelsObj[0]['children']['label'+i]) {
       return;
     } else {
@@ -161,11 +160,11 @@ Template.observatory.events({
     $('#seq-param-modal').removeClass('is-active');
     $('#seq-data-modal').removeClass('is-active');
   },
-  'click .floating-log': function (e) {
-    //Show editable table
-    createTableOfContributions();
-    $('#seq-data-modal').addClass('is-active');
-  },
+  // 'click .floating-log': function (e) {
+  //   //Show editable table
+  //   createTableOfContributions();
+  //   $('#seq-data-modal').addClass('is-active');
+  // },
   'click #save-seq-params': function(e) {
     var info = {};
     info['studentId'] = $('.student-modal-head').attr('data_id');
@@ -245,6 +244,10 @@ Template.observatory.events({
 
 
   },
+  'click #show-all-observations':function (e){
+    createTableOfContributions();
+    $('#seq-data-modal').addClass('is-active');
+  },
   'click #edit-seq-params': function(e) {
     seqId = $(e.target).attr('data_seq');
 
@@ -299,65 +302,62 @@ Template.observatory.events({
 });
 
 function createTableOfContributions() {
-  $('#data-modal-content').children().remove();
-  var envId = Router.current().params._envId
-  var seqs = Sequences.find({obsId:Router.current().params._obsId}).fetch();
-  seqParams = SequenceParameters.find({'children.envId':envId}).fetch()[0];
-  parameterPairs = seqParams["children"]["parameterPairs"];
+    $('#data-modal-content').children().remove();
+    var envId = Router.current().params._envId
+    var seqs = Sequences.find({obsId:Router.current().params._obsId}).fetch();
+    var seqParams = SequenceParameters.find({'children.envId':envId}).fetch()[0];
+    var parameterPairs = seqParams["children"]["parameterPairs"];
 
-  allParams = ['Edit','Name', 'Time'];
-  for (p = 0; p<parameterPairs; p++) {
-    allParams.push(seqParams['children']['label'+p]);
-  }
-  allParams.push("Delete");
-
-  var modal = $('#data-modal-content');
-
-  var table = $('<table/>', {
-    class: "table is-striped"
-  }).appendTo(modal);
-  // Create heading
-  $('<thead/>', {}).appendTo(modal);
-  var heading = $('<tr/>', {}).appendTo(table);
-
-  for (pa in allParams) {
-    $('<th/>', {
-      text: allParams[pa]
-    }).appendTo(heading);
-  }
-  var body = $('<tbody/>', {}).appendTo(table);
-  //loop over each student
-  for (s in seqs) {
-    var row = $('<tr/>', {}).appendTo(table);
-    //loop over each parameter
-    for (p in allParams) {
-      if (allParams[p] == "Delete") {
-        //Add delete button
-        var td = $('<td/>', {}).appendTo(row);
-        var bye = $('<i/>', {
-          class: "fa fa-times delete-seq",
-          data_id: seqs[s]['_id']
-        }).appendTo(td);
-      } else if (allParams[p] == "Time") {
-        attr = seqs[s]['time']
-        $('<td/>', {
-          text: convertTime(Number(attr))
-        }).appendTo(row);
-      }else if (allParams[p] == "Edit") {
-        var td = $('<td/>', {}).appendTo(row);
-        var bye = $('<i/>', {
-          class: "fa fa-pencil-square-o edit-seq",
-          data_id: seqs[s]['_id'],
-          data_studentId: seqs[s]['info']['studentId']
-        }).appendTo(td);
-      }else {
-        attr = seqs[s]['info'][allParams[p]]
-        $('<td/>', {
-          text: attr
-        }).appendTo(row);
-      }
+    allParams = [];
+    for (p = 0; p<parameterPairs; p++) {
+        allParams.push(seqParams['children']['label'+p]);
     }
-  }
+
+    var modal = document.getElementById("data-modal-content");
+    modal.innerHTML += contributionTableTemplate(seqs, allParams);
+}
+
+function contributionTableTemplate(sequences, parameters) {
+    var params = parameters;
+    var contributionRows = sequences.map((sequence) => {
+        return contributionRowTemplate(sequence, params)
+    }).join("");
+
+    return `
+        ${contributionRows}
+    `
+}
+
+function contributionRowTemplate(seqItem, params) {
+    let paramTemplate = params.map((param) => {
+        return `
+            <p class="contributions-grid-item">${param}</p>
+        `
+    }).join("");
+
+    let paramValues = params.map((param) => {
+        let data = seqItem.info[param] ? seqItem.info[param] : "n/a"
+        return `
+            <p class="contributions-grid-item">${data}</p>
+        `
+    }).join("");
+
+    let time = `<p class="contributions-grid-item">${convertTime(Number(seqItem.time))}</p>`
+    return `
+        <div class="contributions-grid-container">
+            <h3 class="contributions-modal-header">${seqItem.info.Name}</h3>
+            <p class="contributions-modal-link edit-seq" data_id="${seqItem._id}" data_studentid="${seqItem.info.studentId}">Edit</p>
+            <p class="contributions-modal-link delete-seq">Delete</p>
+        </div>
+        <div class="contributions-grid-item-container u--bold">
+            <p class="contributions-grid-item">Time</p>
+            ${paramTemplate}
+        </div>
+        <div class="contributions-grid-item-container">
+            ${time}
+            ${paramValues}
+        </div>
+    `
 }
 
 function populateParamBoxes(subjId) {
@@ -464,11 +464,10 @@ function editParamBoxes(seqId, subjId) {
   var seq = Sequences.find({_id: seqId}).fetch()[0]
   $('#param-modal-content').children().remove();
   var envId = Router.current().params._envId
-  seqParams = SequenceParameters.find({'children.envId':envId}).fetch()[0];
-  parameterPairs = seqParams["children"]["parameterPairs"];
+  var seqParams = SequenceParameters.find({'children.envId':envId}).fetch()[0];
+  var parameterPairs = seqParams["children"]["parameterPairs"];
   var subj = Subjects.find({_id: subjId}).fetch()[0];
   var student = subj.info.name;
-
   var modal = $('#param-modal-content');
 
   var name = $("<div/>", {

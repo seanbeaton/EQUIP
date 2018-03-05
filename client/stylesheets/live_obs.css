@@ -49,3 +49,48 @@
     max-height: 50px;
     overflow: hidden;
 }
+
+.contributions-grid-container {
+    display: grid;
+    background-color: white;
+    grid-template-columns: 80% 1fr 1fr;
+    margin: 0 auto;
+    margin-top: 20px;
+    width: 90%;
+    border-bottom: 1px solid #C3BF94;
+    align-items: baseline;
+    text-align: left;
+}
+
+.contributions-grid-item-container {
+    display: inline-flex;
+    background-color: white;
+    justify-content: space-between;
+    width: 90%;
+}
+
+.contributions-grid-item {
+    text-align: center;
+    font-size: 12px;
+    width: 100%;
+}
+
+.u--bold {
+    font-weight: bold;
+}
+
+.contributions-modal-link {
+    font-family: 'Roboto', sans-serif;
+    color: #F25F3D;
+    font-weight: bold;
+    font-size: 12px;
+    text-transform: uppercase;
+    cursor: pointer;
+    text-align: right;
+    background-color: #fff;
+    opacity: 1.0;
+}
+
+.contributions-modal-header {
+    font-size: 18px;
+}
