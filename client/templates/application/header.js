@@ -43,10 +43,10 @@ Template.header.events({
 
 Template.header.helpers({
     isBetaThankYou: function() {
-        var routerLength = Router.current().route.path();
+        var routerPath = Router.current().route.path();
         var getLocalStorage = window.localStorage.getItem("firstSession");
 
-        if (routerLength === "/" && !getLocalStorage) {
+        if (routerPath === "/" && !getLocalStorage) {
             window.localStorage.setItem("firstSession", true);
             return true;
         } else {

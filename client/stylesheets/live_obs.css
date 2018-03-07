@@ -50,7 +50,7 @@
     overflow: hidden;
 }
 
-.contributions-grid-container {
+.contributions-grid-container, .contributions-grid-container-student {
     display: grid;
     background-color: white;
     grid-template-columns: 80% 1fr 1fr;
@@ -62,17 +62,42 @@
     text-align: left;
 }
 
-.contributions-grid-item-container {
+.contributions-grid-item-container  {
     display: inline-flex;
     background-color: white;
     justify-content: space-between;
     width: 90%;
 }
 
+.contributions-grid-item-container-student  {
+    display: inline-flex;
+    background-color: white;
+    width: 90%;
+}
+
 .contributions-grid-item {
-    text-align: center;
-    font-size: 12px;
+    font-family: 'Roboto Condensed', sans-serif;
+    text-align: left;
+    font-size: 13px;
     width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin: 5px;
+}
+
+.contributions-grid-item-student {
+    font-family: 'Roboto Condensed', sans-serif;
+    text-align: left;
+    font-size: 12px;
+    margin-right: 20px;
+    font-weight: bold;
+}
+
+.contributions-grid-item-student span {
+    font-weight: normal;
+    color: gray;
+    padding-left: 5px;
 }
 
 .u--bold {
@@ -80,7 +105,7 @@
 }
 
 .contributions-modal-link {
-    font-family: 'Roboto', sans-serif;
+    font-family: 'Roboto Condensed', sans-serif;
     color: #F25F3D;
     font-weight: bold;
     font-size: 12px;

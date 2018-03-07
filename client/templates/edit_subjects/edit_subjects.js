@@ -213,7 +213,7 @@ Template.editSubjects.events({
       });
   },
 
-  'click .delete-subject': function(e) {
+  'click .delete-student': function(e) {
     var result = confirm("Press 'OK' to delete this Subject.");
       subjId = $(e.target).attr("data_id");
       Meteor.call('subjectDelete', subjId, function(error, result) {
@@ -274,60 +274,51 @@ function createTableOfStudents() {
   $('#data-modal-content').children().remove();
   var envId = Router.current().params._envId
   var students = Subjects.find({envId:envId}).fetch();
-  subjParams = SubjectParameters.find({'children.envId':envId}).fetch()[0];
-  parameterPairs = subjParams["children"]["parameterPairs"];
+  var subjParams = SubjectParameters.find({'children.envId':envId}).fetch()[0];
+  var parameterPairs = subjParams["children"]["parameterPairs"];
 
-  allParams = ['Edit','name'];
+  var allParams = [];
   for (p = 0; p<parameterPairs; p++) {
     allParams.push(subjParams['children']['label'+p]);
   }
-  allParams.push("Delete");
 
-  var modal = $('#data-modal-content');
-
-  var table = $('<table/>', {
-    class: "table is-striped"
-  }).appendTo(modal);
-  // Create heading
-  $('<thead/>', {}).appendTo(modal);
-  var heading = $('<tr/>', {}).appendTo(table);
-
-  for (pa in allParams) {
-    $('<th/>', {
-      text: allParams[pa]
-    }).appendTo(heading);
-  }
-  var body = $('<tbody/>', {}).appendTo(table);
-  //loop over each student
-  for (s in students) {
-    var row = $('<tr/>', {}).appendTo(table);
-    //loop over each parameter
-    for (p in allParams) {
-      if (allParams[p] == "Delete") {
-        //Add delete button
-        var td = $('<td/>', {}).appendTo(row);
-        var bye = $('<i/>', {
-          class: "fa fa-times delete-subject",
-          data_id: students[s]['_id']
-        }).appendTo(td);
-
-      } else if (allParams[p] == "Edit") {
-        var td = $('<td/>', {}).appendTo(row);
-        var bye = $('<i/>', {
-          class: "fa fa-pencil-square-o edit-stud",
-          data_id: students[s]['_id'],
-        }).appendTo(td);
-      }else {
-        attr = students[s]['info'][allParams[p]]
-        $('<td/>', {
-          text: attr
-        }).appendTo(row);
-      }
-    }
-  }
+  var modal = document.getElementById("data-modal-content");
+  modal.innerHTML += contributionTableTemplate(students, allParams);
 }
 
+function contributionTableTemplate(students, parameters) {
+    var params = parameters;
+    var contributionRows = students.map((student) => {
+        return contributionRowTemplate(student, params)
+    }).join("");
 
+    return `
+        <div class="c--modal-header-container">
+            <h3 class="c--modal-header-title">Student Roster</h3>
+        </div>
+        ${contributionRows}
+    `
+}
+
+function contributionRowTemplate(student, params) {
+    let paramValues = params.map((param) => {
+        let data = student.info[param];
+        return `
+            <p class="contributions-grid-item-student">${param}<span>${data}</span></p>
+        `
+    }).join("");
+
+    return `
+        <div class="contributions-grid-container-student">
+            <h3 class="contributions-modal-header">${student.info.name}</h3>
+            <p class="contributions-modal-link edit-stud" data_id="${student._id}" data_studentid="${student.info.studentId}">Edit</p>
+            <p class="contributions-modal-link delete-student" data_id="${student._id}" >Delete</p>
+        </div>
+        <div class="contributions-grid-item-container-student">
+            ${paramValues}
+        </div>
+    `
+}
 
 function populateParamBoxes() {
   var envId = Router.current().params._envId

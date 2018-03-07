@@ -149,3 +149,16 @@ ul {
     overflow: hidden;
     white-space: nowrap;
 }
+
+.c--modal-header-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #000;
+}
+
+.c--modal-header-title {
+    color: white;
+    letter-spacing: .4px;
+    font-weight: normal;
+}

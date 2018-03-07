@@ -324,6 +324,9 @@ function contributionTableTemplate(sequences, parameters) {
     }).join("");
 
     return `
+        <div class="c--modal-header-container">
+            <h3 class="c--modal-header-title">Contribution Log</h3>
+        </div>
         ${contributionRows}
     `
 }
