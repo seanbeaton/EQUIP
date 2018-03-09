@@ -152,9 +152,11 @@ ul {
 
 .c--modal-header-container {
     display: flex;
+    height: 60px;
     justify-content: center;
     align-items: center;
     background-color: #000;
+    margin-bottom: 20px;
 }
 
 .c--modal-header-title {

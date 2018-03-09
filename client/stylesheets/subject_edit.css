@@ -28,8 +28,9 @@
 }
 
 .boxes-wrapper {
-  margin-top:.25em;
-  margin-bottom: .25em;
+  max-width: 960px;
+  margin: 0 auto;
+  padding-bottom: 20px;
 }
 
 .subj-box-labels {
@@ -45,8 +46,8 @@
 }
 
 .subj-box-params {
-  background: #005288;
-  color: white;
+  background: #f2f2f2;
+  color: #F25F3D;
   margin: .25em;
   -webkit-transition:all .2s linear;
   transition:all .2s linear;
@@ -54,6 +55,8 @@
 
 #param-modal-content {
   width: 95%;
+  max-width: 1215px;
+  background-color: #fff;
   overflow: scroll;
 }
 
@@ -83,12 +86,6 @@
   opacity: .5;
 }
 
-#student-name {
-  margin-top: 2%;
-  font-size: 2em;
-  height: 2em;
-}
-
 .drag-label {
   word-wrap: break-word;
   max-height: 50px;
@@ -103,4 +100,36 @@
 #save-locations{
   background: #009CFF;
   color: white;
+}
+
+
+/* NEW STYLES */
+
+.c--modal-student-header {
+    border-bottom: 1px solid lightgray;
+    margin-bottom: 20px;
+}
+
+.c--modal-student-input {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 50px;
+    margin-bottom: 20px;
+    background-color: #f2f2f2;
+    border: 0;
+    padding-left: 15px;
+    font-size: 16px;
+}
+
+.c--modal-student-options-container {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.button-container {
+    margin: 0 auto;
+    text-align: center;
+    margin-bottom: 20px;
 }
