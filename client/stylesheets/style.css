@@ -494,3 +494,24 @@ ul
     top: 50%;
     right: 12%;
 }
+
+.o--standard-button {
+    font-family: 'Roboto', sans-serif !important;
+    font-size: 24px !important;
+    display: flex;
+    width: 200px;
+    height: 60px;
+    align-items: center;
+    justify-content: center;
+    background-color: #F25F3D !important;
+    text-transform: uppercase;
+    border-radius: 0 !important;
+    border: 0 !important;
+    color: #fff !important;
+    transition: color .4s !important;
+    cursor: pointer;
+}
+
+.u--margin-zero-auto {
+    margin: 0 auto;
+}
