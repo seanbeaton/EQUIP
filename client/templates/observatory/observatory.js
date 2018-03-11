@@ -334,26 +334,26 @@ function contributionTableTemplate(sequences, parameters) {
 function contributionRowTemplate(seqItem, params) {
     let paramTemplate = params.map((param) => {
         return `
-            <p class="contributions-grid-item">${param}</p>
+            <p class="o--modal-label contributions-grid-item">${param}</p>
         `
     }).join("");
 
     let paramValues = params.map((param) => {
         let data = seqItem.info[param] ? seqItem.info[param] : "n/a"
         return `
-            <p class="contributions-grid-item">${data}</p>
+            <p class="o--modal-label contributions-grid-item">${data}</p>
         `
     }).join("");
 
-    let time = `<p class="contributions-grid-item">${convertTime(Number(seqItem.time))}</p>`
+    let time = `<p class="o--modal-label contributions-grid-item">${convertTime(Number(seqItem.time))}</p>`
     return `
         <div class="contributions-grid-container">
             <h3 class="contributions-modal-header">${seqItem.info.Name}</h3>
-            <p class="contributions-modal-link edit-seq" data_id="${seqItem._id}" data_studentid="${seqItem.info.studentId}">Edit</p>
-            <p class="contributions-modal-link delete-seq">Delete</p>
+            <p class="o--toggle-links contributions-modal-link edit-seq" data_id="${seqItem._id}" data_studentid="${seqItem.info.studentId}">Edit</p>
+            <p class="o--toggle-links contributions-modal-link delete-seq">Delete</p>
         </div>
         <div class="contributions-grid-item-container u--bold">
-            <p class="contributions-grid-item">Time</p>
+            <p class="o--modal-label contributions-grid-item">Time</p>
             ${paramTemplate}
         </div>
         <div class="contributions-grid-item-container">

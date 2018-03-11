@@ -3,13 +3,13 @@
 <template name="environmentItem">
     <li class="environmentList">
         <!-- acccordion header -->
-        <div class="toggle-accordion">
+        <div class="o--header-link toggle-accordion">
             <span>{{getEnvName}} <p class="carat"> &#9660;</p></span>
             <div class="toggle-sub">
-                <p id="analyze-button">Analyze</p>
-                <p class="export-tab">Export</p>
-                <p class="import-tab">Import</p>
-                <p id="env-delete">Delete</p>
+                <p class="o--toggle-links" id="analyze-button">Analyze</p>
+                <p class="o--toggle-links export-tab">Export</p>
+                <p class="o--toggle-links import-tab">Import</p>
+                <p class="o--toggle-links" id="env-delete">Delete</p>
             </div>
         </div>
         <!-- accordion contents -->
@@ -17,8 +17,8 @@
             <li class="c--accordion-item">
                 <div class="c--accordion-item__inner">
                     <h3 class="c--accordion-item__title">Demographics</h3>
-                    <p class="c--accordion-item__edit" id="edit-class-params">
-                        Edit <i style="color:gray;" class="far fa-question-circle"></i>
+                    <p class="o--toggle-links c--accordion-item__edit" id="edit-class-params">
+                        Edit <i style="color:gray;" class="far fa-question-circle c--accordion-item__icon"></i>
                     </p>
                 </div>
                 <div class="c--accordion-item__inner--labels">
@@ -28,8 +28,8 @@
             <li class="c--accordion-item">
                 <div class="c--accordion-item__inner">
                     <h3 class="c--accordion-item__title">Discource Dimensions</h3>
-                    <p class="c--accordion-item__edit" id="edit-sequence-params">
-                        Edit <i style="color:gray;" class="far fa-question-circle"></i>
+                    <p class="o--toggle-links c--accordion-item__edit" id="edit-sequence-params">
+                        Edit <i style="color:gray;" class="far fa-question-circle c--accordion-item__icon"></i>
                     </p>
                 </div>
                 <div class="c--accordion-item__inner--labels">
@@ -39,8 +39,8 @@
             <li class="c--accordion-item">
                 <div class="c--accordion-item__inner">
                     <h3 class="c--accordion-item__title">Student Roster</h3>
-                    <p class="c--accordion-item__edit" id="edit-class-studs">
-                        Edit <i style="color:gray;" class="far fa-question-circle"></i>
+                    <p class="o--toggle-links c--accordion-item__edit" id="edit-class-studs">
+                        Edit <i class="far fa-question-circle c--accordion-item__icon"></i>
                     </p>
                 </div>
                 <div class="c--accordion-item__inner--labels">
@@ -50,14 +50,14 @@
             </li>
             <li class="c--accordion-item">
                 <div class="c--accordion-item__inner toggle-accordion toggle-nested" data-id={{getEnvironmentId}}>
-                    <h3 class="c--accordion-item__title">Observations ({{getObservationsCount}}) <p class="carat" id="carat-obs"> &#9660;</p></h3>
-                    <p class="c--accordion-item__edit" id="obs-create-button" data-id={{getEnvironmentId}}>Create New Observations</p>
+                    <h3 class="o--header-link c--accordion-item__title-observation">Observations ({{getObservationsCount}}) <p class="carat" id="carat-obs"> &#9660;</p></h3>
+                    <p class="o--toggle-links c--accordion-item__edit" id="obs-create-button" data-id={{getEnvironmentId}}>Create New Observations</p>
                 </div>
                 <ul class="inner-container">
                     <li>
                         <div class="c--accordion-item__inner--observations">
                             {{#each observation in getObservations}}
-                                <p id="enter-class" class="observation-labels" data-id={{observation._id}}>({{@index}}) {{observation.name}}</p>
+                                <p id="enter-class" class="observation-labels o--box-item" data-id={{observation._id}}>({{@index}}) {{observation.name}}</p>
                             {{/each}}
 
                             <p class="c--accordion-item_inner--count">Observations: {{getObservationsCount}}</p>

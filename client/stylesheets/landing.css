@@ -1,26 +1,19 @@
 .c--landing-page__outer {
-    max-width: 1215px;
+    max-width: var(--max-container-width);
     margin: 0 auto;
-    margin-bottom: 40px;
-}
-
-.c--landing-page__logo-container {
-    text-align: center;
-    padding-bottom: 20px;
-    padding-top: 80px;
-}
-
-.c--landing-page__logo {
-    font-family: 'Fredericka the Great', cursive;
-    font-size: 64px;
-    text-transform: uppercase;
 }
 
 .c--landing-page__main-container {
-    margin: 0 auto;
     width: 100%;
     height: auto;
     display: inline-flex;
+}
+
+.c--landing-page__logo-container {
+    margin-top: var(--spacer-40);
+    text-align: center;
+    text-transform: uppercase;
+    margin-bottom: 0px;
 }
 
 .c--landing-page__main-container--left {
@@ -32,8 +25,8 @@
 }
 
 .c--landing-page__main-container--right {
-    background-color: #000;
-    color: #fff;
+    background-color: var(--black);
+    color: var(--white);
     width: 50%;
     height: 605px;
 }
@@ -42,76 +35,56 @@
     padding: 30px 30px;
     font-size: 27px;
     line-height: 200%;
-    color: #fff;
+    color: var(--white);
 }
 
 .c--landing-page__c2a-container {
     display: inline-flex;
     justify-content: center;
     width: 100%;
-    margin: 40px 0;
 }
 
 .c--landing-page__c2a-learn-more-button,
 .c--landing-page__c2a-sign-in-button {
-    font-family: 'Roboto', sans-serif !important;
-    font-size: 24px !important;
-    display: flex;
-    width: 200px;
-    height: 60px;
     margin-left: 20px;
     margin-right: 20px;
-    margin-top: 20px !important;
-    align-items: center;
-    justify-content: center;
-    background-color: #F25F3D !important;
-    text-transform: uppercase;
-    border-radius: 0 !important;
-    border: 0 !important;
-    color: #fff !important;
-    transition: color .4s !important;
-    cursor: pointer;
-}
-
-.c--landing-page__c2a-learn-more-button:hover,
-.c--landing-page__c2a-sign-in-button:hover {
-    color: #000 !important;
 }
 
 .c--landing-page__c2a-learn-more-link {
-    color: #fff;
+    color: var(--white);
     transition: color .4s !important;
 }
 
 .c--landing-page__c2a-learn-more-link:hover {
-    color: #000;
+    color: var(--black);
 }
 
 .c--landing-page__get-started-title {
-    font-family: 'Fredericka the Great', cursive;
-    font-size: 64px;
     text-align: center;
 }
 
 .c--landing-page__get-started-outer {
     width: 100%;
-    background-color: #34C4C4;
+    background-color: var(--teal);
+    margin-bottom: 80px;
 }
 
 .c--landing-page__get-started {
     width: 100%;
-    max-width: 1215px;
+    max-width: var(--max-container-width);
     margin: 0 auto;
 }
 
 .c--landing-page__get-started-inner {
     display: inline-flex;
     width: 100%;
+    margin-bottom: 0px;
 }
 
 .c--landing-page__get-started-left {
     width: 50%;
-    margin: 40px 0
+    margin: 40px 0px;
+    margin-left: 20px;
 }
 
 .c--landing-page__get-started-right {
@@ -119,23 +92,16 @@
     background: url("refresh/classroom-bottom@2x.jpg");
     background-size: cover;
     background-repeat: no-repeat;
-}
-
-.c--landing-page__get-started-left-list-item {
-    margin: 30px 0;
-}
-
-.c--landing-page__get-started-left-title {
-    font-family: 'Fredericka the Great', cursive;
-    font-size: 32px;
+    margin-bottom: 0px;
 }
 
 .c--landing-page__get-started-left-content {
-    font-family: 'Roboto', sans-serif !important;
-    font-size: 21px !important;
-    color: #fff;
-    width: 95%;
-    line-height: 200%;
+    color: var(--white);
+    width: 90%;
+}
+
+.c--landing-page__get-started-left-list-container {
+    margin-left: 50px;
 }
 
 .c--landing-page__faq-outer {
@@ -151,11 +117,8 @@
 }
 
 .c--landing-page__faq-title {
-    font-family: 'Fredericka the Great', cursive;
-    font-size: 64px;
     text-transform: uppercase;
     text-align: center;
-    margin-bottom: 40px;
 }
 
 .c--landing-page__faq-item {
@@ -163,28 +126,25 @@
 }
 
 .c--landing-page__faq-item-top {
-    background-color: #F25F3D;
+    background-color: var(--orange);
     padding: 20px;
+    margin-bottom: 0px;
 }
 
 .c--landing-page__faq-item-top-content {
-    color: #fff;
-    font-family: 'Roboto', sans-serif !important;
-    font-size: 18px !important;
-    line-height: 200%;
+    color: var(--white);
 }
 
 .c--landing-page__faq-item-top-date {
-    color: #000;
-    font-family: 'Roboto', sans-serif !important;
-    font-weight: bold;
-    font-size: 18px !important;
-    line-height: 200%;
+    font-weight: 700;
+}
+
+.c--landing-page__faq-item-top-publication {
+    color: var(--white);
+    text-align: center;
 }
 
 .c--landing__faq-item-bottom {
-    padding: 20px;
-    background-color: #000;
-    color: #34C4C4;
+    background-color: var(--black);
     text-transform: uppercase;
 }

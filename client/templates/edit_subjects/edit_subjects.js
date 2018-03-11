@@ -3,15 +3,13 @@
 */
 
 Template.editSubjects.helpers({
-  subject: function() {
-    subs = Subjects.find({envId: this._id});
-    return subs;
-  },
-  subjParameter: function() {
-
-    var studentParams = SubjectParameters.find({'children.envId':this._id}).fetch();
-    return studentParams;
-  },
+    subject: function() {
+        subs = Subjects.find({envId: this._id});
+        return subs;
+    },
+    classRoomName: function() {
+        return this.envName;
+    }
 });
 
 //Used to set up interactJS and get labels for students
@@ -69,13 +67,10 @@ Template.editSubjects.rendered = function() {
 // Click events
 //
 Template.editSubjects.events({
-
   'click .back-head-params': function(e) {
     Router.go('observationList', {_envId:Router.current().params._envId});
   },
-
   //Stuff for student parameters modal
-
   'click .modal-close': function(e){
     $('#stud-param-modal').removeClass('is-active');
     $('#stud-data-modal').removeClass('is-active');
@@ -295,8 +290,8 @@ function contributionRowTemplate(student, params) {
     return `
         <div class="contributions-grid-container-student">
             <h3 class="contributions-modal-header">${student.info.name}</h3>
-            <p class="contributions-modal-link edit-stud" data_id="${student._id}" data_studentid="${student.info.studentId}">Edit</p>
-            <p class="contributions-modal-link delete-student" data_id="${student._id}" >Delete</p>
+            <p class="o--toggle-links contributions-modal-link edit-stud" data_id="${student._id}" data_studentid="${student.info.studentId}">Edit</p>
+            <p class="o--toggle-links contributions-modal-link delete-student" data_id="${student._id}" >Delete</p>
         </div>
         <div class="contributions-grid-item-container-student">
             ${paramValues}

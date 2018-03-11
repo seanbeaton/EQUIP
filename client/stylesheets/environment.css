@@ -1,10 +1,5 @@
-ul {
-    list-style: none;
-    padding: 0;
-}
-
 .c-dashboard__container--outer {
-    max-width: 1185px;
+    max-width: var(--max-outer-container-width);
     margin: 0 auto;
     padding-top: 20px;
 }
@@ -13,59 +8,49 @@ ul {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin: 20px 0px;
+    margin-top: var(--spacer-40);
+    margin-bottom: 0px;
+}
+
+.c-dashboard__container--title {
+    margin-bottom: 0px;
 }
 
 .c-dashboard__accordion--outer {
-    max-width: 960px;
+    max-width: var(--max-inner-container-width);
     margin: 0 auto;
 }
 
 .inner-container {
+    max-width: var(--max-inner-container-width);
     padding-left: 1em;
     overflow: hidden;
     display: none;
 }
 
-/*.inner .show {
-    display: block;
-}*/
-
 .toggle-accordion {
     display: inline-flex;
-    font-family: 'Roboto', sans-serif;
-    font-size: 24px;
-    text-transform: uppercase;
+    text-transform: capitalize;
     width: 100%;
-    background-color: #000;
-    color: #fff;
     height: 50px;
     align-items: center;
     justify-content: space-between;
     padding-left: 15px;
-    cursor: pointer;
-    margin-top: 20px;
+    margin-bottom: 0px;
 }
 
 .toggle-nested {
-    background-color: #C9EFEF
+    background-color: var(--light-teal);
 }
 
 .toggle-sub {
     display: inline-flex;
-    justify-content: space-between;
-    width: 35%;
     padding-right: 35px;
+    margin-bottom: 0px;
 }
 
 .toggle-sub p {
-    font-family: 'Roboto', sans-serif;
-    color: #F25F3D;
-    font-weight: bold;
-    font-size: 16px;
-    text-transform: uppercase;
     padding-right: 15px;
-    cursor: pointer;
 }
 
 #carat-obs {
@@ -98,18 +83,24 @@ ul {
     margin: 20px 0;
     display: inline-flex;
     width: 95%;
-    border-bottom: 1px solid gray;
+    border-bottom: 1px solid var(--yellow);
     justify-content: space-between;
     align-items: center;
 }
 
 .c--accordion-item__edit {
-    color: #F25F3D;
-    font-weight: bold;
-    font-size: 16px;
-    padding-right: 30px;
-    cursor: pointer;
+    padding-right: var(--spacer-30);
 }
+
+.c--accordion-item__icon {
+    color: var(--gray);
+    margin-left: var(--spacer-10);
+}
+
+.c--accordion-item__edit:hover {
+    color: var(--black) !important;
+}
+
 
 .c--accordion-item__inner--labels {
     display: inline-flex;
@@ -140,14 +131,8 @@ ul {
     width: 20%;
     height: 50px;
     text-align: left;
-    background-color: #d3d3d3;
     margin-bottom: 20px;
     padding-left: 15px;
-    color: #F25F3D;
-    cursor: pointer;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    white-space: nowrap;
 }
 
 .c--modal-header-container {
@@ -163,4 +148,10 @@ ul {
     color: white;
     letter-spacing: .4px;
     font-weight: normal;
+}
+
+.c--accordion-item__title-observation {
+    color: var(--teal) !important;
+    background-color: var(--light-teal) !important;
+    font-weight: 400;
 }

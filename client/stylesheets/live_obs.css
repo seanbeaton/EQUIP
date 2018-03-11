@@ -67,6 +67,7 @@
     background-color: white;
     justify-content: space-between;
     width: 90%;
+    margin-bottom: 0px;
 }
 
 .contributions-grid-item-container-student  {
@@ -76,9 +77,7 @@
 }
 
 .contributions-grid-item {
-    font-family: 'Roboto Condensed', sans-serif;
     text-align: left;
-    font-size: 13px;
     width: 100%;
     white-space: nowrap;
     overflow: hidden;
@@ -87,11 +86,8 @@
 }
 
 .contributions-grid-item-student {
-    font-family: 'Roboto Condensed', sans-serif;
     text-align: left;
-    font-size: 12px;
     margin-right: 20px;
-    font-weight: bold;
 }
 
 .contributions-grid-item-student span {
@@ -100,21 +96,17 @@
     padding-left: 5px;
 }
 
-.u--bold {
-    font-weight: bold;
-}
-
 .contributions-modal-link {
-    font-family: 'Roboto Condensed', sans-serif;
-    color: #F25F3D;
-    font-weight: bold;
-    font-size: 12px;
-    text-transform: uppercase;
-    cursor: pointer;
     text-align: right;
-    background-color: #fff;
+    background-color: var(--white);
     opacity: 1.0;
 }
+
+.contributions-modal-link:hover {
+    color: var(--black) !important;
+    opacity: 1.0 !important;
+}
+
 
 .contributions-modal-header {
     font-size: 18px;
