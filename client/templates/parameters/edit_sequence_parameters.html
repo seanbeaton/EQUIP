@@ -1,45 +1,43 @@
 <!-- HTML for the edit sequence parameters page, requested when the user goes to change parameters after initial setup -->
 
 <template name="editSequenceParameters">
-  <section class="section">
-    <div class="shared-heading">
-      <h2 class="title is-4 back-head-params is-pulled-left">&#8592; Back to Dashboard</h2>
-      <a class="button is-medium help-button is-pulled-right has-text-centered">Help!?</a>
-      <!-- CAN FIX UP THIS HELP BUTTON LATER -->
-    </div>
-  </section>
+    <section class="c--discourse-header__container">
+        <h1 class="c--discourse-header__title">Discourse Dimensions</h1>
+        {{ #if hasObsMade }}
+        <div class="c--discourse-header__links-container">
+            <p id="load-default-seq" class="u--header-links c--student-discourse__links c--discourse-header__links">Load Default</p>
+            <p class="u--header-links c--discourse-header__links export-button">Export</p>
+            <p class="u--header-links c--discourse-header__links import-button">Import</p>
+        </div>
+        {{ else }}
+            <div id="obsMade"></div>
+        {{ /if }}
+    </section>
 
-  <section class="section params-control-panel">
-    <h1 class="title is-2 env-label-head">{{environment.envName}} - Discourse Dimensions</h1>
-    <div class="columns">
-      <div class="column is-offset-1 param-switcher">
-        <button class="button is-large has-text-centered demo-param-button inactive-params">Demographics</button>
-        <button class="button is-large has-text-centered obs-param-button active-params">Discourse Dimensions</button>
-        <h2 class="title is-4 back-to-class is-pulled-right">Go to Classroom</h2>
 
-      </div>
-    </div>
-    {{ #if hasObsMade }}
-    <div class="columns">
-      <div class="column is-offset-1">
-        <button id="load-default-seq" class="button is-medium default-button has-text-centered">Load Defaults</button>
-        <button id="add-seq-param" class="button is-medium is-success has-text-centered">+ Add</button>
-        <button class="button is-medium has-text-centered export-button">Export</button>
-        <button class="button is-medium has-text-centered import-button">Import</button>
-        <button id="save-seq-params" class="button is-medium is-outlined is-info is-pulled-right has-text-centered">Save Parameters</button>
-      </div>
-    </div>
-    {{ else }}
-        <div id="obsMade"></div>
-    {{ /if }}
-  </section>
+    <div class="c--discourse-body__container">
+        <div>
+            <ul class="c--discourse-body__container-list-container">
+                <a href="{{pathFor 'environmentList'}}">
+                    <li class="c--discourse-body__container-list">Dashboard<span> &#62;</span></li>
+                </a>
+                <li class="c--discourse-body__container-list">{{environment.envName}}<span> &#62; </span></li>
+                <li class="c--discourse-body__container-list-current">Discourse Dimensions</li>
+            </ul>
+            <p>
+                Discourse dimensions are the aspects of the classrom talk that you wish to track, like
+                the length of talk or types things students say. Click on <i>load defaults</i> to get a basic set
+                of discourse dimensions to work with. Modify these as appropriate, separating each with a comma.
+                Click the save <i>Save Discourse Dimensions</i> button when you are finished for your changes to remain.
+            </p>
+        </div>
 
-  <section class="section">
-    <div class="columns">
-      <div id="paramsSection" class="column is-offset-1 is-three-quarters">
-      </div>
+        <div>
+            <div id="paramsSection"></div>
+            <button id="save-seq-params" class="">Save Parameters</button>
+        </div>
     </div>
-  </section>
+
 
     <!-- HELP MODAL -->
   <div id="help-env-modal" class="modal">

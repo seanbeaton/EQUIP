@@ -366,156 +366,91 @@ Template.editSequenceParameters.events({
 });
 
 Template.editSequenceParameters.rendered = function() {
-  setDefaultSeqParams();
-  hideRemoveButtons();
+    let editSequence = new EditSequence();
+
+    editSequence.init();
+    editSequence.hideRemoveButtons();
 }
 
-function hideRemoveButtons() {
-    var obsMade = document.getElementById('obsMade');
+const EditSequence = () => {
+    function hideRemoveButtons() {
+        var obsMade = document.getElementById('obsMade');
 
-    if (obsMade) {
-        var allRemoveButtons = document.querySelectorAll('.removeSeq');
-        Array.prototype.map.call(allRemoveButtons, function(btn) {
-             btn.style.display = "none";
-        })
+        if (obsMade) {
+            var allRemoveButtons = document.querySelectorAll('.removeSeq');
+            Array.prototype.map.call(allRemoveButtons, function(btn) {
+                 btn.style.display = "none";
+            })
+        }
     }
-}
-
-function setDefaultSeqParams() {
-
-    var envId = Router.current().params._envId;
-
-  $('<form/>', {
-    id: 'paramForm',
-  }).appendTo('#paramsSection');
-
-  var container = document.getElementById("paramForm");
-
-  parametersObj = SequenceParameters.find({'children.envId':envId}).fetch();
-
-  if ($.isEmptyObject(parametersObj) == true) {
-    parameterPairs = 0;
-  } else {
-    parameterPairs = parametersObj[0]["children"]["parameterPairs"];
-  }
-
-  if (parameterPairs == 0) {
-    var singleParam = $('<div/>', {
-      class: "single-param control myParam0"
-    }).appendTo(container);
-
-      $('<label/>', {
-        class: "label",
-        text: "Parameter Name:"
-      }).appendTo(singleParam);
-
-      $('<input/>', {
-        class: "input",
-        type: "text",
-        name: "label0",
-        placeholder: "Name of your parameter"
-      }).appendTo(singleParam);
-
-      $('<label/>', {
-        class: "label",
-        text: "Options:"
-      }).appendTo(singleParam);
-
-      $('<input/>', {
-        class: "input",
-        type: "text",
-        style: "margin-bottom: .25em",
-        name: "parameter0",
-        placeholder: "List the options for selection separated by commas (e.g. male, female, unspecificied)."
-      }).appendTo(singleParam);
-
-      removeButton = $('<button/>', {
-        class: "button is-small is-danger is-pulled-right remove0 removeSeq",
-        text: "Remove Parameter",
-        style: "margin-right: .5em"
-      }).appendTo(singleParam);
-
-      removeButton.click( function (e) {
-        e.preventDefault();
-        var test = $(this).parent().remove();
-      });
-
-      checkbox = $('<label/>', {
-        class: "checkbox",
-        text: "Toggle?"
-      }).appendTo(singleParam);
-
-      $('<input/>', {
-        class: "checkbox",
-        type: "checkbox",
-        name: "toggle0",
-        style: "margin: .5em",
-      }).appendTo(checkbox);
-
-  } else {
-    for (i=0;i<parameterPairs;i++) {
-      var singleParam = $('<div/>', {
-      class: "single-param control myParam"+i
-      }).appendTo(container);
-
-      $('<label/>', {
-        class: "label",
-        text: "Parameter Name:"
-      }).appendTo(singleParam);
-
-      $('<input/>', {
-        class: "input",
-        type: "text",
-        name: "label"+i,
-        value: parametersObj[0]["children"]["label"+i]
-      }).appendTo(singleParam);
-
-      $('<label/>', {
-        class: "label",
-        text: "Options:"
-      }).appendTo(singleParam);
-
-      $('<input/>', {
-        class: "input",
-        type: "text",
-        style: "margin-bottom: .25em",
-        name: "parameter"+i,
-        value: parametersObj[0]["children"]["parameter"+i]
-      }).appendTo(singleParam);
-
-      var removeButton = $('<button/>', {
-        class: "button is-small is-danger is-pulled-right removeSeq remove"+i,
-        text: "Remove Parameter",
-        style: "margin-right: .5em"
-      }).appendTo(singleParam);
-
-      removeButton.click( function (e) {
-        e.preventDefault();
-        var test = $(this).parent().remove();
-      });
-
-      checkbox = $('<label/>', {
-        class: "checkbox",
-        text: "Toggle?"
-      }).appendTo(singleParam);
-
-      var checkVal = "false";
-      if (parametersObj[0]["children"]["toggle"+i] == "on") {
-        $('<input/>', {
-          class: "checkbox",
-          type: "checkbox",
-          name: "toggle"+i,
-          checked: checkVal,
-          style: "margin: .5em"
-        }).appendTo(checkbox);
-      } else {
-        $('<input/>', {
-          class: "checkbox",
-          type: "checkbox",
-          name: "toggle"+i,
-          style: "margin: .5em"
-        }).appendTo(checkbox);
-      }
+    function addRemoveButtonEvents() {
+        let removeButtons = document.querySelectorAll(".removeSeq");
+        [...removeButtons].forEach((button) => {
+            button.addEventListener("click", (event) => {
+                event.target.parentElement.remove();
+            });
+        });
     }
-  }
+    // Template for no paremeters
+    function noParamForm() {
+        return `
+            <form id="paramForm">
+                <div class="single-param control myParam0">
+                    <label class="label">Parameter Name:</label>
+                    <input class="input" type="text" name="label0" placeholder="Name of your parameter">
+                    <label class="label">Options:</label>
+                    <input class="input" type="text" style="margin-bottom: .25em" name="parameter0" placeholder="List the options for selection separated by commas (e.g. male, female, unspecificied).">
+                    <p class="o--toggle-links removeSeq">
+                        Remove Parameter
+                    </p>
+                </div>
+            </form>
+        `
+    }
+    // Template for form with parameters set
+    function hasParamForm(paramObj, paramPair) {
+        let numberOfParams = Array.apply(null, {length: paramPair}).map(Number.call, Number);
+        let paramNodes = numberOfParams.map((index)=> {
+            let label = paramObj[0]["children"]["label" + index];
+            let parameter = paramObj[0]["children"]["parameter" + index]
+
+            return `
+                <div class="single-param control myParam0">
+                    <label class="label">Parameter Name:</label>
+                    <input class="input" type="text" name="label0" value="${label}">
+                    <label class="label">Options:</label>
+                    <input class="input" type="text" style="margin-bottom: .25em" name="parameter0" value="${parameter}">
+                    <p class="removeSeq o--toggle-links">Remove</p>
+                </div>
+            `
+        }).join("");
+
+        return `
+            <form id="paramForm">
+                ${paramNodes}
+            </form>
+        `
+    }
+
+    function setDefaultSeqParams() {
+        let envId = Router.current().params._envId;
+        let parametersObj = SequenceParameters.find({'children.envId':envId}).fetch();
+        let paramSection = document.getElementById("paramsSection");
+        let parameterPairs;
+
+        $.isEmptyObject(parametersObj)
+            ? parameterPairs = 0
+            : parameterPairs = parametersObj[0]["children"]["parameterPairs"];
+
+        parameterPairs === 0
+            ? paramSection.innerHTML += noParamForm()
+            : paramSection.innerHTML += hasParamForm(parametersObj, parameterPairs);
+
+        addRemoveButtonEvents();
+    }
+
+    return {
+        init: setDefaultSeqParams,
+        hideRemoveButtons: hideRemoveButtons
+    }
 }

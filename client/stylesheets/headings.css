@@ -26,6 +26,7 @@ header {
 }
 
 .brand-container, .logo-container {
+    min-width: 500px;
     margin-bottom: 0
 }
 
@@ -187,11 +188,11 @@ header {
     background-color: var(--orange);
 }
 
-i {
+/* i {
     position: relative;
     top: 5px;
     left: 5px;
-}
+} */
 
 #login-dropdown-list {
     width: 240px;

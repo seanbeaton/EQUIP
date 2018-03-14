@@ -1,51 +1,49 @@
-.back-head-params {
-    text-decoration: underline;
+/* NEW STYLES */
+.c--discourse-header__container {
+    display: inline-flex;
+    width: 100%;
+    justify-content: space-between;
+    margin-top: var(--spacer-40);
+    margin-bottom: 0px;
 }
 
-.back-head-params:hover {
-    color: lightgray;
-    cursor: pointer;
+.c--discourse-body__container-list-container {
+    display: inline-flex;
 }
 
-.back-to-class {
-    text-decoration: underline;
+.c--discourse-header__links-container {
+    display: inline-flex;
+    align-items: center;
+    margin-bottom: 0px;
 }
 
-.back-to-class:hover {
-    color: lightgray;
-    cursor: pointer;
+.c--discourse-body__container-list {
+    font-family: 'Roboto';
+    color: var(--orange);
+    transition: color .4s;
 }
 
-.active-params {
-    background-color: #009CFF;
-    color: white;
+.c--discourse-body__container-list:hover {
+    color: var(--black);
 }
 
-.inactive-params:hover {
-    background-color: grey;
+.c--discourse-body__container-list-current {
+    font-family: 'Roboto';
+    color: var(--black);
 }
 
-.param-switcher {
-    margin-top: 1em;
+.c--discourse-body__container-list span {
+    color: var(--black);
+    margin-right: var(--spacer-10);
 }
 
-.import-button {
-    background: #23d160;
-    color: white;
+.c--discourse-header__links {
+    margin-right: var(--spacer-20);
 }
 
-.export-button {
-    background: #4893cf;
-    color: white;
-}
-
-.default-button {
-    background: #FF8E00;
-    color: white;
-}
-
-.single-param {
-    padding-bottom: .5em;
-    border-bottom: 1px solid black;
-    overflow: auto;
+.c--discourse-body__container {
+    max-width: var(--max-inner-container-width);
+    margin: 0 auto;
+    position: relative;
+    overflow-x: scroll;
 }
