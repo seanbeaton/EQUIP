@@ -162,6 +162,26 @@ li {
     color: var(--white);
 }
 
+.o--form-labels {
+    font-family: 'Roboto Condensed', sans-serif;
+    font-weight: 700;
+    color: var(--teal);
+    font-size: 16px;
+}
+
+.o--form-input {
+    appearance: none;
+    -webkit-appearance: none;
+    height: 40px;
+    margin-bottom: var(--spacer-20);
+    padding-left: 15px;
+    font-family: 'Roboto', sans-serif;
+    font-size: 14px;
+    color: var(--gray);
+    width: 100%;
+    border: 1px solid #d2d2d2;
+}
+
 .o--modal-label {
     font-family: 'Roboto Condensed', sans-serif;
     font-size: 14px;

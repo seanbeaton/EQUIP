@@ -47,3 +47,27 @@
     position: relative;
     overflow-x: scroll;
 }
+
+.c--discourse-form__label-container {
+    margin-bottom: var(--spacer-10);
+    border-bottom: 1px solid var(--yellow);
+}
+
+.c--discourse-form__remove-button {
+    text-align: right;
+}
+
+.c--discourse-form__remove-button:hover {
+    color: var(--black) !important;
+}
+
+.c--discourse-form__save-button {
+    margin: 0 auto;
+    width: 380px !important;
+}
+
+.c--discourse-form__button-container {
+    display: inline-flex;
+    width: 100%;
+    justify-content: space-between;
+}

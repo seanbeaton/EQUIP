@@ -129,82 +129,6 @@ function loadDefaultSeqParams() {
   }
 }
 
-function addSeqFields() {
-  var formCounter = $("#paramForm .single-param").length;
-  var container = document.getElementById("paramForm");
-
-  var singleParam = $('<div/>', {
-      class: "single-param control myParam"+formCounter
-    }).appendTo(container);
-
-      $('<label/>', {
-        class: "label",
-        text: "Parameter Name:"
-      }).appendTo(singleParam);
-
-      $('<input/>', {
-        class: "input",
-        type: "text",
-        name: "label"+formCounter,
-        placeholder: "Name of your parameter"
-      }).appendTo(singleParam);
-
-      $('<label/>', {
-        class: "label",
-        text: "Options:"
-      }).appendTo(singleParam);
-
-      $('<input/>', {
-        class: "input",
-        type: "text",
-        style: "margin-bottom: .25em",
-        name: "parameter"+formCounter,
-        placeholder: "List the options for selection separated by commas (e.g. male, female, unspecificied)."
-      }).appendTo(singleParam);
-
-      removeButton = $('<button/>', {
-        class: "button is-small is-danger is-pulled-right removeSeq remove"+formCounter,
-        text: "Remove Parameter",
-        style: "margin-right: .5em"
-      }).appendTo(singleParam);
-
-      removeButton.click( function (e) {
-        e.preventDefault();
-        var test = $(this).parent().remove();
-      });
-
-      checkbox = $('<label/>', {
-        class: "checkbox",
-        text: "Toggle?"
-      }).appendTo(singleParam);
-
-      $('<input/>', {
-        class: "checkbox",
-        type: "checkbox",
-        style: "margin: .5em",
-        name: "toggle"+formCounter,
-      }).appendTo(checkbox);
-
-      toastr.options = {
-          "closeButton": false,
-          "debug": false,
-          "newestOnTop": false,
-          "progressBar": false,
-          "positionClass": "toast-bottom-right",
-          "preventDuplicates": false,
-          "onclick": null,
-          "showDuration": "300",
-          "hideDuration": "1000",
-          "timeOut": "2000",
-          "extendedTimeOut": "1000",
-          "showEasing": "swing",
-          "hideEasing": "linear",
-          "showMethod": "fadeIn",
-          "hideMethod": "fadeOut"
-        }
-        Command: toastr["info"]("Scroll to bottom to edit new parameter.","Parameter Added")
-}
-
 Template.editSequenceParameters.events({
 
   'click .help-button': function (e) {
@@ -291,18 +215,10 @@ Template.editSequenceParameters.events({
    e.preventDefault();
    Router.go('editSubjectParameters', {_envId:Router.current().params._envId});
  },
-'click #add-seq-param': function(e) {
-  e.preventDefault();
-  addSeqFields();
- },
 'click #load-default-seq': function(e) {
   e.preventDefault();
   loadDefaultSeqParams();
 },
-// 'click .remove-button': function(e) {
-//   e.preventDefault();
-//   alert("Not Working");
-// },
 'click #save-seq-params': function(e) {
   e.preventDefault();
   var parameterPairs = 0;
@@ -391,37 +307,63 @@ const EditSequence = () => {
             });
         });
     }
+    function addParamButtonEvent() {
+        let addButton = document.getElementById("add-seq-param");
+
+        addButton.addEventListener("click", addParamRowTemplate);
+    }
+    function addParamRowTemplate() {
+        var container = document.getElementById("paramForm");
+        container.innerHTML += oneParamRowTemplate();
+        addRemoveButtonEvents();
+    }
+    function oneParamRowTemplate() {
+        return `
+            <div class="single-param control myParam0">
+                <label class="o--form-labels">Parameter Name:</label>
+                <input class="o--form-input" type="text" name="label0" placeholder="Name of your parameter">
+                <label class="o--form-labels">Options:</label>
+                <input class="o--form-input" type="text" style="margin-bottom: .25em" name="parameter0" placeholder="List the options for selection separated by commas (e.g. male, female, unspecificied).">
+                <p class="o--toggle-links c--discourse-form__remove-button removeSeq">Remove</p>
+            </div>
+        `
+    }
     // Template for no paremeters
-    function noParamForm() {
+    function noParamFormTemplate() {
         return `
             <form id="paramForm">
                 <div class="single-param control myParam0">
-                    <label class="label">Parameter Name:</label>
-                    <input class="input" type="text" name="label0" placeholder="Name of your parameter">
-                    <label class="label">Options:</label>
-                    <input class="input" type="text" style="margin-bottom: .25em" name="parameter0" placeholder="List the options for selection separated by commas (e.g. male, female, unspecificied).">
-                    <p class="o--toggle-links removeSeq">
+                    <label class="o--form-labels">Parameter Name:</label>
+                    <input class="o--form-input" type="text" name="label0" placeholder="Name of your parameter">
+                    <label class="o--form-labels">Options:</label>
+                    <input class="o--form-input" type="text" style="margin-bottom: .25em" name="parameter0" placeholder="List the options for selection separated by commas (e.g. male, female, unspecificied).">
+                    <p class="o--toggle-links c--discourse-form__remove-button removeSeq">
                         Remove Parameter
                     </p>
+                    <p id="add-seq-param" class="c--discourse-form__add-button o--toggle-links">Add</p>
                 </div>
             </form>
         `
     }
     // Template for form with parameters set
-    function hasParamForm(paramObj, paramPair) {
+    function hasParamFormTemplate(paramObj, paramPair) {
         let numberOfParams = Array.apply(null, {length: paramPair}).map(Number.call, Number);
         let paramNodes = numberOfParams.map((index)=> {
             let label = paramObj[0]["children"]["label" + index];
-            let parameter = paramObj[0]["children"]["parameter" + index]
+            let parameter = paramObj[0]["children"]["parameter" + index];
+            let lastRow = paramPair === index + 1 ? oneParamRowTemplate() : "";
 
             return `
                 <div class="single-param control myParam0">
-                    <label class="label">Parameter Name:</label>
-                    <input class="input" type="text" name="label0" value="${label}">
-                    <label class="label">Options:</label>
-                    <input class="input" type="text" style="margin-bottom: .25em" name="parameter0" value="${parameter}">
-                    <p class="removeSeq o--toggle-links">Remove</p>
+                    <div class="c--discourse-form__label-container">
+                        <label class="o--form-labels">Parameter Name:</label>
+                    </div>
+                    <input class="o--form-input" type="text" name="label0" value="${label}">
+                    <label class="o--form-labels">Options:</label>
+                    <input class="o--form-input" type="text" style="margin-bottom: .25em" name="parameter0" value="${parameter}">
+                    <p class="removeSeq c--discourse-form__remove-button o--toggle-links">Remove</p>
                 </div>
+                ${lastRow}
             `
         }).join("");
 
@@ -443,10 +385,11 @@ const EditSequence = () => {
             : parameterPairs = parametersObj[0]["children"]["parameterPairs"];
 
         parameterPairs === 0
-            ? paramSection.innerHTML += noParamForm()
-            : paramSection.innerHTML += hasParamForm(parametersObj, parameterPairs);
+            ? paramSection.innerHTML += noParamFormTemplate()
+            : paramSection.innerHTML += hasParamFormTemplate(parametersObj, parameterPairs);
 
         addRemoveButtonEvents();
+        addParamButtonEvent();
     }
 
     return {
