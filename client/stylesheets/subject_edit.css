@@ -90,13 +90,6 @@
   position: absolute;
 }
 
-.c--student-body__container-drag-label {
-  font-family: 'Roboto Condensed', sans-serif;
-  word-wrap: break-word;
-  max-height: 50px;
-  overflow: hidden;
-  color: var(--orange);
-}
 
 
 

@@ -1,3 +1,5 @@
+/* OLD STYLES  */
+
 #edit-students-button {
     background: #009CFF;
     color: white;
@@ -5,11 +7,6 @@
 
 #edit-params-button {
     background: #005288;
-    color: white;
-}
-
-#show-all-observations {
-    background: #FF8E00;
     color: white;
 }
 

@@ -80,16 +80,15 @@ function createToggle(params, label) {
   if (params) {
     var choices = params.split(',');
     togglers = $('.toggle-dash');
-    var wrap = $('<div/>', {class: 'column'}).appendTo(togglers);
+    var wrap = $('<div/>', {class: 'column c--observation__toggle-container'}).appendTo(togglers);
     $("<p/>",{
       text: label,
-      class: 'label',
+      class: 'c--observation-toggle__label o--modal-label',
     }).appendTo(wrap);
-    $('<br/>', {}).appendTo(wrap);
-    var span = $('<span/>', {class:'select'}).appendTo(wrap);
+    var span = $('<span/>').appendTo(wrap);
 
     var select = $('<select/>', {
-        class:"toggle-item",
+        class:"c--observation-toggle_select",
         data_label: label
       }).appendTo(span);
 

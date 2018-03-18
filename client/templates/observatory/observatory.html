@@ -1,34 +1,39 @@
 <!-- HTML for the observatory -->
 
 <template name="observatory">
-  <section class="section">
-    <div class="shared-heading">
-      <h2 class="title is-4 back-head-params is-pulled-left">&#8592; Back to Classroom</h2>
-      <a class="button is-medium help-button is-pulled-right has-text-centered">Help!?</a>
-      <!-- CAN FIX UP THIS HELP BUTTON LATER -->
-    </div>
+  <section class="c--discourse-header__container">
+      <h1 class="c--discourse-header__title">Live Observation</h1>
+      <div class="c--discourse-header__links-container">
+          <p class="u--header-links" id="show-all-observations">Contribution Log</p>
+      </div>
   </section>
-  <section class="section">
-    <div class="columns">
-      <div class="column is-three-quarters">
-        <h1 class="title is-2 env-label-head">{{environment.envName}} - {{observation.name}} - Live Observation</h1>
+
+  <section class="c--observation-body__container">
+      <div>
+          <ul class="c--discourse-body__container-list-container">
+              <a href="{{pathFor 'environmentList'}}">
+                  <li class="c--discourse-body__container-list">Dashboard<span> &#62;</span></li>
+              </a>
+              <li class="c--discourse-body__container-list">{{environment.envName}}<span> &#62; </span></li>
+              <li class="c--discourse-body__container-list-current">Live Observation</li>
+          </ul>
+          <p>
+              To add a contribution, click on the student's name. To edit or delete
+              a contribution, click on the contribution log.
+          </p>
       </div>
-      <div class="column is-one-quarter">
-        <button class="button is-large floating-log" id="show-all-observations">Contribution Log</button>
-        <!-- <h2 id="obs-timer" class="subtitle is-4">00:00:00</h2> -->
+
+      <div class="columns c--observation-toggle__container toggle-dash">
+        <h3 class="column c--observation-toggle__title">Toggles</h3>
       </div>
-    </div>
-    <div class="columns is-multiline toggle-dash">
-      <h2 class="column subtitle is-3 toggle-label">TOGGLES</h2>
-    </div>
+      <div class="subjects">
+        {{#each subject}}
+          <div id="{{_id}}" style='transform:translate({{data_x}}px, {{data_y}}px);' data-x="{{data_x}}" data-y="{{data_y}}" class="dragger c--observation__student-box-container">
+            <p class="c--observation__student-box">{{info.name}}</p>
+          </div>
+        {{/each}}
+      </div>
   </section>
-  <div class="subjects">
-    {{#each subject}}
-      <div id="{{_id}}" style='transform:translate({{data_x}}px, {{data_y}}px);' data-x="{{data_x}}" data-y="{{data_y}}" class="dragger">
-        <p class="student-box">{{info.name}}</p>
-      </div>
-    {{/each}}
-  </div>
 
 
   <!-- MODAL FOR SEQ PARAMS -->
