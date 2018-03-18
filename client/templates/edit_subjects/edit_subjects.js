@@ -387,10 +387,7 @@ function studentParameterTemplate(subjects, paramPairs, student, type) {
 
 function attachOptionSelection() {
     var allNodes = document.querySelectorAll(".optionSelection");
-
-    Array.prototype.forEach.call(allNodes, (node) => {
-        node.addEventListener("click", handleOptionSelect);
-    })
+    [...allNodes].forEach((node) => { node.addEventListener("click", handleOptionSelect); });
 }
 
 var handleOptionSelect = function() {

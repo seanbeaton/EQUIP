@@ -159,20 +159,17 @@ Template.observatory.events({
     $('#seq-param-modal').removeClass('is-active');
     $('#seq-data-modal').removeClass('is-active');
   },
-  // 'click .floating-log': function (e) {
-  //   //Show editable table
-  //   createTableOfContributions();
-  //   $('#seq-data-modal').addClass('is-active');
-  // },
   'click #save-seq-params': function(e) {
     var info = {};
-    info['studentId'] = $('.student-modal-head').attr('data_id');
-    info['Name'] = $('.student-modal-head').attr('data_name');
+    info['studentId'] = $('.js-modal-header').attr('data_id');
+    info['Name'] = $('.js-modal-header').attr('data_name');
     envId = Router.current().params._envId;
     obsId = Router.current().params._obsId;
+
     var obsRaw = Observations.find({_id: obsId}).fetch()[0];
     var choices = [];
     var labels = [];
+
     $('.toggle-item').each(function () {
       if ($(this).attr('data_label') == "Contribution Defaults") {
         return;
@@ -181,13 +178,14 @@ Template.observatory.events({
       choices.push($(this).val());
     });
 
-    $('.subj-box-labels').each(function () {
+    $('.js-subject-labels').each(function () {
       var chosenElement = false;
-      var chosenElements = this.parentElement.querySelectorAll('.subj-box-params');
+      var chosenElements = this.nextElementSibling.querySelectorAll('.subj-box-params');
+
       labels.push(this.textContent);
       chosenElements.forEach(function(ele) {
         if ($(ele).hasClass('chosen')) {
-            choices.push(ele.textContent);
+            choices.push(ele.textContent.replace(/\n/ig, '').trim());
             chosenElement = true;
         }
       })
@@ -224,6 +222,7 @@ Template.observatory.events({
     if (result == false) {
       return;
     }
+
       seqId = $(e.target).attr("data_id");
       Meteor.call('sequenceDelete', seqId, function(error, result) {
         return 0;
@@ -251,8 +250,8 @@ Template.observatory.events({
     seqId = $(e.target).attr('data_seq');
 
     var info = {};
-      info['studentId'] = $('.student-modal-head').attr('data_id');
-      info['Name'] = $('.student-modal-head').attr('data_name');
+      info['studentId'] = $('.js-modal-header').attr('data_id');
+      info['Name'] = $('.js-modal-header').attr('data_name');
       envId = Router.current().params._envId;
       obsId = Router.current().params._obsId;
       var choices = [];
@@ -266,15 +265,21 @@ Template.observatory.events({
       });
 
 
-        $('.subj-box-labels').each(function () {
-          labels.push(this.textContent);
-          var c = $(this).siblings('.chosen')[0];
-          if (c) {
-            choices.push(c.textContent);
-          } else {
-            choices.push(null);
-          }
-        });
+    $('.js-subject-labels').each(function () {
+      var chosenElement = false;
+      var chosenElements = this.nextElementSibling.querySelectorAll('.subj-box-params');
+      labels.push(this.textContent);
+      chosenElements.forEach(function(ele) {
+        if ($(ele).hasClass('chosen')) {
+            choices.push(ele.textContent.replace(/\n/ig, '').trim());
+            chosenElement = true;
+        }
+      })
+
+      if (chosenElement === false) {
+          choices.push(undefined);
+      }
+    });
 
 
       for (label in labels) {
@@ -349,7 +354,7 @@ function contributionRowTemplate(seqItem, params) {
         <div class="contributions-grid-container">
             <h3 class="contributions-modal-header">${seqItem.info.Name}</h3>
             <p class="o--toggle-links contributions-modal-link edit-seq" data_id="${seqItem._id}" data_studentid="${seqItem.info.studentId}">Edit</p>
-            <p class="o--toggle-links contributions-modal-link delete-seq">Delete</p>
+            <p class="o--toggle-links contributions-modal-link delete-seq" data_id="${seqItem._id}" >Delete</p>
         </div>
         <div class="contributions-grid-item-container u--bold">
             <p class="o--modal-label contributions-grid-item">Time</p>
@@ -362,183 +367,112 @@ function contributionRowTemplate(seqItem, params) {
     `
 }
 
+// Saves a new observation
 function populateParamBoxes(subjId) {
-  $('#param-modal-content').children().remove();
-  var envId = Router.current().params._envId
-  seqParams = SequenceParameters.find({'children.envId':envId}).fetch()[0];
-  parameterPairs = seqParams["children"]["parameterPairs"];
-  var subj = Subjects.find({_id: subjId}).fetch()[0];
-  var student = subj.info.name;
+    $('#param-modal-content').children().remove();
+    var envId = Router.current().params._envId;
+    var seqParams = SequenceParameters.find({'children.envId':envId}).fetch()[0];
+    var parameterPairs = seqParams["children"]["parameterPairs"];
+    var subj = Subjects.find({_id: subjId}).fetch()[0];
+    var studentName = subj.info.name;
+    var modal = document.getElementById("param-modal-content");
+    var howDefault = $("*[data_label='Contribution Defaults']").val();
 
-  var howDefault = $("*[data_label='Contribution Defaults']").val();
+    modal.innerHTML += studentHeaderTemplate("Enter a contribution for " + studentName, studentName, subjId);
+    modal.innerHTML += studentParameterTemplate(seqParams, parameterPairs, null, "Save Contribution", null);
+    attachOptionSelection()
+}
 
-  var modal = $('#param-modal-content');
+// Edits an observation
+function editParamBoxes(seqId, subjId) {
+    $('#param-modal-content').children().remove();
+    var envId = Router.current().params._envId;
+    var seqParams = SequenceParameters.find({'children.envId':envId}).fetch()[0];
+    var seq = Sequences.find({_id: seqId}).fetch()[0]
+    var subj = Subjects.find({_id: subjId}).fetch()[0];
+    var parameterPairs = seqParams["children"]["parameterPairs"];
+    var studentName = subj.info.name;
+    var modal = document.getElementById("param-modal-content");
+    var howDefault = $("*[data_label='Contribution Defaults']").val();
 
-  var name = $("<div/>", {
-      class: "columns  boxes-wrapper"
-    }).appendTo(modal);
+    modal.innerHTML += studentHeaderTemplate("Edit contribution for " + studentName, studentName, subjId);
+    modal.innerHTML += studentParameterTemplate(seqParams, parameterPairs, seq, "Edit Contribution", seqId);
+    attachOptionSelection()
+}
 
-    var label = $("<h1/>", {
-      class: "column is-12 has-text-centered title is-3 student-modal-head",
-      text: "Enter Contribution for "+student,
-      data_id: subjId,
-      data_name: student
-    }).appendTo(name);
+function studentHeaderTemplate(type, studentName, subjId) {
+    return `
+        <div class="c--modal-header-container js-modal-header" data_id="${subjId}" data_name="${studentName}">
+            <h3 class="c--modal-header-title">${type}</h3>
+        </div>
+    `
+}
 
-  //
-  //BOX CREATION FOR MODAL
-  //
-  //go through each parameter pair and create a box
-  for (var param = 0; param<parameterPairs; param++) {
-    if(seqParams['children']['toggle'+param] == "on"){
-      continue;
+function studentParameterTemplate(sequences, paramPairs, seq, type, id) {
+    let saveBtn = type === "Save Contribution" ? "save-seq-params" : "edit-seq-params";
+    let counter = Array(paramPairs).fill().map((e,i) => i);
+    let boxes = counter.map((param) => {
+        let params = sequences['children']['parameter' + param];
+        let options = params.split(',');
+        let field = sequences['children']['label' + param];
+        let optionNodes = options.map((opt) => {
+            let selected = "";
+            if (field && seq) { selected = seq['info'][field] === opt.trim() ? "chosen" : "" }
+            return `
+                <div class="column has-text-centered subj-box-params ${selected} optionSelection">
+                    ${opt}
+                </div>
+            `
+        }).join("");
+        return `
+            <div class="c--modal-student-header js-subject-labels">${sequences['children']['label'+param]}</div>
+            <div class="c--modal-student-options-container">
+                ${optionNodes}
+            </div>
+        `
+    }).join("");
+
+    return `
+        <div class="boxes-wrapper">
+            ${boxes}
+        </div>
+        <div class="button-container">
+            <button class="o--standard-button u--margin-zero-auto" data_seq="${id}" id="${saveBtn}">
+                ${type}
+            </button>
+        </div>
+    `
+}
+
+function attachOptionSelection() {
+    var allNodes = document.querySelectorAll(".optionSelection");
+    [...allNodes].forEach((node) => { node.addEventListener("click", handleOptionSelect); });
+}
+
+var handleOptionSelect = function() {
+    $(this).siblings().removeClass('chosen');
+    if ( $(this).hasClass('chosen') ){
+      $(this).removeClass('chosen');
+    } else {
+      $(this).addClass('chosen');
     }
-    var wrap = $("<div/>", {
-      class: "columns  boxes-wrapper"
-    }).appendTo(modal);
-
-    var label = $("<div/>", {
-      class: "column is-2 has-text-centered subj-box-labels",
-      text: seqParams['children']['label'+param]
-    }).appendTo(wrap);
-
-    var field = seqParams['children']['label'+param];
-
-    var params = seqParams['children']['parameter'+param];
-    if (params) {
-        var options = params.split(',');
-        for (opt in options) {
-
-          if ( lastChoices[field] == options[opt] & howDefault == "Last Choices") {
-            var option = $("<div/>", {
-              class: "column has-text-centered subj-box-params chosen hoverable",
-              text: options[opt]
-            }).appendTo(wrap);
-            } else {
-
-              var option = $("<div/>", {
-                class: "column has-text-centered subj-box-params hoverable",
-                text: options[opt]
-              }).appendTo(wrap);
-            }
-
-            option.click(function (e) {
-              e.preventDefault();
-              $(this).siblings().removeClass('chosen');
-              if ( $(this).hasClass('chosen') ){
-                $(this).removeClass('chosen');
-              } else {
-                $(this).addClass('chosen');
-              }
-            });
-        }//end for
-    }
-  }//end for
-
-  $("<button/>", {
-    class: "button is-medium is-success",
-    id: "save-seq-params",
-    text: "Save Contribution"
-  }).appendTo(modal);
-
 }
 
 function convertTime(secs) {
-  var hours = Math.floor(secs / (60*60));
-  if (hours < 10) {
-    hours = '0' + hours;
-  }
-  var divisor_for_minutes = secs % (60 * 60);
-  var minutes = Math.floor(divisor_for_minutes / 60);
- if (minutes < 10) {
-    minutes = '0' + minutes;
-  }
-  var divisor_for_seconds = divisor_for_minutes % 60;
-  var seconds = Math.ceil(divisor_for_seconds);
-if (seconds < 10) {
-    seconds = '0' + seconds;
-  }
-  final_str = ''+hours+':'+minutes+':'+seconds;
-  return final_str;
-}
-
-function editParamBoxes(seqId, subjId) {
-  var seq = Sequences.find({_id: seqId}).fetch()[0]
-  $('#param-modal-content').children().remove();
-  var envId = Router.current().params._envId
-  var seqParams = SequenceParameters.find({'children.envId':envId}).fetch()[0];
-  var parameterPairs = seqParams["children"]["parameterPairs"];
-  var subj = Subjects.find({_id: subjId}).fetch()[0];
-  var student = subj.info.name;
-  var modal = $('#param-modal-content');
-
-  var name = $("<div/>", {
-      class: "columns  boxes-wrapper"
-    }).appendTo(modal);
-
-    var label = $("<h1/>", {
-      class: "column is-12 has-text-centered title is-3 student-modal-head",
-      text: "Editing Contribution for "+student,
-      data_id: subjId,
-      data_name: student
-    }).appendTo(name);
-
-  //
-  //BOX CREATION FOR MODAL
-  //
-  //go through each parameter pair and create a box
-  for (var param = 0; param<parameterPairs; param++) {
-    if(seqParams['children']['toggle'+param] == "on"){
-      continue;
+    var hours = Math.floor(secs / (60*60));
+    if (hours < 10) {
+        hours = '0' + hours;
     }
-    var wrap = $("<div/>", {
-      class: "columns  boxes-wrapper"
-    }).appendTo(modal);
-
-    var label = $("<div/>", {
-      class: "column is-2 has-text-centered subj-box-labels",
-      text: seqParams['children']['label'+param]
-    }).appendTo(wrap);
-
-    var field = seqParams['children']['label'+param];
-
-    var params = seqParams['children']['parameter'+param];
-
-    if (params) {
-      var options = params.split(',');
-
-      for (opt in options) {
-
-          if (seq['info'][field] == options[opt]) {
-            var option = $("<div/>", {
-            class: "column has-text-centered subj-box-params chosen hoverable",
-            text: options[opt]
-          }).appendTo(wrap);
-          } else {
-
-            var option = $("<div/>", {
-              class: "column has-text-centered subj-box-params hoverable",
-              text: options[opt]
-            }).appendTo(wrap);
-          }
-          option.click(function (e) {
-            e.preventDefault();
-            $(this).siblings().removeClass('chosen');
-            if ( $(this).hasClass('chosen') ){
-              $(this).removeClass('chosen');
-            } else {
-              $(this).addClass('chosen');
-            }
-          });
-      }//end for
+    var divisor_for_minutes = secs % (60 * 60);
+    var minutes = Math.floor(divisor_for_minutes / 60);
+    if (minutes < 10) {
+        minutes = '0' + minutes;
     }
-  }//end for
-
-  $("<button/>", {
-    class: "button is-medium is-success",
-    id: "edit-seq-params",
-    data_seq: seqId,
-    text: "Save Revised Contribution"
-  }).appendTo(modal);
-
+    var divisor_for_seconds = divisor_for_minutes % 60;
+    var seconds = Math.ceil(divisor_for_seconds);
+    if (seconds < 10) {
+        seconds = '0' + seconds;
+    }
+    final_str = ''+hours+':'+minutes+':'+seconds;
+    return final_str;
 }
