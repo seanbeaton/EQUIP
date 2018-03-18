@@ -26,6 +26,8 @@ Template.editSequenceParameters.helpers({
       var obs = Observations.find({envId:env[0]._id}, {sort: {lastModified: -1}}).fetch();
       if (obs.length === 0) {
           return true
+      } else {
+          return false
       }
   }
 });
@@ -191,9 +193,8 @@ const EditSequence = () => {
 
         if (obsMade) {
             var allRemoveButtons = document.querySelectorAll('.removeSeq');
-            Array.prototype.map.call(allRemoveButtons, function(btn) {
-                 btn.style.display = "none";
-            })
+
+            [...allRemoveButtons].forEach((button)=> { button.style.display = "none"; });
         }
     }
     function addRemoveButtonEvents() {
@@ -206,14 +207,17 @@ const EditSequence = () => {
     }
     function addParamButtonEvent() {
         let addButton = document.getElementById("add-seq-param");
-
-        addButton.addEventListener("click", addParamRowTemplate);
+        if (addButton) {
+            addButton.addEventListener("click", addParamRowTemplate);
+        }
     }
     function addLoadDefaultEvent() {
         let loadDefaultButton = document.getElementById("load-default-seq");
 
-        loadDefaultButton.addEventListener("click", loadDefaultParamTemplate);
-        addRemoveButtonEvents();
+        if (loadDefaultButton) {
+            loadDefaultButton.addEventListener("click", loadDefaultParamTemplate);
+            addRemoveButtonEvents();
+        }
     }
     function addParamRowTemplate() {
         let container = document.getElementById("paramForm");

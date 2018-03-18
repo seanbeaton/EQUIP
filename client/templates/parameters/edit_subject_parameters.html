@@ -1,15 +1,50 @@
 <!-- HTML for the edit subject parameters page, requested when the user goes to change parameters after initial setup -->
 
 <template name="editSubjectParameters">
-  <section class="section">
-    <div class="shared-heading">
-      <h2 class="title is-4 back-head-params is-pulled-left">&#8592; Back to Dashboard</h2>
-      <a class="button is-medium help-button is-pulled-right has-text-centered">Help!?</a>
-      <!-- CAN FIX UP THIS HELP BUTTON LATER -->
-    </div>
-  </section>
+    <section class="c--discourse-header__container">
+        <h1 class="c--discourse-header__title">Demographics</h1>
+        {{ #if hasObsMade }}
+        <div class="c--discourse-header__links-container">
+            <p id="load-default-demo" class="u--header-links c--student-discourse__links c--discourse-header__links">Load Default</p>
+            <p class="u--header-links c--discourse-header__links export-button">Export</p>
+            <p class="u--header-links c--discourse-header__links import-button">Import</p>
+        </div>
+        {{ else }}
+            <div id="obsMade"></div>
+        {{ /if }}
+    </section>
 
-  <section class="section params-control-panel">
+    <div class="c--discourse-body__container">
+        <div>
+            <ul class="c--discourse-body__container-list-container">
+                <a href="{{pathFor 'environmentList'}}">
+                    <li class="c--discourse-body__container-list">Dashboard<span> &#62;</span></li>
+                </a>
+                <li class="c--discourse-body__container-list">{{environment.envName}}<span> &#62; </span></li>
+                <li class="c--discourse-body__container-list-current">Demographics</li>
+            </ul>
+            <p>
+                Demographics are social markers like race, gender, etc. Click on load defaults to get a
+                basic set of demographics to work with. Modify these as appropriate,
+                separating each with a comma. Click the <i>Save Demographics</i> button when you
+                are finished for you changes to remain.
+            </p>
+        </div>
+
+        <div>
+            <div id="paramsSection"></div>
+            {{ #if hasObsMade }}
+                <div class="c--discourse-form__button-container">
+                    <button id="add-demo-param" class="o--standard-button c--discourse-form__save-button">Add</button>
+                    <button id="save-demo-params" class="o--standard-button c--discourse-form__save-button">Save Demographics</button>
+                </div>
+            {{ /if }}
+        </div>
+    </div>
+
+
+
+  <!-- <section class="section params-control-panel">
     <h1 class="title is-2 env-label-head">{{environment.envName}} - Demographics Parameters</h1>
     <div class="columns">
       <div class="column is-offset-1 param-switcher">
@@ -33,7 +68,7 @@
     {{ else }}
         <div id="obsMade"></div>
     {{ /if }}
-  </section>
+  </section> -->
 
   <section class="section">
     <div class="columns">
