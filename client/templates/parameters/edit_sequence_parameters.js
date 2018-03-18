@@ -30,105 +30,6 @@ Template.editSequenceParameters.helpers({
   }
 });
 
-function loadDefaultSeqParams() {
-
-  $('#paramForm').remove();
-
-  $('<form/>', {
-    id: 'paramForm',
-  }).appendTo('#paramsSection');
-
-  var container = document.getElementById("paramForm");
-  labels = ["Discourse Type", "Teacher Solicitation","Wait Time", "Solicitation Method", "Length of Talk", "Student Talk",  "Explicit Evaluation"]
-
-  for (i=0;i<labels.length;i++){
-     var singleParam = $('<div/>', {
-      class: "single-param control myParam"+i
-      }).appendTo(container);
-
-      $('<label/>', {
-        class: "label",
-        text: "Parameter Name:"
-      }).appendTo(singleParam);
-
-      $('<input/>', {
-        class: "input",
-        type: "text",
-        name: "label"+i,
-        value: labels[i],
-      }).appendTo(singleParam);
-
-      $('<label/>', {
-        class: "label",
-        text: "Options:"
-      }).appendTo(singleParam);
-
-      var inputValue = "";
-      if (labels[i] == "Discourse Type") {
-        inputValue = "Logistics,Content"
-      }
-      if (labels[i] == "Solicitation Method") {
-        inputValue  = "Called On,Not Called On"
-      }
-      if (labels[i] == "Wait Time") {
-        inputValue  = "Less than 3 seconds,3 or more seconds,N/A"
-      }
-      if (labels[i] == "Length of Talk") {
-        inputValue  = "1-4 words,5-20,21 or more"
-      }
-      if (labels[i] == "Student Talk") {
-        inputValue =  "How,What,Why,Other"
-      }
-      if (labels[i] == "Teacher Solicitation") {
-        inputValue =  "How,What,Why,Other"
-      }
-      if (labels[i] == "Explicit Evaluation") {
-        inputValue = "Yes,No"
-      }
-
-      $('<input/>', {
-        class: "input",
-        type: "text",
-        style: "margin-bottom: .25em",
-        name: "parameter"+i,
-        value: inputValue
-      }).appendTo(singleParam);
-
-      removeButton = $('<button/>', {
-        class: "button is-small is-danger is-pulled-right removeSeq remove"+i ,
-        text: "Remove Parameter",
-        style: "margin-right: .5em"
-      }).appendTo(singleParam);
-
-      removeButton.click( function (e) {
-        e.preventDefault();
-        var test = $(this).parent().remove();
-      });
-
-      checkbox = $('<label/>', {
-        class: "checkbox",
-        text: "Toggle?"
-      }).appendTo(singleParam);
-
-      if (labels[i] == "Discourse Type") {
-        $('<input/>', {
-          class: "checkbox",
-          type: "checkbox",
-          style: "margin: .5em",
-          name: "toggle"+i,
-          checked: true
-        }).appendTo(checkbox);
-      } else {
-        $('<input/>', {
-          class: "checkbox",
-          type: "checkbox",
-          style: "margin: .5em",
-          name: "toggle"+i,
-        }).appendTo(checkbox);
-      }
-  }
-}
-
 Template.editSequenceParameters.events({
 
   'click .help-button': function (e) {
@@ -215,10 +116,6 @@ Template.editSequenceParameters.events({
    e.preventDefault();
    Router.go('editSubjectParameters', {_envId:Router.current().params._envId});
  },
-'click #load-default-seq': function(e) {
-  e.preventDefault();
-  loadDefaultSeqParams();
-},
 'click #save-seq-params': function(e) {
   e.preventDefault();
   var parameterPairs = 0;
@@ -312,23 +209,92 @@ const EditSequence = () => {
 
         addButton.addEventListener("click", addParamRowTemplate);
     }
-    function addParamRowTemplate() {
-        var container = document.getElementById("paramForm");
-        container.innerHTML += oneParamRowTemplate();
+    function addLoadDefaultEvent() {
+        let loadDefaultButton = document.getElementById("load-default-seq");
+
+        loadDefaultButton.addEventListener("click", loadDefaultParamTemplate);
         addRemoveButtonEvents();
     }
-    function oneParamRowTemplate() {
+    function addParamRowTemplate() {
+        let container = document.getElementById("paramForm");
+        let lastIndex = document.querySelectorAll(".single-param").length + 1;
+
+        container.innerHTML += oneParamRowTemplate(lastIndex);
+        addRemoveButtonEvents();
+    }
+
+    function loadDefaultParamTemplate() {
+        let container = document.getElementById("paramForm");
+        container.innerHTML = loadParamTemplate();
+        addRemoveButtonEvents();
+    }
+    function loadParamTemplate() {
+        const defaultSequenceData = [
+            {
+                name: "Discourse Type",
+                input: "Logistics,Content"
+            },
+            {
+                name: "Teacher Solicitation",
+                input: "How,What,Why,Other"
+            },
+            {
+                name: "Wait Time",
+                input: "Less than 3 seconds,3 or more seconds,N/A"
+            },
+            {
+                name: "Solicitation Method",
+                input: "Called On,Not Called On"
+            },
+            {
+                name: "Length of Talk",
+                input: "1-4 words,5-20,21 or more"
+            },
+            {
+                name: "Student Talk",
+                input: "How,What,Why,Other"
+            },
+            {
+                name: "Explicit Evaluation",
+                input: "Yes,No"
+            }
+        ]
+
+        let defaultNodes = defaultSequenceData.map((data,idx) => {
+            return oneResultTemplate(data,idx)
+        }).join("");
+
         return `
-            <div class="single-param control myParam0">
+            <form id="paramForm">
+                ${defaultNodes}
+            </form>
+        `
+    }
+
+    function oneResultTemplate(data,idx) {
+        return `
+            <div class="single-param control myParam${idx}">
                 <label class="o--form-labels">Parameter Name:</label>
-                <input class="o--form-input" type="text" name="label0" placeholder="Name of your parameter">
+                <input class="o--form-input" type="text" name="label${idx}" value="${data.name}">
                 <label class="o--form-labels">Options:</label>
-                <input class="o--form-input" type="text" style="margin-bottom: .25em" name="parameter0" placeholder="List the options for selection separated by commas (e.g. male, female, unspecificied).">
+                <input class="o--form-input" type="text" style="margin-bottom: .25em" name="parameter${idx}" value="${data.input}">
                 <p class="o--toggle-links c--discourse-form__remove-button removeSeq">Remove</p>
             </div>
         `
     }
-    // Template for no paremeters
+
+    function oneParamRowTemplate(index) {
+        return `
+            <div class="single-param control myParam0">
+                <label class="o--form-labels">Parameter Name:</label>
+                <input class="o--form-input" type="text" name="label${index}" placeholder="Name of your parameter">
+                <label class="o--form-labels">Options:</label>
+                <input class="o--form-input" type="text" style="margin-bottom: .25em" name="parameter${index}" placeholder="List the options for selection separated by commas (e.g. male, female, unspecificied).">
+                <p class="o--toggle-links c--discourse-form__remove-button removeSeq">Remove</p>
+            </div>
+        `
+    }
+    // Template for no parameters
     function noParamFormTemplate() {
         return `
             <form id="paramForm">
@@ -337,10 +303,7 @@ const EditSequence = () => {
                     <input class="o--form-input" type="text" name="label0" placeholder="Name of your parameter">
                     <label class="o--form-labels">Options:</label>
                     <input class="o--form-input" type="text" style="margin-bottom: .25em" name="parameter0" placeholder="List the options for selection separated by commas (e.g. male, female, unspecificied).">
-                    <p class="o--toggle-links c--discourse-form__remove-button removeSeq">
-                        Remove Parameter
-                    </p>
-                    <p id="add-seq-param" class="c--discourse-form__add-button o--toggle-links">Add</p>
+                    <p class="o--toggle-links c--discourse-form__remove-button removeSeq">Remove</p>
                 </div>
             </form>
         `
@@ -351,16 +314,16 @@ const EditSequence = () => {
         let paramNodes = numberOfParams.map((index)=> {
             let label = paramObj[0]["children"]["label" + index];
             let parameter = paramObj[0]["children"]["parameter" + index];
-            let lastRow = paramPair === index + 1 ? oneParamRowTemplate() : "";
+            let lastRow = paramPair === index + 1 ? oneParamRowTemplate(index + 1) : "";
 
             return `
-                <div class="single-param control myParam0">
+                <div class="single-param control myParam${index}">
                     <div class="c--discourse-form__label-container">
                         <label class="o--form-labels">Parameter Name:</label>
                     </div>
-                    <input class="o--form-input" type="text" name="label0" value="${label}">
+                    <input class="o--form-input" type="text" name="label${index}" value="${label}">
                     <label class="o--form-labels">Options:</label>
-                    <input class="o--form-input" type="text" style="margin-bottom: .25em" name="parameter0" value="${parameter}">
+                    <input class="o--form-input" type="text" style="margin-bottom: .25em" name="parameter${index}" value="${parameter}">
                     <p class="removeSeq c--discourse-form__remove-button o--toggle-links">Remove</p>
                 </div>
                 ${lastRow}
@@ -390,6 +353,7 @@ const EditSequence = () => {
 
         addRemoveButtonEvents();
         addParamButtonEvent();
+        addLoadDefaultEvent();
     }
 
     return {
