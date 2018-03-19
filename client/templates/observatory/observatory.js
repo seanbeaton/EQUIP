@@ -378,8 +378,8 @@ function populateParamBoxes(subjId) {
     var modal = document.getElementById("param-modal-content");
     var howDefault = $("*[data_label='Contribution Defaults']").val();
 
-    modal.innerHTML += studentHeaderTemplate("Enter a contribution for " + studentName, studentName, subjId);
-    modal.innerHTML += studentParameterTemplate(seqParams, parameterPairs, null, "Save Contribution", null);
+    modal.innerHTML += contributionHeaderTemplate("Enter a contribution for " + studentName, studentName, subjId);
+    modal.innerHTML += contributionParameterTemplate(seqParams, parameterPairs, null, "Save Contribution", null);
     attachOptionSelection()
 }
 
@@ -395,12 +395,12 @@ function editParamBoxes(seqId, subjId) {
     var modal = document.getElementById("param-modal-content");
     var howDefault = $("*[data_label='Contribution Defaults']").val();
 
-    modal.innerHTML += studentHeaderTemplate("Edit contribution for " + studentName, studentName, subjId);
-    modal.innerHTML += studentParameterTemplate(seqParams, parameterPairs, seq, "Edit Contribution", seqId);
+    modal.innerHTML += contributionHeaderTemplate("Edit contribution for " + studentName, studentName, subjId);
+    modal.innerHTML += contributionParameterTemplate(seqParams, parameterPairs, seq, "Edit Contribution", seqId);
     attachOptionSelection()
 }
 
-function studentHeaderTemplate(type, studentName, subjId) {
+function contributionHeaderTemplate(type, studentName, subjId) {
     return `
         <div class="c--modal-header-container js-modal-header" data_id="${subjId}" data_name="${studentName}">
             <h3 class="c--modal-header-title">${type}</h3>
@@ -408,7 +408,7 @@ function studentHeaderTemplate(type, studentName, subjId) {
     `
 }
 
-function studentParameterTemplate(sequences, paramPairs, seq, type, id) {
+function contributionParameterTemplate(sequences, paramPairs, seq, type, id) {
     let saveBtn = type === "Save Contribution" ? "save-seq-params" : "edit-seq-params";
     let counter = Array(paramPairs).fill().map((e,i) => i);
     let boxes = counter.map((param) => {

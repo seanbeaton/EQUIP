@@ -414,5 +414,24 @@ input:-webkit-autofill {
   .logo {
     margin: 0;
   }
+}
 
+/*====================================
+	FOOTER STYLES
+====================================*/
+
+.c--app-footer__container {
+    max-width: var(--max-inner-container-width);
+    margin: 100px auto;
+    text-align: center;
+    border-top: 2px solid var(--black);
+}
+
+.c--app-footer__title {
+    margin: 15px 0px;
+}
+
+.c--app-footer__content {
+    color: var(--orange);
+    font-size: 14px;
 }
