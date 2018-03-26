@@ -6,4 +6,50 @@
         {{> yield}}
     </div>
     {{> footer}}
+    <div id="onboarding-modal" class="modal">
+      <div class="modal-background"></div>
+        <div id="data-modal-content" class="modal-content">
+            <div class="c--onboarding-modal__container">
+                <div class="c--onboarding-modal__header-container">
+                    <h1 class="c--onboarding-modal__header-title">New to EQUIP? Here's how it works.</h1>
+                </div>
+
+                <div class="c--onboard-modal__body-container">
+                    <div class="c--onboard-modal__body-content-container">
+                        <img class="c--onboard-modal__body-content-image" src="refresh/icon-create.svg">
+                        <h1 class="c-help-faq-create__body-title">Create</h1>
+                        <p class="c--onboard-modal__body-content">The classroom is where it all happens</p>
+                        <a class="c--onboard-modal__body-link" href="./help-faq">Learn More</a>
+                    </div>
+                    <div class="c--onboard-modal__body-content-container">
+                        <img class="c--onboard-modal__body-content-image" src="refresh/icon-customize.svg">
+                        <h1 class="c-help-faq-create__body-title">Customize</h1>
+                        <p class="c--onboard-modal__body-content">Customize aspects of the classroom you want to track</p>
+                        <a class="c--onboard-modal__body-link" href="./help-faq">Learn More</a>
+                    </div>
+                    <div class="c--onboard-modal__body-content-container">
+                        <img class="c--onboard-modal__body-content-image" src="refresh/icon-observe.svg">
+                        <h1 class="c-help-faq-create__body-title">Observe</h1>
+                        <p class="c--onboard-modal__body-content">Your custom and specific observations are tracked in EQUIP</p>
+                        <a class="c--onboard-modal__body-link" href="./help-faq">Learn More</a>
+                    </div>
+                    <div class="c--onboard-modal__body-content-container">
+                        <img class="c--onboard-modal__body-content-image" src="refresh/icon-analyze.svg">
+                        <h1 class="c-help-faq-create__body-title">Analyze</h1>
+                        <p class="c--onboard-modal__body-content">use EQUIP to analyze all the data you've tracked</p>
+                        <a class="c--onboard-modal__body-link" href="./help-faq">Learn More</a>
+                    </div>
+                </div>
+
+                <div class="o--standard-button c--onboard-modal__button">
+                    <a href="/environmentList?onboarding=true">Create A Class Room Now</a>
+                </div>
+
+                <div class="c--onboard-modal__footer-container">
+                    <p class="c--onboard-modal__footer-content"> Need additional guidance? Get it <a class="c--onboard-modal__footer-link" href="./help-faq">here.</a></p>
+                </div>
+            </div>
+        </div>
+        <button class="modal-close"></button>
+    </div>
 </template>

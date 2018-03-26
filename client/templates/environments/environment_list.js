@@ -3,11 +3,16 @@
 */
 
 Template.environmentList.rendered = function() {
-  $("#navEnv").removeClass("nav-blue-pulse");
-  var obj = Environments.find({}).fetch();
-  if ($.isEmptyObject(obj)) {
-    $('[data-toggle="popover2"]').popover('show').on('click',function(){ $(this).popover('hide')});
+  if (document.querySelector(".toggle-accordion")) {
+      document.querySelectorAll('.toggle-accordion')[0].click(); // main
+      document.querySelectorAll('.toggle-accordion')[1].click(); // observations
   }
+
+  var urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has("onboarding")) {
+        $('#onboarding-modal').removeClass("is-active");
+        $('#env-create-modal').addClass("is-active");
+    }
 }
 
 Template.environmentList.helpers({
@@ -153,9 +158,3 @@ Template.environmentList.events({
     $('#environmentName').val('');
   }
 });
-
-Template.environmentList.rendered = function () {
-    // opens the accordion in the first classroom.
-    document.querySelectorAll('.toggle-accordion')[0].click(); // main
-    document.querySelectorAll('.toggle-accordion')[1].click(); // observations
-}

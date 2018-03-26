@@ -1,3 +1,11 @@
+Template.helpFaq.rendered = function() {
+    let modal = document.getElementById("seq-data-modal");
+
+    if (modal) {
+        modal.classList.remove("is-active");
+    }
+}
+
 Template.helpFaq.helpers({
   accordion: function() {
       return [

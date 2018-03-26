@@ -196,8 +196,6 @@ li {
     white-space: nowrap;
 }
 
-
-
 .help-icon {
     background-image: url("/refresh/help-btn.svg");
     height: 70px;
@@ -206,11 +204,6 @@ li {
     top: 50%;
     right: 12%;
 }
-
-
-
-
-
 
 /*  @TODO OLD STYLES THAT NEED TO REMOVED */
 .alert-custom-info {
@@ -483,4 +476,8 @@ li {
   color: black;
   text-align: center;
   padding: 10px;
+}
+
+.modal-card-body {
+    margin-bottom: 0px;
 }

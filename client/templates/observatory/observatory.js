@@ -136,10 +136,7 @@ Template.observatory.events({
 
 
       populateParamBoxes(myId);
-
-
-  $('#seq-param-modal').addClass('is-active');
-
+      $('#seq-param-modal').addClass('is-active');
   },
   'click .help-button': function (e) {
     $('#help-env-modal').addClass("is-active");

@@ -1,7 +1,6 @@
 /*
 * JS file for header.html
 */
-
 Template.header.events({
      'click #signOut': function(e){
          Meteor.logout(function(){
@@ -38,6 +37,30 @@ Template.header.events({
                  dropDownSignIn.classList.add("login-dropdown-list-sign-in");
              }
          },0)
+     },
+     'click #login-buttons-password': function(e) {
+         debugger;
+         e.preventDefault();
+         if (e.target.innerText === "CREATE ACCOUNT") {
+             $('#onboarding-modal').addClass('is-active');
+         }
+
+     },
+     'keypress input': function(event) {
+         if (event.keyCode == 13) {
+             $('#onboarding-modal').addClass('is-active');
+             event.stopPropagation();
+             return false;
+         }
+     },
+     'click .modal-background': function(e){
+       $('#seq-param-modal').removeClass('is-active');
+       $('#onboarding-modal').removeClass('is-active');
+       $('#help-env-modal').removeClass("is-active");
+     },
+     'click .modal-close': function(e){
+       $('#seq-param-modal').removeClass('is-active');
+       $('#onboarding-modal').removeClass('is-active');
      }
 });
 
@@ -62,8 +85,6 @@ Template.header.rendered = function() {
             loginText.innerHTML = "";
         }
     },100)
-
-
 }
 
 var setBetaThankYouFlag = function() {
@@ -83,4 +104,23 @@ var setBetaThankYouFlag = function() {
     if (!user.profile.betaThankYou) {
         Meteor.users.update(Meteor.userId(),{$set: {profile: {betaThankYou:true}}});
     }
+}
+
+function closeModal() {
+    let closeButton = document.querySelector(".modal-close");
+    let modalBackground = document.querySelector(".modal-background");
+    let learnMoreLink = document.querySelector(".c--onboard-modal__body-link");
+    let modal = document.getElementById("onboarding-modal");
+
+    closeButton.addEventListener("click", (e) => {
+        modal.classList.remove("is-active");
+    });
+
+    modalBackground.addEventListener("click", (e) => {
+        modal.classList.remove("is-active");
+    });
+
+    learnMoreLink.addEventListener("click", (e) => {
+        modal.classList.remove("is-active");
+    });
 }

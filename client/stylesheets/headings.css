@@ -58,6 +58,14 @@ header {
     height: 50px;
 }
 
+#onboarding-modal #data-modal-content {
+    overflow: hidden;
+}
+
+.c--onboarding-modal__container {
+    margin-bottom: 0px;
+}
+
 .c-beta-thank-you__title {
     max-width: var(--max-container-width);
     padding-left: 30px;
@@ -66,6 +74,85 @@ header {
     margin: 0 auto;
     text-align: center;
 }
+
+.c--onboarding-modal__header-container {
+    background-color: var(--black);
+    margin-bottom: 0px;
+}
+
+.c--onboarding-modal__header-title {
+    color: var(--white);
+    font-size: 48px;
+}
+
+.c--onboard-modal__body-container {
+    display: grid;
+    grid-column-gap: 10px;
+    margin: 0px 60px;
+    text-align: left;
+}
+
+.c--onboard-modal__body-content-container {
+    grid-row: 1;
+    max-width: 200px;
+}
+
+.c--onboard-modal__body-content-image {
+    max-width: 85%;
+}
+
+.c-help-faq-create__image {
+    width: 100%;
+}
+
+.c-help-faq-create__body-title {
+    font-size: 40px;
+}
+
+.c--onboard-modal__body-content {
+    font-size: 14px;
+    font-family: 'Roboto Condensed', sans-serif;
+}
+
+.c--onboard-modal__body-link {
+    font-size: 14px;
+    font-family: 'Roboto Condensed', sans-serif;
+    color: var(--orange);
+    border-bottom: 1px solid;
+    padding-bottom: 1px;
+}
+
+.c--onboard-modal__button {
+    margin: 0 auto;
+    width: 400px !important;
+}
+
+.c--onboard-modal__button a {
+    color: var(--white);
+}
+
+.c--onboard-modal__footer-container {
+    margin-top: 40px;
+    margin-bottom: 0px;
+    height: 60px;
+    background-color: var(--teal);
+    display: flex;
+    align-items: center;
+    text-align: left;
+    padding-left: 40px;
+}
+
+.c--onboard-modal__footer-content {
+    color: var(--white);
+    font-family: 'Roboto Condensed', sans-serif;
+    font-size: 14px;
+}
+
+.c--onboard-modal__footer-link {
+    color: var(--orange);
+}
+
+
 
 /*====================================
   MENU STYLES
