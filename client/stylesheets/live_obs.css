@@ -3,6 +3,15 @@
     margin: 0 auto;
 }
 
+.c--observation-header__container {
+    background-color: var(--black);
+}
+
+.c--observation-header__title {
+    color: var(--white);
+    margin-left: 20px;
+}
+
 .c--observation-toggle__container {
     height: 100px;
     align-items: center;
@@ -11,7 +20,7 @@
 
 .c--observation__toggle-container {
     margin-bottom: 0px;
-    text-align: right;
+    text-align: left;
 }
 
 .c--observation__toggle-container:nth-child(3) {
