@@ -108,7 +108,6 @@ Template.observatory.helpers({
   },
   observation: function () {
     var obs = Observations.find({_id: Router.current().params._obsId}).fetch()[0];
-    debugger;
     return obs;
   },
   subject: function() {

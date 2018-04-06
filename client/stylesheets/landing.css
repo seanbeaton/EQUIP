@@ -32,10 +32,10 @@
 }
 
 .c--landing-page__main-container--right p {
-    padding: 30px 30px;
-    font-size: 27px;
-    line-height: 200%;
-    color: var(--white);
+    padding: 50px 50px;
+     font-size: 27px;
+     line-height: 180%;
+     color: var(--white);
 }
 
 .c--landing-page__c2a-container {

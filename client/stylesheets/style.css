@@ -28,9 +28,9 @@ body {
 
 h1 {
     font-family: 'Fredericka the Great', cursive;
-    font-size: 60px;
+    font-size: 100px;
     color: var(--black);
-    line-height: 180%;
+    line-height: 200%;
 }
 
 h2 {
@@ -67,7 +67,7 @@ h5 {
 p {
     font-family: 'Roboto', sans-serif;
     font-size: 21px;
-    line-height: 200%;
+    line-height: 180%;
     color: var(--black);
 }
 
@@ -121,11 +121,11 @@ li {
 
 .o--standard-button {
     margin-bottom: 0px;
-    font-family: 'Roboto', sans-serif !important;
-    font-size: 24px !important;
+    font-family: 'Roboto Condensed', sans-serif !important;
+    font-size: 30px !important;
     display: flex;
-    width: 200px;
-    height: 60px;
+    width: 300px;
+    height: 70px;
     align-items: center;
     justify-content: center;
     background-color: var(--orange) !important;

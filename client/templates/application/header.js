@@ -39,12 +39,10 @@ Template.header.events({
          },0)
      },
      'click #login-buttons-password': function(e) {
-         debugger;
          e.preventDefault();
          if (e.target.innerText === "CREATE ACCOUNT") {
              $('#onboarding-modal').addClass('is-active');
          }
-
      },
      'keypress input': function(event) {
          if (event.keyCode == 13) {
