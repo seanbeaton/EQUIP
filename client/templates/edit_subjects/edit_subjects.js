@@ -172,7 +172,7 @@ Template.editSubjects.events({
     Meteor.call('subjectPositionUpdate', subjects, function(error, result) {
         if (error) {
           alert(error.reason);
-        } else {
+      } else {
           toastr.options = {
           "closeButton": false,
           "debug": false,

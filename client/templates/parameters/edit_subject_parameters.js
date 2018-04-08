@@ -215,7 +215,7 @@ Template.editSubjectParameters.events({
       } else {
         toastr.options = {
           "closeButton": false,
-          "debug": false,
+          "debug": true,
           "newestOnTop": false,
           "progressBar": false,
           "positionClass": "toast-bottom-full-width",
@@ -223,8 +223,8 @@ Template.editSubjectParameters.events({
           "onclick": null,
           "showDuration": "300",
           "hideDuration": "1000",
-          "timeOut": "5000",
-          "extendedTimeOut": "1000",
+          "timeOut": "1000000",
+          "extendedTimeOut": "100000",
           "showEasing": "swing",
           "hideEasing": "linear",
           "showMethod": "fadeIn",

@@ -27,6 +27,7 @@ Template.header.events({
              var signInCloseBtn = document.querySelector('.login-close-text');
              if (signInCloseBtn) {
                  signInCloseBtn.innerHTML = "X";
+                 updateLoginText();
              }
          }, 0);
      },
@@ -83,25 +84,7 @@ Template.header.rendered = function() {
             loginText.innerHTML = "";
         }
     },100)
-}
-
-var setBetaThankYouFlag = function() {
-    var user = Meteor.user();
-    var counter = 5;
-
-    // retry until a user is returned.
-    while (counter > 0 ) {
-        if (!user) {
-            counter--;
-        } else {
-            break;
-        };
-    }
-    if (!user || Router.current().route.path().length > 2) return;
-
-    if (!user.profile.betaThankYou) {
-        Meteor.users.update(Meteor.userId(),{$set: {profile: {betaThankYou:true}}});
-    }
+    closeModal();
 }
 
 function closeModal() {

@@ -26,6 +26,7 @@
     padding-left: 1em;
     overflow: hidden;
     display: none;
+    background-color: var(--white);
 }
 
 .toggle-accordion {
@@ -45,7 +46,6 @@
 
 .toggle-sub {
     display: inline-flex;
-    padding-right: 35px;
     margin-bottom: 0px;
 }
 
@@ -88,13 +88,34 @@
     align-items: center;
 }
 
-.c--accordion-item__edit {
-    padding-right: var(--spacer-30);
+.c--accordion-item__edit-container {
+    display: inline-flex;
+    align-items: center;
+    margin: 0;
 }
 
 .c--accordion-item__icon {
     color: var(--gray);
     margin-left: var(--spacer-10);
+}
+
+.icon-container .tooltiptext {
+    visibility: hidden;
+    width: 120px;
+    background-color: var(--teal);
+    color: var(--white);
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 10px;
+
+    /* Position the tooltip */
+    position: absolute;
+    z-index: 1;
+    left: 77%;
+}
+
+.icon-container:hover .tooltiptext {
+    visibility: visible;
 }
 
 .c--accordion-item__edit:hover {
@@ -125,6 +146,7 @@
 .c--accordion-item_inner--count {
     text-align: left;
     font-size: 14px;
+    font-family: 'Roboto Condensed', sans-serif;
 }
 
 .observation-labels {
@@ -153,5 +175,6 @@
 .c--accordion-item__title-observation {
     color: var(--teal) !important;
     background-color: var(--light-teal) !important;
-    font-weight: 400;
+    font-weight: 700;
+    font-size: 24px !important;
 }

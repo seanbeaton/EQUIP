@@ -17,9 +17,12 @@
             <li class="c--accordion-item">
                 <div class="c--accordion-item__inner">
                     <h3 class="c--accordion-item__title">Demographics</h3>
-                    <p class="o--toggle-links c--accordion-item__edit" id="edit-class-params">
-                        Edit <i style="color:gray;" class="far fa-question-circle c--accordion-item__icon"></i>
-                    </p>
+                    <div class="c--accordion-item__edit-container">
+                        <p class="o--toggle-links c--accordion-item__edit" id="edit-class-params">
+                            Edit
+                        </p>
+                        <span class="icon-container"><i style="color:gray;" class="far fa-question-circle c--accordion-item__icon"></i><span class="tooltiptext">Edit demographics here </span></span>
+                    </div>
                 </div>
                 <div class="c--accordion-item__inner--labels">
                     <p class="demographic-labels">{{getSubjectParameters}}</p>
@@ -27,10 +30,13 @@
             </li>
             <li class="c--accordion-item">
                 <div class="c--accordion-item__inner">
-                    <h3 class="c--accordion-item__title">Discource Dimensions</h3>
-                    <p class="o--toggle-links c--accordion-item__edit" id="edit-sequence-params">
-                        Edit <i style="color:gray;" class="far fa-question-circle c--accordion-item__icon"></i>
-                    </p>
+                    <h3 class="c--accordion-item__title">Discourse Dimensions</h3>
+                    <div class="c--accordion-item__edit-container">
+                        <p class="o--toggle-links c--accordion-item__edit" id="edit-sequence-params">
+                            Edit
+                        </p>
+                        <span class="icon-container"><i style="color:gray;" class="far fa-question-circle c--accordion-item__icon"></i><span class="tooltiptext">Update Discourse Dimensions </span></span>
+                    </div>
                 </div>
                 <div class="c--accordion-item__inner--labels">
                     <p class="demographic-labels">{{getDiscourceParameters}}</p>
@@ -39,9 +45,12 @@
             <li class="c--accordion-item">
                 <div class="c--accordion-item__inner">
                     <h3 class="c--accordion-item__title">Student Roster</h3>
-                    <p class="o--toggle-links c--accordion-item__edit" id="edit-class-studs">
-                        Edit <i class="far fa-question-circle c--accordion-item__icon"></i>
-                    </p>
+                    <div class="c--accordion-item__edit-container">
+                        <p class="o--toggle-links c--accordion-item__edit" id="edit-class-studs">
+                            Edit
+                        </p>
+                        <span class="icon-container"><i style="color:gray;" class="far fa-question-circle c--accordion-item__icon"></i><span class="tooltiptext">Add Or Edit Your Student Roster</span></span>
+                    </div>
                 </div>
                 <div class="c--accordion-item__inner--labels">
                     <p class="demographic-labels">{{getStudents.names}}</p>
