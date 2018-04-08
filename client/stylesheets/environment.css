@@ -118,6 +118,10 @@
     visibility: visible;
 }
 
+.c--accordion-item__create-new-classroom {
+    padding-right: 10px;
+}
+
 .c--accordion-item__edit:hover {
     color: var(--black) !important;
 }
