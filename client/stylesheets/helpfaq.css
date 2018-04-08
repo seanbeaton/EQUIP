@@ -26,9 +26,11 @@
 
 .c-help-faq-create__title,
 .c-help-faq-customize__title {
+    font-family: 'Fredericka the Great', cursive;
     font-size: 50px;
     text-transform: uppercase;
-    color: #000;
+    color: var(--black);
+    font-weight: normal;
 }
 
 .c-help-faq-grid__container {

@@ -478,10 +478,6 @@ input:-webkit-autofill {
   }
 
   .header-container {
-    width: 90%;
-  }
-
-  .header-container {
     height: 200px;
     justify-content: space-between;
   }
@@ -525,14 +521,22 @@ input:-webkit-autofill {
     max-width: var(--max-inner-container-width);
     margin: 100px auto;
     text-align: center;
-    border-top: 2px solid var(--black);
+    border-top: 4px solid var(--black);
 }
 
 .c--app-footer__title {
-    margin: 15px 0px;
+    font-size: 21px;
+    line-height: 180%;
+    margin: 30px 0px 15px;
 }
 
 .c--app-footer__content {
+    display: inline;
+}
+
+.c--app-footer__content a {
     color: var(--orange);
     font-size: 14px;
+    border-bottom: 1px solid;
+    padding-bottom: 1px;
 }
