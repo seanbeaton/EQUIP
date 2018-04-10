@@ -14,8 +14,8 @@ Template.viewData.rendered = function() {
       name = envs[env]['envName'];
       id = envs[env]['_id'];
 
-      var button = $('<button>', {
-        class: "button is-medium classroom-selection",
+      var button = $('<div>', {
+        class: "o--box-container o--box classroom-selection",
         text: name,
         data_id: id
       }).appendTo(classButtons);
@@ -108,8 +108,8 @@ Template.viewData.events({
       name = obs[ob]['name'];
       id = obs[ob]['_id'];
 
-      var button = $('<button>', {
-        class: "button is-medium option-selectors",
+      var button = $('<div>', {
+        class: "o--box-container o--box option-selectors",
         text: name,
         data_id: id
       }).appendTo(obsButtons);
@@ -125,8 +125,8 @@ Template.viewData.events({
         });
     }
 
-    var SA = $('<button>', {
-        class: "button is-medium option-selectors",
+    var SA = $('<div>', {
+        class: "o--box-container o--box option-selectors",
         text: "Select All",
         data_id: 999
       }).appendTo(obsButtons);
@@ -142,8 +142,8 @@ Template.viewData.events({
       name = dparams['children']['label'+d];
       id = dparams['children']['label'+d];
 
-      var button = $('<button>', {
-        class: "button is-medium option-selectors",
+      var button = $('<div>', {
+        class: "o--box-container o--box option-selectors",
         text: name,
         data_id: id
       }).appendTo(demButtons);
@@ -159,8 +159,8 @@ Template.viewData.events({
         });
     }
 
-    var DSA = $('<button>', {
-        class: "button is-medium option-selectors",
+    var DSA = $('<div>', {
+        class: "o--box-container o--box option-selectors",
         text: "Select All",
         data_id: 999
       }).appendTo(demButtons);
@@ -176,8 +176,8 @@ Template.viewData.events({
       name = sparams['children']['label'+s];
       id = sparams['children']['label'+s];
 
-      var button = $('<button>', {
-        class: "button is-medium option-selectors",
+      var button = $('<div>', {
+        class: "o--box-container o--box option-selectors",
         text: name,
         data_id: id
       }).appendTo(seqButtons);
@@ -192,8 +192,8 @@ Template.viewData.events({
           }
         });
     }
-    var SSA = $('<button>', {
-        class: "button is-medium option-selectors",
+    var SSA = $('<div>', {
+        class: "o--box-container o--box option-selectors",
         text: "Select All",
         data_id: 999
       }).appendTo(seqButtons);

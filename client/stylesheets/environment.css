@@ -12,7 +12,13 @@
     margin-bottom: 0px;
 }
 
+
+.c--student-header__title {
+    font-size: 65px;
+}
+
 .c-dashboard__container--title {
+    font-size: 65px;
     margin-bottom: 0px;
 }
 

@@ -1,31 +1,54 @@
-.reset-button {
-    color: white;
-    background-color: #FF2B2E;
-    margin-right: 2em;
+.c--view-data-header__container {
+    display: inline-flex;
+    width: 100%;
+    justify-content: space-between;
+    margin-top: var(--spacer-40);
+    margin-bottom: 0px;
 }
 
-.export-data-button {
-    background: #4893cf;
-    color: white;
+.c--view-data-header__title {
+    font-size: 65px;
 }
 
-.export-class-button {
-    background: #4893cf;
-    color: white;
+.c--view-data-header__links-container {
+    display: inline-flex;
+    align-items: center;
+    margin-bottom: 0px;
+}
+
+.c--view-data-header__links {
+    margin-right: var(--spacer-20);
+    font-size: 24px !important;
+}
+
+.c--view-data__container {
+    max-width: var(--max-inner-container-width);
+    margin: 0 auto;
+}
+
+.c--view-data__container-title {
+    font-family: 'Roboto Condensed', sans-serif;
+    border-bottom: 1px solid var(--yellow);
+    line-height: 30px;
+    margin-bottom: 20px;
 }
 
 .classroom-selection {
-    color: white;
-    background: #005288;
-    margin: .5em;
-    min-width: 200px;
-    max-width: 300px;
+    position: inherit !important;
+    margin-right: 20px;
+    margin-bottom: 20px;
+    margin-left: 10px;
 }
 
 .option-selectors {
-    color: white;
-    background: #005288;
-    margin: .5em;
+    position: inherit !important;
+    margin-left: 10px;
+    margin-right: 20px;
+    margin-bottom: 20px;
+}
+
+.generate-button {
+    margin: 60px auto;
 }
 
 .dparam-selection {

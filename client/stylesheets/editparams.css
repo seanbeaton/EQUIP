@@ -7,6 +7,10 @@
     margin-bottom: 0px;
 }
 
+.c--discourse-header__title {
+    font-size: 65px;
+}
+
 .c--discourse-body__container-list-container {
     display: inline-flex;
 }
