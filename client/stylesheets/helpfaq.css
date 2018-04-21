@@ -53,6 +53,8 @@
 
 .c-faq-accordion__container {
     background-color: #C9EFEF;
+    margin-bottom: 5px;
+    cursor: pointer;
 }
 
 .c-faq-accordion__title {
@@ -61,4 +63,31 @@
 
 .c--accordion-item-copy {
     text-align: left;
+    margin: 15px 0px;
+}
+
+.c-faq {
+    max-width: var(--max-inner-container-width);
+    margin: 0 auto;
+}
+
+.c-faq__title {
+    color: var(--black);
+}
+
+.c-faq-table {
+    margin: 15px 0px;
+}
+
+.c-faq-table, th, td {
+    border: 1px solid var(--gray);
+}
+
+.c-faq-table th, .c-faq-table td  {
+    padding-left: 20px;
+}
+
+.c-faq-table th {
+    background-color: var(--black);
+    color: var(--white);
 }

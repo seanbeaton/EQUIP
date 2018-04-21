@@ -10,6 +10,7 @@ Template.observatory.created = function() {
   Session.set('envId', Router.current().params._envId);
   // createTableOfContributions()
   var labelsObj = SequenceParameters.find({'children.envId':Router.current().params._envId}).fetch();
+
   var parameterPairs = labelsObj[0]['children']['parameterPairs'];
   seqLabels = []
   for (i=0;i<parameterPairs;i++) {

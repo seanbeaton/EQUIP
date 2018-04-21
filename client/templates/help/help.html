@@ -1,4 +1,4 @@
-<template name="helpFaq">
+<template name="help">
     <section class="c-help-faq-header__container">
         <h1 class="c-help-faq-header__title">Help</h1>
     </section>
@@ -126,17 +126,5 @@
                 </div>
             </div>
         </section>
-
-        {{#each accordion}}
-          {{> helpAccordionItem }}
-        {{/each}}
-
-        <section>
-            <h1>FAQ</h1>
-            {{#each accordion}}
-              {{> helpAccordionItem }}
-            {{/each}}
-        </section>
-
     </section>
 </template>

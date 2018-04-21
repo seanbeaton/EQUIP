@@ -1,0 +1,32 @@
+<template name="faq">
+    <section class="c-help-faq-header__container">
+        <h1 class="c-help-faq-header__title">FAQ</h1>
+    </section>
+
+    <div class="c-faq">
+        <section>
+            <h2 class="c-faq__title">Understanding Equity & Inequity in Classrooms</h2>
+            {{#each understandingFaq}}
+              {{> helpAccordionItem }}
+            {{/each}}
+        </section>
+        <section>
+            <h2 class="c-faq__title">Using EQUIP</h2>
+            {{#each usingFaq}}
+              {{> helpAccordionItem }}
+            {{/each}}
+        </section>
+        <section>
+            <h2 class="c-faq__title">Making Sense of EQUIP Analytics</h2>
+            {{#each senseFaq}}
+              {{> helpAccordionItem }}
+            {{/each}}
+        </section>
+        <section>
+            <h2 class="c-faq__title">Security & Privacy</h2>
+            {{#each securityFaq}}
+              {{> helpAccordionItem }}
+            {{/each}}
+        </section>
+    </div>
+</template>

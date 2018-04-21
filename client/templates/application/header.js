@@ -27,7 +27,6 @@ Template.header.events({
              var signInCloseBtn = document.querySelector('.login-close-text');
              if (signInCloseBtn) {
                  signInCloseBtn.innerHTML = "X";
-                 updateLoginText();
              }
          }, 0);
      },
