@@ -31,7 +31,7 @@ function addSubjFields() {
 
       $('<label/>', {
         class: "label",
-        text: "Parameter Name:"
+        text: "Name:"
       }).appendTo(singleParam);
 
       $('<input/>', {
@@ -340,7 +340,7 @@ const EditDemographics = () => {
     function oneResultTemplate(data,idx) {
         return `
             <div class="single-param control myParam${idx}">
-                <label class="o--form-labels">Parameter Name:</label>
+                <label class="o--form-labels">Name:</label>
                 <input class="o--form-input" type="text" name="label${idx}" value="${data.name}">
                 <label class="o--form-labels">Options:</label>
                 <input class="o--form-input" type="text" style="margin-bottom: .25em" name="parameter${idx}" value="${data.input}">
@@ -352,7 +352,7 @@ const EditDemographics = () => {
     function oneParamRowTemplate(index) {
         return `
             <div class="single-param control myParam0">
-                <label class="o--form-labels">Parameter Name:</label>
+                <label class="o--form-labels">Name:</label>
                 <input class="o--form-input" type="text" name="label${index}" placeholder="Name of your parameter">
                 <label class="o--form-labels">Options:</label>
                 <input class="o--form-input" type="text" style="margin-bottom: .25em" name="parameter${index}" placeholder="List the options for selection separated by commas (e.g. male, female, unspecificied).">
@@ -365,7 +365,7 @@ const EditDemographics = () => {
         return `
             <form id="paramForm">
                 <div class="single-param control myParam0">
-                    <label class="o--form-labels">Parameter Name:</label>
+                    <label class="o--form-labels">Name:</label>
                     <input class="o--form-input" type="text" name="label0" placeholder="Name of your parameter">
                     <label class="o--form-labels">Options:</label>
                     <input class="o--form-input" type="text" style="margin-bottom: .25em" name="parameter0" placeholder="List the options for selection separated by commas (e.g. male, female, unspecificied).">
@@ -385,7 +385,7 @@ const EditDemographics = () => {
             return `
                 <div class="single-param control myParam${index}">
                     <div class="c--discourse-form__label-container">
-                        <label class="o--form-labels">Parameter Name:</label>
+                        <label class="o--form-labels">Name:</label>
                     </div>
                     <input class="o--form-input" type="text" name="label${index}" value="${label}">
                     <label class="o--form-labels">Options:</label>

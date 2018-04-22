@@ -107,17 +107,15 @@
 
 .icon-container .tooltiptext {
     visibility: hidden;
-    width: 120px;
+    width: 240px;
     background-color: var(--teal);
     color: var(--white);
-    text-align: center;
-    border-radius: 6px;
+    text-align: left;
+    border-radius: 3px;
     padding: 5px 10px;
-
-    /* Position the tooltip */
     position: absolute;
     z-index: 1;
-    left: 77%;
+    left: 76%;
 }
 
 .icon-container:hover .tooltiptext {
@@ -131,7 +129,6 @@
 .c--accordion-item__edit:hover {
     color: var(--black) !important;
 }
-
 
 .c--accordion-item__inner--labels {
     display: inline-flex;
@@ -161,10 +158,12 @@
 
 .observation-labels {
     width: 20%;
-    height: 50px;
+    height: 30px;
     text-align: left;
     margin-bottom: 20px;
-    padding-left: 15px;
+    padding-left: 5px;
+    font-size: 14px;
+    font-family: 'Roboto Condensed';
 }
 
 .c--modal-header-container {
