@@ -47,7 +47,7 @@ Template.environmentList.events({
    'click #env-create-button': function(e) {
     $('#env-create-modal').addClass("is-active");
   },
-    'click #env-close-modal': function(e) {
+   'click #env-close-modal': function(e) {
     $('#env-create-modal').removeClass("is-active");
   },
   'click .modal-card-foot .button': function(e) {
