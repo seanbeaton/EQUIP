@@ -53,6 +53,7 @@ header {
 
 #onboarding-modal #data-modal-content {
     overflow: hidden;
+    margin: 0;
 }
 
 .c--onboarding-modal__container {
@@ -103,6 +104,7 @@ header {
 
 .c--onboard-modal__body-content-image {
     max-width: 85%;
+    margin-bottom: -30px;
 }
 
 .c-help-faq-create__image {
@@ -111,11 +113,15 @@ header {
 
 .c-help-faq-create__body-title {
     font-size: 40px;
+    margin-bottom: -10px;
+    margin-left: 10px;
 }
 
 .c--onboard-modal__body-content {
     font-size: 14px;
     font-family: 'Roboto Condensed', sans-serif;
+    line-height: 150%;
+    margin-left: 10px;
 }
 
 .c--onboard-modal__body-link {
@@ -124,6 +130,7 @@ header {
     color: var(--orange);
     border-bottom: 1px solid;
     padding-bottom: 1px;
+    margin-left: 10px;
 }
 
 .c--onboard-modal__button {
@@ -148,7 +155,7 @@ header {
 
 .c--onboard-modal__footer-content {
     color: var(--white);
-    font-family: 'Roboto Condensed', sans-serif;
+    font-family: 'Roboto', sans-serif;
     font-size: 14px;
 }
 
