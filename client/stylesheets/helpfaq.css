@@ -24,6 +24,29 @@
     width: 50%;
 }
 
+.c--help-faq-customize__copy, .c--help-faq-create__copy {
+    font-family: 'Roboto', sans-serif;
+    font-size: 16px;
+    margin-bottom: 40px;
+}
+
+.c--help-faq-customize__title {
+    font-family: 'Roboto', sans-serif;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.c--help-faq-customize__list {
+    font-family: 'Roboto', sans-serif;
+    font-size: 16px;
+    margin: 10px 0px;
+}
+
+.c--help-faq-customize__sub-inner {
+    margin-left: 40px;
+    margin-bottom: 40px;
+}
+
 .c-help-faq-create__title,
 .c-help-faq-customize__title {
     font-family: 'Fredericka the Great', cursive;
@@ -31,6 +54,20 @@
     text-transform: uppercase;
     color: var(--black);
     font-weight: normal;
+}
+
+.c-help-faq-terminology__header {
+    font-weight: bold;
+    margin-bottom: var(--spacer-40);
+}
+
+.c-help-faq-terminology__title {
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.c-help-faq-terminology__content {
+    font-size: 16px;
 }
 
 .c-help-faq-grid__container {
@@ -90,4 +127,5 @@
 .c-faq-table th {
     background-color: var(--black);
     color: var(--white);
+    vertical-align: middle;
 }

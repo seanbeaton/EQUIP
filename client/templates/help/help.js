@@ -1,7 +1,9 @@
 Template.help.rendered = function() {
-    let modal = document.getElementById("seq-data-modal");
+    const  modal = document.getElementById("seq-data-modal");
+    const hash = window.location.hash;
 
-    if (modal) {
-        modal.classList.remove("is-active");
+    if (modal) { modal.classList.remove("is-active"); }
+    if (hash) {
+        $("html, body").animate({ scrollTop: $(hash).offset().top }, 1000);
     }
 }
