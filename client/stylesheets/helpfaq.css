@@ -26,20 +26,19 @@
 
 .c--help-faq-customize__copy, .c--help-faq-create__copy {
     font-family: 'Roboto', sans-serif;
-    font-size: 16px;
     margin-bottom: 40px;
 }
 
 .c--help-faq-customize__title {
     font-family: 'Roboto', sans-serif;
-    font-size: 16px;
     font-weight: bold;
 }
 
 .c--help-faq-customize__list {
     font-family: 'Roboto', sans-serif;
-    font-size: 16px;
+    font-size: 21px;
     margin: 10px 0px;
+    color: var(--black);
 }
 
 .c--help-faq-customize__sub-inner {
@@ -63,11 +62,6 @@
 
 .c-help-faq-terminology__title {
     font-weight: bold;
-    font-size: 16px;
-}
-
-.c-help-faq-terminology__content {
-    font-size: 16px;
 }
 
 .c-help-faq-grid__container {
@@ -85,7 +79,6 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 234px;
 }
 
 .c-faq-accordion__container {
