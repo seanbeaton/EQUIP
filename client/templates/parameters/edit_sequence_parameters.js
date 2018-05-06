@@ -344,23 +344,52 @@ const EditSequence = () => {
         `
     }
 
+    function hasParamWithObservationTemplate(paramObj, paramPair) {
+        let numberOfParams = Array.apply(null, {length: paramPair}).map(Number.call, Number);
+        let paramNodes = numberOfParams.map((index)=> {
+            let label = paramObj[0]["children"]["label" + index];
+            let parameter = paramObj[0]["children"]["parameter" + index];
+            let lastRow = paramPair === index + 1 ? oneParamRowTemplate(index + 1) : "";
+
+            return `
+                <div class="single-param control myParam${index}">
+                    <p>${label}</p>
+                    <p style="margin-bottom: .25em">${parameter}</p>
+                </div>
+            `
+        }).join("");
+
+        return `
+            <div>
+                ${paramNodes}
+            </div>
+        `
+    }
+
     function setDefaultSeqParams() {
+        let env = Environments.find({_id:Router.current().params._envId}).fetch();
         let envId = Router.current().params._envId;
         let parametersObj = SequenceParameters.find({'children.envId':envId}).fetch();
+        let obs = Observations.find({envId:env[0]._id}, {sort: {lastModified: -1}}).fetch();
         let paramSection = document.getElementById("paramsSection");
         let parameterPairs;
 
-        $.isEmptyObject(parametersObj)
-            ? parameterPairs = 0
-            : parameterPairs = parametersObj[0]["children"]["parameterPairs"];
+        if (obs.length > 0 ) {
+             parameterPairs = parametersObj[0]["children"]["parameterPairs"];
+             paramSection.innerHTML += hasParamWithObservationTemplate(parametersObj, parameterPairs);
+        } else {
+            $.isEmptyObject(parametersObj)
+                ? parameterPairs = 0
+                : parameterPairs = parametersObj[0]["children"]["parameterPairs"];
 
-        parameterPairs === 0
-            ? paramSection.innerHTML += noParamFormTemplate()
-            : paramSection.innerHTML += hasParamFormTemplate(parametersObj, parameterPairs);
+            parameterPairs === 0
+                ? paramSection.innerHTML += noParamFormTemplate()
+                : paramSection.innerHTML += hasParamFormTemplate(parametersObj, parameterPairs);
 
-        addRemoveButtonEvents();
-        addParamButtonEvent();
-        addLoadDefaultEvent();
+            addRemoveButtonEvents();
+            addParamButtonEvent();
+            addLoadDefaultEvent();
+        }
     }
 
     return {

@@ -40,6 +40,12 @@ Template.header.events({
      },
      'click #login-buttons-password': function(e) {
          e.preventDefault();
+         let errorMessage = document.querySelector(".error-message")
+
+         if (errorMessage && errorMessage.textContent.length > 0) {
+             return;
+         }
+
          if (e.target.innerText === "CREATE ACCOUNT") {
              $('#onboarding-modal').addClass('is-active');
          }

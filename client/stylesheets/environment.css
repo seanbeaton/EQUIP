@@ -145,7 +145,7 @@
     max-height: 600px;
 }
 
-.demographic-labels {
+.demographic-labels, .discourse-labels {
     width: 80%;
     text-align: left;
 }

@@ -25,7 +25,11 @@
                     </div>
                 </div>
                 <div class="c--accordion-item__inner--labels">
+                    {{#if hasObsMade}}
+                    <p class="demographic-labels">Demographic parameters are required before creating your first observation</p>
+                    {{else }}
                     <p class="demographic-labels">{{getSubjectParameters}}</p>
+                    {{/if}}
                 </div>
             </li>
             <li class="c--accordion-item">
@@ -39,7 +43,12 @@
                     </div>
                 </div>
                 <div class="c--accordion-item__inner--labels">
-                    <p class="demographic-labels">{{getDiscourceParameters}}</p>
+                    {{#if hasObsMade}}
+                        <p class="discourse-labels">Discourse parameters are required before creating your first observation.</p>
+                    {{else}}
+                        <p class="discourse-labels">{{getDiscourceParameters}}</p>
+                    {{/if}}
+
                 </div>
             </li>
             <li class="c--accordion-item">
@@ -68,7 +77,6 @@
                             {{#each observation in getObservations}}
                                 <p id="enter-class" class="observation-labels o--box-item" data-id={{observation._id}}>({{@index}}) {{observation.name}}</p>
                             {{/each}}
-
                             <p class="c--accordion-item_inner--count">Observations: {{getObservationsCount}}</p>
                         </div>
                     </li>

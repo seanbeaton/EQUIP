@@ -341,7 +341,7 @@ function studentInputTemplate() {
             <div class="c--modal-student-header">
                 <p>Name / Identifier for Student</p>
             </div>
-            <input class="c--modal-student-input" id="student-name" type="text" placeholder="e.g. Joey or Male Student">
+            <input class="c--modal-student-input" id="student-name" type="text" placeholder="Type Student's First Name, Initials, or Pseudonym">
         </div>
     `
 }

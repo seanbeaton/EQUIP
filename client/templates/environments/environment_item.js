@@ -123,6 +123,9 @@ Template.environmentItem.helpers({
     },
     getSubjectParameters: function() {
         var subjectParameters =  SubjectParameters.find({'children.envId': this._id}).fetch();
+
+        if (subjectParameters.length === 0) return;
+
         var parsedSubjectParameters = subjectParameters[0].children;
         var labels = [];
         for (student in parsedSubjectParameters) {
@@ -169,6 +172,12 @@ Template.environmentItem.helpers({
     },
     getObservationsCount: function() {
         return Observations.find({envId:this._id}, {sort: {lastModified: -1}}).count();
+    },
+    hasObsMade: function() {
+        var obs = Observations.find({envId:this._id}, {sort: {lastModified: -1}}).fetch();
+        if (obs.length === 0) {
+            return true
+        }
     },
     getEnvName: function() {
         return this.envName;
