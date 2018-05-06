@@ -103,11 +103,6 @@ Template.editSubjectParameters.events({
    e.preventDefault();
    Router.go('observationList', {_envId:Router.current().params._envId});
  },
- 'click .obs-param-button': function(e) {
-   e.preventDefault();
-
-   Router.go('editSequenceParameters', {_envId:Router.current().params._envId});
- },
  'click .import-button': function (e) {
     var envId = Router.current().params._envId;
     var element = document.createElement('div');
@@ -124,7 +119,6 @@ Template.editSubjectParameters.events({
             reader.onload = function() {
                 var contents = reader.result;
                 jsonImport = JSON.parse(contents);
-                console.log(jsonImport);
                 if ('label0' in jsonImport) {
                   jsonImport['envId'] = envId;
 
@@ -223,8 +217,8 @@ Template.editSubjectParameters.events({
           "onclick": null,
           "showDuration": "300",
           "hideDuration": "1000",
-          "timeOut": "1000000",
-          "extendedTimeOut": "100000",
+          "timeOut": "5000",
+          "extendedTimeOut": "5000",
           "showEasing": "swing",
           "hideEasing": "linear",
           "showMethod": "fadeIn",
@@ -232,7 +226,9 @@ Template.editSubjectParameters.events({
         }
         Command: toastr["success"]("NOTE: After the first observation is created, you will not be able to edit discourse dimensions or demographics.","Save Successful","Demographic Parameters");
       }
-      Router.go('editSequenceParameters', {_envId:Router.current().params._envId});
+      setTimeout(() => {
+          window.location.href = "/environmentList"
+      },1000)
     });
   } else {
     Meteor.call('updateSubjParameters', clean_obj, function(error, result) {
@@ -258,8 +254,10 @@ Template.editSubjectParameters.events({
         }
         Command: toastr["success"]("NOTE: After the first observation is created, you will not be able to edit discourse dimensions or demographics.","Save Successful","Demographic Parameters");
       }
-
     });
+    setTimeout(() => {
+        window.location.href = "/environmentList"
+    },1000)
   }
 }
 });

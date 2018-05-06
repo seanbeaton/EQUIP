@@ -134,6 +134,9 @@ Template.environmentItem.helpers({
     },
     getDiscourceParameters: function() {
         var sequenceParameters = SequenceParameters.find({'children.envId': this._id}).fetch();
+
+        if (sequenceParameters.length === 0) return;
+
         var parsedDiscourseParameters = sequenceParameters[0].children;
         var labels = [];
 
