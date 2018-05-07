@@ -118,6 +118,9 @@ Template.environmentItem.events({
 
 
 Template.environmentItem.helpers({
+    incrementIndex: function(index) {
+        return index + 1;
+    },
     getEnvironmentId: function() {
         return this._id;
     },
@@ -168,7 +171,7 @@ Template.environmentItem.helpers({
         return Subjects.find({userId: user._id}).count();
     },
     getObservations: function() {
-        return Observations.find({envId:this._id}, {sort: {lastModified: -1}}).fetch();
+        return Observations.find({envId:this._id}, {sort: {datefield: 1}}).fetch();
     },
     getObservationsCount: function() {
         return Observations.find({envId:this._id}, {sort: {lastModified: -1}}).count();
