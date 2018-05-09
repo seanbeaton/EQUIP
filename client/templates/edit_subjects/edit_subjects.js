@@ -40,7 +40,6 @@ interact('.draggable')
     target.style.webkitTransform =
     target.style.transform =
       'translate(' + x + 'px, ' + y + 'px)';
-
     // update the posiion attributes
     target.setAttribute('data-x', x);
     target.setAttribute('data-y', y);
@@ -124,18 +123,11 @@ Template.editSubjects.events({
         info[labels[label]] = choices[label];
     }
 
-    var students = Subjects.find({envId:Router.current().params._envId}).fetch();
-    count = 0;
-    _.each(students, function (s) {
-      if (s['data_x'] == '0') {
-        count++;
-      }
-    });
-
-    y = count*30 + 30;
+    // @FUTURE: Would be great to have a grid that positions
+    // based on a users view of the classroom.
     var subject = {
-      data_x: '0',
-      data_y: String(y),
+      data_x: '50',
+      data_y: String(200),
       envId: this._id,
       info: info
     };
