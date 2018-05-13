@@ -214,12 +214,16 @@ li {
 }
 
 .o--box-item {
-    background-color: var(--light-gray);
+    background-color: #898989;
     color: var(--orange);
     cursor: pointer;
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
+}
+
+.o--required-star {
+    color: var(--orange);
 }
 
 .help-icon {

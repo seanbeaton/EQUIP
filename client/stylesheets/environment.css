@@ -85,6 +85,22 @@
     text-align: center;
 }
 
+.c--accordion-item-label-inner {
+    display: block;
+    text-align: left;
+    position: relative;
+    top: 25px;
+    left: 22px;
+    margin: 0;
+}
+
+.c--accordion-item-label {
+    text-transform: uppercase;
+    color: var(--teal);
+    opacity: .8;
+}
+
+
 .c--accordion-item__inner {
     margin: 20px 0;
     display: inline-flex;
@@ -155,6 +171,15 @@
     text-align: left;
     font-size: 14px;
     font-family: 'Roboto Condensed', sans-serif;
+}
+
+.c--accordion-item_guide {
+    text-align: left;
+    font-size: 14px;
+    font-family: 'Roboto Condensed', sans-serif;
+    font-weight: bold;
+    margin-top: 20px;
+    margin-left: 30px;
 }
 
 .observation-labels {

@@ -32,6 +32,11 @@
             </div>
             {{#if currentUser}}
             <nav class="main-menu">
+                <ul class="c-main-menu__not-signed-in--ul">
+                    <li class="c-main-menu__not-signed-in--li" style="margin: 25px 0px"><a href="/">HOME</a></li>
+                    <li class="c-main-menu__not-signed-in--li" style="margin: 25px 0px"><a href="{{pathFor 'aboutPage'}}">About</a></li>
+                    <li class="c-main-menu__not-signed-in--li" style="margin: 25px 0px"><a href="{{pathFor 'help'}}">Help</a></li>
+                </ul>
                 <div class="dropdown-wrapper menu-button">
                     <a class="menu-button menu-button-header" href="#">{{currentUser.username}}
                         <i style="width: .325em" class="fa fa-caret-down"></i>

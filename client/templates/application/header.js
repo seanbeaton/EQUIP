@@ -38,25 +38,6 @@ Template.header.events({
              }
          },0)
      },
-     'click #login-buttons-password': function(e) {
-         e.preventDefault();
-         let errorMessage = document.querySelector(".error-message")
-
-         if (errorMessage && errorMessage.textContent.length > 0) {
-             return;
-         }
-
-         if (e.target.innerText === "CREATE ACCOUNT") {
-             $('#onboarding-modal').addClass('is-active');
-         }
-     },
-     'keypress input': function(event) {
-         if (event.keyCode == 13) {
-             $('#onboarding-modal').addClass('is-active');
-             event.stopPropagation();
-             return false;
-         }
-     },
      'click .modal-background': function(e){
        $('#seq-param-modal').removeClass('is-active');
        $('#onboarding-modal').removeClass('is-active');

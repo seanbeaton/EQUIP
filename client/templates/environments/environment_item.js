@@ -153,6 +153,22 @@ Template.environmentItem.helpers({
         }
         return labels.join(", ")
     },
+    isClassValidated: function() {
+        var user = Meteor.user();
+        var sequenceParameters = SequenceParameters.find({'children.envId': this._id}).fetch();
+        var subjectParameters =  SubjectParameters.find({'children.envId': this._id}).fetch();
+        var students = Subjects.find({userId: user._id}).fetch();
+        var validation = true;
+        var parameters = [sequenceParameters.length, subjectParameters.length, students.length];
+
+        parameters.forEach((p) => {
+            if (p === 0) {
+                validation = false;
+            }
+        });
+
+        return validation;
+    },
     getStudents: function() {
         var user = Meteor.user();
         var students = Subjects.find({userId: user._id}).fetch();
