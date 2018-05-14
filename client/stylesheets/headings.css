@@ -50,10 +50,14 @@ header {
     letter-spacing: .1em;
 }
 
+.modal-background {
+    margin: 0;
+}
 
-#onboarding-modal #data-modal-content {
+#onboarding-modal{
     overflow: hidden;
     margin: 0;
+    z-index: 9999;
 }
 
 .c--onboarding-modal__container {
@@ -118,7 +122,6 @@ header {
 }
 
 .c--onboard-modal__body-content {
-    font-size: 14px;
     font-family: 'Roboto Condensed', sans-serif;
     line-height: 150%;
     margin-left: 10px;

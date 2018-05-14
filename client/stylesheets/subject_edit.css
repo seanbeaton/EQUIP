@@ -88,8 +88,12 @@
   height: 50px;
   text-align: center;
   position: absolute;
+  background-color: #898989;
 }
 
+.c--student-body__container-drag-label {
+    color: var(--white);
+}
 
 
 

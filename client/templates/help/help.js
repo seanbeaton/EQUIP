@@ -1,23 +1,19 @@
-import Siema from 'siema';
-
+import slick from 'slick-carousel';
 
 Template.help.rendered = function() {
-    const help = document.querySelector(".js-help-carousel");
-    const helpSiema = new Siema({
-        selector: help,
-        loop: true
+    $('.js-help-carousel').slick({
+        arrows: true,
+        dots: true
     });
 
-    const customize = document.querySelector(".js-customize-carousel");
-    const customizeSiema = new Siema({
-        selector: customize,
-        loop: true
+    $('.js-customize-carousel').slick({
+        arrows: true,
+        dots: true
     });
 
-    const observe= document.querySelector(".js-observe-carousel");
-    const observeSiema = new Siema({
-        selector: observe,
-        loop: true
+    $('.js-observe-carousel').slick({
+        arrows: true,
+        dots: true
     });
 
     const modal = document.getElementById("seq-data-modal");

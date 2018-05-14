@@ -214,7 +214,7 @@ li {
 }
 
 .o--box-item {
-    background-color: #898989;
+    background-color: var(--light-gray);
     color: var(--orange);
     cursor: pointer;
     text-overflow: ellipsis;
