@@ -4,25 +4,35 @@
     </section>
 
     <div class="c-faq">
-        <section>
+        <div class="c-faq__select-inner">
+            <select class="c-faq__select js-faq__select">
+                <option selected disabled>Select a FAQ Section</option>
+                <option value="understanding">Understanding Equity & Inequity in Classrooms</option>
+                <option value="using">Using EQUIP</option>
+                <option value="making">Making Sense of EQUIP Analytics</option>
+                <option value="security">Security & Privacy</option>
+                <option>See All FAQ</option>
+            </select>
+        </div>
+        <section class="c-faq__inner js-faq__understanding">
             <h2 class="c-faq__title">Understanding Equity & Inequity in Classrooms</h2>
             {{#each understandingFaq}}
               {{> helpAccordionItem }}
             {{/each}}
         </section>
-        <section>
+        <section class="c-faq__inner js-faq__using">
             <h2 class="c-faq__title">Using EQUIP</h2>
             {{#each usingFaq}}
               {{> helpAccordionItem }}
             {{/each}}
         </section>
-        <section>
+        <section class="c-faq__inner js-faq__making">
             <h2 class="c-faq__title">Making Sense of EQUIP Analytics</h2>
             {{#each senseFaq}}
               {{> helpAccordionItem }}
             {{/each}}
         </section>
-        <section>
+        <section class="c-faq__inner js-faq__security">
             <h2 class="c-faq__title">Security & Privacy</h2>
             {{#each securityFaq}}
               {{> helpAccordionItem }}

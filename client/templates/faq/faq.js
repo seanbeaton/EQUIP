@@ -1,3 +1,14 @@
+Template.faq.rendered = function() {
+    const filterFaqSelectButton = document.querySelector(".js-faq__select");
+
+    filterFaqSelectButton.addEventListener("click", () => {
+
+    })
+}
+
+
+
+
 Template.faq.helpers({
   understandingFaq: function() {
       return [
@@ -89,5 +100,55 @@ Template.faq.events({
 
       $(ele).next().toggleClass('show');
       $(ele).next().slideToggle(350);
+  },
+  'change .js-faq__select': function(e) {
+      const allSections =  document.querySelectorAll(".c-faq__inner");
+      let faqName;
+      switch(e.target.value) {
+      case "understanding":
+            faqName = "js-faq__understanding";
+            [...allSections].forEach((section) => {
+                if (section.classList.contains(faqName)) {
+                    section.classList.remove("hide");
+                } else {
+                    section.classList.add("hide");
+                }
+            })
+            break;
+        case "using":
+              faqName = "js-faq__using";
+              [...allSections].forEach((section) => {
+                  if (section.classList.contains(faqName)) {
+                      section.classList.remove("hide");
+                  } else {
+                      section.classList.add("hide");
+                  }
+              })
+              break;
+      case "making":
+            faqName = "js-faq__making";
+            [...allSections].forEach((section) => {
+                if (section.classList.contains(faqName)) {
+                    section.classList.remove("hide");
+                } else {
+                    section.classList.add("hide");
+                }
+            })
+            break;
+        case "security":
+              faqName= "js-faq__security";
+              [...allSections].forEach((section) => {
+                  if (section.classList.contains(faqName)) {
+                      section.classList.remove("hide");
+                  } else {
+                      section.classList.add("hide");
+                  }
+              })
+              break;
+      default:
+      [...allSections].forEach((section) => {
+          section.classList.remove("hide");
+      })
     }
+  }
 });

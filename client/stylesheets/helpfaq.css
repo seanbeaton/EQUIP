@@ -140,3 +140,43 @@
     color: var(--white);
     vertical-align: middle;
 }
+
+.c-faq__select-inner {
+    color: gray;
+    overflow: hidden;
+    position: relative;
+    border-radius: 3px;
+    max-width: 420px;
+}
+
+.c-faq__select-inner:after {
+    content: "▼";
+    padding: 12px 8px;
+    position: absolute;
+    right: 25px;
+    top: 7px;
+    z-index: 1;
+    text-align: center;
+    width: 10%;
+    height: 100%;
+    pointer-events: none;
+}
+.c-faq__select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  /* Add some styling */
+
+  display: block;
+  height: 50px;
+  margin: 5px 0px;
+  padding: 0px 24px 0px 10px;
+  font-size: 16px;
+  line-height: 1.75;
+  color: #333;
+  background-color: #ffffff;
+  background-image: none;
+  border: 1px solid #cccccc;
+  -ms-word-break: normal;
+  word-break: normal;
+}
