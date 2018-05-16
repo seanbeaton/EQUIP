@@ -96,6 +96,8 @@ Template.environmentItem.events({
       // Bubble up to parent element so accordion toggles correctly
       if (ele.nodeName === "H3" || ele.nodeName === "SPAN") {
           ele = ele.parentElement;
+      } else if(ele.innerText === "EXPORT" || ele.innerText === "IMPORT") {
+          return;
       }
 
       $(ele).next().toggleClass('show');

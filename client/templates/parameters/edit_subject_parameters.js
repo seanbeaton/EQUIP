@@ -168,10 +168,10 @@ Template.editSubjectParameters.events({
 
 'click #save-demo-params': function(e) {
   e.preventDefault();
+  let parameterPairs = 0;
+  const form = document.querySelector('#paramForm');
+  const obj = serialize(form, { hash: true, empty: false });
 
-  var parameterPairs = 0;
-  var form = document.querySelector('#paramForm');
-  var obj = serialize(form, { hash: true, empty: false });
   for (key in obj) {
     if (key.includes('label')){
       num = key.split('label')[1];
@@ -181,6 +181,8 @@ Template.editSubjectParameters.events({
         alert('One of your parameters has a label but no options. Please fix this issue and try saving again.')
         return;
       }
+    } else {
+        obj[key] = obj[key].split(",").filter(function(o) { return o }).join(",");
     }
   }
   var clean_obj = {}
@@ -283,8 +285,11 @@ const EditDemographics = () => {
     function addRemoveButtonEvents() {
         let removeButtons = document.querySelectorAll(".removeDem");
         [...removeButtons].forEach((button) => {
-            button.addEventListener("click", (event) => {
-                event.target.parentElement.remove();
+            $(button).unbind("click").click(function(){
+                var result = confirm("Are you sure you want to delete?");
+                if (result) {
+                    event.target.parentElement.remove();
+                }
             });
         });
     }
@@ -305,9 +310,9 @@ const EditDemographics = () => {
     }
     function addParamRowTemplate() {
         let container = document.getElementById("paramForm");
-        let lastIndex = document.querySelectorAll(".single-param").length + 1;
+        let lastIndex = document.querySelectorAll(".single-param").length;
 
-        container.innerHTML += oneParamRowTemplate(lastIndex);
+        container.insertAdjacentHTML('beforeend', oneParamRowTemplate(lastIndex));
         addRemoveButtonEvents();
     }
 
@@ -385,10 +390,10 @@ const EditDemographics = () => {
             let lastRow = paramPair === index + 1 ? oneParamRowTemplate(index + 1) : "";
 
             return `
-                <div class="single-param control myParam${index}">
-                    <p>${label}</p>
+                <article class="single-param control myParam${index}">
+                    <h3>${label}</h3>
                     <p style="margin-bottom: .25em">${parameter}</p>
-                </div>
+                </article>
             `
         }).join("");
 
