@@ -105,10 +105,17 @@ Template.editSubjects.events({
   'click #save-subj-params': function(e) {
     var students = Subjects.find({envId: this._id});
     var numberOfStudents = students.collection.queries[1].results.length;
-    var yPosition = students.collection.queries[1].results[numberOfStudents - 1].data_y;
-    var xPosition = students.collection.queries[1].results[numberOfStudents - 1].data_x;
-    var newStudentPositionY = parseInt(yPosition) > 1000 ?  328 : parseInt(yPosition) + 75;
-    var newStudentPositionX = parseInt(yPosition) > 1000 ?  parseInt(xPosition) + 250 : xPosition;
+
+    if (numberOfStudents === 0) {
+        var newStudentPositionY = 180;
+        var newStudentPositionX = 0;
+    } else {
+        var yPosition = students.collection.queries[1].results[numberOfStudents - 1].data_y;
+        var xPosition = students.collection.queries[1].results[numberOfStudents - 1].data_x;
+        var newStudentPositionY = parseInt(yPosition) > 1000 ?  180 : parseInt(yPosition) + 75;
+        var newStudentPositionX = parseInt(yPosition) > 1000 ?  parseInt(xPosition) + 250 : xPosition;
+    }
+
     var name = $('#student-name').val();
 
     if (name.length === 0 ) {
