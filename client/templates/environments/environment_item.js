@@ -160,8 +160,12 @@ Template.environmentItem.helpers({
         var sequenceParameters = SequenceParameters.find({'children.envId': this._id}).fetch();
         var subjectParameters =  SubjectParameters.find({'children.envId': this._id}).fetch();
         var students = Subjects.find({userId: user._id}).fetch();
+        let filteredStudents = students.filter(student => student.envId === this._id)
+            .map(student => student.info.name)
         var validation = true;
-        var parameters = [sequenceParameters.length, subjectParameters.length, students.length];
+        var seqParamLength = sequenceParameters[0] ? sequenceParameters[0].children.parameterPairs : sequenceParameters.length;
+        var subParamLength = subjectParameters[0] ? subjectParameters[0].children.parameterPairs : subjectParameters.length;
+        var parameters = [seqParamLength, subParamLength, filteredStudents.length];
 
         parameters.forEach((p) => {
             if (p === 0) {

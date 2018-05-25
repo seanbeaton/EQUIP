@@ -80,6 +80,11 @@ Template.viewData.events({
     $('.obs-selection .chosen').each(function () { obsIds.push($(this).attr('data_id')) });
     $('.dparam-selection .chosen').each(function () { dParams.push($(this).attr('data_id')) });
     $('.sparam-selection .chosen').each(function () { sParams.push($(this).attr('data_id')) });
+
+    if (obsIds.length === 0) {
+        alert("Atleast one observation is required prior to generating a report.");
+        return;
+    }
     // Start generating graphs
     demData = makeDemGraphs(envId, dParams);
     groupCData = makeContributionGraphs(obsIds, dParams, sParams);

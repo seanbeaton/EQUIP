@@ -103,8 +103,19 @@ Template.editSubjects.events({
  },
 
   'click #save-subj-params': function(e) {
-    // If using boxes
-    name = $('#student-name').val();
+    var students = Subjects.find({envId: this._id});
+    var numberOfStudents = students.collection.queries[1].results.length;
+    var yPosition = students.collection.queries[1].results[numberOfStudents - 1].data_y;
+    var xPosition = students.collection.queries[1].results[numberOfStudents - 1].data_x;
+    var newStudentPositionY = parseInt(yPosition) > 1000 ?  328 : parseInt(yPosition) + 75;
+    var newStudentPositionX = parseInt(yPosition) > 1000 ?  parseInt(xPosition) + 250 : xPosition;
+    var name = $('#student-name').val();
+
+    if (name.length === 0 ) {
+        alert("Please enter a name");
+        return;
+    }
+
     var info = {};
     var choices = [];
     var labels = ["name"];
@@ -116,18 +127,22 @@ Template.editSubjects.events({
 
     $('.chosen').each(function () {
       let choice = this.textContent.replace(/\n/ig, '').trim();
-      choices.push(choice);
+      if (choice.length === 0) {
+          alert("please make a selection")
+          return;
+      } else {
+          choices.push(choice);
+      }
     });
 
     for (label in labels) {
         info[labels[label]] = choices[label];
     }
-
     // @FUTURE: Would be great to have a grid that positions
     // based on a users view of the classroom.
     var subject = {
-      data_x: '50',
-      data_y: String(200),
+      data_x: String(newStudentPositionX),
+      data_y: String(newStudentPositionY),
       envId: this._id,
       info: info
     };
@@ -189,12 +204,18 @@ Template.editSubjects.events({
 
   'click .delete-student': function(e) {
     var result = confirm("Press 'OK' to delete this Subject.");
-      subjId = $(e.target).attr("data_id");
-      Meteor.call('subjectDelete', subjId, function(error, result) {
-        return 0;
-      });
 
-      createTableOfStudents();
+    if (result === true) {
+        var subjId = $(e.target).attr("data_id");
+
+        Meteor.call('subjectDelete', subjId, function(error, result) {
+            return 0;
+        });
+
+        createTableOfStudents();
+    } else {
+        return;
+    }
   },
   'click #edit-subj-params': function (e){
     var subjId = $(e.target).attr('data_id');
