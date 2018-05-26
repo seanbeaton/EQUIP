@@ -121,6 +121,7 @@ Template.editSequenceParameters.events({
 'click #save-seq-params': function(e) {
   e.preventDefault();
   var parameterPairs = 0;
+  let formValidated = true;
   var form = document.querySelector('#paramForm');
   var obj = serialize(form, { hash: true, empty: false });
   for (key in obj) {
@@ -134,8 +135,18 @@ Template.editSequenceParameters.events({
       }
     } else {
       obj[key] = obj[key].split(",").filter(function(o) { return o }).join(",");
+      const sequenceKeys = obj[key].split(",");
+
+      sequenceKeys.forEach((key) => {
+          if (key.trim().length === 0) {
+              alert("One of your options are blank. Please enter with the correct format.");
+              formValidated = false;
+          }
+      });
     }
   }
+
+  if (!formValidated) return;
 
   var clean_obj = {}
   var count = 0;

@@ -169,6 +169,7 @@ Template.editSubjectParameters.events({
 'click #save-demo-params': function(e) {
   e.preventDefault();
   let parameterPairs = 0;
+  let formValidated = true;
   const form = document.querySelector('#paramForm');
   const obj = serialize(form, { hash: true, empty: false });
 
@@ -183,8 +184,19 @@ Template.editSubjectParameters.events({
       }
     } else {
         obj[key] = obj[key].split(",").filter(function(o) { return o }).join(",");
+        const demoKeys = obj[key].split(",");
+
+        demoKeys.forEach((key) => {
+            if (key.trim().length === 0) {
+                alert("One of your options are blank. Please enter with the correct format.");
+                formValidated = false;
+            }
+        });
     }
   }
+
+  if (!formValidated) return;
+
   var clean_obj = {}
   var count = 0;
   for (key in obj) {
