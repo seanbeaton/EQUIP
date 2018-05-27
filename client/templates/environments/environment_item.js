@@ -144,12 +144,20 @@ Template.environmentItem.helpers({
     noSubjectParametersEntered: function() {
         let subjectParameters =  SubjectParameters.find({'children.envId': this._id}).fetch();
 
-        return subjectParameters[0].children.parameterPairs === 0 ? true : false;
+        if (subjectParameters.length === 0 || subjectParameters[0].children.parameterPairs === 0 ) {
+            return true;
+        } else {
+            return false;
+        }
     },
     noDiscourseParametersEntered: function() {
         let sequenceParameters = SequenceParameters.find({'children.envId': this._id}).fetch();
 
-        return sequenceParameters[0].children.parameterPairs === 0 ? true : false;
+        if (sequenceParameters.length === 0 || sequenceParameters[0].children.parameterPairs === 0) {
+            return true;
+        } else {
+            return false;
+        }
     },
     getDiscourceParameters: function() {
         var sequenceParameters = SequenceParameters.find({'children.envId': this._id}).fetch();
