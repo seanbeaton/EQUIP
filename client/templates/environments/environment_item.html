@@ -19,7 +19,11 @@
                     <label class="c--accordion-item-label">Step 1</label>
                 </div>
                 <div class="c--accordion-item__inner">
-                    <h3 class="c--accordion-item__title">Demographics<span class="o--required-star">*</span></h3>
+                    <h3 class="c--accordion-item__title">Demographics
+                        {{#if noSubjectParametersEntered }}
+                            <span class="o--required-star">*</span>
+                        {{/if}}
+                    </h3>
                     <div class="c--accordion-item__edit-container">
                         <p class="o--toggle-links c--accordion-item__edit" id="edit-class-params">
                             Edit
@@ -36,7 +40,11 @@
                     <label class="c--accordion-item-label">Step 2</label>
                 </div>
                 <div class="c--accordion-item__inner">
-                    <h3 class="c--accordion-item__title">Discourse Dimensions<span class="o--required-star">*</span></h3>
+                    <h3 class="c--accordion-item__title">Discourse Dimensions
+                        {{#if noDiscourseParametersEntered}}
+                            <span class="o--required-star">*</span>
+                        {{/if}}
+                    </h3>
                     <div class="c--accordion-item__edit-container">
                         <p class="o--toggle-links c--accordion-item__edit" id="edit-sequence-params">
                             Edit
@@ -53,7 +61,11 @@
                     <label class="c--accordion-item-label">Step 3</label>
                 </div>
                 <div class="c--accordion-item__inner">
-                    <h3 class="c--accordion-item__title">Student Roster<span class="o--required-star">*</span></h3>
+                    <h3 class="c--accordion-item__title">Student Roster
+                        {{#if noStudentsAdded}}
+                            <span class="o--required-star">*</span>
+                        {{/if}}
+                    </h3>
                     <div class="c--accordion-item__edit-container">
                         <p class="o--toggle-links c--accordion-item__edit" id="edit-class-studs">
                             Edit

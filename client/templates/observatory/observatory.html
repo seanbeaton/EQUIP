@@ -33,7 +33,7 @@
       </div>
       <div class="subjects">
         {{#each subject}}
-          <div id="{{_id}}" style='transform:translate({{data_x}}px, {{data_y}}px);' data-x="{{data_x}}" data-y="{{data_y}}" class="dragger c--observation__student-box-container">
+          <div id="{{_id}}" style='transform:translate({{data_x}}px, {{math.sub data_y 180}}px);' data-x="{{data_x}}" data-y="{{data_y}}" class="dragger c--observation__student-box-container">
             <p class="c--observation__student-box">{{info.name}}</p>
           </div>
         {{/each}}

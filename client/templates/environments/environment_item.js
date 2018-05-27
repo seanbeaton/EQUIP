@@ -5,7 +5,8 @@
 Template.environmentItem.events({
   'click #enter-class': function(e) {
      e.preventDefault();
-     Router.go('observationList', {_envId:this._id});
+     var obsId = $(e.target).attr("data-id");
+     Router.go('observatory', {_envId:this._id, _obsId: obsId});
   },
   'click .export-tab': function (e) {
     e.preventDefault();
@@ -140,6 +141,16 @@ Template.environmentItem.helpers({
         }
         return labels.join(", ")
     },
+    noSubjectParametersEntered: function() {
+        let subjectParameters =  SubjectParameters.find({'children.envId': this._id}).fetch();
+
+        return subjectParameters[0].children.parameterPairs === 0 ? true : false;
+    },
+    noDiscourseParametersEntered: function() {
+        let sequenceParameters = SequenceParameters.find({'children.envId': this._id}).fetch();
+
+        return sequenceParameters[0].children.parameterPairs === 0 ? true : false;
+    },
     getDiscourceParameters: function() {
         var sequenceParameters = SequenceParameters.find({'children.envId': this._id}).fetch();
 
@@ -187,10 +198,14 @@ Template.environmentItem.helpers({
             count: filteredStudents.length
         }
     },
-    getStudentCount: function() {
-        var user = Meteor.user();
+    noStudentsAdded: function() {
+        let user = Meteor.user();
+        let students = Subjects.find({userId: user._id}).fetch();
 
-        return Subjects.find({userId: user._id}).count();
+        let filteredStudents = students.filter(student => student.envId === this._id)
+            .map(student => student.info.name)
+
+        return filteredStudents.length === 0 ? true : false;
     },
     getObservations: function() {
         return Observations.find({envId:this._id}, {sort: {datefield: 1}}).fetch();

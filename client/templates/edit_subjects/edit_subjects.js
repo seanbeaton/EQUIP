@@ -107,16 +107,16 @@ Template.editSubjects.events({
     const numberOfStudents = students.length;
 
     if (numberOfStudents === 0) {
-        var newStudentPositionY = 180;
-        var newStudentPositionX = 0;
+        let newStudentPositionY = 180;
+        let newStudentPositionX = 0;
     } else {
-        var yPosition = students[numberOfStudents - 1].data_y;
-        var xPosition = students[numberOfStudents - 1].data_x;
-        var newStudentPositionY = parseInt(yPosition) > 1000 ?  180 : parseInt(yPosition) + 75;
-        var newStudentPositionX = parseInt(yPosition) > 1000 ?  parseInt(xPosition) + 250 : xPosition;
+        let yPosition = students[numberOfStudents - 1].data_y;
+        let xPosition = students[numberOfStudents - 1].data_x;
+        let newStudentPositionY = parseInt(yPosition) > 1000 ?  180 : parseInt(yPosition) + 75;
+        let newStudentPositionX = parseInt(yPosition) > 1000 ?  parseInt(xPosition) + 250 : xPosition;
     }
 
-    var name = $('#student-name').val();
+    const name = $('#student-name').val();
 
     if (name.length === 0 ) {
         alert("Please enter a name");
@@ -145,8 +145,7 @@ Template.editSubjects.events({
     for (label in labels) {
         info[labels[label]] = choices[label];
     }
-    // @FUTURE: Would be great to have a grid that positions
-    // based on a users view of the classroom.
+    
     var subject = {
       data_x: String(newStudentPositionX),
       data_y: String(newStudentPositionY),
