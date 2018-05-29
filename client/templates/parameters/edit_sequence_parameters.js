@@ -309,7 +309,7 @@ const EditSequence = () => {
         return `
             <div class="single-param control myParam0">
                 <label class="o--form-labels">Name:</label>
-                <input class="o--form-input" type="text" name="label${index}" placeholder="Name of your parameter">
+                <input class="o--form-input" type="text" name="label${index}" placeholder="Name">
                 <label class="o--form-labels">Options:</label>
                 <input class="o--form-input" type="text" style="margin-bottom: .25em" name="parameter${index}" placeholder="List the options for selection separated by commas (e.g. male, female, unspecificied).">
                 <p class="o--toggle-links c--discourse-form__remove-button removeSeq">Remove</p>
@@ -322,7 +322,7 @@ const EditSequence = () => {
             <form id="paramForm">
                 <div class="single-param control myParam0">
                     <label class="o--form-labels">Name:</label>
-                    <input class="o--form-input" type="text" name="label0" placeholder="Name of your parameter">
+                    <input class="o--form-input" type="text" name="label0" placeholder="Name">
                     <label class="o--form-labels">Options:</label>
                     <input class="o--form-input" type="text" style="margin-bottom: .25em" name="parameter0" placeholder="List the options for selection separated by commas (e.g. male, female, unspecificied).">
                     <p class="o--toggle-links c--discourse-form__remove-button removeSeq">Remove</p>
