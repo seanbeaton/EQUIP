@@ -105,15 +105,17 @@ Template.editSubjects.events({
   'click #save-subj-params': function(e) {
     const students = Subjects.find({envId: Router.current().params._envId}).fetch();
     const numberOfStudents = students.length;
+    let newStudentPositionX;
+    let newStudentPositionY;
 
     if (numberOfStudents === 0) {
-        let newStudentPositionY = 180;
-        let newStudentPositionX = 0;
+        newStudentPositionY = 180;
+        newStudentPositionX = 0;
     } else {
         let yPosition = students[numberOfStudents - 1].data_y;
         let xPosition = students[numberOfStudents - 1].data_x;
-        let newStudentPositionY = parseInt(yPosition) > 1000 ?  180 : parseInt(yPosition) + 75;
-        let newStudentPositionX = parseInt(yPosition) > 1000 ?  parseInt(xPosition) + 250 : xPosition;
+        newStudentPositionY = parseInt(yPosition) > 1000 ?  180 : parseInt(yPosition) + 75;
+        newStudentPositionX = parseInt(yPosition) > 1000 ?  parseInt(xPosition) + 250 : xPosition;
     }
 
     const name = $('#student-name').val();
@@ -145,7 +147,7 @@ Template.editSubjects.events({
     for (label in labels) {
         info[labels[label]] = choices[label];
     }
-    
+
     var subject = {
       data_x: String(newStudentPositionX),
       data_y: String(newStudentPositionY),
