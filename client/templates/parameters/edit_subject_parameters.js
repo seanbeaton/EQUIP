@@ -337,7 +337,7 @@ const EditDemographics = () => {
         const defaultDemoData = [
             {
                 name: "Race",
-                input: "Black,Latinx,White,Other"
+                input: "Asian, Black, Latinx, Native, White, Other"
             },
             {
                 name: "Gender",

@@ -75,7 +75,7 @@ Template.environmentItem.events({
             alert("File not supported, .json files only");
         }
     });
-    alert("If you select a valid file to import for this classrom, it will overwrite any parameters already set.")
+    alert("Please import files that have been previously exported from EQUIP only.")
     fileInput.click(); // opening dialog
 
   },

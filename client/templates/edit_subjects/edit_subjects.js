@@ -118,7 +118,7 @@ Template.editSubjects.events({
         newStudentPositionX = parseInt(yPosition) > 1000 ?  parseInt(xPosition) + 250 : xPosition;
     }
 
-    const name = $('#student-name').val();
+    const name = $('#student-name').val().trim();
 
     if (name.length === 0 ) {
         alert("Please enter a name");
