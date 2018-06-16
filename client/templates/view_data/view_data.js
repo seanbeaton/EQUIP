@@ -80,8 +80,8 @@ Template.viewData.events({
     $('.obs-selection .chosen').each(function () { obsIds.push($(this).attr('data_id')) });
     $('.dparam-selection .chosen').each(function () { dParams.push($(this).attr('data_id')) });
     $('.sparam-selection .chosen').each(function () { sParams.push($(this).attr('data_id')) });
-
-    if (obsIds.length === 0) {
+    let contributions = Sequences.find({'envId': envId}).fetch();
+    if (obsIds.length === 0 || contributions.length === 0) {
         alert("Atleast one observation is required prior to generating a report.");
         return;
     }
@@ -90,7 +90,6 @@ Template.viewData.events({
     groupCData = makeContributionGraphs(obsIds, dParams, sParams);
 
     classStats(envId, sParams, obsIds);
-
     makeRatioGraphs(envId, groupCData, demData);
     makeIndividualGraphs(obsIds);
 
