@@ -360,8 +360,8 @@ function classStats(envId, sParams, obsId) {
     var paramkey = getKeyByValue(sequenceParameters.children, param);
     var position = paramkey.split("").pop();
     var paramPosition = `parameter${position}`;
-    var parameters = sequenceParameters.children[paramPosition].split(",");
-    parameters.filter((obj) => { return paramWithData.indexOf(obj) == -1; }).forEach((item) => { newObject[item] = 0; })
+    var parameters = sequenceParameters.children[paramPosition].split(",").map((str)=> { return str.trim()})
+    parameters.filter((obj) => { return paramWithData.indexOf(obj) == -1;}).forEach((item) => { newObject[item] = 0; })
 
     var total = studTrack.size;
 
@@ -495,7 +495,7 @@ function makeRatioGraphs(envId, cData, dData) {
           for (var x=0; x < allParams['children']['parameterPairs']; x++) {
             if (allParams['children']['label'+x] == demp) {
               selection = allParams['children']['parameter'+x];
-              listedParams = selection.split(',');
+              listedParams = selection.split(',').map((str) => { return str.trim() });
               for (p in listedParams) {
                 if (listedParams[p] in dataSlice[obj].value) {
                   continue;
@@ -516,7 +516,7 @@ function makeRatioGraphs(envId, cData, dData) {
         var paramkey = getKeyByValue(sequenceParameters.children, param);
         var position = paramkey.split("").pop();
         var paramPosition = `parameter${position}`;
-        var barParams = sequenceParameters.children[paramPosition].split(",");
+        var barParams = sequenceParameters.children[paramPosition].split(",").map((str) => { return str.trim() });
         for (var i = 0; i < barParams.length; i++) {
             for (var j = 0; j < dataSlice.length; j++) {
                 if (barParams[i] === dataSlice[j].key) {
