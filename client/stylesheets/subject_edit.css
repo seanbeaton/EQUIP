@@ -95,7 +95,9 @@
     color: var(--white);
 }
 
-
+.modal {
+    margin: 0
+}
 
 /* TODO: CLEAN UP OLD STYLES */
 .boxes-wrapper {

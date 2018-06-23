@@ -114,8 +114,8 @@ Template.editSubjects.events({
     } else {
         let yPosition = students[numberOfStudents - 1].data_y;
         let xPosition = students[numberOfStudents - 1].data_x;
-        newStudentPositionY = parseInt(yPosition) > 1000 ?  180 : parseInt(yPosition) + 75;
-        newStudentPositionX = parseInt(yPosition) > 1000 ?  parseInt(xPosition) + 250 : xPosition;
+        newStudentPositionY = parseInt(xPosition) > 674 ?  parseInt(yPosition) + 75 : yPosition;
+        newStudentPositionX = parseInt(xPosition) > 674 ?  0 : parseInt(xPosition) + 225;
     }
 
     const name = $('#student-name').val().trim();
@@ -301,10 +301,16 @@ function contributionTableTemplate(students, parameters) {
 }
 
 function contributionRowTemplate(student, params) {
+    let paramTemplate = params.map((param) => {
+        return `
+            <p class="o--modal-label contributions-grid-item">${param}</p>
+        `
+    }).join("");
+
     let paramValues = params.map((param) => {
         let data = student.info[param];
         return `
-            <p class="contributions-grid-item-student">${param}<span>${data}</span></p>
+            <p class="o--modal-label contributions-grid-item">${data}</p>
         `
     }).join("");
 
@@ -314,7 +320,10 @@ function contributionRowTemplate(student, params) {
             <p class="o--toggle-links contributions-modal-link edit-stud" data_id="${student._id}" data_studentid="${student.info.studentId}">Edit</p>
             <p class="o--toggle-links contributions-modal-link delete-student" data_id="${student._id}" >Delete</p>
         </div>
-        <div class="contributions-grid-item-container-student">
+        <div class="contributions-grid-item-container u--bold">
+            ${paramTemplate}
+        </div>
+        <div class="contributions-grid-item-container">
             ${paramValues}
         </div>
     `
