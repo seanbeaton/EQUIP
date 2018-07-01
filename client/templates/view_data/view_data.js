@@ -81,8 +81,12 @@ Template.viewData.events({
     $('.dparam-selection .chosen').each(function () { dParams.push($(this).attr('data_id')) });
     $('.sparam-selection .chosen').each(function () { sParams.push($(this).attr('data_id')) });
     let contributions = Sequences.find({'envId': envId}).fetch();
-    if (obsIds.length === 0 || contributions.length === 0) {
-        alert("Atleast one observation is required prior to generating a report.");
+    let totalCont = contributions.filter(function(contribution) {
+       return obsIds.includes(contribution.obsId);
+   }).length;
+
+    if (obsIds.length === 0 || contributions.length === 0 || totalCont === 0) {
+        alert("Atleast one observation or contribution is required prior to generating a report.");
         return;
     }
     // Start generating graphs
@@ -319,7 +323,7 @@ function classStats(envId, sParams, obsId) {
   var totalStuds = studs.length;
   var studTrack = new Set();
   var totalCont = conts.filter(function(contribution) {
-     return obsId.includes(contribution.obsId);
+     return obsIds.includes(contribution.obsId);
  }).length;
   var stats = $('.class-stats');
 
