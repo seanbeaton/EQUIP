@@ -86,7 +86,7 @@ Template.viewData.events({
    }).length;
 
     if (obsIds.length === 0 || contributions.length === 0 || totalCont === 0) {
-        alert("Atleast one observation or contribution is required prior to generating a report.");
+        alert("At least one observation or contribution is required prior to generating a report.");
         return;
     }
     // Start generating graphs
