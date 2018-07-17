@@ -3,11 +3,16 @@
 */
 
 Template.environmentList.rendered = function() {
-  $("#navEnv").removeClass("nav-blue-pulse");
-  var obj = Environments.find({}).fetch();
-  if ($.isEmptyObject(obj)) {
-    $('[data-toggle="popover2"]').popover('show').on('click',function(){ $(this).popover('hide')});
+  if (document.querySelector(".toggle-accordion")) {
+      document.querySelectorAll('.toggle-accordion')[0].click(); // main
+      document.querySelectorAll('.toggle-accordion')[1].click(); // observations
   }
+
+  var urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has("onboarding")) {
+        $('#onboarding-modal').removeClass("is-active");
+        $('#env-create-modal').addClass("is-active");
+    }
 }
 
 Template.environmentList.helpers({
@@ -42,13 +47,88 @@ Template.environmentList.events({
    'click #env-create-button': function(e) {
     $('#env-create-modal').addClass("is-active");
   },
-    'click #env-close-modal': function(e) {
+   'click #env-close-modal': function(e) {
     $('#env-create-modal').removeClass("is-active");
   },
   'click .modal-card-foot .button': function(e) {
     $('#env-create-modal').removeClass("is-active");
     $('#help-env-modal').removeClass("is-active");
   },
+  'click #obs-create-button': function(e) {
+    var id = e.target.getAttribute('data-id');
+    $('#obs-create-modal').addClass("is-active");
+    $('#obs-create-modal').attr("data-id", id);
+  },
+  'click #obs-close-modal': function(e) {
+    $('#obs-create-modal').removeClass("is-active");
+  },
+  'click #save-obs-name': function(e) {
+    var id = $('#obs-create-modal').attr("data-id");
+    var sequenceParams = SequenceParameters.findOne({'children.envId': id});
+    var demographicParams = SubjectParameters.findOne({'children.envId': id});
+    var observations = Observations.find({"envId": id}).fetch();
+    var obsAccordion = $(`.c--accordion-item__inner[data-id=${id}]`);
+
+    var observation = {
+      name: $('#observationName').val(),
+      envId: id,
+      timer: 0
+    };
+
+    if ($('#observationName').val() == "") {
+      alert("Observation name required.");
+      return;
+    }
+
+    if (sequenceParams === undefined || demographicParams === undefined) {
+        alert("You must add students and parameters to the environment to continue to do the observation.")
+        return;
+    }
+
+    if (observations.length === 0 ) {
+        var confirmation = getConfirmation();
+        if (confirmation) {
+            Meteor.call('observationInsert', observation, function(error, result) {
+              return 0;
+            });
+            $('#observationName').val('');
+            $('#obs-close-modal').click();
+            if (!$(obsAccordion).next().hasClass("show")) {
+                $(obsAccordion).click();
+            }
+        }
+    } else {
+        Meteor.call('observationInsert', observation, function(error, result) {
+          return 0;
+        });
+        $('#observationName').val('');
+        $('#obs-close-modal').click();
+
+        if (!$(obsAccordion).next().hasClass("show")) {
+            $(obsAccordion).click();
+        }
+    }
+
+    function getConfirmation() {
+        var retVal = confirm("Are you sure? After the first observation is created, you will not be able to edit discourse dimensions or demographics.");
+        if (retVal === true) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+},
+'click #enter-class': function(e) {
+  // var obj1 = SubjectParameters.find({'children.envId': this._id}).fetch();
+  // var obj2 = SequenceParameters.find({'children.envId': this._id}).fetch();
+  // if ($.isEmptyObject(obj1) || $.isEmptyObject(obj2) || $.isEmptyObject(obj3)) {
+  //  alert('You must add students to the environment to continue to do the observation.');
+  //  return;
+  // }
+    var obsId = $(e.target).attr("data-id");
+    Router.go('observatory', {_envId: this._id, _obsId: obsId});
+},
 
   //  'click #createNewEnvironment': function(e) {
   //   $('#createEnvPopup').modal({
@@ -61,10 +141,6 @@ Template.environmentList.events({
   // },
 
   'click #save-env-name': function(e) {
-
-
-  // 'click #save-env-name': function(e) {
-
     var environment = {
       envName: $('#environmentName').val()
     };

@@ -1,78 +1,169 @@
-.land-1 {
-    background-color: white;
-    font-family: 'Source Sans Pro';
-    font-size: 1.25em;
-    margin-top: -10px;
+.c--landing-page__outer {
+    max-width: var(--max-container-width);
+    margin: 0 auto;
 }
 
-.land-1 .title {
-    margin-top: 1.5em;
+.c--landing-page__main-container {
+    width: 100%;
+    height: auto;
+    display: inline-flex;
 }
 
-body {
-    font-family: 'Source Sans Pro'
+.c--landing-page__logo-container {
+    margin-top: var(--spacer-40);
+    text-align: center;
+    text-transform: uppercase;
+    margin-bottom: 0px;
 }
 
-.beta {
-    color: red;
+.c--landing-page__main-container--left {
+    background: url("refresh/classroom-top@2x.jpg");
+    background-size: cover;
+    background-repeat: no-repeat;
+    width: 50%;
+    height: 605px;
 }
 
-.land-2 {
-    background-color: #4893cf;
-    color: white;
-    font-family: 'Source Sans Pro';
-    font-size: 2em;
+.c--landing-page__main-container--right {
+    background-color: var(--black);
+    color: var(--white);
+    width: 50%;
+    height: 605px;
 }
 
-.land-2 p {
-    margin-left: .5em;
+.c--landing-page__main-container--right p {
+    padding: 50px 50px;
+     font-size: 27px;
+     line-height: 180%;
+     color: var(--white);
 }
 
-.land-2 .title {
-    color: white;
-    margin-bottom: .5em;
+.c--landing-page__c2a-container {
+    display: inline-flex;
+    justify-content: center;
+    width: 100%;
 }
 
-.land-3 {
-    background-color: #f68e1f;
-    color: black;
+.c--landing-page__c2a-learn-more-button,
+.c--landing-page__c2a-sign-in-button {
+    margin-left: 20px;
+    margin-right: 20px;
 }
 
-.land-3 p {
-    margin-left: .5em;
-    font-family: 'Source Sans Pro';
-    font-size: 1.75em;
+.c--landing-page__c2a-learn-more-link {
+    color: var(--white);
+    transition: color .4s !important;
 }
 
-.land-3 .su {
-    float: right;
-    background-color: #4893cf;
-    font-size: 1.75em;
+.c--landing-page__c2a-learn-more-link:hover {
+    color: var(--black);
 }
 
-.land-4 {
-    background-color: white;
-    color: black;
+.c--landing-page__get-started-title {
+    text-align: center;
 }
 
-.land-4 p {
-    margin-left: .5em;
-    font-family: 'Source Sans Pro';
-    font-size: 1.75em;
+.c--landing-page__get-started-outer {
+    width: 100vw;
+    background-color: var(--teal);
+    margin-bottom: 80px;
+    position: relative;
+    left: 50%;
+    margin-left: -50vw;
+
 }
 
-.sponsor {
-    color: #075489;
+.c--landing-page__get-started {
+    width: 100%;
+    max-width: var(--max-container-width);
+    margin: 0 auto;
 }
 
-.sponsor:hover {
-    color: #4893cf;
+.c--landing-page__get-started-inner {
+    display: inline-flex;
+    width: 100%;
+    margin-bottom: 0px;
 }
 
-.sponsor:visited {
-    color: #f68e1f;
+.c--landing-page__get-started-left {
+    width: 50%;
+    margin: 40px 0px;
 }
 
-.equip-use {
-    width: 70%;
+.c--landing-page__get-started-right {
+    width: 50%;
+    background: url("refresh/classroom-bottom@2x.jpg");
+    background-size: cover;
+    background-repeat: no-repeat;
+    margin-bottom: 0px;
+}
+
+.c--landing-page__get-started-left-content {
+    color: var(--white);
+    width: 90%;
+}
+
+.c--landing-page__faq-outer {
+    max-width: 1000px;
+    margin: 0 auto;
+    margin-bottom: 40px;
+}
+
+.c--landing-page__faq-inner {
+    display: inline-flex;
+    width: 100%;
+    justify-content: space-around;
+    margin-bottom: 0;
+}
+
+.c--landing-page__faq-title {
+    text-transform: uppercase;
+    text-align: center;
+}
+
+.c--landing-page__faq-item {
+    width: 30%;
+}
+
+.c--landing-page__faq-item-top {
+    background-color: var(--orange);
+    padding: 20px;
+    margin-bottom: 0px;
+    min-height: 215px;
+}
+
+.c--landing-page__faq-item-top-content {
+    text-transform: capitalize;
+    color: var(--white);
+}
+
+.c--landing-page__faq-item-top-link {
+    color: var(--black);
+    border-bottom: 1px solid;
+    padding-bottom: 1px;
+    font-family: 'Roboto Condensed', sans-serif;
+    text-transform: uppercase;
+    font-size: 14px;
+    letter-spacing: .1em;
+    font-weight: 700;
+}
+
+.c--landing-page__faq-item-top-link:hover {
+    color: var(--white);
+}
+
+.c--landing-page__faq-item-top-publication {
+    color: var(--teal);
+    text-align: left;
+    font-family: 'Roboto Condensed', sans-serif;
+    text-transform: uppercase;
+    font-size: 14px;
+    letter-spacing: .1em;
+    padding-left: 20px;
+    font-weight: 700;
+}
+
+.c--landing__faq-item-bottom {
+    background-color: var(--black);
+    text-transform: uppercase;
 }

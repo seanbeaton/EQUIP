@@ -26,184 +26,11 @@ Template.editSequenceParameters.helpers({
       var obs = Observations.find({envId:env[0]._id}, {sort: {lastModified: -1}}).fetch();
       if (obs.length === 0) {
           return true
+      } else {
+          return false
       }
   }
 });
-
-function loadDefaultSeqParams() {
-
-  $('#paramForm').remove();
-
-  $('<form/>', {
-    id: 'paramForm',
-  }).appendTo('#paramsSection');
-
-  var container = document.getElementById("paramForm");
-  labels = ["Discourse Type", "Teacher Solicitation","Wait Time", "Solicitation Method", "Length of Talk", "Student Talk",  "Explicit Evaluation"]
-
-  for (i=0;i<labels.length;i++){
-     var singleParam = $('<div/>', {
-      class: "single-param control myParam"+i
-      }).appendTo(container);
-
-      $('<label/>', {
-        class: "label",
-        text: "Parameter Name:"
-      }).appendTo(singleParam);
-
-      $('<input/>', {
-        class: "input",
-        type: "text",
-        name: "label"+i,
-        value: labels[i],
-      }).appendTo(singleParam);
-
-      $('<label/>', {
-        class: "label",
-        text: "Options:"
-      }).appendTo(singleParam);
-
-      var inputValue = "";
-      if (labels[i] == "Discourse Type") {
-        inputValue = "Logistics,Content"
-      }
-      if (labels[i] == "Solicitation Method") {
-        inputValue  = "Called On,Not Called On"
-      }
-      if (labels[i] == "Wait Time") {
-        inputValue  = "Less than 3 seconds,3 or more seconds,N/A"
-      }
-      if (labels[i] == "Length of Talk") {
-        inputValue  = "1-4 words,5-20,21 or more"
-      }
-      if (labels[i] == "Student Talk") {
-        inputValue =  "How,What,Why,Other"
-      }
-      if (labels[i] == "Teacher Solicitation") {
-        inputValue =  "How,What,Why,Other"
-      }
-      if (labels[i] == "Explicit Evaluation") {
-        inputValue = "Yes,No"
-      }
-
-      $('<input/>', {
-        class: "input",
-        type: "text",
-        style: "margin-bottom: .25em",
-        name: "parameter"+i,
-        value: inputValue
-      }).appendTo(singleParam);
-
-      removeButton = $('<button/>', {
-        class: "button is-small is-danger is-pulled-right removeSeq remove"+i ,
-        text: "Remove Parameter",
-        style: "margin-right: .5em"
-      }).appendTo(singleParam);
-
-      removeButton.click( function (e) {
-        e.preventDefault();
-        var test = $(this).parent().remove();
-      });
-
-      checkbox = $('<label/>', {
-        class: "checkbox",
-        text: "Toggle?"
-      }).appendTo(singleParam);
-
-      if (labels[i] == "Discourse Type") {
-        $('<input/>', {
-          class: "checkbox",
-          type: "checkbox",
-          style: "margin: .5em",
-          name: "toggle"+i,
-          checked: true
-        }).appendTo(checkbox);
-      } else {
-        $('<input/>', {
-          class: "checkbox",
-          type: "checkbox",
-          style: "margin: .5em",
-          name: "toggle"+i,
-        }).appendTo(checkbox);
-      }
-  }
-}
-
-function addSeqFields() {
-  var formCounter = $("#paramForm .single-param").length;
-  var container = document.getElementById("paramForm");
-
-  var singleParam = $('<div/>', {
-      class: "single-param control myParam"+formCounter
-    }).appendTo(container);
-
-      $('<label/>', {
-        class: "label",
-        text: "Parameter Name:"
-      }).appendTo(singleParam);
-
-      $('<input/>', {
-        class: "input",
-        type: "text",
-        name: "label"+formCounter,
-        placeholder: "Name of your parameter"
-      }).appendTo(singleParam);
-
-      $('<label/>', {
-        class: "label",
-        text: "Options:"
-      }).appendTo(singleParam);
-
-      $('<input/>', {
-        class: "input",
-        type: "text",
-        style: "margin-bottom: .25em",
-        name: "parameter"+formCounter,
-        placeholder: "List the options for selection separated by commas (e.g. male, female, unspecificied)."
-      }).appendTo(singleParam);
-
-      removeButton = $('<button/>', {
-        class: "button is-small is-danger is-pulled-right removeSeq remove"+formCounter,
-        text: "Remove Parameter",
-        style: "margin-right: .5em"
-      }).appendTo(singleParam);
-
-      removeButton.click( function (e) {
-        e.preventDefault();
-        var test = $(this).parent().remove();
-      });
-
-      checkbox = $('<label/>', {
-        class: "checkbox",
-        text: "Toggle?"
-      }).appendTo(singleParam);
-
-      $('<input/>', {
-        class: "checkbox",
-        type: "checkbox",
-        style: "margin: .5em",
-        name: "toggle"+formCounter,
-      }).appendTo(checkbox);
-
-      toastr.options = {
-          "closeButton": false,
-          "debug": false,
-          "newestOnTop": false,
-          "progressBar": false,
-          "positionClass": "toast-bottom-right",
-          "preventDuplicates": false,
-          "onclick": null,
-          "showDuration": "300",
-          "hideDuration": "1000",
-          "timeOut": "2000",
-          "extendedTimeOut": "1000",
-          "showEasing": "swing",
-          "hideEasing": "linear",
-          "showMethod": "fadeIn",
-          "hideMethod": "fadeOut"
-        }
-        Command: toastr["info"]("Scroll to bottom to edit new parameter.","Parameter Added")
-}
 
 Template.editSequenceParameters.events({
 
@@ -291,21 +118,10 @@ Template.editSequenceParameters.events({
    e.preventDefault();
    Router.go('editSubjectParameters', {_envId:Router.current().params._envId});
  },
-'click #add-seq-param': function(e) {
-  e.preventDefault();
-  addSeqFields();
- },
-'click #load-default-seq': function(e) {
-  e.preventDefault();
-  loadDefaultSeqParams();
-},
-// 'click .remove-button': function(e) {
-//   e.preventDefault();
-//   alert("Not Working");
-// },
 'click #save-seq-params': function(e) {
   e.preventDefault();
   var parameterPairs = 0;
+  let formValidated = true;
   var form = document.querySelector('#paramForm');
   var obj = serialize(form, { hash: true, empty: false });
   for (key in obj) {
@@ -317,8 +133,20 @@ Template.editSequenceParameters.events({
         alert('One of your parameters has a label but no options. Please fix this issue and try saving again.')
         return;
       }
+    } else {
+      obj[key] = obj[key].split(",").filter(function(o) { return o }).join(",");
+      const sequenceKeys = obj[key].split(",");
+
+      sequenceKeys.forEach((key) => {
+          if (key.trim().length === 0) {
+              alert("One of your options are blank. Please enter with the correct format.");
+              formValidated = false;
+          }
+      });
     }
   }
+
+  if (!formValidated) return;
 
   var clean_obj = {}
   var count = 0;
@@ -361,161 +189,226 @@ Template.editSequenceParameters.events({
       }
       Command: toastr["success"]("NOTE: After the first observation is created, you will not be able to edit discourse dimensions or demographics.","Save Successful","Observation Parameters");
     }
+    setTimeout(() => {
+        window.location.href = "/environmentList"
+    },1000)
   });
 }
 });
 
 Template.editSequenceParameters.rendered = function() {
-  setDefaultSeqParams();
-  hideRemoveButtons();
+    let editSequence = new EditSequence();
+
+    editSequence.init();
+    editSequence.hideRemoveButtons();
 }
 
-function hideRemoveButtons() {
-    var obsMade = document.getElementById('obsMade');
+const EditSequence = () => {
+    function hideRemoveButtons() {
+        var obsMade = document.getElementById('obsMade');
 
-    if (obsMade) {
-        var allRemoveButtons = document.querySelectorAll('.removeSeq');
-        Array.prototype.map.call(allRemoveButtons, function(btn) {
-             btn.style.display = "none";
-        })
+        if (obsMade) {
+            var allRemoveButtons = document.querySelectorAll('.removeSeq');
+
+            [...allRemoveButtons].forEach((button)=> { button.style.display = "none"; });
+        }
     }
-}
-
-function setDefaultSeqParams() {
-
-    var envId = Router.current().params._envId;
-
-  $('<form/>', {
-    id: 'paramForm',
-  }).appendTo('#paramsSection');
-
-  var container = document.getElementById("paramForm");
-
-  parametersObj = SequenceParameters.find({'children.envId':envId}).fetch();
-
-  if ($.isEmptyObject(parametersObj) == true) {
-    parameterPairs = 0;
-  } else {
-    parameterPairs = parametersObj[0]["children"]["parameterPairs"];
-  }
-
-  if (parameterPairs == 0) {
-    var singleParam = $('<div/>', {
-      class: "single-param control myParam0"
-    }).appendTo(container);
-
-      $('<label/>', {
-        class: "label",
-        text: "Parameter Name:"
-      }).appendTo(singleParam);
-
-      $('<input/>', {
-        class: "input",
-        type: "text",
-        name: "label0",
-        placeholder: "Name of your parameter"
-      }).appendTo(singleParam);
-
-      $('<label/>', {
-        class: "label",
-        text: "Options:"
-      }).appendTo(singleParam);
-
-      $('<input/>', {
-        class: "input",
-        type: "text",
-        style: "margin-bottom: .25em",
-        name: "parameter0",
-        placeholder: "List the options for selection separated by commas (e.g. male, female, unspecificied)."
-      }).appendTo(singleParam);
-
-      removeButton = $('<button/>', {
-        class: "button is-small is-danger is-pulled-right remove0 removeSeq",
-        text: "Remove Parameter",
-        style: "margin-right: .5em"
-      }).appendTo(singleParam);
-
-      removeButton.click( function (e) {
-        e.preventDefault();
-        var test = $(this).parent().remove();
-      });
-
-      checkbox = $('<label/>', {
-        class: "checkbox",
-        text: "Toggle?"
-      }).appendTo(singleParam);
-
-      $('<input/>', {
-        class: "checkbox",
-        type: "checkbox",
-        name: "toggle0",
-        style: "margin: .5em",
-      }).appendTo(checkbox);
-
-  } else {
-    for (i=0;i<parameterPairs;i++) {
-      var singleParam = $('<div/>', {
-      class: "single-param control myParam"+i
-      }).appendTo(container);
-
-      $('<label/>', {
-        class: "label",
-        text: "Parameter Name:"
-      }).appendTo(singleParam);
-
-      $('<input/>', {
-        class: "input",
-        type: "text",
-        name: "label"+i,
-        value: parametersObj[0]["children"]["label"+i]
-      }).appendTo(singleParam);
-
-      $('<label/>', {
-        class: "label",
-        text: "Options:"
-      }).appendTo(singleParam);
-
-      $('<input/>', {
-        class: "input",
-        type: "text",
-        style: "margin-bottom: .25em",
-        name: "parameter"+i,
-        value: parametersObj[0]["children"]["parameter"+i]
-      }).appendTo(singleParam);
-
-      var removeButton = $('<button/>', {
-        class: "button is-small is-danger is-pulled-right removeSeq remove"+i,
-        text: "Remove Parameter",
-        style: "margin-right: .5em"
-      }).appendTo(singleParam);
-
-      removeButton.click( function (e) {
-        e.preventDefault();
-        var test = $(this).parent().remove();
-      });
-
-      checkbox = $('<label/>', {
-        class: "checkbox",
-        text: "Toggle?"
-      }).appendTo(singleParam);
-
-      var checkVal = "false";
-      if (parametersObj[0]["children"]["toggle"+i] == "on") {
-        $('<input/>', {
-          class: "checkbox",
-          type: "checkbox",
-          name: "toggle"+i,
-          checked: checkVal,
-          style: "margin: .5em"
-        }).appendTo(checkbox);
-      } else {
-        $('<input/>', {
-          class: "checkbox",
-          type: "checkbox",
-          name: "toggle"+i,
-          style: "margin: .5em"
-        }).appendTo(checkbox);
-      }
+    function addRemoveButtonEvents() {
+        let removeButtons = document.querySelectorAll(".removeSeq");
+        [...removeButtons].forEach((button) => {
+            $(button).unbind("click").click(function(){
+                var result = confirm("Are you sure you want to delete?");
+                if (result) {
+                    event.target.parentElement.remove();
+                }
+            });
+        });
     }
-  }
+    function addParamButtonEvent() {
+        let addButton = document.getElementById("add-seq-param");
+        if (addButton) {
+            addButton.addEventListener("click", addParamRowTemplate);
+        }
+    }
+    function addLoadDefaultEvent() {
+        let loadDefaultButton = document.getElementById("load-default-seq");
+
+        if (loadDefaultButton) {
+            loadDefaultButton.addEventListener("click", loadDefaultParamTemplate);
+            addRemoveButtonEvents();
+        }
+    }
+    function addParamRowTemplate() {
+        let container = document.getElementById("paramForm");
+        let lastIndex = document.querySelectorAll(".single-param").length;
+        container.insertAdjacentHTML('beforeend', oneParamRowTemplate(lastIndex));
+        addRemoveButtonEvents();
+    }
+
+    function loadDefaultParamTemplate() {
+        let container = document.getElementById("paramForm");
+        container.innerHTML = loadParamTemplate();
+        addRemoveButtonEvents();
+    }
+    function loadParamTemplate() {
+        const defaultSequenceData = [
+            {
+                name: "Discourse Type",
+                input: "Logistics,Content"
+            },
+            {
+                name: "Teacher Solicitation",
+                input: "How,What,Why,Other"
+            },
+            {
+                name: "Wait Time",
+                input: "Less than 3 seconds,3 or more seconds,N/A"
+            },
+            {
+                name: "Solicitation Method",
+                input: "Called On,Not Called On"
+            },
+            {
+                name: "Length of Talk",
+                input: "1-4 words,5-20,21 or more"
+            },
+            {
+                name: "Student Talk",
+                input: "How,What,Why,Other"
+            },
+            {
+                name: "Explicit Evaluation",
+                input: "Yes,No"
+            }
+        ]
+
+        let defaultNodes = defaultSequenceData.map((data,idx) => {
+            return oneResultTemplate(data,idx)
+        }).join("");
+
+        return `
+            <form id="paramForm">
+                ${defaultNodes}
+            </form>
+        `
+    }
+
+    function oneResultTemplate(data,idx) {
+        return `
+            <div class="single-param control myParam${idx}">
+                <label class="o--form-labels">Name:</label>
+                <input class="o--form-input" type="text" name="label${idx}" value="${data.name}">
+                <label class="o--form-labels">Options:</label>
+                <input class="o--form-input" type="text" style="margin-bottom: .25em" name="parameter${idx}" value="${data.input}">
+                <p class="o--toggle-links c--discourse-form__remove-button removeSeq">Remove</p>
+            </div>
+        `
+    }
+
+    function oneParamRowTemplate(index) {
+        return `
+            <div class="single-param control myParam0">
+                <label class="o--form-labels">Name:</label>
+                <input class="o--form-input" type="text" name="label${index}" placeholder="Name">
+                <label class="o--form-labels">Options:</label>
+                <input class="o--form-input" type="text" style="margin-bottom: .25em" name="parameter${index}" placeholder="List the options for selection separated by commas (e.g. male, female, unspecificied).">
+                <p class="o--toggle-links c--discourse-form__remove-button removeSeq">Remove</p>
+            </div>
+        `
+    }
+    // Template for no parameters
+    function noParamFormTemplate() {
+        return `
+            <form id="paramForm">
+                <div class="single-param control myParam0">
+                    <label class="o--form-labels">Name:</label>
+                    <input class="o--form-input" type="text" name="label0" placeholder="Name">
+                    <label class="o--form-labels">Options:</label>
+                    <input class="o--form-input" type="text" style="margin-bottom: .25em" name="parameter0" placeholder="List the options for selection separated by commas (e.g. male, female, unspecificied).">
+                    <p class="o--toggle-links c--discourse-form__remove-button removeSeq">Remove</p>
+                </div>
+            </form>
+        `
+    }
+    // Template for form with parameters set
+    function hasParamFormTemplate(paramObj, paramPair) {
+        let numberOfParams = Array.apply(null, {length: paramPair}).map(Number.call, Number);
+        let paramNodes = numberOfParams.map((index)=> {
+            let label = paramObj[0]["children"]["label" + index];
+            let parameter = paramObj[0]["children"]["parameter" + index];
+            let lastRow = paramPair === index + 1 ? oneParamRowTemplate(index + 1) : "";
+
+            return `
+                <div class="single-param control myParam${index}">
+                    <div class="c--discourse-form__label-container">
+                        <label class="o--form-labels">Name:</label>
+                    </div>
+                    <input class="o--form-input" type="text" name="label${index}" value="${label}">
+                    <label class="o--form-labels">Options:</label>
+                    <input class="o--form-input" type="text" style="margin-bottom: .25em" name="parameter${index}" value="${parameter}">
+                    <p class="removeSeq c--discourse-form__remove-button o--toggle-links">Remove</p>
+                </div>
+                ${lastRow}
+            `
+        }).join("");
+
+        return `
+            <form id="paramForm">
+                ${paramNodes}
+            </form>
+        `
+    }
+
+    function hasParamWithObservationTemplate(paramObj, paramPair) {
+        let numberOfParams = Array.apply(null, {length: paramPair}).map(Number.call, Number);
+        let paramNodes = numberOfParams.map((index)=> {
+            let label = paramObj[0]["children"]["label" + index];
+            let parameter = paramObj[0]["children"]["parameter" + index];
+            let lastRow = paramPair === index + 1 ? oneParamRowTemplate(index + 1) : "";
+
+            return `
+                <article class="single-param control myParam${index}">
+                    <h3>${label}</h3>
+                    <p style="margin-bottom: .25em">${parameter}</p>
+                </article>
+            `
+        }).join("");
+
+        return `
+            <div>
+                ${paramNodes}
+            </div>
+        `
+    }
+
+    function setDefaultSeqParams() {
+        let env = Environments.find({_id:Router.current().params._envId}).fetch();
+        let envId = Router.current().params._envId;
+        let parametersObj = SequenceParameters.find({'children.envId':envId}).fetch();
+        let obs = Observations.find({envId:env[0]._id}, {sort: {lastModified: -1}}).fetch();
+        let paramSection = document.getElementById("paramsSection");
+        let parameterPairs;
+
+        if (obs.length > 0 ) {
+             parameterPairs = parametersObj[0]["children"]["parameterPairs"];
+             paramSection.innerHTML += hasParamWithObservationTemplate(parametersObj, parameterPairs);
+        } else {
+            $.isEmptyObject(parametersObj)
+                ? parameterPairs = 0
+                : parameterPairs = parametersObj[0]["children"]["parameterPairs"];
+
+            parameterPairs === 0
+                ? paramSection.innerHTML += noParamFormTemplate()
+                : paramSection.innerHTML += hasParamFormTemplate(parametersObj, parameterPairs);
+
+            addRemoveButtonEvents();
+            addParamButtonEvent();
+            addLoadDefaultEvent();
+        }
+    }
+
+    return {
+        init: setDefaultSeqParams,
+        hideRemoveButtons: hideRemoveButtons
+    }
 }
