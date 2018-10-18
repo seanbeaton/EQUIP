@@ -86,7 +86,11 @@ Template.environmentItem.events({
   'click #edit-class-studs': function(e) {
      e.preventDefault();
      Router.go('editSubjects', {_envId:this._id});
-  }
+  },
+  'click #edit-classroom-name': function(e) {
+    e.preventDefault();
+    editClassroomName(this._id);
+  },
   });
 
 Template.environmentItem.events({
@@ -122,3 +126,70 @@ Template.environmentItem.events({
        }
    }
  });
+
+
+function editClassroomName(envId) {
+  var env_name = $('.environment-name');
+  var env_name_wrapper = $('.environment-name-wrapper');
+  var currently_editing = !!(env_name.hasClass('editing'));
+  var edit_swap_button = $('#edit-classroom-name');
+
+  if (!currently_editing) {
+    env_name_wrapper.prepend($('<input>', {
+      class: 'edit-env-name title is-3',
+      value: env_name.html()
+    }));
+
+    env_name.addClass('editing');
+    env_name.hide();
+
+    $('.edit-env-name').on('keyup', function(e) {
+      if (e.keyCode === 13) {
+        edit_swap_button.click()
+      }
+    })
+  }
+  else {
+    var new_env_name = $('.edit-env-name');
+    var new_name = new_env_name.val();
+
+    // set new name here.
+
+    var args = {
+      'envId': envId,
+      'envName': new_name,
+    };
+
+    Meteor.call('environmentRename', args, function(error, result) {
+      var message;
+      if (result) {
+        message = $('<span/>', {
+          class: 'name-save-result success-message',
+          text: 'Saved'
+        });
+
+        env_name.html(new_name);
+      }
+      else {
+        message = $('<span/>', {
+          class: 'name-save-result error-message',
+          text: 'Failed to save. Try again later'
+        })
+      }
+      env_name_wrapper.append(message);
+
+      setTimeout(function() {
+        message.remove();
+      }, 3000);
+
+      return 0;
+    });
+
+    new_env_name.remove();
+    env_name.removeClass('editing');
+    env_name.show();
+  }
+
+  currently_editing = !currently_editing;
+  edit_swap_button.html((currently_editing) ? 'Save' : 'Edit')
+}
