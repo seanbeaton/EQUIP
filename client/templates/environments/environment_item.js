@@ -129,10 +129,12 @@ Template.environmentItem.events({
 
 
 function editClassroomName(envId) {
-  var env_name = $('.environment-name');
-  var env_name_wrapper = $('.environment-name-wrapper');
+  let context = $('.environment[data-env-id="' + envId + '"]');
+
+  var env_name = $('.environment-name', context);
+  var env_name_wrapper = $('.environment-name-wrapper', context);
   var currently_editing = !!(env_name.hasClass('editing'));
-  var edit_swap_button = $('#edit-classroom-name');
+  var edit_swap_button = $('#edit-classroom-name', context);
 
   if (!currently_editing) {
     env_name_wrapper.prepend($('<input>', {
@@ -143,14 +145,14 @@ function editClassroomName(envId) {
     env_name.addClass('editing');
     env_name.hide();
 
-    $('.edit-env-name').on('keyup', function(e) {
+    $('.edit-env-name', context).on('keyup', function(e) {
       if (e.keyCode === 13) {
         edit_swap_button.click()
       }
     })
   }
   else {
-    var new_env_name = $('.edit-env-name');
+    var new_env_name = $('.edit-env-name', context);
     var new_name = new_env_name.val();
 
     // set new name here.
@@ -164,7 +166,7 @@ function editClassroomName(envId) {
       var message;
       if (result) {
         message = $('<span/>', {
-          class: 'name-save-result success-message',
+          class: 'name-save-result tag is-success inline-block success-message',
           text: 'Saved'
         });
 
@@ -172,7 +174,7 @@ function editClassroomName(envId) {
       }
       else {
         message = $('<span/>', {
-          class: 'name-save-result error-message',
+          class: 'name-save-result tag is-warning inline-block error-message',
           text: 'Failed to save. Try again later'
         })
       }
@@ -190,6 +192,7 @@ function editClassroomName(envId) {
     env_name.show();
   }
 
+  edit_swap_button.removeClass('is-loading');
   currently_editing = !currently_editing;
   edit_swap_button.html((currently_editing) ? 'Save' : 'Edit')
 }
