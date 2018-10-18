@@ -459,3 +459,9 @@ ul
   text-align: center;
   padding: 10px;
 }
+
+
+.modal-content {
+  background-color: white;
+  padding: 20px 30px;
+}

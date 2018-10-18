@@ -65,22 +65,48 @@
     border-bottom: none;
 }
 
+.spaced-button {
+    margin-left: 0.5em;
+    margin-right: 0.5em;
+}
+
+.spaced-checkbox {
+    margin: 0.5em 0.5em 0 0;
+}
+
+.is-vertical-spaced {
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+}
+
+.is-horizontal-spaced {
+    margin-left: 0.5em;
+    margin-right: 0.5em;
+}
+
+.is-right-spaced {
+    margin-right: 0.5em;
+}
+
 .export-tab {
-    background: #4893cf ;
-    color: white;
-    margin-right: 1em;
+    /*background: #4893cf ;*/
+    /*color: white;*/
+    /*margin-right: 1em;*/
 }
 
 .import-tab {
-    background: #23d160 ;
-    color: white;
-    margin-right: 1em;
+    /*background: #23d160 ;*/
+    /*color: white;*/
+    /*margin-right: 1em;*/
 }
-
 
 .edit-button {
     background: #005288;
     color: white;
+}
+
+.form-submit {
+    margin-top: 1em;
 }
 
 .edit-button:hover {

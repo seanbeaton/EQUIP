@@ -5,14 +5,15 @@
   <div class="single-env">
     <div class="level">
       <div class="level-left">
-          <h1 class="title is-3 env-name environment-name-wrapper"><span class="environment-name">{{envName}}</span><button id="edit-classroom-name" class="button is-small inline-block">Edit</button></h1>
+          <h1 class="title is-3 env-name environment-name-wrapper"><span class="environment-name">{{envName}}</span><button id="edit-classroom-name" class="button is-small spaced-button">Edit</button></h1>
       </div>
       <div class="level-right">
         <!-- Add in functionality for export later -->
         <!-- 12/31/2016 -->
-        <button class="button is-medium export-tab">Export</button>
-        <button class="button is-medium import-tab">Import</button>
-        <button class="button is-medium is-danger" id="env-delete">Delete</button>
+        <button class="button is-medium is-info spaced-button export-tab">Export</button>
+        <button class="button is-medium is-primary spaced-button import-tab">Import</button>
+        <button class="button is-medium is-primary spaced-button dupe-tab" id="env-duplicate">Duplicate</button>
+        <button class="button is-medium is-danger spaced-button" id="env-delete">Delete</button>
       </div>
     </div>
     <div class="columns">

@@ -2,6 +2,9 @@
 * JS file for environment_item.html
 */
 
+import { createModal } from '/client/helpers/modals.js'
+
+
 Template.environmentItem.events({
   'click #enter-class': function(e) {
      e.preventDefault();
@@ -91,6 +94,11 @@ Template.environmentItem.events({
     e.preventDefault();
     editClassroomName(this._id);
   },
+  'click #env-duplicate': function(e) {
+    e.preventDefault();
+    duplicateClassroom(this);
+  },
+
   });
 
 Template.environmentItem.events({
@@ -195,4 +203,103 @@ function editClassroomName(envId) {
   edit_swap_button.removeClass('is-loading');
   currently_editing = !currently_editing;
   edit_swap_button.html((currently_editing) ? 'Save' : 'Edit')
+}
+
+function duplicateClassroom(orig_env) {
+  let context = $('.environment[data-env-id="' + orig_env._id + '"]');
+
+  let modal = createModal('Duplicate Classroom', '', 'duplicate-classroom-modal', true);
+
+  let modal_content = modal.find('.modal-card-body');
+
+  let form_el = $('<div/>', {class: 'field'});
+  form_el.append($('<label/>', {
+    class: "label",
+    text: "New Classroom Name",
+    for: 'new-env-name',
+  }));
+  form_el.append($('<input/>', {
+    id: "new-env-name",
+    class: 'input',
+    value: 'Duplicate of ' + orig_env.envName,
+  }));
+
+  modal_content.append(form_el);
+
+  modal_content.append($('<p/>', {
+    text: "Please select what you'd like to copy from your previous classroom. Note: if you import students you must also import the parameters used to create them.",
+    class: 'is-vertical-spaced'
+  }));
+
+
+  form_el = $('<label/>', {
+    class: "form-label checkbox spaced-checkbox",
+    text: " Parameters",
+    for: 'copy-parameters',
+  }).prepend($('<input/>', {
+    id: "copy-parameters",
+    type: 'checkbox',
+    checked: true
+  }));
+  modal_content.append(form_el);
+
+  form_el = $('<label>/', {
+    class: "form-label checkbox spaced-checkbox",
+    text: " Students",
+    for: 'copy-students',
+  }).prepend($('<input/>', {
+    id: "copy-students",
+    type: 'checkbox',
+    checked: true
+  }));
+
+  modal_content.append(form_el);
+
+  const students_checkbox = modal_content.find('#copy-students');
+  const parameters_checkbox = modal_content.find('#copy-parameters');
+
+  parameters_checkbox.on('change', function() {
+    const value = $(this).is(":checked");
+    students_checkbox.attr('disabled', !value);
+    if (!value) {
+      students_checkbox.attr('checked', false);
+    }
+  });
+
+  const modal_footer = modal.find('.modal-card-foot');
+
+  modal_footer.prepend($('<a/>', {
+    class: 'button is-primary',
+    id: 'submit-duplicate-form',
+    text: 'Duplicate Classroom'
+  }));
+
+  $('#submit-duplicate-form').on('click', function(e) {
+    const import_students = students_checkbox.is(':checked');
+    const import_parameters = parameters_checkbox.is(':checked');
+    const new_env_name = $('#new-env-name').val();
+    if (import_students && !import_parameters) {
+      showDuplicationWarning('You cannot import students without importing parameters.')
+    }
+    const import_values = {
+      sourceEnvId: orig_env._id,
+      import_students: import_students,
+      import_parameters: import_parameters,
+      envName: new_env_name,
+    }
+    Meteor.call('environmentDuplicate', import_values, function(error, result) {
+      if (error && error.error === 'duplicate_error') {
+        showDuplicationWarning(error.reason)
+      }
+    });
+    modal.remove();
+
+  });
+
+  function showDuplicationWarning(message) {
+    $('.obs-dash-list').append('<div class="duplication-warning notification is-warning">' + message + '</div>');
+    setTimeout(function() {
+      $('.duplication-warning').remove()
+    }, 5000);
+  }
 }
