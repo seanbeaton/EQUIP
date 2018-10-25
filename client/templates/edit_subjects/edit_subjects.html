@@ -10,8 +10,8 @@
         </div>
     </section>
 
-    <div class="subjects c--student-body__container">
-      <div>
+    <div class="c--student-body__wrapper">
+      <div class="c--student-body__description">
           <ul class="c--student-body__container-list-container">
               <a href="{{pathFor 'environmentList'}}">
                   <li class="c--student-body__container-list">Dashboard<span> &#62;</span></li>
@@ -22,11 +22,13 @@
               This is the student roster for your classroom: {{classRoomName}}. You can add students, edit their demographic information, or delete students from the roster. You can also save the visual layout of where students are sitting in the classroom. For additional guidance, visit the <a href="{{pathFor 'help' hash='customize'}}">help</a> page.
           </p>
       </div>
-    {{#each subject}}
-      <div id="{{_id}}" style='transform:translate({{data_x}}px, {{data_y}}px);' data-x="{{data_x}}" data-y="{{data_y}}" class="draggable c--student-body__container-drag-area o--box-item">
-        <p class="c--student-body__container-drag-label">{{info.name}}</p>
-      </div>
-    {{/each}}
+    <div class="c--student-body__container subjects">
+        {{#each subject}}
+            <div id="{{_id}}" style='transform:translate({{data_x}}px, {{data_y}}px);' data-x="{{data_x}}" data-y="{{data_y}}" class="draggable c--student-body__container-drag-area o--box-item">
+                <p class="c--student-body__container-drag-label">{{info.name}}</p>
+            </div>
+        {{/each}}
+    </div>
   </div>
 
   <!-- MODAL FOR STUDENT PARAMS -->
