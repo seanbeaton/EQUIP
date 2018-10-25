@@ -115,7 +115,7 @@ function editObservationName(obsId) {
 
   if (!currently_editing) {
     obs_name_wrapper.prepend($('<input>', {
-      class: 'edit-obs-name title is-3',
+      class: 'edit-obs-name inherit-font-size',
       value: obs_name.html()
     }));
 
@@ -164,6 +164,8 @@ function editObservationName(obsId) {
 
     new_obs_name.remove();
     obs_name.removeClass('editing');
+
+    console.log('go');
     obs_name.show();
   }
 

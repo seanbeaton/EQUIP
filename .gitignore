@@ -3,3 +3,4 @@ settings.json
 .DS_Store
 sample_data.txt
 .idea/
+node_modules

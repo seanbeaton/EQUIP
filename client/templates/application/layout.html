@@ -1,9 +1,55 @@
 <!-- HTML for layout which inserts templates into the body (yield) of the website to render new pages. The yield is received from the router.js file. The navbar is on every page as shown below -->
 
 <template name="layout">
-
     {{> header}}
     <div id="main">
-      {{> yield}}
+        {{> yield}}
+    </div>
+    {{> footer}}
+    <div id="onboarding-modal" class="modal">
+      <div class="modal-background"></div>
+        <div id="data-modal-content" class="modal-content">
+            <div class="c--onboarding-modal__container">
+                <div class="c--onboarding-modal__header-container">
+                    <h1 class="c--onboarding-modal__header-title">New to EQUIP? Here's how it works.</h1>
+                </div>
+
+                <div class="c--onboard-modal__body-container">
+                    <div class="c--onboard-modal__body-content-container">
+                        <img class="c--onboard-modal__body-content-image" src="refresh/icon-create.svg">
+                        <h1 class="c-help-faq-create__body-title">Create</h1>
+                        <p class="c--onboard-modal__body-content">Set up your classroom</p>
+                        <a class="c--onboard-modal__body-link" href="/help">Learn More</a>
+                    </div>
+                    <div class="c--onboard-modal__body-content-container">
+                        <img class="c--onboard-modal__body-content-image" src="refresh/icon-customize.svg">
+                        <h1 class="c-help-faq-create__body-title">Customize</h1>
+                        <p class="c--onboard-modal__body-content">Add classroom and student details</p>
+                        <a class="c--onboard-modal__body-link" href="/help">Learn More</a>
+                    </div>
+                    <div class="c--onboard-modal__body-content-container">
+                        <img class="c--onboard-modal__body-content-image" src="refresh/icon-observe.svg">
+                        <h1 class="c-help-faq-create__body-title">Observe</h1>
+                        <p class="c--onboard-modal__body-content">Enter student contributions</p>
+                        <a class="c--onboard-modal__body-link" href="/help">Learn More</a>
+                    </div>
+                    <div class="c--onboard-modal__body-content-container">
+                        <img class="c--onboard-modal__body-content-image" src="refresh/icon-analyze.svg">
+                        <h1 class="c-help-faq-create__body-title">Analyze</h1>
+                        <p class="c--onboard-modal__body-content">Generate a report of your classroom observations</p>
+                        <a class="c--onboard-modal__body-link" href="/help">Learn More</a>
+                    </div>
+                </div>
+
+                <div class="o--standard-button c--onboard-modal__button">
+                    <a href="/environmentList?onboarding=true">Create A Classroom</a>
+                </div>
+
+                <div class="c--onboard-modal__footer-container">
+                    <p class="c--onboard-modal__footer-content"> Need additional guidance? Get it <a class="c--onboard-modal__footer-link" href="/help">here.</a></p>
+                </div>
+            </div>
+        </div>
+        <button class="modal-close"></button>
     </div>
 </template>

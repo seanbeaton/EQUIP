@@ -3,16 +3,13 @@
 */
 
 Template.editSubjects.helpers({
-  subject: function() {
-    subs = Subjects.find({envId: this._id});
-    console.log(subs);
-    return subs;
-  },
-  subjParameter: function() {
-
-    var studentParams = SubjectParameters.find({'children.envId':this._id}).fetch();
-    return studentParams;
-  },
+    subject: function() {
+        subs = Subjects.find({envId: this._id});
+        return subs;
+    },
+    classRoomName: function() {
+        return this.envName;
+    }
 });
 
 //Used to set up interactJS and get labels for students
@@ -30,7 +27,7 @@ interact('.draggable')
     restrict: {
       restriction: 'parent'
     }
- 
+
   });
 
   function dragMoveListener (event) {
@@ -43,7 +40,6 @@ interact('.draggable')
     target.style.webkitTransform =
     target.style.transform =
       'translate(' + x + 'px, ' + y + 'px)';
-
     // update the posiion attributes
     target.setAttribute('data-x', x);
     target.setAttribute('data-y', y);
@@ -59,7 +55,7 @@ interact('.draggable')
 // On rendering, get students and layout classroom with student boxes
 Template.editSubjects.rendered = function() {
   $(document).keyup(function(e) {
-     if (e.keyCode == 27) { 
+     if (e.keyCode == 27) {
       $('#stud-param-modal').removeClass('is-active');
       $('#stud-data-modal').removeClass('is-active');
     }
@@ -70,13 +66,10 @@ Template.editSubjects.rendered = function() {
 // Click events
 //
 Template.editSubjects.events({
-
   'click .back-head-params': function(e) {
     Router.go('observationList', {_envId:Router.current().params._envId});
   },
-
   //Stuff for student parameters modal
-
   'click .modal-close': function(e){
     $('#stud-param-modal').removeClass('is-active');
     $('#stud-data-modal').removeClass('is-active');
@@ -104,60 +97,63 @@ Template.editSubjects.events({
       return;
     }
 
-
     $('#param-modal-content').children().remove();
-
-   $('#stud-param-modal').addClass('is-active');
-   
-    populateParamBoxes();
-  
+    $('#stud-param-modal').addClass('is-active');
+    populateParamBoxes(envId);
  },
 
   'click #save-subj-params': function(e) {
+    const students = Subjects.find({envId: Router.current().params._envId}).fetch();
+    const numberOfStudents = students.length;
+    let newStudentPositionX;
+    let newStudentPositionY;
 
-    // If using boxes
-    name = $('#student-name').val();
+    if (numberOfStudents === 0) {
+        newStudentPositionY = 180;
+        newStudentPositionX = 0;
+    } else {
+        let yPosition = students[numberOfStudents - 1].data_y;
+        let xPosition = students[numberOfStudents - 1].data_x;
+        newStudentPositionY = parseInt(xPosition) > 674 ?  parseInt(yPosition) + 75 : yPosition;
+        newStudentPositionX = parseInt(xPosition) > 674 ?  0 : parseInt(xPosition) + 225;
+    }
+
+    const name = $('#student-name').val().trim();
+
+    if (name.length === 0 ) {
+        alert("Please enter a name");
+        return;
+    }
+
     var info = {};
     var choices = [];
-    var labels = [];
+    var labels = ["name"];
     choices.push(name);
 
-    
-
-    $('.subj-box-labels').each(function () {
+    $('.js-subject-labels').each(function () {
       labels.push(this.textContent);
     });
 
     $('.chosen').each(function () {
-      choices.push(this.textContent);
-    });
-    
-
-    for (label in labels) {
-        if (label == 0) {
-          info['name'] = choices[label];
-        } else {
-          info[labels[label]] = choices[label];
-        }
-    }
-    var students = Subjects.find({envId:Router.current().params._envId}).fetch();
-    count = 0;
-    _.each(students, function (s) {
-      if (s['data_x'] == '0') {
-        count++;
+      let choice = this.textContent.replace(/\n/ig, '').trim();
+      if (choice.length === 0) {
+          alert("please make a selection")
+          return;
+      } else {
+          choices.push(choice);
       }
     });
 
-    y = count*30 + 30;
+    for (label in labels) {
+        info[labels[label]] = choices[label];
+    }
+
     var subject = {
-      data_x: '0',
-      data_y: String(y),
+      data_x: String(newStudentPositionX),
+      data_y: String(newStudentPositionY),
       envId: this._id,
       info: info
     };
-
-
-
 
     Meteor.call('subjectInsert', subject, function(error, result) {
      if (error) {
@@ -170,7 +166,7 @@ Template.editSubjects.events({
   'click .edit-stud' : function (e) {
     studId = $(e.target).attr('data_id');
     editParamBoxes(studId);
-  
+
     $('#stud-data-modal').removeClass('is-active');
     $('#stud-param-modal').addClass('is-active');
   },
@@ -191,7 +187,7 @@ Template.editSubjects.events({
     Meteor.call('subjectPositionUpdate', subjects, function(error, result) {
         if (error) {
           alert(error.reason);
-        } else {
+      } else {
           toastr.options = {
           "closeButton": false,
           "debug": false,
@@ -211,38 +207,42 @@ Template.editSubjects.events({
         }
         Command: toastr["success"]("Save Successful", "Student locations saved as they currently are.")
         }
-      }); 
+      });
   },
 
-  'click .delete-subject': function(e) {
+  'click .delete-student': function(e) {
     var result = confirm("Press 'OK' to delete this Subject.");
-      subjId = $(e.target).attr("data_id");
-      Meteor.call('subjectDelete', subjId, function(error, result) {
-        return 0;
-      });
 
-      createTableOfStudents();
+    if (result === true) {
+        var subjId = $(e.target).attr("data_id");
+
+        Meteor.call('subjectDelete', subjId, function(error, result) {
+            return 0;
+        });
+
+        createTableOfStudents();
+    } else {
+        return;
+    }
   },
   'click #edit-subj-params': function (e){
-    subjId = $(e.target).attr('data_id');
-
+    var subjId = $(e.target).attr('data_id');
     var info = {};
-      info['name'] = $('.student-modal-head').attr('data_name');
-      envId = Router.current().params._envId;
-      var choices = [];
-      var labels = [];
-      //Do this always in the case of editing from obs list
+    info['name'] = $('.js-modal-header').attr('data_name');
+    var envId = Router.current().params._envId;
+    var choices = [];
+    var labels = [];
+    //Do this always in the case of editing from obs list
 
-        $('.subj-box-labels').each(function () {
-          labels.push(this.textContent);
-          var c = $(this).siblings('.chosen')[0];
-          if (c) {
-            choices.push(c.textContent);
-          } else {
-            choices.push(null);
-          }
-        });
-      
+    $('.js-subject-labels').each(function () {
+        labels.push(this.textContent);
+    });
+
+    $('.chosen').each(function () {
+      let choice = this.textContent.replace(/\n/ig, '').trim();
+      choices.push(choice);
+    });
+
       for (label in labels) {
         info[labels[label]] = choices[label];
       }
@@ -264,7 +264,6 @@ Template.editSubjects.events({
     createTableOfStudents()
     $('#stud-data-modal').addClass('is-active');
   }
-
 });
 
 //
@@ -275,202 +274,157 @@ function createTableOfStudents() {
   $('#data-modal-content').children().remove();
   var envId = Router.current().params._envId
   var students = Subjects.find({envId:envId}).fetch();
-  subjParams = SubjectParameters.find({'children.envId':envId}).fetch()[0];
-  parameterPairs = subjParams["children"]["parameterPairs"];
+  var subjParams = SubjectParameters.find({'children.envId':envId}).fetch()[0];
+  var parameterPairs = subjParams["children"]["parameterPairs"];
 
-  allParams = ['Edit','name'];
+  var allParams = [];
   for (p = 0; p<parameterPairs; p++) {
     allParams.push(subjParams['children']['label'+p]);
   }
-  allParams.push("Delete");
 
-  var modal = $('#data-modal-content');
-
-  var table = $('<table/>', {
-    class: "table is-striped"
-  }).appendTo(modal);
-  // Create heading
-  $('<thead/>', {}).appendTo(modal);
-  var heading = $('<tr/>', {}).appendTo(table);
-
-  for (pa in allParams) {
-    $('<th/>', {
-      text: allParams[pa]
-    }).appendTo(heading);
-  }
-  var body = $('<tbody/>', {}).appendTo(table);
-  //loop over each student
-  for (s in students) {
-    var row = $('<tr/>', {}).appendTo(table);
-    //loop over each parameter
-    for (p in allParams) {
-      if (allParams[p] == "Delete") {
-        //Add delete button
-        var td = $('<td/>', {}).appendTo(row);
-        var bye = $('<i/>', {
-          class: "fa fa-times delete-subject",
-          data_id: students[s]['_id']
-        }).appendTo(td);
-
-      } else if (allParams[p] == "Edit") {
-        var td = $('<td/>', {}).appendTo(row);
-        var bye = $('<i/>', {
-          class: "fa fa-pencil-square-o edit-stud",
-          data_id: students[s]['_id'],
-        }).appendTo(td);
-      }else {
-        attr = students[s]['info'][allParams[p]]
-        $('<td/>', {
-          text: attr
-        }).appendTo(row);
-      }
-    }
-  }
+  var modal = document.getElementById("data-modal-content");
+  modal.innerHTML += contributionTableTemplate(students, allParams);
 }
 
+function contributionTableTemplate(students, parameters) {
+    var params = parameters;
+    var contributionRows = students.map((student) => {
+        return contributionRowTemplate(student, params)
+    }).join("");
 
-
-function populateParamBoxes() {
-  var envId = Router.current().params._envId
-  subjParams = SubjectParameters.find({'children.envId':envId}).fetch()[0];
-  parameterPairs = subjParams["children"]["parameterPairs"];
-
-  var modal = $('#param-modal-content');
-  
-  var name = $("<div/>", {
-      class: "columns  boxes-wrapper"
-    }).appendTo(modal);
-
-    var label = $("<div/>", {
-      class: "column is-2 has-text-centered subj-box-labels",
-      text: "Name or Identifier for Student"
-    }).appendTo(name);
-
-    $('<input/>', {
-        class: "column input",
-        id: "student-name",
-        type: "text",
-        placeholder: "Eg, Joey or Male Student"
-      }).appendTo(name);
-
-
-  //
-  //BOX CREATION FOR MODAL
-  //
-  //go through each parameter pair and create a box
-  for (var param = 0; param<parameterPairs; param++) {
-    var wrap = $("<div/>", {
-      class: "columns  boxes-wrapper"
-    }).appendTo(modal);
-
-    var label = $("<div/>", {
-      class: "column is-2 has-text-centered subj-box-labels",
-      text: subjParams['children']['label'+param]
-    }).appendTo(wrap);
-
-    var params = subjParams['children']['parameter'+param]
-    var options = params.split(',');
-
-    for (opt in options) {
-  
-        var option = $("<div/>", {
-          class: "column has-text-centered subj-box-params hoverable",
-          text: options[opt]
-        }).appendTo(wrap);
-
-        option.click(function (e) {
-          e.preventDefault();
-          $(this).siblings().removeClass('chosen');
-          if ( $(this).hasClass('chosen') ){
-            $(this).removeClass('chosen');
-          } else {
-            $(this).addClass('chosen');
-          }
-        });
-    }//end for
-  }//end for
-
-  $("<button/>", {
-    class: "button is-medium is-success",
-    id: "save-subj-params",
-    text: "Add Subject"
-  }).appendTo(modal);
-
+    return `
+        <div class="c--modal-header-container">
+            <h3 class="c--modal-header-title">Student Roster</h3>
+        </div>
+        ${contributionRows}
+    `
 }
 
+function contributionRowTemplate(student, params) {
+    let paramTemplate = params.map((param) => {
+        return `
+            <p class="o--modal-label contributions-grid-item">${param}</p>
+        `
+    }).join("");
+
+    let paramValues = params.map((param) => {
+        let data = student.info[param];
+        return `
+            <p class="o--modal-label contributions-grid-item">${data}</p>
+        `
+    }).join("");
+
+    return `
+        <div class="contributions-grid-container-student">
+            <h3 class="contributions-modal-header">${student.info.name}</h3>
+            <p class="o--toggle-links contributions-modal-link edit-stud" data_id="${student._id}" data_studentid="${student.info.studentId}">Edit</p>
+            <p class="o--toggle-links contributions-modal-link delete-student" data_id="${student._id}" >Delete</p>
+        </div>
+        <div class="contributions-grid-item-container u--bold">
+            ${paramTemplate}
+        </div>
+        <div class="contributions-grid-item-container">
+            ${paramValues}
+        </div>
+    `
+}
+
+// Saves a new student
+function populateParamBoxes(envId) {
+    var subjParams = SubjectParameters.find({'children.envId':envId}).fetch()[0];
+    var parameterPairs = subjParams["children"]["parameterPairs"];
+    var modal = document.getElementById("param-modal-content");
+
+    modal.innerHTML += studentHeaderTemplate("Add a Student");
+    modal.innerHTML += studentInputTemplate();
+    modal.innerHTML += studentParameterTemplate(subjParams, parameterPairs, null, "Add Student");
+    attachOptionSelection()
+}
+
+// Edits student
 function editParamBoxes(subjId) {
-  $('#param-modal-content').children().remove();
-  var envId = Router.current().params._envId
-  subParams = SubjectParameters.find({'children.envId':envId}).fetch()[0];
-  parameterPairs = subParams["children"]["parameterPairs"];
-  var subj = Subjects.find({_id: subjId}).fetch()[0];
-  var student = subj.info.name;
+    $('#param-modal-content').children().remove();
+    let envId = Router.current().params._envId
+    let subjParams = SubjectParameters.find({'children.envId':envId}).fetch()[0];
+    let parameterPairs = subjParams["children"]["parameterPairs"];
+    let subj = Subjects.find({_id: subjId}).fetch()[0];
+    let student = subj.info.name;
+    let modal = document.getElementById("param-modal-content");
 
-  var modal = $('#param-modal-content');
-  
-  var name = $("<div/>", {
-      class: "columns  boxes-wrapper"
-    }).appendTo(modal);
-
-    var label = $("<h1/>", {
-      class: "column is-12 has-text-centered title is-3 student-modal-head",
-      text: "Editing Info for "+student,
-      data_id: subjId,
-      data_name: student
-    }).appendTo(name);
-
-  //
-  //BOX CREATION FOR MODAL
-  //
-  //go through each parameter pair and create a box
-  for (var param = 0; param<parameterPairs; param++) {
-
-    var wrap = $("<div/>", {
-      class: "columns  boxes-wrapper"
-    }).appendTo(modal);
-
-    var label = $("<div/>", {
-      class: "column is-2 has-text-centered subj-box-labels",
-      text: subParams['children']['label'+param]
-    }).appendTo(wrap);
-
-    var field = subParams['children']['label'+param];
-
-    var params = subParams['children']['parameter'+param];
-    var options = params.split(',');
-
-    for (opt in options) {
-  
-        if (subj['info'][field] == options[opt]) {
-          var option = $("<div/>", {
-          class: "column has-text-centered subj-box-params chosen hoverable",
-          text: options[opt]
-        }).appendTo(wrap);
-        } else {
-  
-          var option = $("<div/>", {
-            class: "column has-text-centered subj-box-params hoverable",
-            text: options[opt]
-          }).appendTo(wrap);
-        }
-        option.click(function (e) {
-          e.preventDefault();
-          $(this).siblings().removeClass('chosen');
-          if ( $(this).hasClass('chosen') ){
-            $(this).removeClass('chosen');
-          } else {
-            $(this).addClass('chosen');
-          }
-        });
-    }//end for
-  }//end for
-
-  $("<button/>", {
-    class: "button is-medium is-success",
-    id: "edit-subj-params",
-    data_id: subjId,
-    text: "Save Revised Student Info"
-  }).appendTo(modal);
-
+    modal.innerHTML += studentHeaderTemplate(`Edit ${student}`, student);
+    modal.innerHTML += studentParameterTemplate(subjParams, parameterPairs, subj, "Edit Student");
+    attachOptionSelection()
 }
 
+function studentHeaderTemplate(type, student) {
+    let studentName = student ? student : "";
+    return `
+        <div class="c--modal-header-container js-modal-header" data_name="${studentName}">
+            <h3 class="c--modal-header-title">${type}</h3>
+        </div>
+    `
+}
+
+function studentInputTemplate() {
+    return `
+        <div class="boxes-wrapper">
+            <div class="c--modal-student-header">
+                <p>Name / Identifier for Student</p>
+            </div>
+            <input class="c--modal-student-input" id="student-name" type="text" placeholder="Type Student's First Name, Initials, or Pseudonym">
+        </div>
+    `
+}
+
+function studentParameterTemplate(subjects, paramPairs, student, type) {
+    let saveBtn = type === "Add Student" ? "save-subj-params" : "edit-subj-params";
+    let counter = Array(paramPairs).fill().map((e,i) => i);
+    let studentId = student ? student._id.trim() : "";
+    let boxes = counter.map((param) => {
+        let params = subjects['children']['parameter' + param];
+        let options = params.split(',');
+        let field = subjects['children']['label' + param];
+        let optionNodes = options.map((opt) => {
+            let selected = "";
+
+            if (field && student) { selected = student['info'][field] === opt ? "chosen" : "" }
+
+            return `
+                <div class="column has-text-centered subj-box-params ${selected} optionSelection">
+                    ${opt}
+                </div>
+            `
+        }).join("");
+        return `
+            <div class="c--modal-student-header js-subject-labels">${subjects['children']['label'+param]}</div>
+            <div class="c--modal-student-options-container">
+                ${optionNodes}
+            </div>
+        `
+    }).join("");
+
+    return `
+        <div class="boxes-wrapper">
+            ${boxes}
+        </div>
+        <div class="button-container">
+            <button class="o--standard-button u--margin-zero-auto" id="${saveBtn}" data_id="${studentId}">
+                ${type}
+            </button>
+        </div>
+    `
+}
+
+function attachOptionSelection() {
+    var allNodes = document.querySelectorAll(".optionSelection");
+    [...allNodes].forEach((node) => { node.addEventListener("click", handleOptionSelect); });
+}
+
+var handleOptionSelect = function() {
+    $(this).siblings().removeClass('chosen');
+    if ( $(this).hasClass('chosen') ){
+      $(this).removeClass('chosen');
+    } else {
+      $(this).addClass('chosen');
+    }
+}

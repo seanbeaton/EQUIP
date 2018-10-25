@@ -1,51 +1,105 @@
 <!-- HTML for environment items in the environment list -->
 
 <template name="environmentItem">
-<div class="environment" data-env-id={{_id}}>
-  <div class="single-env">
-    <div class="level">
-      <div class="level-left">
-          <h1 class="title is-3 env-name environment-name-wrapper"><span class="environment-name">{{envName}}</span><button id="edit-classroom-name" class="button is-small spaced-button">Edit</button></h1>
-      </div>
-      <div class="level-right">
-        <!-- Add in functionality for export later -->
-        <!-- 12/31/2016 -->
-        <button class="button is-medium is-info spaced-button export-tab">Export</button>
-        <button class="button is-medium is-primary spaced-button import-tab">Import</button>
-        <button class="button is-medium is-primary spaced-button dupe-tab" id="env-duplicate">Duplicate</button>
-        <button class="button is-medium is-danger spaced-button" id="env-delete">Delete</button>
-      </div>
-    </div>
-    <div class="columns">
-      <div class="column">
-        <p>Created On: {{submitted}}</p>
-        {{#if trackModified}}
-        <p>Last Modified: {{lastModified}} </p>
-        {{else}}
-        <p>Last Parameter/Subject Modification: {{lastModifiedParam}} </p>
-        <p>Last Observation Modification: {{lastModifiedObs}} </p>
-        {{/if}}
-      </div>
-    </div>
-    <div class="columns">
-      <div class="column">
-        <button id="enter-class" class="button is-large enter-button">Observation List</button>
-      </div>
-
-      <div class="column">
-        <button id="edit-class-studs" class="button is-large stud-edit-button {{needsSubjects}}">Edit Students</button>
-      </div>
-      <div class="column">
-        {{ #if hasObsMade }}
-            <button id="edit-class-params" class="button is-large edit-button {{needsSubjects}}">Edit Parameters</button>
-        {{else}}
-            <button id="edit-class-params" class="button is-large edit-button {{needsSubjects}}">View Parameters</button>
-        {{ /if }}
-
-      </div>
-      <div class="column">
-      </div>
-    </div>
-  </div>
-</div>
+    <li class="environmentList environment" data-env-id={{_id}}>
+        <!-- acccordion header -->
+        <div class="o--header-link toggle-accordion">
+            <span><span class="environment-name-wrapper"><span class="environment-name">{{envName}}</span><button id="edit-classroom-name" class="button is-small spaced-button">Edit</button></span> <p class="carat"> &#9660;</p></span>
+            <div class="toggle-sub">
+                <p class="o--toggle-links" id="analyze-button">Analyze</p>
+                <p class="o--toggle-links export-tab">Export</p>
+                <p class="o--toggle-links import-tab">Import</p>
+                <p class="o--toggle-links dupe-tab" id="env-duplicate">Duplicate</p>
+                <p class="o--toggle-links" id="env-delete">Delete</p>
+            </div>
+        </div>
+        <!-- accordion contents -->
+        <ul class="inner-container">
+            <li class="c--accordion-item">
+                <div class="c--accordion-item-label-inner">
+                    <label class="c--accordion-item-label">Step 1</label>
+                </div>
+                <div class="c--accordion-item__inner">
+                    <h3 class="c--accordion-item__title">Demographics
+                        {{#if noSubjectParametersEntered }}
+                            <span class="o--required-star">*</span>
+                        {{/if}}
+                    </h3>
+                    <div class="c--accordion-item__edit-container">
+                        <p class="o--toggle-links c--accordion-item__edit" id="edit-class-params">
+                            Edit
+                        </p>
+                        <span class="icon-container"><i style="color:gray;" class="far fa-question-circle c--accordion-item__icon"></i><span class="tooltiptext">Demographics are social markers like race, gender, etc.</span></span>
+                    </div>
+                </div>
+                <div class="c--accordion-item__inner--labels">
+                    <p class="demographic-labels">{{getSubjectParameters}}</p>
+                </div>
+            </li>
+            <li class="c--accordion-item">
+                <div class="c--accordion-item-label-inner">
+                    <label class="c--accordion-item-label">Step 2</label>
+                </div>
+                <div class="c--accordion-item__inner">
+                    <h3 class="c--accordion-item__title">Discourse Dimensions
+                        {{#if noDiscourseParametersEntered}}
+                            <span class="o--required-star">*</span>
+                        {{/if}}
+                    </h3>
+                    <div class="c--accordion-item__edit-container">
+                        <p class="o--toggle-links c--accordion-item__edit" id="edit-sequence-params">
+                            Edit
+                        </p>
+                        <span class="icon-container"><i style="color:gray;" class="far fa-question-circle c--accordion-item__icon"></i><span class="tooltiptext">Discourse dimensions are the aspects of classroom talk that you wish to track, like the type of questions teachers ask or the length of student contributions.</span></span>
+                    </div>
+                </div>
+                <div class="c--accordion-item__inner--labels">
+                    <p class="discourse-labels">{{getDiscourceParameters}}</p>
+                </div>
+            </li>
+            <li class="c--accordion-item">
+                <div class="c--accordion-item-label-inner">
+                    <label class="c--accordion-item-label">Step 3</label>
+                </div>
+                <div class="c--accordion-item__inner">
+                    <h3 class="c--accordion-item__title">Student Roster
+                        {{#if noStudentsAdded}}
+                            <span class="o--required-star">*</span>
+                        {{/if}}
+                    </h3>
+                    <div class="c--accordion-item__edit-container">
+                        <p class="o--toggle-links c--accordion-item__edit" id="edit-class-studs">
+                            Edit
+                        </p>
+                        <span class="icon-container"><i style="color:gray;" class="far fa-question-circle c--accordion-item__icon"></i><span class="tooltiptext">Your student roster contains the names of your students and a visual layout of where they sit in the classroom.</span></span>
+                    </div>
+                </div>
+                <div class="c--accordion-item__inner--labels">
+                    <p class="demographic-labels">{{getStudents.names}}</p>
+                    <p class="c--accordion-item_inner--count">Students: {{getStudents.count}}</p>
+                </div>
+                {{#if hasObsMade}}
+                    <p class="c--accordion-item_guide"><span class="o--required-star">*</span>Demographics, Discourse Dimensions, and Student Roster are required before an observation can be performed. Click "Edit" to setup each.</p>
+                {{/if}}
+            </li>
+            <li class="c--accordion-item">
+                <div class="c--accordion-item__inner toggle-accordion toggle-nested" data-id={{getEnvironmentId}}>
+                    <h3 class="o--header-link c--accordion-item__title-observation">Observations ({{getObservationsCount}}) <p class="carat" id="carat-obs"> &#9660;</p></h3>
+                    {{#if isClassValidated}}
+                        <p class="o--toggle-links c--accordion-item__create-new-classroom" id="obs-create-button" data-id={{getEnvironmentId}}>Create New Observation</p>
+                    {{/if}}
+                </div>
+                <ul class="inner-container">
+                    <li>
+                        <div class="c--accordion-item__inner--observations">
+                            {{#each observation in getObservations}}
+                                <p id="enter-class" class="observation-labels o--box-item" data-id={{observation._id}}>({{incrementIndex @index }}) {{observation.name}}</p>
+                            {{/each}}
+                            <p class="c--accordion-item_inner--count">Observations: {{getObservationsCount}}</p>
+                        </div>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+  </li>
 </template>

@@ -110,7 +110,3 @@ Template.observationList.events({
     $('#seq-data-modal').addClass('is-active');
   },
 });
-
-Template.observationList.rendered = function() {
-
-};

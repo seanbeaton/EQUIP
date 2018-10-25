@@ -1,16 +1,131 @@
-.about-text {
-    font-size: 24px;
-    font-family: 'Open Sans';
+.c--about-header__container {
+    margin-top: var(--spacer-40);
 }
 
-.about-text a {
-    color: #4893cf;
+.c--about-header__title {
+    font-size: 65px;
 }
 
-.about-text a:hover {
-    opacity: .5;
+.c--about-info__content {
+    font-size: 30px;
 }
 
-/*.staff {
-    width: 200px;
-}*/
+.c--about-main__inner {
+    width: var(--max-inner-container-width);
+    margin: 0 auto;
+    padding-bottom: 80px;
+    border-bottom: 4px solid var(--black);
+}
+
+.c--about-bio__container {
+    background-color: var(--black);
+    display: inline-flex;
+    margin-bottom: var(--spacer-20);
+}
+
+.c--about-bio__container:nth-of-type(3) {
+    margin-top: 60px;
+}
+
+.c--about-bio__header {
+    font-size: 30px
+}
+
+.c--about-bio__image {
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    width: 50%;
+    margin: 0
+}
+
+.c--bio-image__niral {
+    background-image: url("Niral.jpeg");
+}
+
+.c--about-bio__image {
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    width: 50%;
+    margin: 0
+}
+
+.c--bio-image__daniel {
+    background-image: url("refresh/dr-daniel-reinholz@2x.jpg");
+}
+
+.c--about-bio__inner {
+    padding: 40px;
+    width: 50%
+}
+
+.c--about-bio__title {
+    color: var(--white);
+}
+
+.c--about-research__container, .c--about-development__container  {
+    width: var(--max-inner-container-width);
+    margin: 0 auto;
+    margin-top: 40px;
+}
+
+.c--about-research__content {
+    margin-bottom: 20px;
+    font-size: 16px;
+}
+
+.c--about-development__title {
+    font-family: 'Roboto Condensed', sans-serif;
+}
+
+.c--about-development__content {
+    font-family: 'Roboto Condensed', sans-serif;
+    font-size: 16px;
+}
+
+.c--about-development__link {
+    color: var(--orange);
+    border-bottom: 1px solid
+}
+
+.c--about-footer__container {
+    display: inline-flex;
+    justify-content: space-between;
+    width: var(--max-inner-container-width);
+    margin: 0 auto;
+    margin-top: 40px;
+    text-align: center;
+    align-items: center;
+}
+
+.c--about-footer__item:nth-of-type(1) {
+    min-width: 125px;
+    margin: 0 45px;
+}
+
+.c--about-footer__item {
+    margin: 0 20px;
+    display: flex;
+    flex-flow: column nowrap;
+}
+
+.c--about-footer__image {
+    display: block;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.c--about-footer__content-inner {
+    display: inline-flex;
+    justify-content: space-around;
+    width: 100%;
+    margin-top: 20px;
+    margin-bottom: 0px;
+}
+
+.c--about-footer__content {
+    font-size: 14px;
+    color: #d1cece;
+    margin-top: auto;
+}

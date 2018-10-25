@@ -11,12 +11,13 @@ import * as observation_helpers from '/client/helpers/observations.js'
 Template.observatory.created = function() {
   Session.set('envId', Router.current().params._envId);
   const obsId = Router.current().params._obsId;
-  observation_helpers.createTableOfContributions(obsId);
+  // observation_helpers.createTableOfContributions(obsId);
+
   var labelsObj = SequenceParameters.find({'children.envId':Router.current().params._envId}).fetch();
+
   var parameterPairs = labelsObj[0]['children']['parameterPairs'];
   seqLabels = []
   for (i=0;i<parameterPairs;i++) {
-    console.log("label " + labelsObj[0]['children']['label'+i]);
     if (!labelsObj[0]['children']['label'+i]) {
       return;
     } else {
@@ -26,7 +27,7 @@ Template.observatory.created = function() {
   aTagSelectArray = []
 }
 
-// Updates Timer
+// Updates Timerq
 function clockSet() {
   var secs = timer.value;
   var hours = Math.floor(secs / (60*60));
@@ -85,16 +86,15 @@ function createToggle(params, label) {
   if (params) {
     var choices = params.split(',');
     togglers = $('.toggle-dash');
-    var wrap = $('<div/>', {class: 'column'}).appendTo(togglers);
+    var wrap = $('<div/>', {class: 'column c--observation__toggle-container'}).appendTo(togglers);
     $("<p/>",{
       text: label,
-      class: 'label',
+      class: 'c--observation-toggle__label o--modal-label',
     }).appendTo(wrap);
-    $('<br/>', {}).appendTo(wrap);
-    var span = $('<span/>', {class:'select'}).appendTo(wrap);
+    var span = $('<span/>').appendTo(wrap);
 
     var select = $('<select/>', {
-        class:"toggle-item",
+        class:"c--observation-toggle_select",
         data_label: label
       }).appendTo(span);
 
@@ -140,12 +140,8 @@ Template.observatory.events({
       myId = $(e.target).attr('id');
     }
 
-
-      observation_helpers.populateParamBoxes(myId);
-
-
-  $('#seq-param-modal').addClass('is-active');
-
+    observation_helpers.populateParamBoxes(myId);
+    $('#seq-param-modal').addClass('is-active');
   },
   'click .help-button': function (e) {
     $('#help-env-modal').addClass("is-active");
@@ -165,21 +161,17 @@ Template.observatory.events({
     $('#seq-param-modal').removeClass('is-active');
     $('#seq-data-modal').removeClass('is-active');
   },
-  'click .floating-log': function (e) {
-    //Show editable table
-    console.log(this);
-    observation_helpers.createTableOfContributions(this._id);
-    $('#seq-data-modal').addClass('is-active');
-  },
   'click #save-seq-params': function(e) {
     var info = {};
-    info['studentId'] = $('.student-modal-head').attr('data_id');
-    info['Name'] = $('.student-modal-head').attr('data_name');
+    info['studentId'] = $('.js-modal-header').attr('data_id');
+    info['Name'] = $('.js-modal-header').attr('data_name');
     envId = Router.current().params._envId;
     obsId = Router.current().params._obsId;
+
     var obsRaw = Observations.find({_id: obsId}).fetch()[0];
     var choices = [];
     var labels = [];
+
     $('.toggle-item').each(function () {
       if ($(this).attr('data_label') == "Contribution Defaults") {
         return;
@@ -188,13 +180,14 @@ Template.observatory.events({
       choices.push($(this).val());
     });
 
-    $('.subj-box-labels').each(function () {
+    $('.js-subject-labels').each(function () {
       var chosenElement = false;
-      var chosenElements = this.parentElement.querySelectorAll('.subj-box-params');
+      var chosenElements = this.nextElementSibling.querySelectorAll('.subj-box-params');
+
       labels.push(this.textContent);
       chosenElements.forEach(function(ele) {
         if ($(ele).hasClass('chosen')) {
-            choices.push(ele.textContent);
+            choices.push(ele.textContent.replace(/\n/ig, '').trim());
             chosenElement = true;
         }
       })
@@ -232,12 +225,16 @@ Template.observatory.events({
   'click .delete-seq': function(e) {
     observation_helpers.deleteContribution(e);
   },
+  'click #show-all-observations':function (e){
+    observation_helpers.createTableOfContributions(this._id);
+    $('#seq-data-modal').addClass('is-active');
+  },
   'click #edit-seq-params': function(e) {
     seqId = $(e.target).attr('data_seq');
 
     var info = {};
-      info['studentId'] = $('.student-modal-head').attr('data_id');
-      info['Name'] = $('.student-modal-head').attr('data_name');
+      info['studentId'] = $('.js-modal-header').attr('data_id');
+      info['Name'] = $('.js-modal-header').attr('data_name');
       envId = Router.current().params._envId;
       obsId = Router.current().params._obsId;
       var choices = [];
@@ -251,15 +248,21 @@ Template.observatory.events({
       });
 
 
-        $('.subj-box-labels').each(function () {
-          labels.push(this.textContent);
-          var c = $(this).siblings('.chosen')[0];
-          if (c) {
-            choices.push(c.textContent);
-          } else {
-            choices.push(null);
-          }
-        });
+    $('.js-subject-labels').each(function () {
+      var chosenElement = false;
+      var chosenElements = this.nextElementSibling.querySelectorAll('.subj-box-params');
+      labels.push(this.textContent);
+      chosenElements.forEach(function(ele) {
+        if ($(ele).hasClass('chosen')) {
+            choices.push(ele.textContent.replace(/\n/ig, '').trim());
+            chosenElement = true;
+        }
+      })
+
+      if (chosenElement === false) {
+          choices.push(undefined);
+      }
+    });
 
 
       for (label in labels) {
@@ -282,5 +285,14 @@ Template.observatory.events({
     $('#seq-param-modal').removeClass('is-active');
     observation_helpers.createTableOfContributions(this._id);
     $('#seq-data-modal').addClass('is-active');
+  }
+});
+
+Template.registerHelper( 'math', function () {
+  return {
+    mul ( a, b ) { return a * b; },
+    div ( a, b ) { return b ? a / b : 0; },
+    sum ( a, b ) { return a + b; },
+    sub ( a, b ) { return a - b; },
   }
 });

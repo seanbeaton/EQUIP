@@ -14,8 +14,8 @@ Template.viewData.rendered = function() {
       name = envs[env]['envName'];
       id = envs[env]['_id'];
 
-      var button = $('<button>', {
-        class: "button is-medium classroom-selection",
+      var button = $('<div>', {
+        class: "o--box-container o--box classroom-selection",
         text: name,
         data_id: id
       }).appendTo(classButtons);
@@ -80,12 +80,20 @@ Template.viewData.events({
     $('.obs-selection .chosen').each(function () { obsIds.push($(this).attr('data_id')) });
     $('.dparam-selection .chosen').each(function () { dParams.push($(this).attr('data_id')) });
     $('.sparam-selection .chosen').each(function () { sParams.push($(this).attr('data_id')) });
+    let contributions = Sequences.find({'envId': envId}).fetch();
+    let totalCont = contributions.filter(function(contribution) {
+       return obsIds.includes(contribution.obsId);
+   }).length;
+
+    if (obsIds.length === 0 || contributions.length === 0 || totalCont === 0) {
+        alert("At least one observation or contribution is required prior to generating a report.");
+        return;
+    }
     // Start generating graphs
     demData = makeDemGraphs(envId, dParams);
     groupCData = makeContributionGraphs(obsIds, dParams, sParams);
 
     classStats(envId, sParams, obsIds);
-
     makeRatioGraphs(envId, groupCData, demData);
     makeIndividualGraphs(obsIds);
 
@@ -108,8 +116,8 @@ Template.viewData.events({
       name = obs[ob]['name'];
       id = obs[ob]['_id'];
 
-      var button = $('<button>', {
-        class: "button is-medium option-selectors",
+      var button = $('<div>', {
+        class: "o--box-container o--box option-selectors",
         text: name,
         data_id: id
       }).appendTo(obsButtons);
@@ -125,8 +133,8 @@ Template.viewData.events({
         });
     }
 
-    var SA = $('<button>', {
-        class: "button is-medium option-selectors",
+    var SA = $('<div>', {
+        class: "o--box-container o--box option-selectors",
         text: "Select All",
         data_id: 999
       }).appendTo(obsButtons);
@@ -142,8 +150,8 @@ Template.viewData.events({
       name = dparams['children']['label'+d];
       id = dparams['children']['label'+d];
 
-      var button = $('<button>', {
-        class: "button is-medium option-selectors",
+      var button = $('<div>', {
+        class: "o--box-container o--box option-selectors",
         text: name,
         data_id: id
       }).appendTo(demButtons);
@@ -159,8 +167,8 @@ Template.viewData.events({
         });
     }
 
-    var DSA = $('<button>', {
-        class: "button is-medium option-selectors",
+    var DSA = $('<div>', {
+        class: "o--box-container o--box option-selectors",
         text: "Select All",
         data_id: 999
       }).appendTo(demButtons);
@@ -176,8 +184,8 @@ Template.viewData.events({
       name = sparams['children']['label'+s];
       id = sparams['children']['label'+s];
 
-      var button = $('<button>', {
-        class: "button is-medium option-selectors",
+      var button = $('<div>', {
+        class: "o--box-container o--box option-selectors",
         text: name,
         data_id: id
       }).appendTo(seqButtons);
@@ -192,8 +200,8 @@ Template.viewData.events({
           }
         });
     }
-    var SSA = $('<button>', {
-        class: "button is-medium option-selectors",
+    var SSA = $('<div>', {
+        class: "o--box-container o--box option-selectors",
         text: "Select All",
         data_id: 999
       }).appendTo(seqButtons);
@@ -315,7 +323,7 @@ function classStats(envId, sParams, obsId) {
   var totalStuds = studs.length;
   var studTrack = new Set();
   var totalCont = conts.filter(function(contribution) {
-     return obsId.includes(contribution.obsId);
+     return obsIds.includes(contribution.obsId);
  }).length;
   var stats = $('.class-stats');
 
@@ -356,8 +364,8 @@ function classStats(envId, sParams, obsId) {
     var paramkey = getKeyByValue(sequenceParameters.children, param);
     var position = paramkey.split("").pop();
     var paramPosition = `parameter${position}`;
-    var parameters = sequenceParameters.children[paramPosition].split(",");
-    parameters.filter((obj) => { return paramWithData.indexOf(obj) == -1; }).forEach((item) => { newObject[item] = 0; })
+    var parameters = sequenceParameters.children[paramPosition].split(",").map((str)=> { return str.trim()})
+    parameters.filter((obj) => { return paramWithData.indexOf(obj) == -1;}).forEach((item) => { newObject[item] = 0; })
 
     var total = studTrack.size;
 
@@ -491,7 +499,7 @@ function makeRatioGraphs(envId, cData, dData) {
           for (var x=0; x < allParams['children']['parameterPairs']; x++) {
             if (allParams['children']['label'+x] == demp) {
               selection = allParams['children']['parameter'+x];
-              listedParams = selection.split(',');
+              listedParams = selection.split(',').map((str) => { return str.trim() });
               for (p in listedParams) {
                 if (listedParams[p] in dataSlice[obj].value) {
                   continue;
@@ -512,7 +520,7 @@ function makeRatioGraphs(envId, cData, dData) {
         var paramkey = getKeyByValue(sequenceParameters.children, param);
         var position = paramkey.split("").pop();
         var paramPosition = `parameter${position}`;
-        var barParams = sequenceParameters.children[paramPosition].split(",");
+        var barParams = sequenceParameters.children[paramPosition].split(",").map((str) => { return str.trim() });
         for (var i = 0; i < barParams.length; i++) {
             for (var j = 0; j < dataSlice.length; j++) {
                 if (barParams[i] === dataSlice[j].key) {

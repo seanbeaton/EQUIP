@@ -1,4 +1,6 @@
-.dash-head {
+
+
+/*.dash-head {
     text-decoration: underline;
 }
 
@@ -89,15 +91,15 @@
 }
 
 .export-tab {
-    /*background: #4893cf ;*/
-    /*color: white;*/
-    /*margin-right: 1em;*/
+    background: #4893cf ;
+    color: white;
+    margin-right: 1em;
 }
 
 .import-tab {
-    /*background: #23d160 ;*/
-    /*color: white;*/
-    /*margin-right: 1em;*/
+    background: #23d160 ;
+    color: white;
+    margin-right: 1em;
 }
 
 .edit-button {
@@ -145,4 +147,4 @@
   -webkit-animation-duration: 2s;
   -webkit-animation-iteration-count: infinite;
   color: white;
-}
+}*/
