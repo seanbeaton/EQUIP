@@ -1,0 +1,8 @@
+@media print {
+    nav.nav-wrap, .report-dash-head {
+        display: none !important;
+    }
+    @page {
+        size: landscape;
+    }
+}

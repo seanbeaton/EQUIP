@@ -79,29 +79,29 @@
 }
 
 .arc text {
-  font: 18px !important;
-  text-anchor: middle;
-  fill: black;
+    font: 18px !important;
+    text-anchor: middle;
+    fill: black;
 }
 
 .arc path {
-  stroke: #fff;
+    stroke: #fff;
 }
 
 .axis .domain {
-  display: none;
+    display: none;
 }
 
 .single-bar {
-  fill: steelblue;
+    fill: steelblue;
 }
 
 .single-bar:hover {
-  fill: brown;
+    fill: brown;
 }
 
 .axis--x path {
-  display: none;
+    display: none;
 }
 
 .stat-head {
@@ -110,33 +110,117 @@
 }
 
 .plots {
-    border-top: 1px solid black;
-    padding: 2em;
-    border-bottom: 1px dashed black;
+    /*border-top: 1px solid black;*/
+    /*padding: 2em;*/
+    /*border-bottom: 1px dashed black;*/
     margin-bottom: 1em;
 }
 
+.ratio-plot > svg,
 .plots > svg {
-    margin: 2em;
+    /*margin: 10px;*/
+    /*box-sizing: border-box;*/
+    /*box-sizing: content-box;*/
     border: 1px dashed grey;
+}
+
+.report {
+    max-width: 1240px;
+    margin: 0 auto;
+}
+
+.report__section {
+    page-break-after: always;
+    page-break-before: always;
+    margin-bottom: 4em;
+}
+
+.report__section-head {
+    margin: 2em 0;
+}
+
+.report__section-body {
+    margin: 1em 0;
 }
 
 .class-stats {
     margin-bottom: 1em;
-    width: 960px;
-}
-
-.category-list {
-    width: 25%;
-    float: left;
-    margin-bottom: 25px;
-    height: 100%;
+    display: flex;
+    flex-flow: row wrap;
 }
 
 .category-summary {
-    margin-bottom: 25px;
+    margin-bottom: 2em;
+    flex: 0 0 100%;
+}
+
+.category-list {
+    flex: 0 1 200px;
+    /*width: 25%;*/
+    float: left;
+    margin-bottom: 2em;
+    height: 100%;
 }
 
 .single-stat {
-    margin-left: 1em
+    margin-left: 1.3em
+}
+
+.demo-plots {
+    display: flex;
+    flex-flow: row wrap;
+}
+
+.demo-plots svg {
+    flex: 1 1 300px;
+    max-width: 400px;
+    /*max-width: 50%;*/
+    width: 100%;
+    height: auto;
+    margin: 0 auto;
+    border: 0;
+
+}
+
+.vert-ind {
+    position: absolute;
+    top: 0px;
+    left: 10px;
+    z-index: 100000;
+}
+
+.individual-plots {
+    position: relative;
+}
+
+.ratio-plot {
+    padding: 10px;
+    display: inline-block;
+}
+
+.print-only {
+    display: none;
+}
+
+@media print {
+
+    .print-only {
+        display: block;
+    }
+    .individual-plots {
+        /*transform: scale(0.7);*/
+        /*transform-origin: top left;*/
+        zoom: 0.7;
+        /*page-break-before: always;*/
+    }
+    .ratio-plots {
+        zoom: 0.65;
+    }
+}
+
+
+.ratio-plot:nth-child(odd) {
+    page-break-before: always;
+    /*page-break-after: always;*/
+    position: relative;
 }

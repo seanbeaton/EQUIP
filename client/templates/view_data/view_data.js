@@ -520,7 +520,9 @@ function makeRatioGraphs(envId, cData, dData) {
                 }
             }
         }
-        makeStackedBar(sortedData, label, ".ratio-plots", "Equity Ratio");
+        let wrapper_class = "ratio-plot--" + label.toLowerCase().replace(/ /g, '-')
+        $(".ratio-plots").append('<div class="ratio-plot ' + wrapper_class + '"></div>');
+        makeStackedBar(sortedData, label, "." + wrapper_class, "Equity Ratio");
     }
   }
 }
@@ -557,7 +559,7 @@ function makeIndividualGraphs(oIds) {
 
   data = d3.entries(completeContrib);
   data = _(data).sortBy('value')
-  var newWidth = data.length * 80;
+  var newWidth = data.length * 34;
   var containerWidth = newWidth * 1.05;
   var x1 = d3.scaleBand().padding(0.5);
   var margin = {top: 50, right: 20, bottom: 30, left: 40},
@@ -613,7 +615,7 @@ function makeIndividualGraphs(oIds) {
         return x(d.key.slice(0,10));
       })
       .attr("y", function(d) { return y(d.value) })
-      .attr("width", 70)
+      .attr("width", 24)
       .attr("height", function(d) { return height - y(d.value); })
 
   g.selectAll(".bar")
@@ -639,14 +641,14 @@ function makeIndividualGraphs(oIds) {
 }
 
 function makePieChart(data, label) {
-  var margin = {header: 100, top: 50, right: 50, bottom: 50, left: 50},
-  width = 700
-  height = 700 - margin.top - margin.bottom - margin.header,
-  fullW = 700,
-  fullH = 700,
+  var margin = {header: 50, top: 20, right: 30, bottom: 20, left: 30},
+  width = 400,
+  height = 400 - margin.top - margin.bottom - margin.header,
+  fullW = 400,
+  fullH = 400,
   radius = Math.min(width, height) / 2,
   arc = d3.arc().innerRadius(radius * .6).outerRadius(radius),
-  labelr = radius + 30;
+  labelr = radius + 10;
 
   var svg = d3.select(".demo-plots")
             .append("svg")
@@ -678,19 +680,20 @@ function makePieChart(data, label) {
   arcs.append("path")
     .attr('d', path)
     .attr('fill', function (d) { return color(d.data.key); })
-    .on('mouseover', function(d) {
-    $("#toolTip")
-      .html(d.data.key + ": " + d.data.value )
-      .show();
-    })
-    .on('mousemove', function(d) {
+    .on('mouseenter',
+      function(d) {
+        let pos = $(this).position();
+        pos.top -= ($('#toolTip').height() + 30) ;
         $("#toolTip")
-          .css('left', "50%")
-          .css('top', "50%")
-    })
-    .on('mouseout', function(d) {
+          .html(d.data.key + ": " + d.data.value )
+          .css(pos)
+          .show();
+      })
+    .on('mouseleave',
+      function(d) {
         $("#toolTip").html('').hide();
-    });
+      }
+    );
 
   var textLabels = arcs.append("text")
       .attr("transform", function(d) {

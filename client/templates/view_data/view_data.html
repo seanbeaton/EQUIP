@@ -32,40 +32,82 @@
 
 <!-- HTML for displaying graphics (hidden at first) -->
   <section class="section report-body">
-    <div>
-      <h1 class="title is-2 report-label-head">Classroom Demographic Breakdown</h1>
-      <p class="subtitle is-4 report-description">Demographics of the class.</p>
-    </div>
-    <div class="columns plots demo-plots">
+      <div class="report">
+          <div class="report__section print-only">
+              <div class="report__section-head">
+                  <h3 class="title is-3 report-label-head">Classroom Details</h3>
+                  <h4 class="subtitle is-5 report-description">Details about the classroom in this report.</h4>
+              </div>
+              <div class="report__section-body">
+                  <div class="plots classroom-details">
 
-    </div>
-    <div>
-      <h1 class="title is-2 report-label-head">Classroom Statistics</h1>
-      <p class="subtitle is-4 report-description">This is a summary of the participation at the classroom level.</p>
-    </div>
-    <div class="class-stats row"></div>
-    <div style="clear:both;">
-      <h1 class="title is-2 report-label-head">Individual Contributions</h1>
-      <p class="subtitle is-4 report-description">A bar graph showing individual contributions across all students.</p>
-    </div>
-    <div class="vert-ind" style="float: left; position: relative; top: 16px; left: 70px; z-index: 100000"> </div>
-    <div class="plots container individual-plots" style="overflow-x: scroll; margin: 0; padding: 0"></div>
+                  </div>
+              </div>
+          </div>
+          <div class="report__section">
+              <div class="report__section-head">
+                  <h3 class="title is-3 report-label-head">Classroom Details</h3>
+                  <h4 class="subtitle is-5 report-description">Details about the classroom in this report.</h4>
+              </div>
+              <div class="report__section-body">
+                  <div class="plots classroom-details">
 
+                  </div>
+              </div>
+          </div>
+          <div class="report__section">
+              <div class="report__section-head">
+                  <h3 class="title is-3 report-label-head">Classroom Demographic Breakdown</h3>
+                  <h4 class="subtitle is-5 report-description">Demographics of the class.</h4>
+              </div>
+              <div class="report__section-body">
+                  <div class="plots demo-plots">
 
-    <div>
-      <h1 class="title is-2 report-label-head">Contribution Ratios Across Demographics</h1>
-      <p class="subtitle is-4 report-description">Bar graphs showing equity factor for contributions across all demographic categories chosen. The equity factor describes the ratio of actual participation over expected participation, based on demographics (e.g., if Latinx students make up 30% of the class, one would expect that they have 30% of the contributions). An equity factor greater than 1 indicates the group is participating more than one would expect in an "equal" classroom, 1 is what one would expect, and less than 1 is less than one would expect (underrepreseted). </p>
-    </div>
-    <div class="columns plots ratio-plots">
+                  </div>
+              </div>
+          </div>
+          <div class="report__section">
+              <div class="report__section-head">
+                  <h3 class="title is-3 report-label-head">Classroom Statistics</h3>
+                  <h4 class="subtitle is-5 report-description">This is a summary of the participation at the classroom level.</h4>
+              </div>
+              <div class="report__section-body">
+                <div class="class-stats row"></div>
+              </div>
 
-    </div>
-    <!-- <div>
-      <h1 class="title is-2 report-label-head">Contributions Across Demographics</h1>
-      <p class="subtitle is-4 report-description">Test 123, Dan and Niral can add explanations here</p>
-    </div>
-    <div class="columns plots contribution-plots">
+          </div>
+          <div class="report__section">
 
-    </div> -->
+              <div class="report__section-head">
+                  <h3 class="title is-3 report-label-head">Individual Contributions</h3>
+                  <h4 class="subtitle is-5 report-description">A bar graph showing individual contributions across all students.</h4>
+              </div>
+              <div class="report__section-body">
+                  <div class="plots individual-plots">
+                      <div class="vert-ind"> </div>
+                  </div>
+              </div>
+          </div>
+          <div class="report__section">
+              <div class="report__section-head">
+                  <h3 class="title is-3 report-label-head">Contribution Ratios Across Demographics</h3>
+                  <h4 class="subtitle is-5 report-description">Bar graphs showing equity factor for contributions across all demographic categories chosen. The equity factor describes the ratio of actual participation over expected participation, based on demographics (e.g., if Latinx students make up 30% of the class, one would expect that they have 30% of the contributions). An equity factor greater than 1 indicates the group is participating more than one would expect in an "equal" classroom, 1 is what one would expect, and less than 1 is less than one would expect (underrepreseted). </h4>
+              </div>
+              <div class="report__section-body">
+                  <div class="columns plots ratio-plots">
+
+                  </div>
+              </div>
+          </div>
+          <!-- <div>
+            <h1 class="title is-2 report-label-head">Contributions Across Demographics</h1>
+            <p class="subtitle is-4 report-description">Test 123, Dan and Niral can add explanations here</p>
+          </div>
+          <div class="columns plots contribution-plots">
+
+          </div> -->
+      </div>
+
 
   </section>
 
