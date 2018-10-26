@@ -96,6 +96,11 @@
   text-align: center;
   position: absolute;
   background-color: #898989;
+  transition: 1s cubic-bezier(0, 2.5, 1, -1.5) background-color;
+}
+
+.just-added {
+    background-color: #7fa989;
 }
 
 .c--student-body__container-drag-label {
