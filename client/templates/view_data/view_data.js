@@ -299,8 +299,6 @@ Template.viewData.events({
 function reportSummary(chosenClassroomName, sParams, dParams, totalCont) {
   let container = $('.classroom-summary');
   container.append('<div><strong>Classroom: </strong><span>' + chosenClassroomName + '</span></div>');
-  console.log(sParams, dParams, totalCont);
-
   container.append('<div><strong>Total Contributions: </strong><span>' + totalCont + '</span></div>');
   container.append('<div><strong>Discourse Parameters: </strong>' + genUnorderedList(dParams) + '</div>');
   container.append('<div><strong>Sequence Parameters: </strong>' + genUnorderedList(sParams) + '</div>');
