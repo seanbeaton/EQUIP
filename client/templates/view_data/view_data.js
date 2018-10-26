@@ -59,6 +59,10 @@ Template.viewData.events({
   'click .reset-button': function (e) {
     location.reload()
   },
+  'click .print-button': function (e) {
+    e.preventDefault();
+    print()
+  },
 
   'click .help-button': function (e) {
     $('#help-env-modal').addClass("is-active");
@@ -763,9 +767,9 @@ function makePieChart(data, label) {
 
 function makeStackedBar(dataEnum, label, selector, yLabel) {
   var margin = {top: 50, right: 20, bottom: 30, left: 40},
-    width = 600 - margin.left - margin.right,
+    width = 550 - margin.left - margin.right,
     height = 500 - margin.top - margin.bottom,
-    fullW = 600,
+    fullW = 550,
     fullH = 500;
 
   var svg = d3.select(selector)

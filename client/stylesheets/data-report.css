@@ -127,9 +127,11 @@
     display: none;
 }
 
-.stat-head {
+.stat-head,
+.stat-head:not(:last-child) {
     margin-top: .5em;
-    text-decoration: underline;
+    margin-bottom: 0.5em;
+    /*text-decoration: underline;*/
 }
 
 .plots {
@@ -173,20 +175,20 @@
 }
 
 .category-summary {
-    margin-bottom: 2em;
+    margin-bottom: 1em;
     flex: 0 0 100%;
 }
 
 .category-list {
-    flex: 0 1 200px;
+    flex: 0 1 250px;
     /*width: 25%;*/
     float: left;
-    margin-bottom: 2em;
+    margin-bottom: 1em;
     height: 100%;
 }
 
 .single-stat {
-    margin-left: 1.3em
+    margin: 2px 0;
 }
 
 .demo-plots {
@@ -227,6 +229,13 @@
 
 @media print {
 
+    header, .c--view-data-header__container {
+        display: none !important;
+    }
+    @page {
+        size: landscape;
+    }
+
     .print-only {
         display: block;
     }
@@ -240,7 +249,6 @@
         zoom: 0.65;
     }
 }
-
 
 .ratio-plot:nth-child(odd) {
     page-break-before: always;
