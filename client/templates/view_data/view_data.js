@@ -76,27 +76,31 @@ Template.viewData.events({
 
   'click .generate-button': function (e) {
     // Get classroom, obs, and all params.
-    obsIds = [];
-    dParams = [];
-    sParams = [];
+    let obsIds = [];
+    let dParams = [];
+    let sParams = [];
 
-    envId = $('.env-selection .chosen').attr('data_id');
+    const chosenClassroomName = $('.env-selection .chosen').text();
+    $('.print-classroom-name').text(chosenClassroomName);
+
+    let envId = $('.env-selection .chosen').attr('data_id');
     $('.obs-selection .chosen').each(function () { obsIds.push($(this).attr('data_id')) });
     $('.dparam-selection .chosen').each(function () { dParams.push($(this).attr('data_id')) });
     $('.sparam-selection .chosen').each(function () { sParams.push($(this).attr('data_id')) });
     let contributions = Sequences.find({'envId': envId}).fetch();
     let totalCont = contributions.filter(function(contribution) {
        return obsIds.includes(contribution.obsId);
-   }).length;
+    }).length;
 
     if (obsIds.length === 0 || contributions.length === 0 || totalCont === 0) {
         alert("At least one observation or contribution is required prior to generating a report.");
         return;
     }
     // Start generating graphs
-    demData = makeDemGraphs(envId, dParams);
-    groupCData = makeContributionGraphs(obsIds, dParams, sParams);
+    let demData = makeDemGraphs(envId, dParams);
+    let groupCData = makeContributionGraphs(obsIds, dParams, sParams);
 
+    reportSummary(chosenClassroomName, sParams, dParams, totalCont);
     classStats(envId, sParams, obsIds);
     makeRatioGraphs(envId, groupCData, demData);
     makeIndividualGraphs(obsIds);
@@ -291,6 +295,26 @@ Template.viewData.events({
     }
 });
 
+
+function reportSummary(chosenClassroomName, sParams, dParams, totalCont) {
+  let container = $('.classroom-summary');
+  container.append('<div><strong>Classroom: </strong><span>' + chosenClassroomName + '</span></div>');
+  console.log(sParams, dParams, totalCont);
+
+  container.append('<div><strong>Total Contributions: </strong><span>' + totalCont + '</span></div>');
+  container.append('<div><strong>Discourse Parameters: </strong>' + genUnorderedList(dParams) + '</div>');
+  container.append('<div><strong>Sequence Parameters: </strong>' + genUnorderedList(sParams) + '</div>');
+}
+
+function genUnorderedList(list) {
+  let output = '<ul>';
+  for (let i = 0; i < list.length; i++) {
+    output += '<li>' + list[i] + '</li>';
+  }
+  output += '</ul>';
+  return output
+}
+
 function renderStats(stats, data, name, total) {
   if (!data) {
     return;
@@ -326,9 +350,9 @@ function classStats(envId, sParams, obsId) {
   var conts = Sequences.find({'envId': envId}).fetch();
   var totalStuds = studs.length;
   var studTrack = new Set();
-  var totalCont = conts.filter(function(contribution) {
-     return obsIds.includes(contribution.obsId);
- }).length;
+  var totalCont = conts.filter(function (contribution) {
+    return obsId.includes(contribution.obsId);
+  }).length;
   var stats = $('.class-stats');
 
   var filteredResults = conts.filter(function(result) {
@@ -633,12 +657,12 @@ function makeIndividualGraphs(oIds) {
   g.selectAll(".bar")
     .data(data)
     .enter().append("text")
-    .text(function(d) { if (d.value === 0.1) return 0; })
+    .text(function(d) { if (d.value === 0.1) return 0; else return d.value})
     .attr("text-anchor", "middle")
       .attr("x", function(d) {
         return (x(d.key.slice(0,10))) + 30;
       })
-     .attr("y", function(d) { return y(d.value) - 10; })
+     .attr("y", function(d) { return y(d.value) - 12; })
      .attr("font-family", "sans-serif")
      .attr("font-size", "15px")
      .attr("fill", "black");
