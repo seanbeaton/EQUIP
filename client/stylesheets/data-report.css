@@ -258,7 +258,7 @@
     margin-left: 20px;
 }
 
-.report__section.print-only .report-label-head {
+.report__section__column.print-only .report-label-head {
     margin-top: 8em;
 }
 
@@ -268,6 +268,11 @@
 
 .classroom-summary li {
     margin: 2px 0 2px 10px;
+}
+
+.report__section--columns {
+    display: flex;
+    flex-flow: row nowrap;
 }
 
 @media print {
@@ -292,6 +297,10 @@
     }
     .ratio-plots {
         zoom: 0.65;
+    }
+
+    .report__section--print-first-page .report__section__column:not(.print-only) {
+        padding: 30px 0;
     }
 }
 
