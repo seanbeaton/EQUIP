@@ -536,3 +536,7 @@ li {
 .spaced-button {
     margin: 8px 10px;
 }
+
+.spaced-checkbox {
+    margin-right: 10px;
+}
