@@ -314,7 +314,6 @@ function editClassroomName(envId) {
 
     new_env_name.remove();
     env_name.removeClass('editing');
-    console.log('go');
     env_name.show();
   }
 

@@ -161,6 +161,12 @@ Template.observatory.events({
     $('#seq-param-modal').removeClass('is-active');
     $('#seq-data-modal').removeClass('is-active');
   },
+  'click #edit-observation-name': function(e) {
+    editObservationName(this._id);
+  },
+  'click #delete-observation': function(e) {
+    deleteObservation(this._id);
+  },
   'click #save-seq-params': function(e) {
     var info = {};
     info['studentId'] = $('.js-modal-header').attr('data_id');
@@ -296,3 +302,86 @@ Template.registerHelper( 'math', function () {
     sub ( a, b ) { return a - b; },
   }
 });
+
+
+function editObservationName(obsId) {
+  let context = $('.observation[data-obs-id="' + obsId + '"]');
+
+  var obs_name = $('.observation-name', context);
+  var obs_name_wrapper = $('.observation-name-wrapper', context);
+  var currently_editing = !!(obs_name.hasClass('editing'));
+  var edit_swap_button = $('#edit-observation-name', context);
+
+  edit_swap_button.addClass('is-loading');
+
+  if (!currently_editing) {
+    obs_name_wrapper.prepend($('<input>', {
+      class: 'edit-obs-name inherit-font-size',
+      value: obs_name.html()
+    }));
+
+    obs_name.addClass('editing');
+    obs_name.hide();
+
+    $(context, '.edit-obs-name').on('keyup', function(e) {
+      if (e.keyCode === 13) {
+        edit_swap_button.click()
+      }
+    })
+  }
+
+  else {
+    var new_obs_name = $('.edit-obs-name', context);
+    var new_name = new_obs_name.val();
+
+    var args = {
+      'obsId': obsId,
+      'obsName': new_name,
+    };
+
+    Meteor.call('observationRename', args, function(error, result) {
+      var message;
+      if (result) {
+        message = $('<span/>', {
+          class: 'name-save-result tag is-success inline-block success-message',
+          text: 'Saved'
+        });
+        obs_name.html(new_name);
+      }
+      else {
+        message = $('<span/>', {
+          class: 'name-save-result tag is-warning inline-block error-message',
+          text: 'Failed to save. Try again later'
+        })
+      }
+      obs_name_wrapper.append(message);
+
+      setTimeout(function() {
+        message.remove();
+      }, 3000);
+
+      return 0;
+    });
+
+    new_obs_name.remove();
+    obs_name.removeClass('editing');
+
+    console.log('go');
+    obs_name.show();
+  }
+
+  edit_swap_button.removeClass('is-loading');
+  currently_editing = !currently_editing;
+  edit_swap_button.html((currently_editing) ? 'Save' : 'Edit')
+}
+
+function deleteObservation(obsId) {
+  var result = confirm("Are you sure you want to delete this observation?");
+  if (result) {
+    Meteor.call('observationDelete', obsId, function(error, result) {
+      if (!error) {
+        Router.go('environmentList');
+      }
+    })
+  }
+}

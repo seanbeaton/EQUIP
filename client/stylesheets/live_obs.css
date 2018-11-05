@@ -12,6 +12,10 @@
     margin-left: 20px;
 }
 
+.c--observation-header__container .toggle-sub {
+    margin: 25px 0;
+}
+
 .c--observation-front__container {
     border-bottom: 1px solid var(--gray);
     text-align: center;
