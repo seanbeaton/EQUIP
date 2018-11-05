@@ -113,10 +113,10 @@ Template.environmentItem.events({
       var ele = e.target;
       var $ele = $(e.target);
       // Bubble up to parent element so accordion toggles correctly
-      if (!$ele.is('.toggle-accordion') && !$ele.is('.environment-name')) {
+      if (!$ele.is('.toggle-accordion') && !$ele.is('.environment-name') && !$ele.is('.carat')) {
         return
       }
-      if (!$ele.is('.toggle-accordion') ) {
+      if (!$ele.is('.toggle-accordion')) {
         $ele = $ele.parents('.toggle-accordion');
       }
 
