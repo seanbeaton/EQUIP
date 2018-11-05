@@ -658,7 +658,7 @@ function makeIndividualGraphs(oIds) {
     .text(function(d) { if (d.value === 0.1) return 0; else return d.value})
     .attr("text-anchor", "middle")
       .attr("x", function(d) {
-        return (x(d.key.slice(0,10))) + 30;
+        return (x(d.key.slice(0,10))) + 12;
       })
      .attr("y", function(d) { return y(d.value) - 12; })
      .attr("font-family", "sans-serif")
