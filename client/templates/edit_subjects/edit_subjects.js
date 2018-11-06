@@ -12,23 +12,36 @@ Template.editSubjects.helpers({
     }
 });
 
+const grid_size = {
+  x: 210,
+  y: 60,
+  width: 960,
+  height: 1200
+};
+
 //Used to set up interactJS and get labels for students
 // (and a session for some reason???)
-Template.editSubjects.created = function() {
-Session.set('envId', Router.current().params._envId);
+Template.editSubjects.created = function () {
+  Session.set('envId', Router.current().params._envId);
 
-// target elements with the "draggable" class
-interact('.draggable')
-  .draggable({
-    // disable inertial throwing
-    inertia: false,
-    autoScroll: true,
-    onmove: dragMoveListener,
-    restrict: {
-      restriction: 'parent'
-    }
-
-  });
+  // target elements with the "draggable" class
+  interact('.draggable')
+    .draggable({
+      // disable inertial throwing
+      snap: {
+        targets: [
+          interact.createSnapGrid(grid_size)
+        ],
+        range: Infinity,
+        relativePoints: [{x: 0, y: 0}]
+      },
+      inertia: false,
+      autoScroll: true,
+      onmove: dragMoveListener,
+      restrict: {
+        restriction: 'parent'
+      }
+    });
 
   function dragMoveListener (event) {
     var target = event.target,
@@ -109,13 +122,19 @@ Template.editSubjects.events({
     let newStudentPositionY;
 
     if (numberOfStudents === 0) {
-        newStudentPositionY = 180;
-        newStudentPositionX = 0;
+        newStudentPositionY = 19;
+        newStudentPositionX = 82.5;
     } else {
-        let yPosition = students[numberOfStudents - 1].data_y;
-        let xPosition = students[numberOfStudents - 1].data_x;
-        newStudentPositionY = parseInt(xPosition) > 674 ?  parseInt(yPosition) + 75 : yPosition;
-        newStudentPositionX = parseInt(xPosition) > 674 ?  0 : parseInt(xPosition) + 225;
+        // TODO, save these somewhere, pull from same place as grid init
+        const grid_start_point = {
+          x: 82.5,
+          y: 19
+        };
+        let open_position = find_open_position(students, grid_size, grid_start_point);
+        // let yPosition = students[numberOfStudents - 1].data_y;
+        // let xPosition = students[numberOfStudents - 1].data_x;
+        newStudentPositionY = open_position.y;
+        newStudentPositionX = open_position.x;
     }
 
     const name = $('#student-name').val().trim();
@@ -160,6 +179,11 @@ Template.editSubjects.events({
        alert(error.reason);
      } else {
       $('#stud-param-modal').removeClass('is-active');
+      console.log('added student', result._id);
+       $('.o--box-item#' + result._id).addClass('just-added');
+       setTimeout(function() {
+         $('.o--box-item#' + result._id).removeClass('just-added');
+       }, 5000);
      }
    });
  },
@@ -265,6 +289,31 @@ Template.editSubjects.events({
     $('#stud-data-modal').addClass('is-active');
   }
 });
+
+
+function find_open_position(students, grid_size, grid_start_position) {
+  console.log(students)
+  let x = grid_start_position.x,
+      y = grid_start_position.y;
+  let complete = false;
+  while (!complete) {
+    let element_in_location = students.find(function(el) {
+      return (parseFloat(el.data_x) === x && parseFloat(el.data_y) === y)
+    });
+    if (!element_in_location) {
+      complete = true;
+    } else {
+      if (x + (grid_size.x * 2) > grid_size.width) {
+        x = grid_start_position.x;
+        y += grid_size.y;
+      } else {
+        x += grid_size.x
+      }
+    }
+  }
+  return {x: x, y: y};
+
+}
 
 //
 // Support functions for creating tables/menus
