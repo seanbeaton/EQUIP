@@ -14,23 +14,28 @@
 
 <!-- HTML for selecting what to include in report (visible to start) -->
   <section class="c--view-data__container option-select">
-      <h3 class="c--view-data__container-title">Select a Classroom</h3>
-      <div class="columns env-selection is-multiline"></div>
+      <div class="no-print">
+          <h3 class="c--view-data__container-title">Select a Classroom</h3>
+          <div class="columns env-selection is-multiline"></div>
 
-      <h3 class="c--view-data__container-title">Select Observations</h3>
-      <div class="columns obs-selection is-multiline">
-          <h2 class="column subtitle">Please select a classroom first</h2>
-      </div>
-      <h3 class="c--view-data__container-title">Select Demographic Parameters</h3>
-      <div class="columns dparam-selection is-multiline">
-          <h2 class="column subtitle">Please select a classroom first</h2>
-      </div>
-      <h3 class="c--view-data__container-title">Select Sequence Parameters</h3>
-      <div class="columns sparam-selection is-multiline">
-          <h2 class="column subtitle">Please select a classroom first</h2>
-      </div>
+          <h3 class="c--view-data__container-title">Select Observations</h3>
+          <div class="columns obs-selection is-multiline">
+              <h2 class="column subtitle">Please select a classroom first</h2>
+          </div>
+          <h3 class="c--view-data__container-title">Select Demographic Parameters</h3>
+          <div class="columns dparam-selection is-multiline">
+              <h2 class="column subtitle">Please select a classroom first</h2>
+          </div>
+          <h3 class="c--view-data__container-title">Select Sequence Parameters</h3>
+          <div class="columns sparam-selection is-multiline">
+              <h2 class="column subtitle">Please select a classroom first</h2>
+          </div>
 
-      <button class="o--standard-button generate-button">Generate Report!</button>
+          <button class="o--standard-button generate-button">Generate Report!</button>
+      </div>
+      <div class="print-only">
+          <h2>Please generate the report before printing.</h2>
+      </div>
   </section>
 
 <!-- HTML for displaying graphics (hidden at first) -->
