@@ -77,6 +77,7 @@ Template.viewData.events({
   'click .generate-button': function (e) {
     // Get classroom, obs, and all params.
     let obsIds = [];
+    let obsNames = [];
     let dParams = [];
     let sParams = [];
 
@@ -84,7 +85,9 @@ Template.viewData.events({
     $('.print-classroom-name').text(chosenClassroomName);
 
     let envId = $('.env-selection .chosen').attr('data_id');
-    $('.obs-selection .chosen').each(function () { obsIds.push($(this).attr('data_id')) });
+    $('.obs-selection .chosen')
+      .each(function () { obsIds.push($(this).attr('data_id')) })
+      .each(function () { obsNames.push($(this).text()) });
     $('.dparam-selection .chosen').each(function () { dParams.push($(this).attr('data_id')) });
     $('.sparam-selection .chosen').each(function () { sParams.push($(this).attr('data_id')) });
     let contributions = Sequences.find({'envId': envId}).fetch();
@@ -100,7 +103,7 @@ Template.viewData.events({
     let demData = makeDemGraphs(envId, dParams);
     let groupCData = makeContributionGraphs(obsIds, dParams, sParams);
 
-    reportSummary(chosenClassroomName, sParams, dParams, totalCont);
+    reportSummary(chosenClassroomName, obsNames, sParams, dParams, totalCont);
     classStats(envId, sParams, obsIds);
     makeRatioGraphs(envId, groupCData, demData);
     makeIndividualGraphs(obsIds);
@@ -296,10 +299,11 @@ Template.viewData.events({
 });
 
 
-function reportSummary(chosenClassroomName, sParams, dParams, totalCont) {
+function reportSummary(chosenClassroomName, observations, sParams, dParams, totalCont) {
   let container = $('.classroom-summary');
   container.append('<div><strong>Classroom: </strong><span>' + chosenClassroomName + '</span></div>');
   container.append('<div><strong>Total Contributions: </strong><span>' + totalCont + '</span></div>');
+  container.append('<div><strong>Observations: </strong>' + genUnorderedList(observations) + '</div>');
   container.append('<div><strong>Discourse Parameters: </strong>' + genUnorderedList(dParams) + '</div>');
   container.append('<div><strong>Sequence Parameters: </strong>' + genUnorderedList(sParams) + '</div>');
 }
