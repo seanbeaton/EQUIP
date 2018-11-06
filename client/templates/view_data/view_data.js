@@ -689,7 +689,7 @@ function makePieChart(data, label) {
   height = 400 - margin.top - margin.bottom - margin.header,
   fullW = 400,
   fullH = 400,
-  radius = Math.min(width, height) / 2,
+  radius = Math.min(width, height) / 2 - 20,
   arc = d3.arc().innerRadius(radius * .6).outerRadius(radius),
   labelr = radius + 10;
 
