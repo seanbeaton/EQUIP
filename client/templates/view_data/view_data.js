@@ -596,7 +596,7 @@ function makeIndividualGraphs(oIds) {
   var newWidth = data.length * 34;
   var containerWidth = newWidth * 1.05;
   var x1 = d3.scaleBand().padding(0.5);
-  var margin = {top: 50, right: 20, bottom: 30, left: 40},
+  var margin = {top: 50, right: 20, bottom: 60, left: 40},
       width = newWidth - margin.left - margin.right,
       height = 500 - margin.top - margin.bottom,
       fullW = newWidth,
@@ -622,12 +622,19 @@ function makeIndividualGraphs(oIds) {
       y = d3.scaleLinear().rangeRound([height, 0]);
 
   x.domain(data.map(function(d) { return d.key.slice(0,10); }));
-  y.domain([0, d3.max(data, function(d) { return d.value; })]);
+  y.domain([0, d3.max(data, function (d) {
+    return d.value;
+  })]);
 
   g.append("g")
-      .attr("class", "axis axis--x")
-      .attr("transform", "translate(0," + height + ")")
-      .call(d3.axisBottom(x))
+    .attr("class", "axis axis--x")
+    .attr("transform", "translate(0," + height + ")")
+    .append('g')
+    .attr("class", "x-axis-labels")
+    .call(d3.axisBottom(x))
+    .selectAll('.x-axis-labels text')
+    .attr("text-anchor", "start")
+    .attr('transform', 'rotate(45,-5,10)');
 
   svgY.append("g")
       .attr("class", "axis axis--y")
@@ -654,16 +661,18 @@ function makeIndividualGraphs(oIds) {
 
   g.selectAll(".bar")
     .data(data)
-    .enter().append("text")
+    .enter()
+    .append("text")
     .text(function(d) { if (d.value === 0.1) return 0; else return d.value})
     .attr("text-anchor", "middle")
-      .attr("x", function(d) {
-        return (x(d.key.slice(0,10))) + 12;
-      })
-     .attr("y", function(d) { return y(d.value) - 12; })
-     .attr("font-family", "sans-serif")
-     .attr("font-size", "15px")
-     .attr("fill", "black");
+    .attr("x", function(d) {
+      return (x(d.key.slice(0,10))) + 12;
+    })
+    .attr("y", function(d) { return y(d.value) - 12; })
+    .attr("font-family", "sans-serif")
+    .attr("font-size", "15px")
+    .attr("fill", "black")
+
 
   g.append("text")
       .attr("x", 100)
