@@ -17,8 +17,8 @@ const grid_size = {
   y: 60,
   width: 920,
   height: 1200,
-  grid_start_x: 82.5,
-  grid_start_y: 19,
+  // grid_start_x: 82.5,
+  // grid_start_y: 19,
   vert_offset: 12,
   horiz_offset: 25,
 };
@@ -35,18 +35,20 @@ Template.editSubjects.created = function () {
       snap: {
         targets: [
           function(xPos, yPos) {
-            console.log('xpos', xPos, 'yPos', yPos);
             let parent_rect = $('.c--student-body__container')[0].getBoundingClientRect();
             let top_left = {
               x: parent_rect.x + window.scrollX + grid_size.horiz_offset,
               y: parent_rect.y + window.scrollY + grid_size.vert_offset,
             }
-            console.log('top_left', top_left);
-            let f = interact.createSnapGrid({x:grid_size.x, y: grid_size.y, range: Infinity, offset: top_left}),
-            ret = f(xPos, yPos);
+            let f = interact.createSnapGrid({x:grid_size.x, y: grid_size.y, range: Infinity, offset: top_left});
+            let ret = f(xPos, yPos);
             // if (ret.x < grid_size.x) ret.x = grid_size.x;
             // if (ret.x > grid_size.width) ret.x = grid_size.width;
-            console.log('result', ret);
+            // console.log('result before', ret);
+            // ret.x = parseInt(ret.x);
+            // ret.y = parseInt(ret.y);
+            // console.log('result after', ret);
+
             return ret;
           }
         ],
@@ -70,13 +72,11 @@ Template.editSubjects.created = function () {
         x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx,
         y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
 
-    // translate the element
-    target.style.webkitTransform =
-    target.style.transform =
-      'translate(' + x + 'px, ' + y + 'px)';
-    // update the posiion attributes
-    target.setAttribute('data-x', x);
-    target.setAttribute('data-y', y);
+    // get the closest valid coords:
+    x = Math.round(x / parseFloat(grid_size.x)) * parseFloat(grid_size.x);
+    y = Math.round(y / parseFloat(grid_size.y)) * parseFloat(grid_size.y);
+
+    moveStudent(target, x, y)
   }
 
 
@@ -143,15 +143,15 @@ Template.editSubjects.events({
     let newStudentPositionY;
 
     if (numberOfStudents === 0) {
-        newStudentPositionY = grid_size.grid_start_y;
-        newStudentPositionX = grid_size.grid_start_x;
+        newStudentPositionY = 0;
+        newStudentPositionX = 0;
     } else {
         // TODO, save these somewhere, pull from same place as grid init
-        const grid_start_point = {
-          x: grid_size.grid_start_x,
-          y: grid_size.grid_start_y
-        };
-        let open_position = find_open_position(students, grid_size, grid_start_point);
+        // const grid_start_point = {
+        //   x: grid_size.grid_start_x,
+        //   y: grid_size.grid_start_y
+        // };
+        let open_position = find_open_position(students);
         // let yPosition = students[numberOfStudents - 1].data_y;
         // let xPosition = students[numberOfStudents - 1].data_x;
         newStudentPositionY = open_position.y;
@@ -200,7 +200,6 @@ Template.editSubjects.events({
        alert(error.reason);
      } else {
       $('#stud-param-modal').removeClass('is-active');
-      console.log('added student', result._id);
        $('.o--box-item#' + result._id).addClass('just-added');
        setTimeout(function() {
          $('.o--box-item#' + result._id).removeClass('just-added');
@@ -218,6 +217,14 @@ Template.editSubjects.events({
   'click #edit-remove-student': function(e) {
     createTableOfStudents();
     $('#stud-data-modal').addClass('is-active');
+  },
+  'click #align-students': function(e) {
+    const students = Subjects.find({envId: Router.current().params._envId}).fetch();
+    align_all_students(students);
+  },
+  'click #align-students-alpha': function(e) {
+    const students = Subjects.find({envId: Router.current().params._envId}).fetch();
+    align_all_students(students, true);
   },
   'click #save-locations': function(e) {
     var subjects = [];
@@ -312,28 +319,87 @@ Template.editSubjects.events({
 });
 
 
-function find_open_position(students, grid_size, grid_start_position) {
-  console.log(students)
-  let x = grid_start_position.x,
-      y = grid_start_position.y;
+function find_open_position(students) {
+  let x = 0,
+      y = 0;
   let complete = false;
   while (!complete) {
     let element_in_location = students.find(function(el) {
-      return (parseFloat(el.data_x) === x && parseFloat(el.data_y) === y)
+      if (el.ignoreLocation) {
+        return false
+      }
+      return (parseFloat(el.data_x) === parseFloat(x) && parseFloat(el.data_y) === parseFloat(y))
     });
     if (!element_in_location) {
       complete = true;
     } else {
-      if (x + (grid_size.x * 2) > grid_size.width) {
-        x = grid_start_position.x;
+      if (x + grid_size.x >= grid_size.width) {
+        x = 0;
         y += grid_size.y;
       } else {
         x += grid_size.x
       }
+      if (x > 2000) {
+        complete = true
+      }
     }
   }
   return {x: x, y: y};
+}
 
+function align_all_students(students, alphabetically) {
+  if (typeof alphabetically === 'undefined') {
+    alphabetically = false;
+  }
+
+  students.forEach(function(student) {
+    student.ignoreLocation = true;
+  });
+  students = students.sort(function(a, b) {
+    if (!alphabetically) {
+      if (a.data_y != b.data_y) {
+        return a.data_y - b.data_y;
+      }
+      if (a.data_x != b.data_x) {
+        return a.data_x - b.data_x;
+      }
+    }
+
+    // Check case insensitive first
+    if (a.info.name.toLowerCase() < b.info.name.toLowerCase()) {
+      return -1
+    }
+    if (a.info.name.toLowerCase() > b.info.name.toLowerCase()) {
+      return 1
+    }
+    // then insensitive
+    if (a.info.name < b.info.name) {
+      return -1
+    }
+    if (a.info.name > b.info.name) {
+      return 1
+    }
+    return 0
+  });
+  console.log('sorted students', students);
+  for (let s_key in students) {
+    if (!students.hasOwnProperty(s_key)) return;
+    let open_pos = find_open_position(students);
+    moveStudent($('#' + students[s_key]._id)[0], open_pos.x, open_pos.y);
+    students[s_key].ignoreLocation = false;
+    students[s_key].data_x = open_pos.x;
+    students[s_key].data_y = open_pos.y;
+  }
+}
+
+function moveStudent(student, x, y) {
+  // translate the element
+  student.style.webkitTransform =
+    student.style.transform =
+      'translate(' + x + 'px, ' + y + 'px)';
+  // update the posiion attributes
+  student.setAttribute('data-x', x);
+  student.setAttribute('data-y', y);
 }
 
 //
