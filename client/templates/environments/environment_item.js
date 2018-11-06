@@ -98,7 +98,7 @@ Template.environmentItem.events({
      e.preventDefault();
      Router.go('editSubjects', {_envId:this._id});
   },
-  'click #edit-classroom-name': function(e) {
+  'click .edit-classroom-name': function(e) {
     e.preventDefault();
     e.stopPropagation();
     editClassroomName(this._id);
@@ -254,12 +254,13 @@ Template.environmentItem.helpers({
 
 
 function editClassroomName(envId) {
+  console.log('envId', envId);
   let context = $('.environment[data-env-id="' + envId + '"]');
 
   var env_name = $('.environment-name', context);
   var env_name_wrapper = $('.environment-name-wrapper', context);
   var currently_editing = !!(env_name.hasClass('editing'));
-  var edit_swap_button = $('#edit-classroom-name', context);
+  var save_button = $('.edit-classroom-name.button', context);
 
   if (!currently_editing) {
     env_name_wrapper.prepend($('<input>', {
@@ -269,10 +270,11 @@ function editClassroomName(envId) {
 
     env_name.addClass('editing');
     env_name.hide();
+    save_button.show();
 
     $('.edit-env-name', context).on('keyup', function(e) {
       if (e.keyCode === 13) {
-        edit_swap_button.click()
+        save_button.click()
       }
     })
   }
@@ -312,6 +314,7 @@ function editClassroomName(envId) {
       return 0;
     });
 
+    save_button.hide();
     new_env_name.remove();
     env_name.removeClass('editing');
     env_name.show();

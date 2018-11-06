@@ -4,12 +4,13 @@
     <li class="environmentList environment" data-env-id={{_id}}>
         <!-- acccordion header -->
         <div class="o--header-link toggle-accordion">
-            <span><span class="environment-name-wrapper"><span class="environment-name">{{envName}}</span><button id="edit-classroom-name" class="button is-small spaced-button">Edit</button></span> <p class="carat"> &#9660;</p></span>
+            <span><span class="environment-name-wrapper"><span class="environment-name">{{envName}}</span><button style="display: none;" class="edit-classroom-name button is-small spaced-button">Save</button></span> <p class="carat"> &#9660;</p></span>
             <div class="toggle-sub">
                 <p class="o--toggle-links" id="analyze-button">Analyze</p>
                 <p class="o--toggle-links export-tab">Export</p>
                 <p class="o--toggle-links import-tab">Import</p>
                 <p class="o--toggle-links dupe-tab" id="env-duplicate">Duplicate</p>
+                <p class="o--toggle-links edit-classroom-name">Rename</p>
                 <p class="o--toggle-links" id="env-delete">Delete</p>
             </div>
         </div>
