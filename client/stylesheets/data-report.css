@@ -258,8 +258,18 @@
     margin-left: 20px;
 }
 
-.report__section__column.print-only .report-label-head {
-    margin-top: 8em;
+.report__section--print-first-page .report__section-head {
+    display: flex;
+    margin-top: 3em;
+}
+
+.report__section--print-first-page .report-label-head {
+    white-space: nowrap;
+    margin-top: 30px;
+}
+
+.report__section--print-first-page .report__section-body {
+    margin-top: 16rem;
 }
 
 .classroom-summary div {
@@ -270,14 +280,33 @@
     margin: 2px 0 2px 10px;
 }
 
+.report__section--print-first-page .classroom-summary ul {
+    margin: 0 0 0 8px;
+}
+
+.report__section--print-first-page .classroom-summary li {
+    margin: 2px 4px 2px 0px;
+    display: inline-block;
+}
+
+.report__section--print-first-page .classroom-summary li:not(:last-child):after {
+    content: ',';
+}
+
 .report__section--columns {
     display: flex;
     flex-flow: row nowrap;
 }
 
 @media print {
+    .no-print {
+        display: none;
+    }
     .print-only {
         display: block;
+    }
+    .report-body {
+        padding-top: 0;
     }
     header, .c--view-data-header__container, footer {
         display: none !important;
