@@ -23,11 +23,13 @@
           </p>
       </div>
     <div class="c--student-body__container subjects">
+        <div class="drag-bounding-box">
         {{#each subject}}
             <div id="{{_id}}" style='transform:translate({{data_x}}px, {{data_y}}px);' data-x="{{data_x}}" data-y="{{data_y}}" class="draggable c--student-body__container-drag-area o--box-item">
                 <p class="c--student-body__container-drag-label">{{info.name}}</p>
             </div>
         {{/each}}
+        </div>
     </div>
   </div>
 

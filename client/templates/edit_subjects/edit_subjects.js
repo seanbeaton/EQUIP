@@ -13,10 +13,14 @@ Template.editSubjects.helpers({
 });
 
 const grid_size = {
-  x: 210,
+  x: 230,
   y: 60,
-  width: 960,
-  height: 1200
+  width: 920,
+  height: 1200,
+  grid_start_x: 82.5,
+  grid_start_y: 19,
+  vert_offset: 12,
+  horiz_offset: 25,
 };
 
 //Used to set up interactJS and get labels for students
@@ -30,16 +34,33 @@ Template.editSubjects.created = function () {
       // disable inertial throwing
       snap: {
         targets: [
-          interact.createSnapGrid(grid_size)
+          function(xPos, yPos) {
+            console.log('xpos', xPos, 'yPos', yPos);
+            let parent_rect = $('.c--student-body__container')[0].getBoundingClientRect();
+            let top_left = {
+              x: parent_rect.x + window.scrollX + grid_size.horiz_offset,
+              y: parent_rect.y + window.scrollY + grid_size.vert_offset,
+            }
+            console.log('top_left', top_left);
+            let f = interact.createSnapGrid({x:grid_size.x, y: grid_size.y, range: Infinity, offset: top_left}),
+            ret = f(xPos, yPos);
+            // if (ret.x < grid_size.x) ret.x = grid_size.x;
+            // if (ret.x > grid_size.width) ret.x = grid_size.width;
+            console.log('result', ret);
+            return ret;
+          }
         ],
         range: Infinity,
-        relativePoints: [{x: 0, y: 0}]
+        relativePoints: [{x: 0, y: 0}],
+        // endOnly: true,
+        // offset: {x: -65, y: -17},
       },
       inertia: false,
       autoScroll: true,
       onmove: dragMoveListener,
       restrict: {
-        restriction: 'parent'
+        restriction: '.drag-bounding-box',
+        elementRect: { left: 0, right: 1, top: 0, bottom: 1 }
       }
     });
 
@@ -122,13 +143,13 @@ Template.editSubjects.events({
     let newStudentPositionY;
 
     if (numberOfStudents === 0) {
-        newStudentPositionY = 19;
-        newStudentPositionX = 82.5;
+        newStudentPositionY = grid_size.grid_start_y;
+        newStudentPositionX = grid_size.grid_start_x;
     } else {
         // TODO, save these somewhere, pull from same place as grid init
         const grid_start_point = {
-          x: 82.5,
-          y: 19
+          x: grid_size.grid_start_x,
+          y: grid_size.grid_start_y
         };
         let open_position = find_open_position(students, grid_size, grid_start_point);
         // let yPosition = students[numberOfStudents - 1].data_y;
@@ -163,7 +184,7 @@ Template.editSubjects.events({
       }
     });
 
-    for (label in labels) {
+    for (let label in labels) {
         info[labels[label]] = choices[label];
     }
 

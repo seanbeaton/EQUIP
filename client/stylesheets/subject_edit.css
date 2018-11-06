@@ -44,12 +44,20 @@
 .c--student-body__container {
     display: flex;
     position: relative;
-    overflow-x: scroll;
+    overflow-x: auto;
+}
+
+.drag-bounding-box {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
 }
 
 .subjects {
     border: 1px solid rgba(0,0,0,0.3);
     height: 1200px;
+    padding: 12px 25px;
 }
 
 .c--student-body__wrapper {
@@ -91,7 +99,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 200px;
+  width: 220px;
   height: 50px;
   text-align: center;
   position: absolute;
