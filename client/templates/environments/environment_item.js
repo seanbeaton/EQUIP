@@ -320,9 +320,7 @@ function editClassroomName(envId) {
     env_name.show();
   }
 
-  edit_swap_button.removeClass('is-loading');
-  currently_editing = !currently_editing;
-  edit_swap_button.html((currently_editing) ? 'Save' : 'Edit')
+  save_button.removeClass('is-loading');
 }
 
 function duplicateClassroom(orig_env) {

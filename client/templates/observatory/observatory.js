@@ -161,7 +161,7 @@ Template.observatory.events({
     $('#seq-param-modal').removeClass('is-active');
     $('#seq-data-modal').removeClass('is-active');
   },
-  'click #edit-observation-name': function(e) {
+  'click .edit-observation-name': function(e) {
     editObservationName(this._id);
   },
   'click #delete-observation': function(e) {
@@ -310,9 +310,9 @@ function editObservationName(obsId) {
   var obs_name = $('.observation-name', context);
   var obs_name_wrapper = $('.observation-name-wrapper', context);
   var currently_editing = !!(obs_name.hasClass('editing'));
-  var edit_swap_button = $('#edit-observation-name', context);
+  var save_button = $('.edit-observation-name.button', context);
 
-  edit_swap_button.addClass('is-loading');
+  save_button.addClass('is-loading');
 
   if (!currently_editing) {
     obs_name_wrapper.prepend($('<input>', {
@@ -322,10 +322,11 @@ function editObservationName(obsId) {
 
     obs_name.addClass('editing');
     obs_name.hide();
+    save_button.show();
 
     $(context, '.edit-obs-name').on('keyup', function(e) {
       if (e.keyCode === 13) {
-        edit_swap_button.click()
+        save_button.click()
       }
     })
   }
@@ -363,16 +364,13 @@ function editObservationName(obsId) {
       return 0;
     });
 
+    save_button.show();
     new_obs_name.remove();
     obs_name.removeClass('editing');
-
-    console.log('go');
     obs_name.show();
   }
 
-  edit_swap_button.removeClass('is-loading');
-  currently_editing = !currently_editing;
-  edit_swap_button.html((currently_editing) ? 'Save' : 'Edit')
+  save_button.removeClass('is-loading');
 }
 
 function deleteObservation(obsId) {

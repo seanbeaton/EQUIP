@@ -24,10 +24,11 @@
       <div class="columns c--observation-header__container">
         <h2 class="column c--observation-header__title observation-name-wrapper">
             <span class="observation-name">{{observation.name}}</span>
-            <button id="edit-observation-name" class="button is-small spaced-button">Edit</button>
+            <button style="display:none;" class="edit-observation-name button is-small spaced-button">Save</button>
         </h2>
           <div class="toggle-sub">
-            <p class="o--toggle-links" id="delete-observation">Delete</p>
+              <p class="o--toggle-links edit-observation-name">Rename</p>
+              <p class="o--toggle-links" id="delete-observation">Delete</p>
           </div>
       </div>
       <div class="columns c--observation-front__container">
