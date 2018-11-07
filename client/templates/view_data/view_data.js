@@ -600,7 +600,7 @@ function makeIndividualGraphs(oIds) {
   var newWidth = data.length * 34;
   var containerWidth = newWidth * 1.05;
   var x1 = d3.scaleBand().padding(0.5);
-  var margin = {top: 50, right: 20, bottom: 60, left: 40},
+  var margin = {top: 70, right: 20, bottom: 60, left: 40},
       width = newWidth - margin.left - margin.right,
       height = 500 - margin.top - margin.bottom,
       fullW = newWidth,
@@ -630,15 +630,23 @@ function makeIndividualGraphs(oIds) {
     return d.value;
   })]);
 
-  g.append("g")
+
+  // Set up the x axis with names for all the students.
+  let x_axis = g.append("g")
     .attr("class", "axis axis--x")
     .attr("transform", "translate(0," + height + ")")
     .append('g')
     .attr("class", "x-axis-labels")
-    .call(d3.axisBottom(x))
+    .call(d3.axisBottom(x));
+
+  x_axis
     .selectAll('.x-axis-labels text')
-    .attr("text-anchor", "start")
-    .attr('transform', 'rotate(45,-5,10)');
+    .attr("text-anchor", "end")
+    .attr('transform', 'rotate(-45,0,0)');
+
+  x_axis
+    .selectAll('.x-axis-labels line')
+    .attr('transform', 'translate(3,0)');
 
   svgY.append("g")
       .attr("class", "axis axis--y")
@@ -680,7 +688,7 @@ function makeIndividualGraphs(oIds) {
 
   g.append("text")
       .attr("x", 100)
-      .attr("y", -20)
+      .attr("y", -40)
       .attr("dy", "0.32em")
       .attr("font-weight", "bold")
       .attr("text-anchor", "middle")
