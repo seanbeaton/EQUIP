@@ -39,23 +39,14 @@ Template.editSubjects.created = function () {
             let top_left = {
               x: parent_rect.x + window.scrollX + grid_size.horiz_offset,
               y: parent_rect.y + window.scrollY + grid_size.vert_offset,
-            }
+            };
             let f = interact.createSnapGrid({x:grid_size.x, y: grid_size.y, range: Infinity, offset: top_left});
-            let ret = f(xPos, yPos);
-            // if (ret.x < grid_size.x) ret.x = grid_size.x;
-            // if (ret.x > grid_size.width) ret.x = grid_size.width;
-            // console.log('result before', ret);
-            // ret.x = parseInt(ret.x);
-            // ret.y = parseInt(ret.y);
-            // console.log('result after', ret);
-
-            return ret;
+            return f(xPos, yPos);
           }
         ],
         range: Infinity,
         relativePoints: [{x: 0, y: 0}],
         // endOnly: true,
-        // offset: {x: -65, y: -17},
       },
       inertia: false,
       autoScroll: true,
@@ -64,6 +55,41 @@ Template.editSubjects.created = function () {
         restriction: '.drag-bounding-box',
         elementRect: { left: 0, right: 1, top: 0, bottom: 1 }
       }
+    })
+    .on('dragend', function(e) {
+      const students = Subjects.find({envId: Router.current().params._envId}).fetch();
+
+      let target = e.target;
+      let dest_x = (parseFloat(target.getAttribute('data-x')) || 0);
+      let dest_y = (parseFloat(target.getAttribute('data-y')) || 0);
+
+      dest_x = Math.round(dest_x / parseFloat(grid_size.x)) * parseFloat(grid_size.x);
+      dest_y = Math.round(dest_y / parseFloat(grid_size.y)) * parseFloat(grid_size.y);
+
+      console.log(e, target);
+      let occupying_student = findStudentAtLocation(students, dest_x, dest_y);
+      console.log('occupying_student', occupying_student);
+      if (occupying_student) {
+        let new_pos = {
+          x: parseFloat(target.getAttribute('data-orig-x')),
+          y: parseFloat(target.getAttribute('data-orig-y')),
+        };
+        if (!new_pos.x || !new_pos.y) {
+          new_pos = find_open_position(students)
+        }
+        moveStudent(document.getElementById(occupying_student._id), new_pos.x, new_pos.y)
+      }
+      target.classList.remove('dragging');
+      target.removeAttribute('data-orig-x');
+      target.removeAttribute('data-orig-y');
+      saveStudentLocations();
+    })
+    .on('dragstart', function(e) {
+      let target = e.target;
+      target.classList.add('dragging');
+      target.setAttribute('data-orig-x', target.getAttribute('data-x'));
+      target.setAttribute('data-orig-y', target.getAttribute('data-y'));
+      console.log('setting orig locations');
     });
 
   function dragMoveListener (event) {
@@ -76,12 +102,12 @@ Template.editSubjects.created = function () {
     x = Math.round(x / parseFloat(grid_size.x)) * parseFloat(grid_size.x);
     y = Math.round(y / parseFloat(grid_size.y)) * parseFloat(grid_size.y);
 
-    moveStudent(target, x, y)
+    moveStudent(target, x, y);
   }
 
 
   // this is used later in the resizing and gesture demos
-  window.dragMoveListener = dragMoveListener;
+  // window.dragMoveListener = dragMoveListener;
   /* INTERACTJS END */
 
 };
@@ -137,75 +163,7 @@ Template.editSubjects.events({
  },
 
   'click #save-subj-params': function(e) {
-    const students = Subjects.find({envId: Router.current().params._envId}).fetch();
-    const numberOfStudents = students.length;
-    let newStudentPositionX;
-    let newStudentPositionY;
-
-    if (numberOfStudents === 0) {
-        newStudentPositionY = 0;
-        newStudentPositionX = 0;
-    } else {
-        // TODO, save these somewhere, pull from same place as grid init
-        // const grid_start_point = {
-        //   x: grid_size.grid_start_x,
-        //   y: grid_size.grid_start_y
-        // };
-        let open_position = find_open_position(students);
-        // let yPosition = students[numberOfStudents - 1].data_y;
-        // let xPosition = students[numberOfStudents - 1].data_x;
-        newStudentPositionY = open_position.y;
-        newStudentPositionX = open_position.x;
-    }
-
-    const name = $('#student-name').val().trim();
-
-    if (name.length === 0 ) {
-        alert("Please enter a name");
-        return;
-    }
-
-    var info = {};
-    var choices = [];
-    var labels = ["name"];
-    choices.push(name);
-
-    $('.js-subject-labels').each(function () {
-      labels.push(this.textContent);
-    });
-
-    $('.chosen').each(function () {
-      let choice = this.textContent.replace(/\n/ig, '').trim();
-      if (choice.length === 0) {
-          alert("please make a selection")
-          return;
-      } else {
-          choices.push(choice);
-      }
-    });
-
-    for (let label in labels) {
-        info[labels[label]] = choices[label];
-    }
-
-    var subject = {
-      data_x: String(newStudentPositionX),
-      data_y: String(newStudentPositionY),
-      envId: this._id,
-      info: info
-    };
-
-    Meteor.call('subjectInsert', subject, function(error, result) {
-     if (error) {
-       alert(error.reason);
-     } else {
-      $('#stud-param-modal').removeClass('is-active');
-       $('.o--box-item#' + result._id).addClass('just-added');
-       setTimeout(function() {
-         $('.o--box-item#' + result._id).removeClass('just-added');
-       }, 5000);
-     }
-   });
+    saveNewSubject()
  },
   'click .edit-stud' : function (e) {
     studId = $(e.target).attr('data_id');
@@ -221,45 +179,15 @@ Template.editSubjects.events({
   'click #align-students': function(e) {
     const students = Subjects.find({envId: Router.current().params._envId}).fetch();
     align_all_students(students);
+    saveStudentLocations()
   },
   'click #align-students-alpha': function(e) {
     const students = Subjects.find({envId: Router.current().params._envId}).fetch();
     align_all_students(students, true);
+    saveStudentLocations();
   },
   'click #save-locations': function(e) {
-    var subjects = [];
-    $('.draggable').each(function () {
-      id = $(this).attr('id');
-      x = $(this).attr('data-x');
-      y = $(this).attr('data-y');
-      subject = {'id': id, 'x': x, 'y': y};
-      subjects.push(subject);
-    });
-
-    Meteor.call('subjectPositionUpdate', subjects, function(error, result) {
-        if (error) {
-          alert(error.reason);
-      } else {
-          toastr.options = {
-          "closeButton": false,
-          "debug": false,
-          "newestOnTop": false,
-          "progressBar": false,
-          "positionClass": "toast-bottom-right",
-          "preventDuplicates": false,
-          "onclick": null,
-          "showDuration": "300",
-          "hideDuration": "1000",
-          "timeOut": "2000",
-          "extendedTimeOut": "1000",
-          "showEasing": "swing",
-          "hideEasing": "linear",
-          "showMethod": "fadeIn",
-          "hideMethod": "fadeOut"
-        }
-        Command: toastr["success"]("Save Successful", "Student locations saved as they currently are.")
-        }
-      });
+    saveStudentLocations()
   },
 
   'click .delete-student': function(e) {
@@ -324,12 +252,8 @@ function find_open_position(students) {
       y = 0;
   let complete = false;
   while (!complete) {
-    let element_in_location = students.find(function(el) {
-      if (el.ignoreLocation) {
-        return false
-      }
-      return (parseFloat(el.data_x) === parseFloat(x) && parseFloat(el.data_y) === parseFloat(y))
-    });
+
+    let element_in_location = findStudentAtLocation(students, x, y)
     if (!element_in_location) {
       complete = true;
     } else {
@@ -385,7 +309,7 @@ function align_all_students(students, alphabetically) {
   for (let s_key in students) {
     if (!students.hasOwnProperty(s_key)) return;
     let open_pos = find_open_position(students);
-    moveStudent($('#' + students[s_key]._id)[0], open_pos.x, open_pos.y);
+    moveStudent(document.getElementById(students[s_key]._id), open_pos.x, open_pos.y);
     students[s_key].ignoreLocation = false;
     students[s_key].data_x = open_pos.x;
     students[s_key].data_y = open_pos.y;
@@ -393,13 +317,20 @@ function align_all_students(students, alphabetically) {
 }
 
 function moveStudent(student, x, y) {
+  // if (typeof permanent === 'undefined') {
+  //   permanent = 'true'
+  // }
+
   // translate the element
   student.style.webkitTransform =
     student.style.transform =
       'translate(' + x + 'px, ' + y + 'px)';
   // update the posiion attributes
+
   student.setAttribute('data-x', x);
   student.setAttribute('data-y', y);
+  // if (permanent) {
+  // }
 }
 
 //
@@ -420,6 +351,119 @@ function createTableOfStudents() {
 
   var modal = document.getElementById("data-modal-content");
   modal.innerHTML += contributionTableTemplate(students, allParams);
+}
+
+function saveStudentLocations() {
+  var subjects = [];
+  $('.draggable').each(function () {
+    id = $(this).attr('id');
+    x = $(this).attr('data-x');
+    y = $(this).attr('data-y');
+    subject = {'id': id, 'x': x, 'y': y};
+    subjects.push(subject);
+  });
+
+  Meteor.call('subjectPositionUpdate', subjects, function(error, result) {
+    if (error) {
+      alert(error.reason);
+    } else {
+      toastr.options = {
+        "closeButton": false,
+        "debug": false,
+        "newestOnTop": false,
+        "progressBar": false,
+        "positionClass": "toast-bottom-right",
+        "preventDuplicates": true,
+        "onclick": null,
+        "showDuration": "300",
+        "hideDuration": "1000",
+        "timeOut": "2000",
+        "extendedTimeOut": "1000",
+        "showEasing": "swing",
+        "hideEasing": "linear",
+        "showMethod": "fadeIn",
+        "hideMethod": "fadeOut"
+      }
+      Command: toastr["success"]("Student locations saved.")
+    }
+  });
+}
+
+function findStudentAtLocation(students, x, y) {
+  console.log('looking for students at ', x, y);
+  return students.find(function(el) {
+    if (el.ignoreLocation) {
+      return false
+    }
+    return (parseFloat(el.data_x) === parseFloat(x) && parseFloat(el.data_y) === parseFloat(y))
+  });
+}
+
+function saveNewSubject() {
+  const students = Subjects.find({envId: Router.current().params._envId}).fetch();
+  const numberOfStudents = students.length;
+  let newStudentPositionX;
+  let newStudentPositionY;
+
+  if (numberOfStudents === 0) {
+    newStudentPositionY = 0;
+    newStudentPositionX = 0;
+  } else {
+    let open_position = find_open_position(students);
+    // let yPosition = students[numberOfStudents - 1].data_y;
+    // let xPosition = students[numberOfStudents - 1].data_x;
+    newStudentPositionY = open_position.y;
+    newStudentPositionX = open_position.x;
+  }
+
+  const name = $('#student-name').val().trim();
+
+  if (name.length === 0 ) {
+    alert("Please enter a name");
+    return;
+  }
+
+  var info = {};
+  var choices = [];
+  var labels = ["name"];
+  choices.push(name);
+
+  $('.js-subject-labels').each(function () {
+    labels.push(this.textContent);
+  });
+
+  $('.chosen').each(function () {
+    let choice = this.textContent.replace(/\n/ig, '').trim();
+    if (choice.length === 0) {
+      alert("please make a selection");
+      return;
+    } else {
+      choices.push(choice);
+    }
+  });
+
+  for (let label in labels) {
+    info[labels[label]] = choices[label];
+  }
+
+  let subject = {
+    data_x: String(newStudentPositionX),
+    data_y: String(newStudentPositionY),
+    envId: this._id,
+    info: info
+  };
+
+  Meteor.call('subjectInsert', subject, function(error, result) {
+    if (error) {
+      alert(error.reason);
+    } else {
+      $('#stud-param-modal').removeClass('is-active');
+      $('.o--box-item#' + result._id).addClass('just-added');
+      setTimeout(function() {
+        $('.o--box-item#' + result._id).removeClass('just-added');
+      }, 5000);
+    }
+  });
 }
 
 function contributionTableTemplate(students, parameters) {
