@@ -195,6 +195,7 @@
 
 .student {
     transition: 0.25s ease box-shadow;
+    transition-property: transform, box-shadow;
 }
 
 .student.dragging {
