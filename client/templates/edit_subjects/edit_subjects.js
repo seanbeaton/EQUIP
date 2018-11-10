@@ -66,9 +66,7 @@ Template.editSubjects.created = function () {
       dest_x = Math.round(dest_x / parseFloat(grid_size.x)) * parseFloat(grid_size.x);
       dest_y = Math.round(dest_y / parseFloat(grid_size.y)) * parseFloat(grid_size.y);
 
-      console.log(e, target);
       let occupying_student = findStudentAtLocation(students, dest_x, dest_y);
-      console.log('occupying_student', occupying_student);
       if (occupying_student) {
         let new_pos = {
           x: parseFloat(target.getAttribute('data-orig-x')),
@@ -89,7 +87,6 @@ Template.editSubjects.created = function () {
       target.classList.add('dragging');
       target.setAttribute('data-orig-x', target.getAttribute('data-x'));
       target.setAttribute('data-orig-y', target.getAttribute('data-y'));
-      console.log('setting orig locations');
     });
 
   function dragMoveListener (event) {
@@ -305,7 +302,6 @@ function align_all_students(students, alphabetically) {
     }
     return 0
   });
-  console.log('sorted students', students);
   for (let s_key in students) {
     if (!students.hasOwnProperty(s_key)) return;
     let open_pos = find_open_position(students);
@@ -390,7 +386,6 @@ function saveStudentLocations() {
 }
 
 function findStudentAtLocation(students, x, y) {
-  console.log('looking for students at ', x, y);
   return students.find(function(el) {
     if (el.ignoreLocation) {
       return false
