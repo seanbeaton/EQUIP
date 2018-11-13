@@ -160,7 +160,7 @@ Template.editSubjects.events({
  },
 
   'click #save-subj-params': function(e) {
-    saveNewSubject()
+    saveNewSubject(this)
  },
   'click .edit-stud' : function (e) {
     studId = $(e.target).attr('data_id');
@@ -394,7 +394,7 @@ function findStudentAtLocation(students, x, y) {
   });
 }
 
-function saveNewSubject() {
+function saveNewSubject(env) {
   const students = Subjects.find({envId: Router.current().params._envId}).fetch();
   const numberOfStudents = students.length;
   let newStudentPositionX;
@@ -444,7 +444,7 @@ function saveNewSubject() {
   let subject = {
     data_x: String(newStudentPositionX),
     data_y: String(newStudentPositionY),
-    envId: this._id,
+    envId: env._id,
     info: info
   };
 
