@@ -208,53 +208,63 @@ Template.editSubjects.events({
     }
   },
   'click #edit-subj-params': function (e) {
-    var subjId = $(e.target).attr('data-id');
-
-    var envId = Router.current().params._envId;
-
-    //Do this always in the case of editing from obs list
-
-    let form_incomplete = false;
-
-    let info = {};
-    info.name = $('.js-modal-header').attr('data_name');
-
-    info.demographics = {};
-
-    $('.c--modal-student-options-container').each(function() {
-      let parameter_name = this.getAttribute('data-parameter-name');
-      let parameter_choice = $('.chosen', $(this)).text().replace(/\n/ig, '').trim();
-      if (parameter_choice.length === 0) {
-        alert(`No selection made for ${parameter_name}`);
-        form_incomplete = true;
-      } else {
-        info.demographics[parameter_name] = parameter_choice
-      }
-    });
-
-    if (form_incomplete) {
-      return;
-    }
-
-    let subject = {
-      info: info,
-      subId: subjId
-    };
-
-    Meteor.call('subjectUpdate', subject, function(error, result) {
-     if (error) {
-       alert(error.reason);
-     } else {
-      $('#stud-param-modal').removeClass('is-active');
-     }
-   });
+    editStudent(e);
     //This should happen at the end...
     $('#stud-param-modal').removeClass('is-active');
-    createTableOfStudents()
+    createTableOfStudents();
     $('#stud-data-modal').addClass('is-active');
+  },
+  'click #edit-subj-params-exit': function (e) {
+    editStudent(e);
+    //This should happen at the end...
+    $('#stud-param-modal').removeClass('is-active');
+    // createTableOfStudents();
+    // $('#stud-data-modal').addClass('is-active');
   }
 });
 
+function editStudent(e) {
+  var subjId = $(e.target).attr('data-id');
+
+  var envId = Router.current().params._envId;
+
+  //Do this always in the case of editing from obs list
+
+  let form_incomplete = false;
+
+  let info = {};
+  info.name = $('.js-modal-header').attr('data_name');
+
+  info.demographics = {};
+
+  $('.c--modal-student-options-container').each(function() {
+    let parameter_name = this.getAttribute('data-parameter-name');
+    let parameter_choice = $('.chosen', $(this)).text().replace(/\n/ig, '').trim();
+    if (parameter_choice.length === 0) {
+      alert(`No selection made for ${parameter_name}`);
+      form_incomplete = true;
+    } else {
+      info.demographics[parameter_name] = parameter_choice
+    }
+  });
+
+  if (form_incomplete) {
+    return;
+  }
+
+  let subject = {
+    info: info,
+    subId: subjId
+  };
+
+  Meteor.call('subjectUpdate', subject, function(error, result) {
+    if (error) {
+      alert(error.reason);
+    } else {
+      $('#stud-param-modal').removeClass('is-active');
+    }
+  });
+}
 
 function find_open_position(students) {
   let x = 0,
@@ -590,7 +600,7 @@ function editParamBoxes(subjId) {
     let updated_student = updateStudent(subj, allParams);
 
     modal.innerHTML += studentHeaderTemplate(`Edit ${student}`, student);
-    modal.innerHTML += studentParameterTemplate(allParams, updated_student, "Edit Student");
+    modal.innerHTML += studentParameterTemplate(allParams, updated_student, "Save Student");
     attachOptionSelection()
 }
 
@@ -647,16 +657,25 @@ function studentParameterTemplate(allParams, student, type) {
         `
     }).join("");
 
-    return `
-        <div class="boxes-wrapper">
-            ${boxes}
-        </div>
-        <div class="button-container">
-            <button class="o--standard-button u--margin-zero-auto" id="${saveBtn}" data-id="${studentId}">
-                ${type}
-            </button>
-        </div>
-    `
+  let exit_save_button = '';
+  if (saveBtn === 'edit-subj-params') {
+    exit_save_button = `
+        <button class="o--standard-button u--margin-zero-auto" id="${saveBtn}-exit" data-id="${studentId}">
+            ${type} and Close
+        </button>
+      `
+  }
+  return `
+      <div class="boxes-wrapper">
+          ${boxes}
+      </div>
+      <div class="button-container button-container--horizontal">
+          <button class="o--standard-button u--margin-zero-auto" id="${saveBtn}" data-id="${studentId}">
+              ${type}
+          </button>
+          ${exit_save_button}
+      </div>
+  `
 }
 
 function attachOptionSelection() {
