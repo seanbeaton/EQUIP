@@ -558,7 +558,7 @@ function makeRatioGraphs(envId, cData, dData) {
                 }
             }
         }
-        let wrapper_class = "ratio-plot--" + label.toLowerCase().replace(/ /g, '-')
+        let wrapper_class = "ratio-plot--" + label.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
         $(".ratio-plots").append('<div class="ratio-plot ' + wrapper_class + '"></div>');
         makeStackedBar(sortedData, label, "." + wrapper_class, "Equity Ratio");
     }
