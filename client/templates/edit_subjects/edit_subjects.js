@@ -572,6 +572,7 @@ function populateParamBoxes() {
     modal.innerHTML += studentInputTemplate();
     modal.innerHTML += studentParameterTemplate(allParams, null, "Add Student");
     attachOptionSelection()
+    $('.student-name-field').focus()
 }
 
 // Edits student
@@ -608,7 +609,7 @@ function studentInputTemplate() {
             <div class="c--modal-student-header">
                 <p>Name / Identifier for Student</p>
             </div>
-            <input class="c--modal-student-input" id="student-name" type="text" placeholder="Type Student's First Name, Initials, or Pseudonym">
+            <input class="c--modal-student-input student-name-field" id="student-name" type="text" placeholder="Type Student's First Name, Initials, or Pseudonym">
         </div>
     `
 }
