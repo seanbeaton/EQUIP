@@ -304,8 +304,8 @@ function reportSummary(chosenClassroomName, observations, sParams, dParams, tota
   container.append('<div><strong>Classroom: </strong><span>' + chosenClassroomName + '</span></div>');
   container.append('<div><strong>Total Contributions: </strong><span>' + totalCont + '</span></div>');
   container.append('<div><strong>Observations: </strong>' + genUnorderedList(observations) + '</div>');
-  container.append('<div><strong>Discourse Parameters: </strong>' + genUnorderedList(dParams) + '</div>');
-  container.append('<div><strong>Sequence Parameters: </strong>' + genUnorderedList(sParams) + '</div>');
+  container.append('<div><strong>Social Markers: </strong>' + genUnorderedList(dParams) + '</div>');
+  container.append('<div><strong>Discourse Dimensions: </strong>' + genUnorderedList(sParams) + '</div>');
 }
 
 function genUnorderedList(list) {
