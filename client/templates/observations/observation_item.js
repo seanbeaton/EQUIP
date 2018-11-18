@@ -45,11 +45,11 @@ Template.observationItem.events({
     observation_helpers.deleteContribution(e);
   },
   'click #edit-seq-params': function(e) {
-    seqId = $(e.target).attr('data_seq');
+    seqId = $(e.target).attr('data-seq');
 
     var info = {};
-      info['studentId'] = $('.student-modal-head').attr('data_id');
-      info['Name'] = $('.student-modal-head').attr('data_name');
+      info['studentId'] = $('.student-modal-head').attr('data-id');
+      info['Name'] = $('.student-modal-head').attr('data-name');
       let envId = Router.current().params._envId;
       let obsId = this._id;
       var choices = [];

@@ -2,6 +2,9 @@
 * JS file for edit_subjects.html
 */
 
+import {updateStudent, updateStudents} from '/client/helpers/students.js'
+import {setupSubjectParameters} from '/client/helpers/parameters.js'
+
 Template.editSubjects.helpers({
     subject: function() {
         subs = Subjects.find({envId: this._id});
@@ -233,7 +236,7 @@ function editStudent(e) {
   let form_incomplete = false;
 
   let info = {};
-  info.name = $('.js-modal-header').attr('data_name');
+  info.name = $('.js-modal-header').attr('data-name');
 
   info.demographics = {};
 
@@ -325,7 +328,7 @@ function align_all_students(students, alphabetically) {
     return 0
   });
   for (let s_key in students) {
-    if (!students.hasOwnProperty(s_key)) return;
+    if (!students.hasOwnProperty(s_key)) continue;
     let open_pos = find_open_position(students);
     moveStudent(document.getElementById(students[s_key]._id), open_pos.x, open_pos.y);
     students[s_key].ignoreLocation = false;
@@ -360,60 +363,13 @@ function createTableOfStudents() {
   let students = Subjects.find({envId:Router.current().params._envId}).fetch();
   // var parameterPairs = subjParams["children"]["parameterPairs"];
 
-  let allParams = setupParameters();
+  let allParams = setupSubjectParameters();
 
   let updated_students = updateStudents(students, allParams);
 
   var modal = document.getElementById("data-modal-content");
   modal.innerHTML += contributionTableTemplate(updated_students, allParams);
-}
 
-
-function setupParameters(envId) {
-  if (typeof envId === 'undefined') {
-    envId = Router.current().params._envId
-  }
-
-  let subjParams = SubjectParameters.find({'children.envId':envId}).fetch()[0];
-
-  let allParams = [];
-  // console.log(students);
-  if (subjParams.children["parameters"] === undefined) {
-    // for legacy classrooms
-    for (let p = 0; p < subjParams["children"]["parameterPairs"]; p++) {
-      allParams.push({
-        'name': subjParams['children']['label'+p],
-        'options': subjParams['children']['parameter'+p],
-      });
-    }
-  }
-  else {
-    // new data model classrooms
-    allParams = subjParams.children.parameters
-  }
-  return allParams
-}
-
-
-
-function updateStudents(students, allParams) {
-  // if we have the legacy student params, convert to the new ones.
-  students.forEach(function(student) {
-    updateStudent(student, allParams)
-  });
-  return students
-}
-
-function updateStudent(student, allParams) {
-  if (student.info['demographics'] === undefined) {
-    student.info.demographics = {};
-    for (let param_k in allParams) {
-      if (!allParams.hasOwnProperty(param_k)) return;
-      let param = allParams[param_k];
-      student.info.demographics[param.name] = student.info[param.name]
-    }
-  }
-  return student
 }
 
 function saveStudentLocations() {
@@ -543,7 +499,7 @@ function contributionTableTemplate(students, parameters) {
 }
 
 function contributionRowTemplate(student, params) {
-  // console.log(student, params);
+  console.log(student, params);
     let paramTemplate = params.map((param) => {
         return `
             <p class="o--modal-label contributions-grid-item">${param.name}</p>
@@ -576,7 +532,7 @@ function contributionRowTemplate(student, params) {
 function populateParamBoxes() {
     var modal = document.getElementById("param-modal-content");
 
-    let allParams = setupParameters();
+    let allParams = setupSubjectParameters();
 
     modal.innerHTML += studentHeaderTemplate("Add a Student");
     modal.innerHTML += studentInputTemplate();
@@ -588,15 +544,11 @@ function populateParamBoxes() {
 // Edits student
 function editParamBoxes(subjId) {
     $('#param-modal-content').children().remove();
-    // let envId = Router.current().params._envId
-    // let subjParams = SubjectParameters.find({'children.envId':envId}).fetch()[0];
-    // let parameterPairs = subjParams["children"]["parameterPairs"];
-  console.log('subjid', subjId);
     let subj = Subjects.find({_id: subjId}).fetch()[0];
     let student = subj.info.name;
     let modal = document.getElementById("param-modal-content");
 
-    let allParams = setupParameters();
+    let allParams = setupSubjectParameters();
     let updated_student = updateStudent(subj, allParams);
 
     modal.innerHTML += studentHeaderTemplate(`Edit ${student}`, student);
@@ -607,7 +559,7 @@ function editParamBoxes(subjId) {
 function studentHeaderTemplate(type, student) {
     let studentName = student ? student : "";
     return `
-        <div class="c--modal-header-container js-modal-header" data_name="${studentName}">
+        <div class="c--modal-header-container js-modal-header" data-name="${studentName}">
             <h3 class="c--modal-header-title">${type}</h3>
         </div>
     `

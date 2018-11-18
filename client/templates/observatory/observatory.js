@@ -7,6 +7,8 @@ var timer = new Stopwatch();
 var lastChoices = {};
 
 import * as observation_helpers from '/client/helpers/observations.js'
+import {updateStudent, updateStudents} from '/client/helpers/students.js'
+
 
 Template.observatory.created = function() {
   Session.set('envId', Router.current().params._envId);
@@ -168,48 +170,78 @@ Template.observatory.events({
     deleteObservation(this._id);
   },
   'click #save-seq-params': function(e) {
-    var info = {};
-    info['studentId'] = $('.js-modal-header').attr('data_id');
-    info['Name'] = $('.js-modal-header').attr('data_name');
-    envId = Router.current().params._envId;
-    obsId = Router.current().params._obsId;
+    // var info = {};
+    // info['studentId'] = $('.js-modal-header').attr('data-id');
+    // info['Name'] = $('.js-modal-header').attr('data_name');
+    // envId = Router.current().params._envId;
+    // obsId = Router.current().params._obsId;
 
-    var obsRaw = Observations.find({_id: obsId}).fetch()[0];
-    var choices = [];
-    var labels = [];
+    // var choices = [];
+    // var labels = [];
 
-    $('.toggle-item').each(function () {
-      if ($(this).attr('data_label') == "Contribution Defaults") {
-        return;
-      }
-      labels.push($(this).attr('data_label'));
-      choices.push($(this).val());
-    });
+    let info = {
+      student: {
+        studentId:$('.js-modal-header').attr('data-id'),
+        studentName: $('.js-modal-header').attr('data-name'),
+      },
+    };
 
-    $('.js-subject-labels').each(function () {
-      var chosenElement = false;
-      var chosenElements = this.nextElementSibling.querySelectorAll('.subj-box-params');
+    let form_incomplete = false;
 
-      labels.push(this.textContent);
-      chosenElements.forEach(function(ele) {
-        if ($(ele).hasClass('chosen')) {
-            choices.push(ele.textContent.replace(/\n/ig, '').trim());
-            chosenElement = true;
-        }
-      })
+    info.parameters = {};
 
-      if (chosenElement === false) {
-          choices.push(undefined);
+    $('.c--modal-student-options-container').each(function() {
+      let parameter_name = this.getAttribute('data-parameter-name');
+      let parameter_choice = $('.chosen', $(this)).text().replace(/\n/ig, '').trim();
+      if (parameter_choice.length === 0) {
+        alert(`No selection made for ${parameter_name}`);
+        form_incomplete = true;
+      } else {
+        info.parameters[parameter_name] = parameter_choice
       }
     });
 
-    for (label in labels) {
-      info[labels[label]] = choices[label];
+    if (form_incomplete) {
+      return;
     }
 
-    lastChoices = info;
+    //
+    // $('.toggle-item').each(function () {
+    //   if ($(this).attr('data_label') == "Contribution Defaults") {
+    //     return;
+    //   }
+    //   labels.push($(this).attr('data_label'));
+    //   choices.push($(this).val());
+    // });
+    //
+    // $('.js-subject-labels').each(function () {
+    //   var chosenElement = false;
+    //   var chosenElements = this.nextElementSibling.querySelectorAll('.subj-box-params');
+    //
+    //   labels.push(this.textContent);
+    //   chosenElements.forEach(function(ele) {
+    //     if ($(ele).hasClass('chosen')) {
+    //         choices.push(ele.textContent.replace(/\n/ig, '').trim());
+    //         chosenElement = true;
+    //     }
+    //   })
+    //
+    //   if (chosenElement === false) {
+    //       choices.push(undefined);
+    //   }
+    // });
+    //
+    // for (label in labels) {
+    //   info[labels[label]] = choices[label];
+    // }
+    //
+    // lastChoices = info;
 
-    var sequence = {
+    const obsId = Router.current().params._obsId;
+    const envId = Router.current().params._envId;
+    let obsRaw = Observations.find({_id: obsId}).fetch()[0];
+
+    let sequence = {
       envId: envId,
       time: timer.value,
       info: info,
@@ -236,63 +268,74 @@ Template.observatory.events({
     $('#seq-data-modal').addClass('is-active');
   },
   'click #edit-seq-params': function(e) {
-    seqId = $(e.target).attr('data_seq');
-
-    var info = {};
-      info['studentId'] = $('.js-modal-header').attr('data_id');
-      info['Name'] = $('.js-modal-header').attr('data_name');
-      envId = Router.current().params._envId;
-      obsId = Router.current().params._obsId;
-      var choices = [];
-      var labels = [];
-      $('.toggle-item').each(function () {
-        if ($(this).attr('data_label') == "Contribution Defaults") {
-          return;
-        }
-        labels.push($(this).attr('data_label'));
-        choices.push($(this).val());
-      });
-
-
-    $('.js-subject-labels').each(function () {
-      var chosenElement = false;
-      var chosenElements = this.nextElementSibling.querySelectorAll('.subj-box-params');
-      labels.push(this.textContent);
-      chosenElements.forEach(function(ele) {
-        if ($(ele).hasClass('chosen')) {
-            choices.push(ele.textContent.replace(/\n/ig, '').trim());
-            chosenElement = true;
-        }
-      })
-
-      if (chosenElement === false) {
-          choices.push(undefined);
-      }
-    });
-
-
-      for (label in labels) {
-        info[labels[label]] = choices[label];
-      }
-
-      var sequence = {
-        info: info,
-        seqId: seqId
-      };
-
-      Meteor.call('sequenceUpdate', sequence, function(error, result) {
-       if (error) {
-         alert(error.reason);
-       } else {
-        $('#seq-param-modal').removeClass('is-active');
-       }
-     });
+    editSequence(e);
     //This should happen at the end...
     $('#seq-param-modal').removeClass('is-active');
     observation_helpers.createTableOfContributions(this._id);
     $('#seq-data-modal').addClass('is-active');
   }
 });
+
+function editSequence(e) {
+
+  seqId = $(e.target).attr('data-seq');
+
+  var info = {};
+  info['studentId'] = $('.js-modal-header').attr('data-id');
+  info['Name'] = $('.js-modal-header').attr('data-name');
+  envId = Router.current().params._envId;
+  obsId = Router.current().params._obsId;
+  var choices = [];
+  var labels = [];
+  $('.toggle-item').each(function () {
+    if ($(this).attr('data_label') == "Contribution Defaults") {
+      return;
+    }
+    labels.push($(this).attr('data_label'));
+    choices.push($(this).val());
+  });
+
+
+  $('.js-subject-labels').each(function () {
+    var chosenElement = false;
+    var chosenElements = this.nextElementSibling.querySelectorAll('.subj-box-params');
+    labels.push(this.textContent);
+    chosenElements.forEach(function(ele) {
+      if ($(ele).hasClass('chosen')) {
+        choices.push(ele.textContent.replace(/\n/ig, '').trim());
+        chosenElement = true;
+      }
+    })
+
+    if (chosenElement === false) {
+      choices.push(undefined);
+    }
+  });
+
+
+  for (label in labels) {
+    info[labels[label]] = choices[label];
+  }
+
+  var sequence = {
+    info: info,
+    seqId: seqId
+  };
+
+
+
+  Meteor.call('sequenceUpdate', sequence, function(error, result) {
+    if (error) {
+      alert(error.reason);
+    } else {
+      $('#seq-param-modal').removeClass('is-active');
+    }
+  });
+}
+
+function editSeqParamBoxes(seqId) {
+
+}
 
 Template.registerHelper( 'math', function () {
   return {

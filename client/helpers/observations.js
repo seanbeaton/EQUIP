@@ -64,20 +64,21 @@
 //   }
 // }
 
+import {setupSequenceParameters} from '/client/helpers/parameters.js'
+import {updateSequence, updateSequences} from "/client/helpers/sequences.js";
+
 
 function createTableOfContributions() {
   $('#data-modal-content').children().remove();
   var envId = Router.current().params._envId
+
+
   var seqs = Sequences.find({obsId:Router.current().params._obsId}).fetch();
-  var seqParams = SequenceParameters.find({'children.envId':envId}).fetch()[0];
-  var parameterPairs = seqParams["children"]["parameterPairs"];
+  let allParams = setupSequenceParameters()
 
-  allParams = [];
-  for (p = 0; p<parameterPairs; p++) {
-    allParams.push(seqParams['children']['label'+p]);
-  }
+  seqs = updateSequences(seqs, allParams);
 
-  var modal = document.getElementById("data-modal-content");
+  let modal = document.getElementById("data-modal-content");
   modal.innerHTML += contributionTableTemplate(seqs, allParams);
 }
 
@@ -99,23 +100,24 @@ function contributionTableTemplate(sequences, parameters) {
 function contributionRowTemplate(seqItem, params) {
   let paramTemplate = params.map((param) => {
     return `
-            <p class="o--modal-label contributions-grid-item">${param}</p>
+            <p class="o--modal-label contributions-grid-item">${param.name}</p>
         `
   }).join("");
 
   let paramValues = params.map((param) => {
-    let data = seqItem.info[param] ? seqItem.info[param] : "n/a"
+    let data = seqItem.info.parameters[param.name] ? seqItem.info.parameters[param.name] : "n/a"
     return `
             <p class="o--modal-label contributions-grid-item">${data}</p>
         `
   }).join("");
 
   let time = `<p class="o--modal-label contributions-grid-item">${convertTime(Number(seqItem.time))}</p>`
+  console.log('seqItem', seqItem);
   return `
         <div class="contributions-grid-container">
-            <h3 class="contributions-modal-header">${seqItem.info.Name}</h3>
-            <p class="o--toggle-links contributions-modal-link edit-seq" data_id="${seqItem._id}" data_studentid="${seqItem.info.studentId}">Edit</p>
-            <p class="o--toggle-links contributions-modal-link delete-seq" data_id="${seqItem._id}" >Delete</p>
+            <h3 class="contributions-modal-header">${seqItem.info.student.studentName}</h3>
+            <p class="o--toggle-links contributions-modal-link edit-seq" data-id="${seqItem._id}" data-student-id="${seqItem.info.student.studentId}">Edit</p>
+            <p class="o--toggle-links contributions-modal-link delete-seq" data-id="${seqItem._id}" >Delete</p>
         </div>
         <div class="contributions-grid-item-container u--bold">
             <p class="o--modal-label contributions-grid-item">Time</p>
@@ -221,15 +223,19 @@ function convertTime(secs) {
 function populateParamBoxes(subjId) {
   $('#param-modal-content').children().remove();
   var envId = Router.current().params._envId;
-  var seqParams = SequenceParameters.find({'children.envId':envId}).fetch()[0];
-  var parameterPairs = seqParams["children"]["parameterPairs"];
-  var subj = Subjects.find({_id: subjId}).fetch()[0];
-  var studentName = subj.info.name;
-  var modal = document.getElementById("param-modal-content");
-  var howDefault = $("*[data_label='Contribution Defaults']").val();
+  // var seqParams = SequenceParameters.find({'children.envId':envId}).fetch()[0];
+  // var parameterPairs = seqParams["children"]["parameterPairs"];
 
-  modal.innerHTML += contributionHeaderTemplate("Enter a contribution for " + studentName, studentName, subjId);
-  modal.innerHTML += contributionParameterTemplate(seqParams, parameterPairs, null, "Save Contribution", null);
+  var subj = Subjects.find({_id: subjId}).fetch()[0];
+  // var studentName = subj.info.name;
+  var modal = document.getElementById("param-modal-content");
+  // var howDefault = $("*[data_label='Contribution Defaults']").val();
+
+  let allParams = setupSequenceParameters();
+  // let updated_sequence = updateSequence(subj, allParams);
+
+  modal.innerHTML += contributionHeaderTemplate("Enter a contribution for " + subj.info.name, subj.info.name, subjId);
+  modal.innerHTML += contributionParameterTemplate(allParams, null, "Save Contribution");
   attachOptionSelection()
 }
 
@@ -237,42 +243,50 @@ function populateParamBoxes(subjId) {
 
 function contributionHeaderTemplate(type, studentName, subjId) {
   return `
-        <div class="c--modal-header-container js-modal-header" data_id="${subjId}" data_name="${studentName}">
+        <div class="c--modal-header-container js-modal-header" data-id="${subjId}" data-name="${studentName}">
             <h3 class="c--modal-header-title">${type}</h3>
         </div>
     `
 }
 
-function contributionParameterTemplate(sequences, paramPairs, seq, type, id) {
+function contributionParameterTemplate(allParams, sequence, type) {
   let saveBtn = type === "Save Contribution" ? "save-seq-params" : "edit-seq-params";
-  let counter = Array(paramPairs).fill().map((e,i) => i);
-  let boxes = counter.map((param) => {
-    let params = sequences['children']['parameter' + param];
-    let options = params.split(',');
-    let field = sequences['children']['label' + param];
+
+  let boxes = allParams.map((param) => {
+    console.log('param', param);
+
+    let options = param.options.split(',').map(function(item) { return item.trim() });
+
     let optionNodes = options.map((opt) => {
+      console.log('opt', opt);
       let selected = "";
-      if (field && seq) { selected = seq['info'][field] === opt.trim() ? "chosen" : "" }
+
+      if (sequence) { selected = sequence.info.parameters[param.name] === opt ? "chosen" : "" }
+      // console.log('creating options for student, ', student);
       return `
                 <div class="column has-text-centered subj-box-params ${selected} optionSelection">
                     ${opt}
                 </div>
             `
     }).join("");
+
     return `
-            <div class="c--modal-student-header js-subject-labels">${sequences['children']['label'+param]}</div>
-            <div class="c--modal-student-options-container">
+
+            <div class="c--modal-student-header js-subject-labels">${param.name}</div>
+            <div class="c--modal-student-options-container" data-parameter-name="${param.name}">
                 ${optionNodes}
             </div>
         `
   }).join("");
+
+  let seqId = sequence ? sequence._id.trim() : "";
 
   return `
         <div class="boxes-wrapper">
             ${boxes}
         </div>
         <div class="button-container">
-            <button class="o--standard-button u--margin-zero-auto" data_seq="${id}" id="${saveBtn}">
+            <button class="o--standard-button u--margin-zero-auto" data-seq="${seqId}" id="${saveBtn}">
                 ${type}
             </button>
         </div>
@@ -298,87 +312,28 @@ var handleOptionSelect = function() {
 
 
 function editParamBoxes(seqId, subjId) {
-  var seq = Sequences.find({_id: seqId}).fetch()[0]
   $('#param-modal-content').children().remove();
-  var envId = Router.current().params._envId
-  seqParams = SequenceParameters.find({'children.envId': envId}).fetch()[0];
-  parameterPairs = seqParams["children"]["parameterPairs"];
+
   var subj = Subjects.find({_id: subjId}).fetch()[0];
+  var seq = Sequences.find({_id: seqId}).fetch()[0];
   var student = subj.info.name;
 
-  var modal = $('#param-modal-content');
+  var modal = document.getElementById('param-modal-content');
 
-  var name = $("<div/>", {
-    class: "columns  boxes-wrapper"
-  }).appendTo(modal);
+  let allParams = setupSequenceParameters();
+  let updatedSequence = updateSequence(seq, allParams);
 
-  var label = $("<h1/>", {
-    class: "column is-12 has-text-centered title is-3 student-modal-head",
-    text: "Editing Contribution for " + student,
-    data_id: subjId,
-    data_name: student
-  }).appendTo(name);
-
-  //
-  //BOX CREATION FOR MODAL
-  //
-  //go through each parameter pair and create a box
-  for (var param = 0; param < parameterPairs; param++) {
-
-    var wrap = $("<div/>", {
-      class: "columns  boxes-wrapper"
-    }).appendTo(modal);
-
-    var label = $("<div/>", {
-      class: "column is-2 has-text-centered subj-box-labels",
-      text: seqParams['children']['label' + param]
-    }).appendTo(wrap);
-
-    var field = seqParams['children']['label' + param];
-
-    var params = seqParams['children']['parameter' + param];
-    var options = params.split(',');
-
-    for (opt in options) {
-
-      if (seq['info'][field] == options[opt]) {
-        var option = $("<div/>", {
-          class: "column has-text-centered subj-box-params chosen hoverable",
-          text: options[opt]
-        }).appendTo(wrap);
-      } else {
-
-        var option = $("<div/>", {
-          class: "column has-text-centered subj-box-params hoverable",
-          text: options[opt]
-        }).appendTo(wrap);
-      }
-      option.click(function (e) {
-        e.preventDefault();
-        $(this).siblings().removeClass('chosen');
-        if ($(this).hasClass('chosen')) {
-          $(this).removeClass('chosen');
-        } else {
-          $(this).addClass('chosen');
-        }
-      });
-    }//end for
-  }//end for
-
-  $("<button/>", {
-    class: "button is-medium is-success",
-    id: "edit-seq-params",
-    data_seq: seqId,
-    text: "Save Revised Contribution"
-  }).appendTo(modal);
-
+  modal.innerHTML += contributionHeaderTemplate(`Edit contribution for ${student}`, student, subjId);
+  modal.innerHTML += contributionParameterTemplate(allParams, updatedSequence, "Save Changes");
+  console.log('adding the modal content');
+  attachOptionSelection()
 }
 
 function editContribution(e) {
-  const seqId = $(e.target).attr('data_id');
-  const myId = $(e.target).attr('data_studentId');
+  const seqId = $(e.target).attr('data-id');
+  const studentId = $(e.target).attr('data-student-id');
 
-  editParamBoxes(seqId, myId);
+  editParamBoxes(seqId, studentId);
 
   $('#seq-data-modal').removeClass('is-active');
   $('#seq-param-modal').addClass('is-active');
