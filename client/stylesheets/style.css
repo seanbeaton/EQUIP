@@ -540,3 +540,38 @@ li {
 .spaced-checkbox {
     margin-right: 10px;
 }
+
+.login-form {
+    max-width: 500px;
+    padding: 20px 20px;
+    margin: 60px auto;
+    background: white;
+}
+
+.login-form input {
+    display: block;
+    padding: 8px 12px;
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 100%;
+}
+
+
+.login-form button[type="submit"] {
+    padding: 8px 12px;
+    background-color: var(--orange);
+    border: 0;
+
+    font-family: 'Roboto Condensed', sans-serif !important;
+    font-size: 24px;
+    display: flex;
+    width: 300px;
+    cursor: pointer;
+    margin: 0 auto;
+    color: white;
+    /*height: 30px;*/
+    align-items: center;
+    justify-content: center;
+    text-transform: uppercase;
+
+}
