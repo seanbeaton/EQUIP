@@ -24,7 +24,8 @@ Template.observationItem.events({
           return 0;
         });
       }
-  },
+     // ga('Observations', 'Delete observation')
+   },
   'click .modal-close': function(e){
     $('#seq-param-modal').removeClass('is-active');
     $('#seq-data-modal').removeClass('is-active');
@@ -37,13 +38,14 @@ Template.observationItem.events({
     }
     observation_helpers.createTableOfContributions(this._id);
     $('#seq-data-modal').addClass('is-active');
+    // ga('Observations', 'View contributions')
   },
-  'click .edit-seq': function(e) {
-    observation_helpers.editContribution(e);
-  },
-  'click .delete-seq': function(e) {
-    observation_helpers.deleteContribution(e);
-  },
+  // 'click .edit-seq': function(e) {
+  //   observation_helpers.editContribution(e);
+  // },
+  // 'click .delete-seq': function(e) {
+  //   observation_helpers.deleteContribution(e);
+  // },
   'click #edit-seq-params': function(e) {
     seqId = $(e.target).attr('data_seq');
 

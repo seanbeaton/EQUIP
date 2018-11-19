@@ -108,6 +108,12 @@ Template.viewData.events({
     makeRatioGraphs(envId, groupCData, demData);
     makeIndividualGraphs(obsIds);
 
+    ga('Analytics', 'View', JSON.stringify({
+      'classroom_name': chosenClassroomName,
+      'num_observations': obsNames.length,
+      'num_contributions': totalCont,
+    }));
+
     $('.option-select').css('display', 'none');
     $('.report-body').css('visibility', 'visible');
   },
