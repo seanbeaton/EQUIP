@@ -28,7 +28,7 @@ AccountsTemplates.configure({
   // termsUrl: 'terms-of-use',
 
   // Redirects
-  homeRoutePath: '/home',
+  homeRoutePath: '/environmentList',
   redirectTimeout: 4000,
   //
   // // Hooks
