@@ -216,8 +216,16 @@ header {
     display: inline-flex;
     align-items: center;
     justify-content: space-between;
-    width: 45%;
+    /*width: 45%;*/
+    color: white;
+    font-family: 'Roboto Condensed', sans-serif;
 }
+
+.c-main-menu__not-signed-in a {
+    color: white;
+    text-transform: uppercase;
+}
+
 
 .c-main-menu__not-signed-in--ul {
     font-family: 'Roboto Condensed', sans-serif;
@@ -225,11 +233,12 @@ header {
 }
 
 .c-main-menu__not-signed-in--li {
-    padding-right: 40px;
+    padding-right: 20px;
 }
 
 .c-main-menu__not-signed-in--li a {
     font-size: 20px;
+    padding: 10px 10px;
     color: white;
     text-transform: uppercase;
     transition: color .4s;
