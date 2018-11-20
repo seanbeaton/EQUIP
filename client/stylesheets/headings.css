@@ -226,6 +226,12 @@ header {
     text-transform: uppercase;
 }
 
+.c-main-menu__not-signed-in a:hover {
+    color: white;
+    text-transform: uppercase;
+    background-color: transparent;
+}
+
 
 .c-main-menu__not-signed-in--ul {
     font-family: 'Roboto Condensed', sans-serif;
@@ -250,7 +256,8 @@ header {
 }
 
 .c-main-menu__not-signed-in-login-button {
-    font-family: 'Roboto', sans-serif;
+    /*font-family: 'Roboto', sans-serif;*/
+    font-family: 'Roboto Condensed', sans-serif;
     font-size: 24px;
     display: flex;
     width: 150px;

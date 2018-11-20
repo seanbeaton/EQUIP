@@ -548,6 +548,41 @@ li {
     background: white;
 }
 
+
+
+.at-input {
+    position: relative;
+}
+
+.login-form input ~ svg {
+    display: inline-block;
+    position: absolute;
+    right: 10px;
+    top: 33px;
+}
+
+.login-form .login-buttons {
+    margin: -20px -20px 0;
+    padding: 20px;
+    display: flex;
+}
+
+.login-form .login-buttons a {
+    flex: 1 1 200px;
+    text-align: center;
+    color: var(--orange);
+    font-size: 20px;
+    font-family: 'Roboto Condensed', sans-serif;
+    text-transform: uppercase;
+}
+
+.login-form input ~ svg:not(:last-of-type) {
+    display: none;
+    /* this is super hacky, but there's a bug with the login that causes
+     validation to fire every time you unfocus a field, adding a new icon every time
+     without removing the previous one.*/
+}
+
 .login-form input {
     display: block;
     padding: 8px 12px;
