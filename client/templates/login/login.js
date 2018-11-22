@@ -104,6 +104,24 @@ AccountsTemplates.addFields([
     displayName: "email",
     re: /.+@(.+){2,}\.(.+){2,}/,
     errStr: 'Invalid email',
+    func: function(value) {
+      if (Meteor.isClient) {
+        var self = this;
+        Meteor.call("emailExists", value, function(err, userExists){
+          if (!userExists) {
+            self.setSuccess(false);
+          }
+          // self.setValidating(false);
+          else {
+            self.setError("Email already exists");
+          }
+          self.setValidating(false);
+      });
+      return;
+    }
+  // Server
+  return Meteor.call("userExists", value);
+},
   },
   pwd
 ]);
