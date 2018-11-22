@@ -554,6 +554,14 @@ li {
     position: relative;
 }
 
+.at-input.validating * {
+    cursor: auto;
+}
+
+/*.at-input.validating input {*/
+    /*cursor: default;*/
+/*}*/
+
 .login-form input ~ svg {
     display: inline-block;
     position: absolute;

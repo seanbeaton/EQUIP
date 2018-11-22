@@ -16,24 +16,26 @@ AccountsTemplates.configure({
   showResendVerificationEmailLink: false,
 
   // Client-side Validation
-  continuousValidation: true,
-  negativeFeedback: false,
-  negativeValidation: true,
-  positiveValidation: true,
-  positiveFeedback: true,
+  continuousValidation: false,
+  // negativeFeedback: false,
+  // negativeValidation: true,
+  // positiveValidation: true,
+  // positiveFeedback: true,
   defaultState: "signUp",
-  showValidating: true,
+  // showValidating: true,
 
   // Privacy Policy and Terms of Use
-  // privacyUrl: 'privacy',
-  // termsUrl: 'terms-of-use',
+  privacyUrl: '/terms-of-use#privacy',
+  termsUrl: '/terms-of-use',
 
   // Redirects
   homeRoutePath: '/environmentList',
   redirectTimeout: 4000,
   //
   // // Hooks
-  // onLogoutHook: myLogoutFunc,
+  onLogoutHook: function() {
+    Router.go('environmentList');
+  },
   // onSubmitHook: mySubmitFunc,
   // preSignUpHook: myPreSubmitFunc,
   postSignUpHook: function() {
@@ -62,7 +64,31 @@ AccountsTemplates.configure({
 
 AccountsTemplates.configureRoute('signIn', {
   name: 'login',
-  path: '/login',
+  path: '/sign-in',
+  template: 'login',
+  layoutTemplate: 'layout',
+  redirect: '/environmentList',
+});
+
+AccountsTemplates.configureRoute('signUp', {
+  name: 'signup',
+  path: '/sign-up',
+  template: 'login',
+  layoutTemplate: 'layout',
+  redirect: '/environmentList',
+});
+
+AccountsTemplates.configureRoute('resetPwd', {
+  name: 'resetpwd',
+  path: '/reset-password',
+  template: 'login',
+  layoutTemplate: 'layout',
+  redirect: '/environmentList',
+});
+
+AccountsTemplates.configureRoute('changePwd', {
+  name: 'changepwd',
+  path: '/change-password',
   template: 'login',
   layoutTemplate: 'layout',
   redirect: '/environmentList',
@@ -74,6 +100,12 @@ AccountsTemplates.addFields([
   {
     _id: "username",
     type: "text",
+    // continuousValidation: true,
+    negativeValidation: true,
+    positiveValidation: true,
+    negativeFeedback: false,
+    positiveFeedback: false,
+    showValidating: false,
     displayName: "username",
     required: true,
     minLength: 5,
@@ -81,26 +113,33 @@ AccountsTemplates.addFields([
       if (Meteor.isClient) {
         // console.log("Validating username...");
         var self = this;
+        self.setSuccess();
         Meteor.call("userExists", value, function(err, userExists){
           if (!userExists) {
-            self.setSuccess(false);
+            self.setSuccess();
+            return true;
           }
-          // self.setValidating(false);
           else {
             self.setError("User already exists");
+            return false;
           }
-          self.setValidating(false);
         });
-        return;
       }
-      // Server
-      return Meteor.call("userExists", value);
+      if (Meteor.isServer) {
+        return Meteor.call("userExists", value);
+      }
     },
   },
   {
     _id: 'email',
     type: 'email',
     required: true,
+    continuousValidation: true,
+    negativeValidation: true,
+    positiveValidation: true,
+    negativeFeedback: false,
+    positiveFeedback: false,
+    showValidating: false,
     displayName: "email",
     re: /.+@(.+){2,}\.(.+){2,}/,
     errStr: 'Invalid email',
@@ -109,21 +148,51 @@ AccountsTemplates.addFields([
         var self = this;
         Meteor.call("emailExists", value, function(err, userExists){
           if (!userExists) {
-            self.setSuccess(false);
+            self.setSuccess();
+            return true;
           }
           // self.setValidating(false);
           else {
             self.setError("Email already exists");
+            return false;
           }
-          self.setValidating(false);
       });
-      return;
-    }
-  // Server
-  return Meteor.call("userExists", value);
-},
+      }
+    // Server
+      if (Meteor.isServer) {
+        return Meteor.call("userExists", value);
+      }
+    },
   },
-  pwd
+  pwd,
+  {
+    _id: 'institution',
+    type: 'text',
+    required: true,
+    displayName: 'Institution Name',
+    placeholder: 'University of Northeast Alaska'
+  },
+  {
+    _id: 'role',
+    type: 'text',
+    required: true,
+    displayName: 'Role',
+    placeholder: 'e.g. teacher, developer, classroom consultant...',
+  },
+  {
+    _id: 'intended_use',
+    type: 'text',
+    required: true,
+    displayName: 'What are you planning on using equip for?',
+    placeholder: 'e.g. reducing bias in my classroom...',
+  },
+  {
+    _id: 'how_did_you_hear',
+    type: 'text',
+    required: true,
+    displayName: 'How did you hear about EQUIP?',
+    placeholder: 'e.g. colleague, conference...',
+  },
 ]);
 
 Template.login.events({
