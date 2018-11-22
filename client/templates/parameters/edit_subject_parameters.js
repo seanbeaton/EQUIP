@@ -211,11 +211,14 @@ Template.editSubjectParameters.events({
     }
   }
 
+
+
   var extendObj = _.extend(clean_obj, {
     envId: Router.current().params._envId,
     parameterPairs: parameterPairs
   });
   var existingObj = SequenceParameters.find({'children.envId':clean_obj.envId}).fetch();
+  ga('Subject Parameters', 'Save', JSON.stringify(clean_obj));
   if ($.isEmptyObject(existingObj) == true) {
     Meteor.call('updateSubjParameters', clean_obj, function(error, result) {
       if (error){
@@ -269,6 +272,7 @@ Template.editSubjectParameters.events({
         Command: toastr["success"]("NOTE: After the first observation is created, you will not be able to edit discourse dimensions or demographics.","Save Successful","Demographic Parameters");
       }
     });
+
     setTimeout(() => {
         window.location.href = "/environmentList"
     },1000)

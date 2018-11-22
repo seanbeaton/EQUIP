@@ -40,9 +40,11 @@ Template.observationList.events({
     $('#help-env-modal').removeClass("is-active");
   },
   'click #obs-create-button': function(e) {
+    ga('Observations', 'Create - started');
     $('#obs-create-modal').addClass("is-active");
   },
   'click #obs-close-modal': function(e) {
+    ga('Observations', 'Create - failed', 'Cancelled');
     $('#obs-create-modal').removeClass("is-active");
   },
   'click .modal-card-foot .button': function(e) {
@@ -63,12 +65,14 @@ Template.observationList.events({
 
     if ($('#observationName').val() == "") {
       alert("Observation name required.");
+      ga('Observations', 'Create - failed', 'Name missing');
       return;
     }
 
     if (sequenceParams === undefined || demographicParams === undefined) {
-        alert("You must add students and parameters to the environment to continue to do the observation.")
-        return;
+      alert("You must add students and parameters to the environment to continue to do the observation.")
+      ga('Observations', 'Create - failed', 'Students/params missing');
+      return;
     }
 
     if (observations.length === 0 ) {
@@ -79,6 +83,7 @@ Template.observationList.events({
             });
 
             $('#observationName').val('');
+          ga('Observations', 'Create - succeeded');
         }
     } else {
         Meteor.call('observationInsert', observation, function(error, result) {
@@ -94,13 +99,14 @@ Template.observationList.events({
             return true;
         }
         else {
-            return false;
+          ga('Observations', 'Create - failed', 'Cancelled on prompt');
+          return false;
         }
     }
   },
-  'click .delete-seq': function(e) {
-    observation_helpers.deleteContribution(e);
-  },
+  // 'click .delete-seq': function(e) {
+  //   observation_helpers.deleteContribution(e);
+  // },
   'click .modal-close': function(e){
     $('#seq-param-modal').removeClass('is-active');
     $('#seq-data-modal').removeClass('is-active');
