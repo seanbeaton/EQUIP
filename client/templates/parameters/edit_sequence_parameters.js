@@ -259,7 +259,7 @@ const EditSequence = () => {
             },
             {
                 name: "Teacher Solicitation",
-                input: "How,What,Why,Other"
+                input: "How,What,Why,Other,N/A"
             },
             {
                 name: "Wait Time",
