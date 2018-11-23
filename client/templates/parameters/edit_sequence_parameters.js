@@ -165,7 +165,7 @@ Template.editSequenceParameters.events({
     envId: Router.current().params._envId,
     parameterPairs: parameterPairs
   });
-  ga('Sequence Parameters', 'Save', JSON.stringify(clean_obj));
+  gtag('event', 'save', {'event_category': 'sequence_params', 'event_label': JSON.stringify(clean_obj)});
 
   Meteor.call('updateSeqParameters', clean_obj, function(error, result) {
     if (error){

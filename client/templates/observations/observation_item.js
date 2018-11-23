@@ -24,7 +24,7 @@ Template.observationItem.events({
           return 0;
         });
       }
-     // ga('Observations', 'Delete observation')
+     // gtag('event',  'Observations', 'Delete observation')
    },
   'click .modal-close': function(e){
     $('#seq-param-modal').removeClass('is-active');
@@ -38,7 +38,7 @@ Template.observationItem.events({
     }
     observation_helpers.createTableOfContributions(this._id);
     $('#seq-data-modal').addClass('is-active');
-    // ga('Observations', 'View contributions')
+    // gtag('event',  'Observations', 'View contributions')
   },
   // 'click .edit-seq': function(e) {
   //   observation_helpers.editContribution(e);

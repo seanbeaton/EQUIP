@@ -216,6 +216,9 @@ Template.environmentItem.helpers({
     },
     getStudents: function() {
         var user = Meteor.user();
+        if (!user) {
+          return;
+        }
         var students = Subjects.find({userId: user._id}).fetch();
 
         let filteredStudents = students.filter(student => student.envId === this._id)

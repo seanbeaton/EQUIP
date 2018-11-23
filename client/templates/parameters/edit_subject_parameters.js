@@ -218,7 +218,7 @@ Template.editSubjectParameters.events({
     parameterPairs: parameterPairs
   });
   var existingObj = SequenceParameters.find({'children.envId':clean_obj.envId}).fetch();
-  ga('Subject Parameters', 'Save', JSON.stringify(clean_obj));
+  gtag('event',  'save', {'event_category': 'seq_params', 'event_label': JSON.stringify(clean_obj)});
   if ($.isEmptyObject(existingObj) == true) {
     Meteor.call('updateSubjParameters', clean_obj, function(error, result) {
       if (error){

@@ -133,7 +133,7 @@ Template.observatory.events({
   },
   'click .dragger': function(e) {
     //Create Sequence
-    ga('Sequences', 'Add');
+    gtag('event', 'add', {'event_category': 'sequences'});
 
     var myId;
     if ($(e.target).is('p')) {
@@ -223,7 +223,7 @@ Template.observatory.events({
      if (error) {
        alert(error.reason);
      } else {
-       ga('Sequences', 'Add - Success');
+       gtag('event',  'add_success', {'event_category': 'sequences'});
        $('#seq-param-modal').removeClass('is-active');
      }
    });
@@ -236,7 +236,7 @@ Template.observatory.events({
   },
   'click #show-all-observations':function (e){
     observation_helpers.createTableOfContributions(this._id);
-    ga('Observation', 'View sequence list');
+    gtag('event', 'view_sequence_list', {'event_category': 'observations'});
     $('#seq-data-modal').addClass('is-active');
   },
   'click #edit-seq-params': function(e) {
@@ -288,7 +288,7 @@ Template.observatory.events({
        if (error) {
          alert(error.reason);
        } else {
-         ga('Sequences', 'Edit - Success');
+         gtag('event',  'edit_success', {'event_category': 'sequences'});
          $('#seq-param-modal').removeClass('is-active');
        }
      });
@@ -354,7 +354,7 @@ function editObservationName(obsId) {
           text: 'Saved'
         });
         obs_name.html(new_name);
-        ga('Observations', 'Rename');
+        gtag('event',  'rename', {'event_category': 'observations'});
       }
       else {
         message = $('<span/>', {
@@ -385,7 +385,7 @@ function deleteObservation(obsId) {
   if (result) {
     Meteor.call('observationDelete', obsId, function(error, result) {
       if (!error) {
-        ga('Observations', 'Delete');
+        gtag('event', 'delete', {'event_category': 'observations'});
         Router.go('environmentList');
       }
     })

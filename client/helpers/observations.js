@@ -375,7 +375,7 @@ function editParamBoxes(seqId, subjId) {
 }
 
 function editContribution(e) {
-  ga('Sequences', 'Edit');
+  gtag('event', 'edit', {'event_category': 'sequences'});
 
   const seqId = $(e.target).attr('data_id');
   const myId = $(e.target).attr('data_studentId');
@@ -387,16 +387,15 @@ function editContribution(e) {
 }
 
 function deleteContribution(e) {
-  ga('Sequences', 'Delete');
   var result = confirm("Press 'OK' to delete this Contribution.");
   if (result == false) {
-    ga('Sequences', 'Delete - Cancelled');
+    gtag('event', 'delete_cancelled', {'event_category': 'sequences'});
     return;
   }
   const obsId = seq['obsId'];
   const seqId = $(e.target).attr("data_id");
   Meteor.call('sequenceDelete', seqId, function (error, result) {
-    ga('Sequences', 'Delete - Success');
+    gtag('event', 'delete', {'event_category': 'sequences'});
     return 0;
   });
   createTableOfContributions(obsId);

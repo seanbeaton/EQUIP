@@ -40,11 +40,11 @@ Template.observationList.events({
     $('#help-env-modal').removeClass("is-active");
   },
   'click #obs-create-button': function(e) {
-    ga('Observations', 'Create - started');
+    gtag('event',  'create_start', {'event_category': 'observations'});
     $('#obs-create-modal').addClass("is-active");
   },
   'click #obs-close-modal': function(e) {
-    ga('Observations', 'Create - failed', 'Cancelled');
+    gtag('event',  'create_fail', {'event_category': 'observations', 'event_label': 'cancelled'});
     $('#obs-create-modal').removeClass("is-active");
   },
   'click .modal-card-foot .button': function(e) {
@@ -65,13 +65,13 @@ Template.observationList.events({
 
     if ($('#observationName').val() == "") {
       alert("Observation name required.");
-      ga('Observations', 'Create - failed', 'Name missing');
+      gtag('event',  'create_fail', {'event_category': 'observations', 'event_label': 'missing_name'});
       return;
     }
 
     if (sequenceParams === undefined || demographicParams === undefined) {
       alert("You must add students and parameters to the environment to continue to do the observation.")
-      ga('Observations', 'Create - failed', 'Students/params missing');
+      gtag('event',  'create_fail', {'event_category': 'observations', 'event_label': 'params_missing'});
       return;
     }
 
@@ -83,7 +83,7 @@ Template.observationList.events({
             });
 
             $('#observationName').val('');
-          ga('Observations', 'Create - succeeded');
+          gtag('event',  'create_success', {'event_category': 'observations'});
         }
     } else {
         Meteor.call('observationInsert', observation, function(error, result) {
@@ -99,7 +99,7 @@ Template.observationList.events({
             return true;
         }
         else {
-          ga('Observations', 'Create - failed', 'Cancelled on prompt');
+          gtag('event',  'create_fail', {'event_category': 'observations', 'event_label': 'cancel_on_prompt'});
           return false;
         }
     }

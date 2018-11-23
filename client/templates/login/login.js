@@ -33,12 +33,22 @@ AccountsTemplates.configure({
   redirectTimeout: 4000,
   //
   // // Hooks
-  onLogoutHook: function() {
-    Router.go('environmentList');
+  onLogoutHook: function () {
+    Router.go('landingPage');
   },
-  // onSubmitHook: mySubmitFunc,
+  onSubmitHook: function (error, state) {
+    console.log('state', state);
+    if (state === 'signUp') {
+      gtag('event', 'signup', {'event_category': 'user'});
+      console.log('signup');
+    }
+    else if (state === 'signIn') {
+      console.log('signin');
+      gtag('event', 'login', {'event_category': 'user'})
+    }
+  },
   // preSignUpHook: myPreSubmitFunc,
-  postSignUpHook: function() {
+  postSignUpHook: function () {
     // ga here.
   },
 
@@ -109,12 +119,12 @@ AccountsTemplates.addFields([
     displayName: "username",
     required: true,
     minLength: 5,
-    func: function(value){
+    func: function (value) {
       if (Meteor.isClient) {
         // console.log("Validating username...");
         var self = this;
         self.setSuccess();
-        Meteor.call("userExists", value, function(err, userExists){
+        Meteor.call("userExists", value, function (err, userExists) {
           if (!userExists) {
             self.setSuccess();
             return true;
@@ -143,10 +153,10 @@ AccountsTemplates.addFields([
     displayName: "email",
     re: /.+@(.+){2,}\.(.+){2,}/,
     errStr: 'Invalid email',
-    func: function(value) {
+    func: function (value) {
       if (Meteor.isClient) {
         var self = this;
-        Meteor.call("emailExists", value, function(err, userExists){
+        Meteor.call("emailExists", value, function (err, userExists) {
           if (!userExists) {
             self.setSuccess();
             return true;
@@ -156,9 +166,9 @@ AccountsTemplates.addFields([
             self.setError("Email already exists");
             return false;
           }
-      });
+        });
       }
-    // Server
+      // Server
       if (Meteor.isServer) {
         return Meteor.call("userExists", value);
       }
@@ -196,12 +206,12 @@ AccountsTemplates.addFields([
 ]);
 
 Template.login.events({
-  'click .login-buttons__login': function(e) {
+  'click .login-buttons__login': function (e) {
     console.log('ping');
     e.preventDefault();
     AccountsTemplates.setState('signIn');
   },
-  'click .login-buttons__register': function(e) {
+  'click .login-buttons__register': function (e) {
     e.preventDefault();
     AccountsTemplates.setState('signUp');
   },

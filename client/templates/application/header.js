@@ -2,21 +2,23 @@
 * JS file for header.html
 */
 Template.header.events({
-     'click #signOut': function(e){
-         Meteor.logout(function(){
-             console.log("user logged out");
-         });
-     },
+  'click #signOut': function (e) {
+    Meteor.logout(function () {
+      console.log("user logged out");
+      Router.go('landingPage');
+      gtag('event', 'logout', {'event_category': 'User'})
+    });
+  },
      'mouseenter .dropdown-wrapper': function(e) {
          document.querySelector('.dropdown-wrapper .fa-caret-down').classList.add('hide');
          document.querySelector('.dropdown-wrapper .fa-caret-up').classList.remove('hide');
-
-         if (Meteor.userId()) {
-             var loginLink = document.getElementById('login-name-link');
-             loginLink.innerHTML = "";
-             loginLink.classList.remove("login-link-text");
-             loginLink.classList.add("login-link-text-sign-in");
-         }
+         //
+         // if (Meteor.userId()) {
+         //     var loginLink = document.getElementById('login-name-link');
+         //     loginLink.innerHTML = "";
+         //     loginLink.classList.remove("login-link-text");
+         //     loginLink.classList.add("login-link-text-sign-in");
+         // }
      },
      'mouseleave .dropdown-wrapper': function(e) {
          document.querySelector('.dropdown-wrapper .fa-caret-up').classList.add('hide');
