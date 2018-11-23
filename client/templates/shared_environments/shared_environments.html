@@ -1,0 +1,39 @@
+<template name="sharedEnv">
+    <div class="shared-environment">
+        <h2>{{envName}} <span class="deemphasize">by</span> <span class="env-author">{{authorName}}</span></h2>
+        <div class="params params--discourse">
+            <h4>Discourse parameters</h4>
+            <ul>
+                {{#each sequenceParams}}
+                    <li>{{>sequenceParam}}</li>
+                {{/each}}
+            </ul>
+        </div>
+        <div class="params params--demographics">
+            <h4>Demographics</h4>
+            <ul>
+                {{#each subjectParams}}
+                    <li>{{>subjectParam}}</li>
+                {{/each}}
+            </ul>
+        </div>
+        <div class="button-wrapper">
+            <a class="save-shared-env" data-shared-env-id="{{_id}}" href="#">Save to my classrooms</a>
+        </div>
+    </div>
+</template>
+
+<template name="sharedEnvSave">
+    <div class="shared-environment">
+        <h2>{{envName}}</h2>
+        <div>Saving shared environment...</div>
+    </div>
+</template>
+
+<template name="sequenceParam">
+    <span>{{label}}: {{parameter}}</span>
+</template>
+
+<template name="subjectParam">
+    <span>{{label}}: {{parameter}}</span>
+</template>
