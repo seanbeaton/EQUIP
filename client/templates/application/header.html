@@ -66,14 +66,29 @@
                 </div>
             </nav>
             {{else}}
-            <nav class="c-main-menu__not-signed-in">
+            <nav class="main-menu">
                 <ul class="c-main-menu__not-signed-in--ul">
-                    <li class="c-main-menu__not-signed-in--li"><a href="{{pathFor 'aboutPage'}}">About</a></li>
-                    <li class="c-main-menu__not-signed-in--li"><a href="{{pathFor 'help'}}">Help</a></li>
+                    <li class="c-main-menu__not-signed-in--li desktop-only"><a href="{{pathFor 'aboutPage'}}">About</a></li>
+                    <li class="c-main-menu__not-signed-in--li desktop-only"><a href="{{pathFor 'help'}}">Help</a></li>
                 </ul>
-                <div class="c-main-menu__not-signed-in-login-button">
-                    <a href="{{pathFor 'login'}}">Log&nbsp;in</a>
-                </div>
+                <span class="desktop-only">
+                    <div class="c-main-menu__not-signed-in-login-button">
+                        <a href="{{pathFor 'login'}}">Log&nbsp;in</a>
+                    </div>
+                </span>
+                <span class="mobile-only">
+                    <div class="dropdown-wrapper">
+                        <a class="menu-button menu-button-header" href="#">
+                            <i style="width: 1em" class="fa fa-bars"></i>
+                            <i style="width: 1em" class="fa fa-times hide"></i>
+                        </a>
+                        <div class="drop-menu fade-in effect">
+                            <a class='menu-button' href="{{pathFor 'login'}}">Log in</a>
+                            <a class='menu-button' href="{{pathFor 'aboutPage'}}">About</a>
+                            <a class='menu-button' href="{{pathFor 'help'}}">Help</a>
+                        </div>
+                    </div>
+                </span>
             </nav>
             {{/if}}
         </div>

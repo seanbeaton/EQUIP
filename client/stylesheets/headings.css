@@ -224,6 +224,7 @@ header {
     color: var(--white);
     height: 100%;
     padding: .55em;
+    max-height: 75px;
 }
 
 .drop-menu .menu-button {
@@ -293,6 +294,7 @@ header {
     font-family: 'Roboto Condensed', sans-serif;
     font-size: 24px;
     display: flex;
+    overflow: hidden;
     width: 150px;
     height: 75px;
     align-items: center;
@@ -574,6 +576,10 @@ input:-webkit-autofill {
     }
 }
 
+nav a:hover {
+    background-color: var(--orange);
+    color: white;
+}
 
 .logo {
     max-width: 130px;
