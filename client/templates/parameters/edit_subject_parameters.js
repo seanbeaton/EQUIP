@@ -345,7 +345,7 @@ const EditDemographics = () => {
             },
             {
                 name: "Gender",
-                input: "Male,Female,Other"
+                input: "Boy,Girl,Other"
             }
         ]
 
