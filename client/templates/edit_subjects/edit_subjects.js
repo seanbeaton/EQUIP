@@ -202,40 +202,64 @@ Template.editSubjects.events({
         return;
     }
   },
-  'click #edit-subj-params': function (e){
+  'click #edit-subj-params': function (e) {
     var subjId = $(e.target).attr('data_id');
-    var info = {};
-    info['name'] = $('.js-modal-header').attr('data_name');
-    var envId = Router.current().params._envId;
-    var choices = [];
-    var labels = [];
+    // var info = {};
+    // info['name'] = $('.js-modal-header').attr('data_name');
+    // var envId = Router.current().params._envId;
+    // var choices = [];
+    // var labels = [];
     //Do this always in the case of editing from obs list
 
-    $('.js-subject-labels').each(function () {
-        labels.push(this.textContent);
-    });
 
-    $('.chosen').each(function () {
-      let choice = this.textContent.replace(/\n/ig, '').trim();
-      choices.push(choice);
-    });
+    let form_incomplete = false;
 
-      for (label in labels) {
-        info[labels[label]] = choices[label];
+    let info = {};
+    info.name = $('.js-modal-header').attr('data_name');
+
+    info.demographics = {};
+
+    $('.c--modal-student-options-container').each(function () {
+      let parameter_name = this.getAttribute('data-parameter-name');
+      let parameter_choice = $('.chosen', $(this)).text().replace(/\n/ig, '').trim();
+      if (parameter_choice.length === 0) {
+        alert(`No selection made for ${parameter_name}`);
+        form_incomplete = true;
+      } else {
+        info[parameter_name] = parameter_choice
       }
+    });
 
-      var subject = {
-        info: info,
-        subId: subjId
-      };
+    if (form_incomplete) {
+      return;
+    }
 
-      Meteor.call('subjectUpdate', subject, function(error, result) {
-       if (error) {
-         alert(error.reason);
-       } else {
+    //
+    // $('.js-subject-labels').each(function () {
+    //     labels.push(this.textContent);
+    // });
+    //
+    // $('.chosen').each(function () {
+    //   let choice = this.textContent.replace(/\n/ig, '').trim();
+    //   choices.push(choice);
+    // });
+    //
+    //   for (label in labels) {
+    //     info[labels[label]] = choices[label];
+    //   }
+
+    var subject = {
+      info: info,
+      subId: subjId
+    };
+
+    Meteor.call('subjectUpdate', subject, function (error, result) {
+      if (error) {
+        alert(error.reason);
+      } else {
         $('#stud-param-modal').removeClass('is-active');
-       }
-     });
+      }
+    });
     //This should happen at the end...
     $('#stud-param-modal').removeClass('is-active');
     createTableOfStudents()
@@ -418,27 +442,26 @@ function saveNewSubject(env) {
     return;
   }
 
-  var info = {};
-  var choices = [];
-  var labels = ["name"];
-  choices.push(name);
+  let form_incomplete = false;
 
-  $('.js-subject-labels').each(function () {
-    labels.push(this.textContent);
-  });
+  let info = {};
+  info.name = name
 
-  $('.chosen').each(function () {
-    let choice = this.textContent.replace(/\n/ig, '').trim();
-    if (choice.length === 0) {
-      alert("please make a selection");
-      return;
+  info.demographics = {};
+
+  $('.c--modal-student-options-container').each(function() {
+    let parameter_name = this.getAttribute('data-parameter-name');
+    let parameter_choice = $('.chosen', $(this)).text().replace(/\n/ig, '').trim();
+    if (parameter_choice.length === 0) {
+      alert(`No selection made for ${parameter_name}`);
+      form_incomplete = true;
     } else {
-      choices.push(choice);
+      info[parameter_name] = parameter_choice
     }
   });
 
-  for (let label in labels) {
-    info[labels[label]] = choices[label];
+  if (form_incomplete) {
+    return;
   }
 
   let subject = {
@@ -557,11 +580,13 @@ function studentParameterTemplate(subjects, paramPairs, student, type) {
     let studentId = student ? student._id.trim() : "";
     let boxes = counter.map((param) => {
         let params = subjects['children']['parameter' + param];
-        let options = params.split(',');
+        let options = params.split(',').map(function(item) { return item.trim(); });
         let field = subjects['children']['label' + param];
         let optionNodes = options.map((opt) => {
             let selected = "";
-
+            console.log('opt', opt, field, student);
+            console.log('{', opt, '}');
+            console.log('{', 'opt', '}');
             if (field && student) { selected = student['info'][field] === opt ? "chosen" : "" }
 
             return `
@@ -572,7 +597,7 @@ function studentParameterTemplate(subjects, paramPairs, student, type) {
         }).join("");
         return `
             <div class="c--modal-student-header js-subject-labels">${subjects['children']['label'+param]}</div>
-            <div class="c--modal-student-options-container">
+            <div class="c--modal-student-options-container" data-parameter-name="${subjects['children']['label'+param]}">
                 ${optionNodes}
             </div>
         `
