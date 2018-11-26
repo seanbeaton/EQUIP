@@ -55,15 +55,20 @@ AccountsTemplates.configure({
   // Texts
   texts: {
     button: {
-      signUp: "Register Now!"
+      signUp: "Register!",
+      signIn: "Log in"
     },
     socialSignUp: "Register",
     title: {
       forgotPwd: "Recover Your Password",
+      signIn: "Log in",
+      signUp: "Create an account",
       // enrollAccount: "Enroll Title",
 
     },
 
+    signInLink_pre: "Already have an account?",
+    signInLink_link: "Log in now!",
     signUpLink_pre: "Don't have an account already?",
     signUpLink_link: "Create one now!",
     errors: {
