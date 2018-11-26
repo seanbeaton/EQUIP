@@ -73,7 +73,7 @@ AccountsTemplates.configure({
     signUpLink_link: "Create one now!",
     errors: {
       loginForbidden: "Those details don't seem to be correct. Make sure your password is correct, or if you don't already have an account, you can create one now.",
-      mustBeLoggedIn: "You have to be logged in to do that.",
+      mustBeLoggedIn: "Please log in to continue.",
     }
   },
 });
