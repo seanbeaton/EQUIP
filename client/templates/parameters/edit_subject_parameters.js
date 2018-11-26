@@ -345,9 +345,9 @@ const EditDemographics = () => {
             },
             {
                 name: "Gender",
-                input: "Boy,Girl,Other"
+                input: "Girl, Boy, Nonbinary, Other"
             }
-        ]
+        ];
 
         let defaultNodes = defaultDemoData.map((data,idx) => {
             return oneResultTemplate(data,idx)
