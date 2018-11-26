@@ -180,7 +180,7 @@ AccountsTemplates.addFields([
     type: 'text',
     required: true,
     displayName: 'Institution Name',
-    placeholder: 'University of Northeast Alaska'
+    placeholder: 'e.g., University of Northeast Alaska, Eastwood Unified School District'
   },
   {
     _id: 'role',
@@ -193,7 +193,7 @@ AccountsTemplates.addFields([
     _id: 'intended_use',
     type: 'text',
     required: true,
-    displayName: 'What are you planning on using equip for?',
+    displayName: 'What are you planning on using EQUIP for?',
     placeholder: 'e.g. reducing bias in my classroom...',
   },
   {
