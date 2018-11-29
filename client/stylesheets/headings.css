@@ -563,12 +563,23 @@ input:-webkit-autofill {
     pointer-events: none;
 }
 
-.dropdown-wrapper:hover .drop-menu,
-.dropdown-wrapper.dropdown-wrapper--open .drop-menu {
-    max-height: 320px;
-    opacity: 1;
-    pointer-events: auto;
+
+@media screen and (max-width: 550px) {
+    .dropdown-wrapper.dropdown-wrapper--open .drop-menu {
+        max-height: 320px;
+        opacity: 1;
+        pointer-events: auto;
+    }
 }
+
+@media screen and (min-width: 551px) {
+    .dropdown-wrapper:hover .drop-menu {
+        max-height: 320px;
+        opacity: 1;
+        pointer-events: auto;
+    }
+}
+
 
 @media screen and (max-width: 550px) {
     .logo-text,

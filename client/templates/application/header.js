@@ -32,11 +32,13 @@ Template.header.events({
   'click .dropdown-wrapper': function(e) {
     $('.dropdown-wrapper').toggleClass('dropdown-wrapper--open');
 
-    $(document).mouseup(function(e) {
+    $(document).off('mouseup').on('mouseup', function(e) {
+
       let menu_wrapper = $('.dropdown-wrapper');
       if (!menu_wrapper.hasClass('dropdown-wrapper--open')) {
         return;
       }
+
       if (!menu_wrapper.is(e.target) && menu_wrapper.has(e.target).length === 0) {
         menu_wrapper.removeClass('dropdown-wrapper--open');
       }
