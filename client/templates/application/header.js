@@ -9,9 +9,12 @@ Template.header.events({
       gtag('event', 'logout', {'event_category': 'User'})
     });
   },
+  'click .dropdown-wrapper': function(e) {
+    $('.dropdown-wrapper').toggleClass('dropdown-wrapper--open')
+  },
      'mouseenter .dropdown-wrapper': function(e) {
-         document.querySelector('.dropdown-wrapper .fa-caret-down').classList.add('hide');
-         document.querySelector('.dropdown-wrapper .fa-caret-up').classList.remove('hide');
+         // document.querySelector('.dropdown-wrapper .fa-caret-down').classList.add('hide');
+         // document.querySelector('.dropdown-wrapper .fa-caret-up').classList.remove('hide');
          //
          // if (Meteor.userId()) {
          //     var loginLink = document.getElementById('login-name-link');
@@ -21,8 +24,8 @@ Template.header.events({
          // }
      },
      'mouseleave .dropdown-wrapper': function(e) {
-         document.querySelector('.dropdown-wrapper .fa-caret-up').classList.add('hide');
-         document.querySelector('.dropdown-wrapper .fa-caret-down').classList.remove('hide');
+         // document.querySelector('.dropdown-wrapper .fa-caret-up').classList.add('hide');
+         // document.querySelector('.dropdown-wrapper .fa-caret-down').classList.remove('hide');
      },
      'click #login-buttons': function(e) {
          setTimeout(function(){

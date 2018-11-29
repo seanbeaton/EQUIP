@@ -558,6 +558,18 @@ li {
     cursor: auto;
 }
 
+#at-signUp {
+
+}
+
+.at-input.has-error input + span {
+    color: red;
+}
+
+.at-input .fa-check {
+    color: #1fc559;
+}
+
 /*.at-input.validating input {*/
     /*cursor: default;*/
 /*}*/
