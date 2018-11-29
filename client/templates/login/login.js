@@ -17,10 +17,10 @@ AccountsTemplates.configure({
 
   // Client-side Validation
   continuousValidation: false,
-  // negativeFeedback: false,
-  // negativeValidation: true,
-  // positiveValidation: true,
-  // positiveFeedback: true,
+  negativeFeedback: false,
+  negativeValidation: true,
+  positiveValidation: true,
+  positiveFeedback: true,
   defaultState: "signIn",
   // showValidating: true,
 
