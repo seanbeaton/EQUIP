@@ -692,3 +692,10 @@ li {
 .env-author {
     font-size: 20px;
 }
+
+.basic-container {
+    background-color: white;
+    margin: 100px auto;
+    max-width: 900px;
+    padding: 2rem;
+}

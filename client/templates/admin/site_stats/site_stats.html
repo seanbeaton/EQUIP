@@ -1,0 +1,52 @@
+<!-- HTML for the edit subjects page -->
+
+<template name="siteStats">
+    <div class="basic-container">
+        <h2>Site stats</h2>
+        <div class="stats-container">
+            <ul>
+            {{#each stats}}
+                {{> stat }}
+            {{ else }}
+                <li>No stats available</li>
+            {{/each}}
+            </ul>
+        </div>
+        <div class="stats-container">
+            <h4>Demographic usage</h4>
+            <ul>
+            {{#each demographic_popularities}}
+                {{> param_pop }}
+            {{ else }}
+                <li>No stats available</li>
+            {{/each}}
+            </ul>
+        </div>
+        <div class="stats-container">
+            <h4>Discourse parameter usage</h4>
+            <ul>
+            {{#each discourse_param_popularities}}
+                {{> param_pop }}
+            {{ else }}
+                <li>No stats available</li>
+            {{/each}}
+            </ul>
+        </div>
+    </div>
+</template>
+
+<template name="stat">
+    <li>{{label}}: {{value}}</li>
+</template>
+
+<template name="param_pop">
+    <li>{{label}}: {{count}} usage(s).
+        <br/>
+        Options that were used:
+        {{#each paramopts in params}}
+            <br/>
+            <code>{{paramopts.label}}</code> was used {{paramopts.count}} time(s)
+        {{/each}}
+    </li>
+    <hr/>
+</template>

@@ -80,7 +80,7 @@ AccountsTemplates.configure({
 
 AccountsTemplates.configureRoute('signIn', {
   name: 'login',
-  path: '/sign-in',
+  path: '/login',
   template: 'login',
   layoutTemplate: 'layout',
   redirect: '/environmentList',

@@ -15,6 +15,7 @@ Meteor.publish('environments', function() {
     );
 });
 
+
 Meteor.publish('observations', function() {
     if (!this.userId) {
         return this.ready();
@@ -59,3 +60,85 @@ Meteor.publish('shared_environments', function() {
    // these are public
    return SharedEnvironments.find();
 });
+
+
+Meteor.publish('allEnvs', function() {
+  if (Roles.userIsInRole(this.userId, ['admin'], 'site')) {
+    return Environments.find();
+  }
+  else {
+    // return [];
+    //
+    this.ready()
+  }
+
+  // this.stop();
+  return;
+});
+Meteor.publish('allObs', function() {
+  if (Roles.userIsInRole(this.userId, ['admin'], 'site')) {
+    return Observations.find();
+  }
+  else {
+    this.ready();
+    // return [];
+  }
+
+  // this.stop();
+  return;
+});
+
+Meteor.publish('allSeqs', function() {
+  if (Roles.userIsInRole(this.userId, ['admin'], 'site')) {
+    return Sequences.find();
+  }
+  else {
+    // return [];
+
+    this.ready()
+  }
+
+  // this.stop();
+  return;
+});
+
+Meteor.publish('allSubjectsAndParams', function() {
+  if (Roles.userIsInRole(this.userId, ['admin'], 'site')) {
+    return [
+      SequenceParameters.find(),
+      SubjectParameters.find(),
+      Subjects.find(),
+    ]
+  }
+  else {
+    // return [];
+
+    this.ready()
+  }
+
+  // this.stop();
+  return;
+});
+
+
+
+Meteor.publish('users', function () {
+  if (Roles.userIsInRole(this.userId, ['admin'], 'site')) {
+    return Meteor.users.find();
+  }
+  else {
+    // return [];
+    this.ready()
+  }
+
+  // this.stop();
+  return;
+});
+
+//
+// Meteor.publish('Meteor.users', function() {
+//
+//
+//   return Meteor.users.find(selector, options);
+//
+// });
