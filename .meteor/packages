@@ -32,3 +32,4 @@ accounts-ui
 dynamic-import@0.3.0
 useraccounts:unstyled
 useraccounts:iron-routing
+alanning:roles
