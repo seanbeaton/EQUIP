@@ -218,7 +218,10 @@ function convertTime(secs) {
 
 
 // Saves a new observation
-function populateParamBoxes(subjId) {
+function populateParamBoxes(subjId, seqId) {
+  if (typeof seqId === 'undefined') {
+    seqId = null;
+  }
   $('#param-modal-content').children().remove();
   var envId = Router.current().params._envId;
   var seqParams = SequenceParameters.find({'children.envId':envId}).fetch()[0];
@@ -228,8 +231,14 @@ function populateParamBoxes(subjId) {
   var modal = document.getElementById("param-modal-content");
   var howDefault = $("*[data_label='Contribution Defaults']").val();
 
-  modal.innerHTML += contributionHeaderTemplate("Enter a contribution for " + studentName, studentName, subjId);
-  modal.innerHTML += contributionParameterTemplate(seqParams, parameterPairs, null, "Save Contribution", null);
+  if (seqId) {
+    modal.innerHTML += contributionHeaderTemplate("Edit contribution for " + studentName, studentName, subjId);
+    modal.innerHTML += contributionParameterTemplate(seqParams, parameterPairs, seqId, "Update");
+  }
+  else {
+    modal.innerHTML += contributionHeaderTemplate("Enter a contribution for " + studentName, studentName, subjId);
+    modal.innerHTML += contributionParameterTemplate(seqParams, parameterPairs, seqId, "Save Contribution");
+  }
   attachOptionSelection()
 }
 
@@ -243,7 +252,13 @@ function contributionHeaderTemplate(type, studentName, subjId) {
     `
 }
 
-function contributionParameterTemplate(sequences, paramPairs, seq, type, id) {
+function contributionParameterTemplate(sequences, paramPairs, seqId, type) {
+  let seq;
+
+  if (seqId) {
+    seq = Sequences.findOne({_id: seqId});
+  }
+
   let saveBtn = type === "Save Contribution" ? "save-seq-params" : "edit-seq-params";
   let counter = Array(paramPairs).fill().map((e,i) => i);
   let boxes = counter.map((param) => {
@@ -272,7 +287,7 @@ function contributionParameterTemplate(sequences, paramPairs, seq, type, id) {
             ${boxes}
         </div>
         <div class="button-container">
-            <button class="o--standard-button u--margin-zero-auto" data_seq="${id}" id="${saveBtn}">
+            <button class="o--standard-button u--margin-zero-auto" data_seq="${seqId}" id="${saveBtn}">
                 ${type}
             </button>
         </div>
@@ -375,7 +390,7 @@ function editParamBoxes(seqId, subjId) {
 }
 
 function editContribution(e) {
-  gtag('event', 'edit', {'event_category': 'sequences'});
+  // gtag('event', 'edit', {'event_category': 'sequences'});
 
   const seqId = $(e.target).attr('data_id');
   const myId = $(e.target).attr('data_studentId');

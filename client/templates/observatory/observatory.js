@@ -229,7 +229,19 @@ Template.observatory.events({
    });
   },
   'click .edit-seq': function(e) {
-    observation_helpers.editContribution(e);
+    // observation_helpers.editContribution(e);
+    gtag('event', 'edit', {'event_category': 'sequences'});
+    $('#seq-data-modal').removeClass('is-active');
+
+    let seqId = $(e.target).attr('data_id');
+    let subjId = $(e.target).attr('data_studentid');
+
+    console.log('editing student id',  subjId, 'seq id', seqId);
+
+    observation_helpers.populateParamBoxes(subjId, seqId);
+    $('#seq-param-modal').addClass('is-active');
+
+
   },
   'click .delete-seq': function(e) {
     observation_helpers.deleteContribution(e);
@@ -240,17 +252,17 @@ Template.observatory.events({
     $('#seq-data-modal').addClass('is-active');
   },
   'click #edit-seq-params': function(e) {
-    seqId = $(e.target).attr('data_seq');
+    let seqId = $(e.target).attr('data_seq');
 
     var info = {};
       info['studentId'] = $('.js-modal-header').attr('data_id');
       info['Name'] = $('.js-modal-header').attr('data_name');
-      envId = Router.current().params._envId;
-      obsId = Router.current().params._obsId;
+      let envId = Router.current().params._envId;
+      let obsId = Router.current().params._obsId;
       var choices = [];
       var labels = [];
       $('.toggle-item').each(function () {
-        if ($(this).attr('data_label') == "Contribution Defaults") {
+        if ($(this).attr('data_label') === "Contribution Defaults") {
           return;
         }
         labels.push($(this).attr('data_label'));
