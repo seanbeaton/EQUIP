@@ -7,7 +7,7 @@ Template.siteStats.helpers({
     let stats = [];
     stats.push({label: 'Number of users', value: Meteor.users.find().count()});
     stats.push({label: 'Number of classrooms', value: Environments.find().count()});
-    stats.push({label: 'Number of students', value: Environments.find().count()});
+    stats.push({label: 'Number of students', value: Subjects.find().count()});
     stats.push({label: 'Number of observations', value: Observations.find().count()});
     stats.push({label: 'Number of sequences', value: Sequences.find().count()});
 
