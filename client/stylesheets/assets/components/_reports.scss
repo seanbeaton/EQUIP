@@ -4,8 +4,12 @@ $padding: 16px;
 .report-section {
   max-width: $container-size;
   padding: $padding;
-  margin: 100px auto;
+  margin: 20px auto;
   background: white;
+}
+
+.report-section:first-child {
+  margin: 100px auto 20px;
 }
 
 .report-select__options {
@@ -15,9 +19,9 @@ $padding: 16px;
 }
 .report-select__option {
   display: block;
-  padding: 32px 8px;
+  padding: 16px 8px;
   margin: 0;
-  flex: 1 1 200px;
+  flex: 1 0 200px;
   cursor: pointer;
   font-size: 24px;
   font-family: 'Roboto Condensed', sans-serif;
@@ -29,9 +33,41 @@ $padding: 16px;
   margin-right: 8px;
 }
 
-.option--observation,
-.option--environment {
-  padding: 16px 8px;
+.interactive-report__title {
+  font-size: 20px;
+  line-height: 1;
+  padding: 10px 16px;
+  .deemphasize {
+    opacity: 0.6;
+  }
+}
+
+.param-select {
+  margin: 0 0 8px;
+}
+
+.param-select__label {
+  margin: 0 16px 0 0;
+  flex: 0 0 auto;
+}
+
+.param-select--labelled {
+  display: flex;
+  align-items: center;
+  > .report-select__options {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+}
+
+.option--demographic,
+.option--discourse {
+  padding: 8px 8px;
+  font-size: 18px;
+}
+
+.option--report-type {
+  padding: 32px 8px;
 }
 
 .back-button {
@@ -57,4 +93,22 @@ $padding: 16px;
 .selected {
   background: rgba(52, 196, 196, 0.2);
   color: #34C4C4;
+}
+
+.swappable {
+  display: flex;
+  flex-flow: column nowrap;
+  &.swapped {
+    flex-flow: column-reverse nowrap;
+  }
+  .swappable__button {
+    display: inline-block;
+    padding: 16px;
+    line-height: 1;
+    font-size: 20px;
+    height: 52px;
+    width: 52px;
+    margin: -26px 0;
+    cursor: pointer;
+  }
 }

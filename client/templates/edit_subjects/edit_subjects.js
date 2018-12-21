@@ -2,6 +2,10 @@
 * JS file for edit_subjects.html
 */
 
+import {updateStudent, updateStudents, getStudents} from '/client/helpers/students.js'
+import {setupSubjectParameters} from '/client/helpers/parameters.js'
+import {getStudent} from "/client/helpers/students.js";
+
 Template.editSubjects.helpers({
     subject: function() {
         subs = Subjects.find({envId: this._id});
@@ -146,7 +150,7 @@ Template.editSubjects.events({
     $('#help-env-modal').removeClass("is-active");
   },
   'click #add-student': function(e) {
-    var envId = Router.current().params._envId
+    var envId = Router.current().params._envId;
     var subjParams = SubjectParameters.findOne({'children.envId':envId});
 
     if ($.isEmptyObject(subjParams)) {
@@ -156,14 +160,19 @@ Template.editSubjects.events({
 
     $('#param-modal-content').children().remove();
     $('#stud-param-modal').addClass('is-active');
-    populateParamBoxes(envId);
+    populateParamBoxes();
  },
 
   'click #save-subj-params': function(e) {
     saveNewSubject(this)
  },
   'click .edit-stud' : function (e) {
-    studId = $(e.target).attr('data_id');
+    let target = $(e.target)
+    if (!target.hasClass('edit-stud')) {
+      target = target.parents('.edit-stud');
+    }
+    let studId = target.attr('data-id');
+    console.log('e', e);
     editParamBoxes(studId);
 
     $('#stud-data-modal').removeClass('is-active');
@@ -191,7 +200,7 @@ Template.editSubjects.events({
     var result = confirm("Press 'OK' to delete this Subject.");
 
     if (result === true) {
-        var subjId = $(e.target).attr("data_id");
+        var subjId = $(e.target).attr("data-id");
 
         Meteor.call('subjectDelete', subjId, function(error, result) {
             return 0;
@@ -203,70 +212,63 @@ Template.editSubjects.events({
     }
   },
   'click #edit-subj-params': function (e) {
-    var subjId = $(e.target).attr('data_id');
-    // var info = {};
-    // info['name'] = $('.js-modal-header').attr('data_name');
-    // var envId = Router.current().params._envId;
-    // var choices = [];
-    // var labels = [];
-    //Do this always in the case of editing from obs list
-
-
-    let form_incomplete = false;
-
-    let info = {};
-    info.name = $('.js-modal-header').attr('data_name');
-
-    info.demographics = {};
-
-    $('.c--modal-student-options-container').each(function () {
-      let parameter_name = this.getAttribute('data-parameter-name');
-      let parameter_choice = $('.chosen', $(this)).text().replace(/\n/ig, '').trim();
-      if (parameter_choice.length === 0) {
-        alert(`No selection made for ${parameter_name}`);
-        form_incomplete = true;
-      } else {
-        info[parameter_name] = parameter_choice
-      }
-    });
-
-    if (form_incomplete) {
-      return;
-    }
-
-    //
-    // $('.js-subject-labels').each(function () {
-    //     labels.push(this.textContent);
-    // });
-    //
-    // $('.chosen').each(function () {
-    //   let choice = this.textContent.replace(/\n/ig, '').trim();
-    //   choices.push(choice);
-    // });
-    //
-    //   for (label in labels) {
-    //     info[labels[label]] = choices[label];
-    //   }
-
-    var subject = {
-      info: info,
-      subId: subjId
-    };
-
-    Meteor.call('subjectUpdate', subject, function (error, result) {
-      if (error) {
-        alert(error.reason);
-      } else {
-        $('#stud-param-modal').removeClass('is-active');
-      }
-    });
+    editStudent(e);
     //This should happen at the end...
     $('#stud-param-modal').removeClass('is-active');
-    createTableOfStudents()
+    createTableOfStudents();
     $('#stud-data-modal').addClass('is-active');
+  },
+  'click #edit-subj-params-exit': function (e) {
+    editStudent(e);
+    //This should happen at the end...
+    $('#stud-param-modal').removeClass('is-active');
+    // createTableOfStudents();
+    // $('#stud-data-modal').addClass('is-active');
   }
 });
 
+function editStudent(e) {
+  var subjId = $(e.target).attr('data-id');
+
+  var envId = Router.current().params._envId;
+
+  //Do this always in the case of editing from obs list
+
+  let form_incomplete = false;
+
+  let info = {};
+  info.name = $('.js-modal-header').attr('data-name');
+
+  info.demographics = {};
+
+  $('.c--modal-student-options-container').each(function() {
+    let parameter_name = this.getAttribute('data-parameter-name');
+    let parameter_choice = $('.chosen', $(this)).text().replace(/\n/ig, '').trim();
+    if (parameter_choice.length === 0) {
+      alert(`No selection made for ${parameter_name}`);
+      form_incomplete = true;
+    } else {
+      info.demographics[parameter_name] = parameter_choice
+    }
+  });
+
+  if (form_incomplete) {
+    return;
+  }
+
+  let subject = {
+    info: info,
+    subId: subjId
+  };
+
+  Meteor.call('subjectUpdate', subject, function(error, result) {
+    if (error) {
+      alert(error.reason);
+    } else {
+      $('#stud-param-modal').removeClass('is-active');
+    }
+  });
+}
 
 function find_open_position(students) {
   let x = 0,
@@ -327,7 +329,7 @@ function align_all_students(students, alphabetically) {
     return 0
   });
   for (let s_key in students) {
-    if (!students.hasOwnProperty(s_key)) return;
+    if (!students.hasOwnProperty(s_key)) continue;
     let open_pos = find_open_position(students);
     moveStudent(document.getElementById(students[s_key]._id), open_pos.x, open_pos.y);
     students[s_key].ignoreLocation = false;
@@ -359,15 +361,7 @@ function moveStudent(student, x, y) {
 
 function createTableOfStudents() {
   $('#data-modal-content').children().remove();
-  var envId = Router.current().params._envId
-  var students = Subjects.find({envId:envId}).fetch();
-  var subjParams = SubjectParameters.find({'children.envId':envId}).fetch()[0];
-  var parameterPairs = subjParams["children"]["parameterPairs"];
-
-  var allParams = [];
-  for (p = 0; p<parameterPairs; p++) {
-    allParams.push(subjParams['children']['label'+p]);
-  }
+  let students = getStudents(envId);
 
   var modal = document.getElementById("data-modal-content");
   modal.innerHTML += contributionTableTemplate(students, allParams);
@@ -437,15 +431,16 @@ function saveNewSubject(env) {
 
   const name = $('#student-name').val().trim();
 
-  if (name.length === 0 ) {
-    alert("Please enter a name");
-    return;
-  }
-
   let form_incomplete = false;
 
+  if (name.length === 0 ) {
+    alert("Please enter a name");
+    form_incomplete = true;
+  }
+
   let info = {};
-  info.name = name
+
+  info.name = name;
 
   info.demographics = {};
 
@@ -456,7 +451,7 @@ function saveNewSubject(env) {
       alert(`No selection made for ${parameter_name}`);
       form_incomplete = true;
     } else {
-      info[parameter_name] = parameter_choice
+      info.demographics[parameter_name] = parameter_choice
     }
   });
 
@@ -464,6 +459,7 @@ function saveNewSubject(env) {
     return;
   }
 
+  console.log('yo', info);
   let subject = {
     data_x: String(newStudentPositionX),
     data_y: String(newStudentPositionY),
@@ -485,9 +481,8 @@ function saveNewSubject(env) {
 }
 
 function contributionTableTemplate(students, parameters) {
-    var params = parameters;
     var contributionRows = students.map((student) => {
-        return contributionRowTemplate(student, params)
+        return contributionRowTemplate(student, parameters)
     }).join("");
 
     return `
@@ -499,14 +494,15 @@ function contributionTableTemplate(students, parameters) {
 }
 
 function contributionRowTemplate(student, params) {
+  console.log(student, params);
     let paramTemplate = params.map((param) => {
         return `
-            <p class="o--modal-label contributions-grid-item">${param}</p>
+            <p class="o--modal-label contributions-grid-item">${param.name}</p>
         `
     }).join("");
 
     let paramValues = params.map((param) => {
-        let data = student.info[param];
+        let data = student.info.demographics[param.name] ? student.info.demographics[param.name] : 'Not Specified';
         return `
             <p class="o--modal-label contributions-grid-item">${data}</p>
         `
@@ -515,8 +511,8 @@ function contributionRowTemplate(student, params) {
     return `
         <div class="contributions-grid-container-student">
             <h3 class="contributions-modal-header">${student.info.name}</h3>
-            <p class="o--toggle-links contributions-modal-link edit-stud" data_id="${student._id}" data_studentid="${student.info.studentId}">Edit</p>
-            <p class="o--toggle-links contributions-modal-link delete-student" data_id="${student._id}" >Delete</p>
+            <p class="o--toggle-links contributions-modal-link edit-stud" data-id="${student._id}" data_studentid="${student.info.studentId}">Edit</p>
+            <p class="o--toggle-links contributions-modal-link delete-student" data-id="${student._id}" >Delete</p>
         </div>
         <div class="contributions-grid-item-container u--bold">
             ${paramTemplate}
@@ -528,36 +524,36 @@ function contributionRowTemplate(student, params) {
 }
 
 // Saves a new student
-function populateParamBoxes(envId) {
-    var subjParams = SubjectParameters.find({'children.envId':envId}).fetch()[0];
-    var parameterPairs = subjParams["children"]["parameterPairs"];
+function populateParamBoxes() {
     var modal = document.getElementById("param-modal-content");
+
+    let allParams = setupSubjectParameters();
 
     modal.innerHTML += studentHeaderTemplate("Add a Student");
     modal.innerHTML += studentInputTemplate();
-    modal.innerHTML += studentParameterTemplate(subjParams, parameterPairs, null, "Add Student");
+    modal.innerHTML += studentParameterTemplate(allParams, null, "Add Student");
     attachOptionSelection()
+    $('.student-name-field').focus()
 }
 
 // Edits student
 function editParamBoxes(subjId) {
     $('#param-modal-content').children().remove();
-    let envId = Router.current().params._envId
-    let subjParams = SubjectParameters.find({'children.envId':envId}).fetch()[0];
-    let parameterPairs = subjParams["children"]["parameterPairs"];
-    let subj = Subjects.find({_id: subjId}).fetch()[0];
-    let student = subj.info.name;
     let modal = document.getElementById("param-modal-content");
 
+    let subj = getStudent(subjId);
+    let allParams = setupSubjectParameters();
+    let student = subj.info.name;
+
     modal.innerHTML += studentHeaderTemplate(`Edit ${student}`, student);
-    modal.innerHTML += studentParameterTemplate(subjParams, parameterPairs, subj, "Edit Student");
+    modal.innerHTML += studentParameterTemplate(allParams, subj, "Save Student");
     attachOptionSelection()
 }
 
 function studentHeaderTemplate(type, student) {
     let studentName = student ? student : "";
     return `
-        <div class="c--modal-header-container js-modal-header" data_name="${studentName}">
+        <div class="c--modal-header-container js-modal-header" data-name="${studentName}">
             <h3 class="c--modal-header-title">${type}</h3>
         </div>
     `
@@ -569,25 +565,29 @@ function studentInputTemplate() {
             <div class="c--modal-student-header">
                 <p>Name / Identifier for Student</p>
             </div>
-            <input class="c--modal-student-input" id="student-name" type="text" placeholder="Type Student's First Name, Initials, or Pseudonym">
+            <input class="c--modal-student-input student-name-field" id="student-name" type="text" placeholder="Type Student's First Name, Initials, or Pseudonym">
         </div>
     `
 }
 
-function studentParameterTemplate(subjects, paramPairs, student, type) {
+function studentParameterTemplate(allParams, student, type) {
     let saveBtn = type === "Add Student" ? "save-subj-params" : "edit-subj-params";
-    let counter = Array(paramPairs).fill().map((e,i) => i);
     let studentId = student ? student._id.trim() : "";
-    let boxes = counter.map((param) => {
-        let params = subjects['children']['parameter' + param];
-        let options = params.split(',').map(function(item) { return item.trim(); });
-        let field = subjects['children']['label' + param];
+
+    console.log(allParams);
+    let boxes = allParams.map((param) => {
+      console.log('param', param);
+        // let params = subjects['children']['parameter' + param];
+        let options = param.options.split(',').map(function(item) { return item.trim() });
+
+        // let field = allParams['children']['label' + param];
+
+
         let optionNodes = options.map((opt) => {
             let selected = "";
-            console.log('opt', opt, field, student);
-            console.log('{', opt, '}');
-            console.log('{', 'opt', '}');
-            if (field && student) { selected = student['info'][field] === opt ? "chosen" : "" }
+
+            if (student) { selected = student.info.demographics[param.name] === opt ? "chosen" : "" }
+            console.log('creating options for student, ', student);
 
             return `
                 <div class="column has-text-centered subj-box-params ${selected} optionSelection">
@@ -595,24 +595,34 @@ function studentParameterTemplate(subjects, paramPairs, student, type) {
                 </div>
             `
         }).join("");
+
         return `
-            <div class="c--modal-student-header js-subject-labels">${subjects['children']['label'+param]}</div>
-            <div class="c--modal-student-options-container" data-parameter-name="${subjects['children']['label'+param]}">
+            <div class="c--modal-student-header js-subject-labels">${param.name}</div>
+            <div class="c--modal-student-options-container" data-parameter-name="${param.name}">
                 ${optionNodes}
             </div>
         `
     }).join("");
 
-    return `
-        <div class="boxes-wrapper">
-            ${boxes}
-        </div>
-        <div class="button-container">
-            <button class="o--standard-button u--margin-zero-auto" id="${saveBtn}" data_id="${studentId}">
-                ${type}
-            </button>
-        </div>
-    `
+  let exit_save_button = '';
+  if (saveBtn === 'edit-subj-params') {
+    exit_save_button = `
+        <button class="o--standard-button u--margin-zero-auto" id="${saveBtn}-exit" data-id="${studentId}">
+            ${type} and Close
+        </button>
+      `
+  }
+  return `
+      <div class="boxes-wrapper">
+          ${boxes}
+      </div>
+      <div class="button-container button-container--horizontal">
+          <button class="o--standard-button u--margin-zero-auto" id="${saveBtn}" data-id="${studentId}">
+              ${type}
+          </button>
+          ${exit_save_button}
+      </div>
+  `
 }
 
 function attachOptionSelection() {
