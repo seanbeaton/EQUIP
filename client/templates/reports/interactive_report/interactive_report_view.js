@@ -178,11 +178,11 @@ let updateGraph = function() {
 };
 
 let createGraph = function(contribData, containerSelector) {
-    svg = $('<svg width="600" height="500"></svg>');
+    svg = $('<svg width="668" height="500"></svg>');
     $(containerSelector).html(svg);
 
     var svg = d3.select(containerSelector + " svg"),
-        margin = {top: 20, right: 20, bottom: 30, left: 40},
+        margin = {top: 20, right: 20, bottom: 30, left: 50},
         width = +svg.attr("width") - margin.left - margin.right,
         height = +svg.attr("height") - margin.top - margin.bottom,
         g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
