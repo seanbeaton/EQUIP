@@ -1,10 +1,10 @@
 import {setupSequenceParameters, setupSubjectParameters} from "./parameters";
+import {getStudent} from "./students";
 
 function getSequence(seqId, envId) {
   let sequence = Sequences.find({_id:seqId}).fetch();
   let allParams = setupSequenceParameters(envId);
   return updateSequence(sequence, allParams);
-
 }
 function getSequences(obsId, envId) {
   let sequences = Sequences.find({obsId:obsId}).fetch();
@@ -32,6 +32,7 @@ function updateSequence(sequence, allParams) {
   sequence.info.student = {
     studentId: sequence.info.studentId,
     studentName: sequence.info.Name,
+    demographics: getStudent(sequence.info.studentId, sequence.envId).info.demographics
   };
   return sequence
 }
