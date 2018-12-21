@@ -38,7 +38,7 @@ Template.environmentList.events({
   'click #analyze-button': function (e){
     e.preventDefault();
     e.stopPropagation();
-    Router.go('viewData');
+    Router.go('staticReport');
   },
   'click .help-button': function (e) {
     $('#help-env-modal').addClass("is-active");

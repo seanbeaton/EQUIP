@@ -1,0 +1,43 @@
+<!-- HTML for data analyisis page -->
+
+<template name="interactiveReportOptions">
+    {{> reportBackButton }}
+
+    <!-- HTML for displaying graphics (hidden at first) -->
+    <section class="report-section report-section--select report-section--select--env">
+        <h2>Which classroom do you want to explore?</h2>
+        <div class="report-select__options report-select__options--environments">
+            {{#each environments }}
+                {{> envButton }}
+            {{/each}}
+        </div>
+    </section>
+
+    {{#if environmentChosen }}
+        <section class="report-section report-section--select report-section--select--obs">
+            <h2>Choose an observation.</h2>
+            <div class="report-select__options report-select__options--observations">
+                {{#each observations }}
+                    {{> obsButton }}
+                {{else}}
+                    The selected classroom doesn't have any observations.
+                {{/each}}
+            </div>
+        </section>
+    {{/if}}
+
+
+</template>
+
+
+<template name="envButton">
+    <div class="report-select__option option--environment" data-env-id="{{_id}}">
+        {{ envName }}
+    </div>
+</template>
+
+<template name="obsButton">
+    <div class="report-select__option option--observation" data-obs-id="{{_id}}">
+        {{ name }}
+    </div>
+</template>

@@ -1,9 +1,9 @@
 /*
-* JS file for view_data.js
+* JS file for static_report.js
 */
 var d3 = require('d3');
 //Generate classroom buttons immediately
-Template.viewData.rendered = function() {
+Template.staticReport.rendered = function() {
   var envs = Environments.find({}).fetch();
   if ($.isEmptyObject(envs)) {
     $('.env-selection').append('<h2 class="subtitle is-2" style="color: red;">You must create classroom data before doing an analysis is possible.</h2>')
@@ -34,19 +34,19 @@ Template.viewData.rendered = function() {
   }
 }
 
-Template.viewData.helpers({
+Template.staticReport.helpers({
    environment: function() {
       return Environments.find({}, {sort: {submitted: -1}});
    },
 });
 
-Template.viewData.helpers({
+Template.staticReport.helpers({
    sequences: function() {
       return Sequences.find();
    },
 });
 
-Template.viewData.helpers({
+Template.staticReport.helpers({
    subjects: function() {
       return Subjects.find();
    },
@@ -54,7 +54,7 @@ Template.viewData.helpers({
 
 
 
-Template.viewData.events({
+Template.staticReport.events({
 
   'click .reset-button': function (e) {
     location.reload()

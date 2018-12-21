@@ -1,0 +1,60 @@
+$container-size: 900px;
+$padding: 16px;
+
+.report-section {
+  max-width: $container-size;
+  padding: $padding;
+  margin: 100px auto;
+  background: white;
+}
+
+.report-select__options {
+  display: flex;
+  margin: -8px;
+  padding: 16px 0 16px;
+}
+.report-select__option {
+  display: block;
+  padding: 32px 8px;
+  margin: 0;
+  flex: 1 1 200px;
+  cursor: pointer;
+  font-size: 24px;
+  font-family: 'Roboto Condensed', sans-serif;
+  word-wrap: break-word;
+  text-align: center;
+  overflow: hidden;
+  color: var(--orange);
+  background-color: var(--light-gray);
+  margin-right: 8px;
+}
+
+.option--observation,
+.option--environment {
+  padding: 16px 8px;
+}
+
+.back-button {
+  position: fixed;
+  left: 20px;
+  top: 200px;
+  font-size: 50px;
+  padding: 20px;
+  z-index: 200;
+  &:after {
+    content: "\27f5";
+  }
+}
+
+.back-button--reports {
+
+}
+
+.inactive {
+  display: none;
+}
+
+.selected {
+  background: rgba(52, 196, 196, 0.2);
+  color: #34C4C4;
+}
