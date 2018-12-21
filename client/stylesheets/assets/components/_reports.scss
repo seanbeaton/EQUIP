@@ -14,14 +14,16 @@ $padding: 16px;
 
 .report-select__options {
   display: flex;
+  flex-flow: row wrap;
   margin: -8px;
+  width: 100%;
   padding: 16px 0 16px;
 }
 .report-select__option {
   display: block;
-  padding: 16px 8px;
-  margin: 0;
+  margin: 4px;
   flex: 1 0 200px;
+  padding: 0;
   cursor: pointer;
   font-size: 24px;
   font-family: 'Roboto Condensed', sans-serif;
@@ -29,9 +31,26 @@ $padding: 16px;
   text-align: center;
   overflow: hidden;
   color: var(--orange);
-  background-color: var(--light-gray);
-  margin-right: 8px;
+  //margin-right: 8px;
+
+  .option__text {
+    background-color: var(--light-gray);
+    pointer-events: none;
+    display: block;
+    padding: 16px 8px;
+  }
 }
+
+
+.selected .option__text {
+  background: rgba(52, 196, 196, 0.2);
+  color: #34C4C4;
+}
+
+.report-select__option--spacer {
+
+}
+
 
 .interactive-report__title {
   font-size: 20px;
@@ -62,12 +81,16 @@ $padding: 16px;
 
 .option--demographic,
 .option--discourse {
-  padding: 8px 8px;
   font-size: 18px;
+  .option__text {
+    padding: 8px 8px;
+  }
 }
 
 .option--report-type {
-  padding: 32px 8px;
+  .option__text {
+    padding: 32px 8px;
+  }
 }
 
 .back-button {
@@ -90,10 +113,6 @@ $padding: 16px;
   display: none;
 }
 
-.selected {
-  background: rgba(52, 196, 196, 0.2);
-  color: #34C4C4;
-}
 
 .swappable {
   display: flex;

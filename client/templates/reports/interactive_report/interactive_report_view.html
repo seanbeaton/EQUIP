@@ -11,6 +11,11 @@
                     {{#each demographics }}
                         {{> demoButton }}
                     {{/each}}
+
+                    <div class="report-select__option report-select__option--spacer"></div>
+                    <div class="report-select__option report-select__option--spacer"></div>
+                    <div class="report-select__option report-select__option--spacer"></div>
+                    <div class="report-select__option report-select__option--spacer"></div>
                 </div>
             </div>
             <span class="swappable__button"><i class="fas fa-exchange-alt fa-rotate-90"></i></span>
@@ -20,6 +25,11 @@
                     {{#each discourseDimensions }}
                         {{> discourseButton }}
                     {{/each}}
+
+                    <div class="report-select__option report-select__option--spacer"></div>
+                    <div class="report-select__option report-select__option--spacer"></div>
+                    <div class="report-select__option report-select__option--spacer"></div>
+                    <div class="report-select__option report-select__option--spacer"></div>
                 </div>
             </div>
         </div>
@@ -32,12 +42,12 @@
 
 <template name="discourseButton">
     <div class="report-select__option option--discourse" data-discourse-id="{{name}}" data-id="{{name}}" data-param-type="discourse">
-        {{name}}
+        <span class="option__text">{{name}}</span>
     </div>
 </template>
 
 <template name="demoButton">
     <div class="report-select__option option--demographic" data-demo-id="{{name}}" data-id="{{name}}" data-param-type="demographics">
-        {{name}}
+        <span class="option__text">{{name}}</span>
     </div>
 </template>

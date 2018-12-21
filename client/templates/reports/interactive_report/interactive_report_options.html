@@ -10,6 +10,11 @@
             {{#each environments }}
                 {{> envButton }}
             {{/each}}
+            <div class="report-select__option report-select__option--spacer"></div>
+            <div class="report-select__option report-select__option--spacer"></div>
+            <div class="report-select__option report-select__option--spacer"></div>
+            <div class="report-select__option report-select__option--spacer"></div>
+
         </div>
     </section>
 
@@ -22,6 +27,10 @@
                 {{else}}
                     The selected classroom doesn't have any observations.
                 {{/each}}
+                <div class="report-select__option report-select__option--spacer"></div>
+                <div class="report-select__option report-select__option--spacer"></div>
+                <div class="report-select__option report-select__option--spacer"></div>
+                <div class="report-select__option report-select__option--spacer"></div>
             </div>
         </section>
     {{/if}}
@@ -32,12 +41,12 @@
 
 <template name="envButton">
     <div class="report-select__option option--environment" data-env-id="{{_id}}">
-        {{ envName }}
+        <span class="option__text">{{ envName }}</span>
     </div>
 </template>
 
 <template name="obsButton">
     <div class="report-select__option option--observation" data-obs-id="{{_id}}">
-        {{ name }}
+        <span class="option__text">{{ name }}</span>
     </div>
 </template>
