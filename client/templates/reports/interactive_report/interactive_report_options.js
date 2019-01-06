@@ -684,7 +684,12 @@ let compileContributionData = function(obsIds, xParams, yParams, envId) {
     let equity_ratios = {}
     Object.keys(column_values).forEach(function(key) {
       let percent_of_demo = contrib_data.student_body_demographic_ratios[y.column_name];
+      if (isNaN(percent_of_demo)) percent_of_demo = 0;
+
       let percent_of_contribs = (column_values[key] / contrib_data.y_axis_n_values[key]);
+      if (isNaN(percent_of_contribs)) percent_of_contribs = 0;
+
+      console.log('percent of contribs', percent_of_contribs);
       equity_ratios[key] = percent_of_contribs / percent_of_demo
     });
     equity_ratios['column_name'] = y['column_name'];
