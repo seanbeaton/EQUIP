@@ -76,7 +76,6 @@ function createTableOfContributions() {
   var envId = Router.current().params._envId;
   let obsId = Router.current().params._obsId;
   let seqs = getSequences(obsId, envId);
-  // console.log('got seqs ', seqs);
 
   let modal = document.getElementById("data-modal-content");
   let allParams = setupSequenceParameters();
@@ -264,6 +263,7 @@ function contributionParameterTemplate(allParams, sequence, type) {
       let selected = "";
 
       if (sequence) { selected = sequence.info.parameters[param.name] === opt ? "chosen" : "" }
+      // console.log('creating options for student, ', student);
       return `
                 <div class="column has-text-centered subj-box-params ${selected} optionSelection">
                     ${opt}
@@ -283,17 +283,16 @@ function contributionParameterTemplate(allParams, sequence, type) {
   let seqId = sequence ? sequence._id.trim() : "";
 
   return `
+            <!--<button id="randomize-selected" class="o&#45;&#45;standard-button c&#45;&#45;discourse-form__save-button">Randomize</button>-->
+        <div class="boxes-wrapper">
+        
+            ${boxes}
+        </div>
         <div class="button-container">
             <button class="o--standard-button u--margin-zero-auto" data-seq="${seqId}" id="${saveBtn}">
                 ${type}
             </button>
-                                <button id="randomize-selected" class="o--standard-button c--discourse-form__save-button">Randomize</button>
-
         </div>
-        <div class="boxes-wrapper">
-            ${boxes}
-        </div>
-
     `
 }
 
