@@ -74,10 +74,12 @@ import {getSequence, getSequences} from "./sequences.js";
 function createTableOfContributions() {
   $('#data-modal-content').children().remove();
   var envId = Router.current().params._envId;
-    let obsId = Router.current().params._obsId;
+  let obsId = Router.current().params._obsId;
   let seqs = getSequences(obsId, envId);
+  // console.log('got seqs ', seqs);
 
   let modal = document.getElementById("data-modal-content");
+  let allParams = setupSequenceParameters();
   modal.innerHTML += contributionTableTemplate(seqs, allParams);
 }
 
@@ -111,7 +113,6 @@ function contributionRowTemplate(seqItem, params) {
   }).join("");
 
   let time = `<p class="o--modal-label contributions-grid-item">${convertTime(Number(seqItem.time))}</p>`
-  console.log('seqItem', seqItem);
   return `
         <div class="contributions-grid-container">
             <h3 class="contributions-modal-header">${seqItem.info.student.studentName}</h3>
@@ -256,16 +257,13 @@ function contributionParameterTemplate(allParams, sequence, type) {
   let saveBtn = type === "Save Contribution" ? "save-seq-params" : "edit-seq-params";
 
   let boxes = allParams.map((param) => {
-    console.log('param', param);
 
     let options = param.options.split(',').map(function(item) { return item.trim() });
 
     let optionNodes = options.map((opt) => {
-      console.log('opt', opt);
       let selected = "";
 
       if (sequence) { selected = sequence.info.parameters[param.name] === opt ? "chosen" : "" }
-      // console.log('creating options for student, ', student);
       return `
                 <div class="column has-text-centered subj-box-params ${selected} optionSelection">
                     ${opt}
@@ -285,14 +283,17 @@ function contributionParameterTemplate(allParams, sequence, type) {
   let seqId = sequence ? sequence._id.trim() : "";
 
   return `
-        <div class="boxes-wrapper">
-            ${boxes}
-        </div>
         <div class="button-container">
             <button class="o--standard-button u--margin-zero-auto" data-seq="${seqId}" id="${saveBtn}">
                 ${type}
             </button>
+                                <button id="randomize-selected" class="o--standard-button c--discourse-form__save-button">Randomize</button>
+
         </div>
+        <div class="boxes-wrapper">
+            ${boxes}
+        </div>
+
     `
 }
 
@@ -329,7 +330,6 @@ function editParamBoxes(seqId, subjId) {
   let allParams = setupSequenceParameters();
   modal.innerHTML += contributionHeaderTemplate(`Edit contribution for ${student}`, student, subjId);
   modal.innerHTML += contributionParameterTemplate(allParams, seq, "Save Changes");
-  console.log('adding the modal content');
   attachOptionSelection()
 }
 

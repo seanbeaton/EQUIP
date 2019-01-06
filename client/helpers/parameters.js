@@ -27,7 +27,7 @@ function setupParameters(parameterType, envId) {
 
   let allParams = [];
 
-  console.log('subjParams', subjParams);
+  // console.log('subjParams', subjParams);
 
   if (subjParams.children["parameters"] === undefined) {
     // for legacy classrooms

@@ -26,6 +26,13 @@
 
 .interactive-report__title {
   grid-column-start: 2;
+  grid-column-end: 3;
+  grid-row-start: 1;
+  grid-row-end: 2;
+}
+
+.interactive-report__graph-type {
+  grid-column-start: 3;
   grid-column-end: 4;
   grid-row-start: 1;
   grid-row-end: 2;
@@ -86,4 +93,45 @@ $light-grid-color: #ddd;
 
 .interactive-report__key-sidebar {
   padding: 8px;
+}
+
+.toggle--graph-type {
+  cursor: pointer;
+}
+
+.change-graph-type-link {
+  color: var(--orange);
+  border-bottom: 1px solid;
+}
+.clickable-tick {
+  padding: 3px;
+  text {
+    padding: 3px;
+    border: 1px solid black;
+  }
+}
+
+.axis--y {
+  .tick {
+    opacity: 0.6;
+  }
+  .tick.clickable-tick {
+    opacity: 0.75;
+    &:hover {
+      opacity: 1;
+    }
+    text {
+      cursor: pointer;
+    }
+  }
+}
+
+.interactive-report__graph-type {
+  line-height: 1;
+  font-size: 0.8rem;
+}
+.graph-type-toggle-wrapper {
+  //display: block;
+  //line-height: 1;
+  //padding-top: 4px;
 }

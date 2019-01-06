@@ -171,6 +171,16 @@ Template.observatory.events({
   'click #delete-observation': function(e) {
     deleteObservation(this._id);
   },
+  'click #randomize-selected': function(e) {
+    $('.c--modal-student-options-container').each(function() {
+      let param_opts = $('.subj-box-params', $(this))
+      param_opts.removeClass('chosen');
+      let index = Math.floor(param_opts.length * Math.random());
+      console.log('index ', index)
+      param_opts[index].click()
+
+    });
+  },
   'click #save-seq-params': function(e) {
     // var info = {};
     // info['studentId'] = $('.js-modal-header').attr('data-id');
@@ -192,6 +202,7 @@ Template.observatory.events({
 
     info.parameters = {};
 
+    // todo this should cycle through known fields, not those that are in html
     $('.c--modal-student-options-container').each(function() {
       let parameter_name = this.getAttribute('data-parameter-name');
       let parameter_choice = $('.chosen', $(this)).text().replace(/\n/ig, '').trim();
@@ -202,6 +213,8 @@ Template.observatory.events({
         info.parameters[parameter_name] = parameter_choice
       }
     });
+
+    console.log('info (params', info.parameters);
 
     if (form_incomplete) {
       return;
