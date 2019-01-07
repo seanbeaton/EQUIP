@@ -108,7 +108,7 @@ var clearParameters = function() {
 };
 
 Template.interactiveReportOptions.events({
-  'click .report-section-wrapper__prev-section-button': function(e) {
+  'click .report-section-wrapper__fade': function(e) {
     lastSlide.get();
     let lastSlidePos = possibleSlides[lastSlide.get()].pos;
 
@@ -118,7 +118,7 @@ Template.interactiveReportOptions.events({
 
     console.log('prev slide', prevSlide);
 
-    if (!prevSlide) {
+    if (typeof prevSlide[0] === 'undefined') {
       return
     }
 
@@ -435,12 +435,18 @@ $(window).on('updated-filters', function() {
   }
 });
 
+let sidebar;
 let updateReport = function() {
 
   let report_wrapper = $('.report-section--interactive-report')
   report_wrapper.removeClass('inactive');
   if ($('.interactive-report', report_wrapper).length === 0) {
     createReport()
+    let sidebarLevels = {
+      0: 'key',
+      1: 'bar_tooltip',
+    }
+    sidebar = new Sidebar('.interactive-report__key-sidebar', sidebarLevels);
   }
   updateReportTitle()
   updateKeySidebar(); // todo, make the colors here match the actual graph
@@ -516,6 +522,8 @@ let createGraph = function(contribData, containerSelector, dataset) {
     .data(data)
     .enter().append("g")
     .attr("transform", function(d) { return "translate(" + x0(d.column_name) + ",0)"; })
+    .attr("class", 'bar-group')
+    .attr("data-bar-group", function(d) { return d.column_name })
     .selectAll("rect")
     .data(function(d) { return keys.map(function(key) { return {key: key, value: d[key]}; }); })
     .enter().append("rect")
@@ -523,7 +531,20 @@ let createGraph = function(contribData, containerSelector, dataset) {
     .attr("y", function(d) { return y(d.value); })
     .attr("width", x1.bandwidth())
     .attr("height", function(d) { return height - y(d.value); })
-    .attr("fill", function(d) { return z(d.key); });
+    .attr("fill", function(d) { return z(d.key); })
+    .attr("class", 'hover-bar')
+    .attr("data-bar-x", function(d) { return d.key })
+    .on('mouseover', function() {
+      // hover on
+      let group = $(this).parent().attr('data-bar-group');
+      let bar = $(this).attr('data-bar-x');
+      buildBarTooltipSlide(group, bar, contribData)
+    })
+    .on('mouseout', function() {
+      // sidebar.setCurrentPanel('key')
+      // hover out
+
+    });
 
   g.append("g")
     .attr("class", "axis axis--x")
@@ -588,6 +609,26 @@ let createGraph = function(contribData, containerSelector, dataset) {
 
 }
 
+
+let buildBarTooltipSlide = function(group, bar, contribData) {
+  console.log('building tooltip for group', group, 'bar', bar, 'with contribdata', contribData)
+  let title = `${group} x ${bar}`;
+  let num_contributions = contribData.x_axis_n_values[group].columns[bar];
+  let total_contribs_in_group = contribData.x_axis_n_values[group].n;
+  let total_contribs_of_type = contribData.y_axis_n_values[group];
+  let num_students_in_group = 'tbd';
+  let html = `
+    <div class="stat-leadin">Of the contributions by demographic <span class="stat-group-name">${group}</span>...</div>
+    <div class="stat">${num_contributions} of ${total_contribs_in_group} were <span class="stat-group-name">${bar}</span> (${(num_contributions / total_contribs_in_group * 100).toFixed(2)}%)</div>
+    <div class="stat-leadin">Of the contributions of type <span class="stat-group-name">${bar}</span>...</div>
+    <div class="stat">${num_contributions} of ${total_contribs_of_type} were by students in the demographic <span class="stat-group-name">${group}</span> (${(num_contributions / total_contribs_of_type * 100).toFixed(2)}%)</div>
+    <div class="stat-leadin">Of all students ${num_students_in_group} are <span class="stat-group-name">${group}</span></div>
+    <div class="stat-leadin">Participation:</div>
+    <div class="stat">tbd</div>
+  `;
+
+  sidebar.setSlide('bar_tooltip', html, title)
+}
 
 let compileContributionData = function(obsIds, xParams, yParams, envId) {
 
@@ -808,6 +849,68 @@ let updateReportTitle = function() {
   $('.interactive-report__title').html(title)
 }
 
+
+class Sidebar {
+  constructor(selector, levels) {
+    this.levels = levels;
+    this.selector = $(selector);
+    this.selector.html(`<div class="panels-flex" style="width: ${Object.keys(levels).length}00%"></div>`);
+    this.container = $('.panels-flex', this.selector);
+    this._currentPanelIndex = 0;
+    this._currentPanelID = levels[0];
+    let panels = {};
+    Object.keys(this.levels).forEach(index => {panels[levels[index]] = {html: '', title: '', id: levels[index], index: index}});
+    this.panels = panels;
+    let that = this;
+    Object.keys(this.panels).forEach(function(id) {
+      that.createPanel(that.panels[id])
+    })
+  }
+  setCurrentPanel(panel_id) {
+    if (panel_id === this._currentPanelID) {
+      // Same panel, no need to move
+      return;
+    }
+    let that = this;
+    Object.keys(this.levels).forEach(function(index) {
+      if (that.levels[index] === panel_id) {
+        that._currentPanelIndex = index
+      }
+    });
+
+    // this.levels.findIndex(val => val === panel_id);
+    this._currentPanelID = panel_id;
+    this.animateToCurrentPanel()
+  }
+  setSlide(panel_id, html, title) {
+    this.panels[panel_id].html = html;
+    this.panels[panel_id].title = title;
+    this.updatePanelContent(this.panels[panel_id]);
+    this.setCurrentPanel(panel_id);
+  }
+  updatePanelContent(panel) {
+    console.log('updating panel content for panel', panel);
+    let html = `
+    <div class="panel__interior">
+      <h4 class="panel__title">${panel.title}</h4>
+      <div class="panel__content">${panel.html}</div>
+    </div>
+    `
+    $('.sidebar-panel[data-panel-id="' + panel.id + '"]', this.container).html(html)
+  }
+  createPanel(panel) {
+    let html = `
+    <div class="sidebar-panel" data-panel-id="${panel.id}" style="order: ${panel.index}"></div>
+`;
+    console.log('creating panel', panel, 'html', html);
+    this.container.append(html);
+    this.updatePanelContent(panel);
+  }
+  animateToCurrentPanel() {
+    $('.panels-flex').css('margin-left', `-${this._currentPanelIndex}00%`)
+  }
+}
+
 let updateKeySidebar = function() {
   let y_axis = getYAxisSelection();
   let label_colors = getLabelColors(y_axis.selected_option.option_list);
@@ -816,11 +919,11 @@ let updateKeySidebar = function() {
     return `<span class="key--label"><span class="key--color" style="background-color: ${color}"></span>${label}</span>`
   })
 
-  let html = $(`<div class='sitebar-label'>Key: ${y_axis.selected_value}</div>
-                    ${key_chunks.join('')}
-`)
-  $('.interactive-report__key-sidebar').html(html)
+  let html = `${key_chunks.join('')}`;
+  sidebar.setSlide('key', html, `Key: ${y_axis.selected_value}`)
 }
+
+
 
 let available_colors = [
   "#003f5c",
