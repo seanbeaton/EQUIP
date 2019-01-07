@@ -23,6 +23,44 @@ const selectedXParameter = new ReactiveVar(false);
 const selectedYParameter = new ReactiveVar(false);
 const graphType = new ReactiveVar('equity');
 
+const possibleSlides = {
+  env: {
+    show: 'env',
+    pos: 1,
+  },
+  obs: {
+    show: 'obs',
+    pos: 2,
+  },
+  params: {
+    show: 'params',
+    pos: 3,
+  },
+  graph: {
+    show: 'params',
+    pos: 3,
+  },
+};
+
+const lastSlide = new ReactiveVar('env');
+
+
+let calculateSlidePosition = function(section) {
+  console.log('calculateSlidePosition, going to slide', section);
+  lastSlide.set(section);
+  let slideSettings = possibleSlides[lastSlide.get()];
+  let prevSlides = Object.keys(possibleSlides).filter(item => possibleSlides[item].pos < slideSettings.pos);
+  console.log('prevsliders', prevSlides);
+
+  let heights = prevSlides.map(prevSlide => $('.report-section[data-slide-id="' + prevSlide +'"]').height() + 40); // 40px margin
+  let aboveItemsHeight = heights.reduce((a, b) => a + b, 0);  // sum
+  let topMargin = `${aboveItemsHeight * -1}px`;
+
+  $('.report-section-wrapper__slide').css('marginTop', topMargin)
+}
+
+
+
 Template.interactiveReportOptions.helpers({
     environments: function() {
         return Environments.find();
@@ -37,6 +75,14 @@ Template.interactiveReportOptions.helpers({
     observations: function() {
         // console.log('obsOptions', obsOptions);
         return obsOptions.get()
+    },
+    possibleSlides: function() {
+        // console.log('obsOptions', obsOptions);
+        return possibleSlides;
+    },
+    lastSlide: function() {
+        // console.log('obsOptions', obsOptions);
+        return lastSlide.get()
     },
     observationChosen: function() {
         // console.log('observationChosen', obsOptions.get(), !!(obsOptions.get()));
@@ -62,8 +108,24 @@ var clearParameters = function() {
 };
 
 Template.interactiveReportOptions.events({
+  'click .report-section-wrapper__prev-section-button': function(e) {
+    lastSlide.get();
+    let lastSlidePos = possibleSlides[lastSlide.get()].pos;
+
+    console.log('lastslidepos', lastSlidePos);
+
+    let prevSlide = Object.keys(possibleSlides).filter(item => possibleSlides[item].pos === lastSlidePos - 1);
+
+    console.log('prev slide', prevSlide);
+
+    if (!prevSlide) {
+      return
+    }
+
+    calculateSlidePosition(possibleSlides[prevSlide[0]].show);
+  },
     'click .option--environment': function(e) {
-        let $target = $(e.target);
+      let $target = $(e.target);
         if (!$target.hasClass('selected')) {
             $('.option--environment').removeClass('selected');
             $target.addClass('selected');
@@ -71,7 +133,9 @@ Template.interactiveReportOptions.events({
         else {
           return;
         }
-        clearObservations();
+      calculateSlidePosition('obs');
+
+      clearObservations();
         envSet.set(false);
         envSet.set(true);
         selectedEnvironment.set(getCurrentEnvId());
@@ -82,6 +146,7 @@ Template.interactiveReportOptions.events({
 
     },
     'click .option--observation': function(e) {
+      calculateSlidePosition('obs');
       // clearParameters();
       let $target = $(e.target);
       if (!$target.hasClass('selected')) {
@@ -97,7 +162,7 @@ Template.interactiveReportOptions.events({
       let currentObsIds = selectedObservations.get();
 
       if (currentObsIds.find(id => id === clickedObservationId)) {
-        currentObsIds.splice(clickedObservationId, 1)
+        currentObsIds.splice(currentObsIds.indexOf(clickedObservationId), 1);
       }
       else {
         currentObsIds.push(clickedObservationId);
@@ -113,9 +178,6 @@ Template.interactiveReportOptions.events({
         $target = $target.parents('.graph-type-toggle-wrapper')
       }
       $target = $('.toggle--graph-type', $target)
-
-      console.log('$target', $target);
-
 
       if ($target.attr('data-graph-type') === 'equity') {
         $target.attr('data-graph-type', 'contributions')
@@ -170,6 +232,8 @@ Template.interactiveReportView.rendered = function() {
 
 Template.interactiveReportView.events({
   'click .option--demographic': function(e) {
+    calculateSlidePosition('params');
+
     let $target = $(e.target);
     if (!$target.hasClass('selected')) {
       $('.option--demographic').removeClass('selected');
@@ -181,6 +245,7 @@ Template.interactiveReportView.events({
     $(window).trigger('updated-filters')
   },
   'click .option--discourse': function(e) {
+    calculateSlidePosition('params');
     let $target = $(e.target);
     if (!$target.hasClass('selected')) {
       $('.option--discourse').removeClass('selected');
@@ -192,6 +257,7 @@ Template.interactiveReportView.events({
     $(window).trigger('updated-filters')
   },
   'click .swappable__button': function(e) {
+    calculateSlidePosition('params');
     let $target = $(e.target);
     $target.parents('.swappable').toggleClass('swapped')
 
@@ -689,7 +755,7 @@ let compileContributionData = function(obsIds, xParams, yParams, envId) {
       let percent_of_contribs = (column_values[key] / contrib_data.y_axis_n_values[key]);
       if (isNaN(percent_of_contribs)) percent_of_contribs = 0;
 
-      console.log('percent of contribs', percent_of_contribs);
+      // console.log('percent of contribs', percent_of_contribs);
       equity_ratios[key] = percent_of_contribs / percent_of_demo
     });
     equity_ratios['column_name'] = y['column_name'];

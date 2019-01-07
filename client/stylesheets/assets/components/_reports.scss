@@ -12,6 +12,12 @@ $padding: 16px;
   margin: 100px auto 20px;
 }
 
+.report-section-wrapper__slide-track {
+  .report-section:first-child {
+    margin: 20px auto;
+  }
+
+}
 .report-select__options {
   display: flex;
   flex-flow: row wrap;
@@ -38,6 +44,9 @@ $padding: 16px;
     pointer-events: none;
     display: block;
     padding: 16px 8px;
+  }
+  &.report-select__option--spacer {
+    cursor: default;
   }
 }
 
@@ -93,16 +102,26 @@ $padding: 16px;
   }
 }
 
+@mixin fa-button {
+  font-size: 40px;
+  padding: 5px;
+  border-radius: 50px;
+  line-height: 40px;
+  width: 40px;
+  box-sizing: content-box;
+  text-align: center;
+  background: white;
+  box-shadow: 0px 1px 4px 2px rgba(0, 0, 0, 0.1);
+  z-index: 200;
+  cursor: pointer;
+  display: inline-block;
+}
+
 .back-button {
   position: fixed;
   left: 20px;
-  top: 200px;
-  font-size: 50px;
-  padding: 20px;
-  z-index: 200;
-  &:after {
-    content: "\27f5";
-  }
+  bottom: 20px;
+  @include fa-button;
 }
 
 .back-button--reports {
@@ -121,13 +140,16 @@ $padding: 16px;
     flex-flow: column-reverse nowrap;
   }
   .swappable__button {
-    display: inline-block;
-    padding: 16px;
-    line-height: 1;
-    font-size: 20px;
-    height: 52px;
-    width: 52px;
+    @include fa-button;
+    font-size: 32px;
     margin: -26px 0;
-    cursor: pointer;
   }
+}
+
+
+.report-section-wrapper__prev-section-button {
+  @include fa-button;
+  position: absolute;
+  right: 20px;
+  top: 20px;
 }

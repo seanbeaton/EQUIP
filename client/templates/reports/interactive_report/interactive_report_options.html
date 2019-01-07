@@ -3,8 +3,15 @@
 <template name="interactiveReportOptions">
     {{> reportBackButton }}
 
+    <div class="report-section-wrapper">
+        <div class="report-section-wrapper__fade">
+            <div class="report-section-wrapper__prev-section-button"><i class="fa fa-arrow-up" aria-hidden="true"></i></div>
+        </div>
+    <div class="report-section-wrapper__slide-track">
+        <div class="report-section-wrapper__slide">
+
     <!-- HTML for displaying graphics (hidden at first) -->
-    <section class="report-section report-section--select report-section--select--env">
+    <section data-slide-id="env" class="report-section report-section--select report-section--select--env">
         <h2>Which classroom do you want to explore?</h2>
         <div class="report-select__options report-select__options--environments">
             {{#each environments }}
@@ -19,7 +26,7 @@
     </section>
 
     {{#if environmentChosen }}
-        <section class="report-section report-section--select report-section--select--obs">
+        <section data-slide-id="obs" class="report-section report-section--select report-section--select--obs">
             <h2>Choose one or more observations.</h2>
             <div class="report-select__options report-select__options--observations">
                 {{#each observations }}
@@ -38,6 +45,7 @@
     {{#if observationChosen }}
         {{> interactiveReportView }}
     {{/if}}
+    </div></div></div>
 </template>
 
 
@@ -57,7 +65,7 @@
 <template name="interactiveReportView">
     {{> reportBackButton }}
 
-    <section class="report-section report-section--select">
+    <section data-slide-id="params" class="report-section report-section--select">
         <h2>Exploring analytics for {{ environment.envName }} | {{ observationNames }}.</h2>
         <div class="swappable">
             <div class="param-select param-select--labelled">
@@ -89,7 +97,7 @@
             </div>
         </div>
     </section>
-    <section class="report-section report-section--interactive-report inactive">
+    <section data-slide-id="graph" class="report-section report-section--interactive-report inactive">
 
     </section>
 </template>
