@@ -213,7 +213,6 @@ AccountsTemplates.addFields([
 
 Template.login.events({
   'click .login-buttons__login': function (e) {
-    console.log('ping');
     e.preventDefault();
     AccountsTemplates.setState('signIn');
   },
