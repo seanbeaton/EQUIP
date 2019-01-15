@@ -8,18 +8,6 @@ Template.landingPage.events({
     $('#login-dropdown-list').addClass('open');
     $('#login-username-or-email').focus();
   },
-   'click .c--landing-page__c2a-sign-in-button': function(e) {
-       e.stopPropagation();
-       let loginButton = document.querySelector('#login-sign-in-link');
-       let signedInButton = document.querySelector('.menu-button-header');
-       if (loginButton) {
-           smoothScrollToNavigation();
-           loginButton.click();
-       } else {
-           smoothScrollToNavigation();
-           $('.login-name-link').click();
-       }
-   },
    'click .c--landing-page__c2a-learn-more-link': function(e) {
        e.stopPropagation();
        smoothScrollToNavigation();
