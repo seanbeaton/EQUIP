@@ -141,6 +141,10 @@ Template.interactiveReportOptions.events({
         envSet.set(!!getCurrentEnvId());
 
     },
+    'click .option--all-observations': function(e) {
+      selectedObservations.set([])
+      $('.option--observation').removeClass('selected').click()
+    },
     'click .option--observation': function(e) {
       calculateSlidePosition('obs');
       // clearParameters();
@@ -508,7 +512,7 @@ let createGraph = function(contribData, containerSelector, dataset) {
   $(containerSelector).html(svg);
 
   var svg = d3.select(containerSelector + " svg"),
-    margin = {top: 20, right: 20, bottom: 40, left: 50},
+    margin = {top: 30, right: 20, bottom: 40, left: 50},
     width = +svg.attr("width") - margin.left - margin.right,
     height = +svg.attr("height") - margin.top - margin.bottom,
     g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
@@ -678,12 +682,12 @@ let createGraph = function(contribData, containerSelector, dataset) {
 
 
 let buildBarTooltipSlide = function(group, bar, contribData) {
-  console.log('building tooltip for group', group, 'bar', bar, 'with contribdata', contribData)
+  // console.log('building tooltip for group', group, 'bar', bar, 'with contribdata', contribData)
   let title = `${group} x ${bar}`;
   let num_contributions = contribData.x_axis_n_values[group].columns[bar];
   let total_contribs_in_group = contribData.x_axis_n_values[group].n;
-  let total_contribs_of_type = contribData.y_axis_n_values[group];
-  let num_students_in_group = 'tbd';
+  let total_contribs_of_type = contribData.y_axis_n_values[bar];
+  let num_students_in_group = (contribData.student_body_demographic_ratios[group] * 100).toFixed(2) + '%';
   let html = `
     <div class="stat-leadin">Of the contributions by demographic <span class="stat-group-name">${group}</span>...</div>
     <div class="stat">${num_contributions} of ${total_contribs_in_group} were <span class="stat-group-name">${bar}</span> (${(num_contributions / total_contribs_in_group * 100).toFixed(2)}%)</div>
@@ -965,7 +969,6 @@ class Sidebar {
     this.setCurrentPanel(panel_id);
   }
   updatePanelContent(panel) {
-    console.log('updating panel content for panel', panel);
     let html = `
     <div class="panel__interior">
       <h4 class="panel__title">${panel.title}</h4>

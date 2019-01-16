@@ -28,7 +28,7 @@ $padding: 16px;
 .report-select__option {
   display: block;
   margin: 4px;
-  flex: 1 0 200px;
+  flex: 1 0 150px;
   padding: 0;
   cursor: pointer;
   font-size: 24px;
@@ -43,7 +43,8 @@ $padding: 16px;
     background-color: var(--light-gray);
     pointer-events: none;
     display: block;
-    padding: 16px 8px;
+    font-size: 18px;
+    padding: 4px 8px;
   }
   &.report-select__option--spacer {
     cursor: default;
@@ -85,14 +86,6 @@ $padding: 16px;
   > .report-select__options {
     padding-left: 8px;
     padding-right: 8px;
-  }
-}
-
-.option--demographic,
-.option--discourse {
-  font-size: 18px;
-  .option__text {
-    padding: 8px 8px;
   }
 }
 
