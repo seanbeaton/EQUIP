@@ -1,2 +1,0 @@
-
-//Generate classroom buttons immediately

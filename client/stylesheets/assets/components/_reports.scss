@@ -135,9 +135,9 @@ $padding: 16px;
 
 .swappable {
   display: flex;
-  flex-flow: column nowrap;
+  flex-flow: row nowrap;
   &.swapped {
-    flex-flow: column-reverse nowrap;
+    flex-flow: row-reverse nowrap;
   }
   .swappable__button {
     @include fa-button;

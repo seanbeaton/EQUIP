@@ -32,14 +32,10 @@ const possibleSlides = {
     show: 'obs',
     pos: 2,
   },
-  params: {
+  params: { // This is also the graph
     show: 'params',
     pos: 3,
-  },
-  graph: {
-    show: 'params',
-    pos: 3,
-  },
+  }
 };
 
 const lastSlide = new ReactiveVar('env');
@@ -169,7 +165,8 @@ Template.interactiveReportOptions.events({
       }
 
       selectedObservations.set(currentObsIds);
-      $(window).trigger('updated-filters') // We're also forcing a graph update when you select new observations, not just changing params
+      updateReport();
+      // setTimeout(function(){$(window).trigger('updated-filters')}, 100) // We're also forcing a graph update when you select new observations, not just changing params
     },
     'click .graph-type-toggle-wrapper': function(e) {
       let $target = $(e.target);
@@ -231,35 +228,44 @@ Template.interactiveReportView.rendered = function() {
 }
 
 Template.interactiveReportView.events({
-  'click .option--demographic': function(e) {
+  'change .param-select-form-item': function(e) {
     calculateSlidePosition('params');
-
-    let $target = $(e.target);
-    if (!$target.hasClass('selected')) {
-      $('.option--demographic').removeClass('selected');
-      $target.addClass('selected');
-    }
-
     selectedXParameter.set(getXAxisSelection());
     selectedYParameter.set(getYAxisSelection());
     $(window).trigger('updated-filters')
   },
-  'click .option--discourse': function(e) {
-    calculateSlidePosition('params');
-    let $target = $(e.target);
-    if (!$target.hasClass('selected')) {
-      $('.option--discourse').removeClass('selected');
-      $target.addClass('selected');
-    }
-
-    selectedXParameter.set(getXAxisSelection());
-    selectedYParameter.set(getYAxisSelection());
-    $(window).trigger('updated-filters')
-  },
+  // 'click .option--demographic': function(e) {
+  //   calculateSlidePosition('params');
+  //
+  //   // let $target = $(e.target);
+  //   // if (!$target.hasClass('selected')) {
+  //   //   $('.option--demographic').removeClass('selected');
+  //   //   $target.addClass('selected');
+  //   // }
+  //
+  //   selectedXParameter.set(getXAxisSelection());
+  //   selectedYParameter.set(getYAxisSelection());
+  //   $(window).trigger('updated-filters')
+  // },
+  // 'click .option--discourse': function(e) {
+  //   // calculateSlidePosition('params');
+  //   let $target = $(e.target);
+  //   // if (!$target.hasClass('selected')) {
+  //   //   $('.option--discourse').removeClass('selected');
+  //   //   $target.addClass('selected');
+  //   // }
+  //
+  //   selectedXParameter.set(getXAxisSelection());
+  //   selectedYParameter.set(getYAxisSelection());
+  //   $(window).trigger('updated-filters')
+  // },
   'click .swappable__button': function(e) {
     calculateSlidePosition('params');
     let $target = $(e.target);
-    $target.parents('.swappable').toggleClass('swapped')
+    if (!$target.hasClass('.swappable__button')) {
+      $target = $target.parents('.swappable__button');
+    }
+    $target.siblings('.swappable').toggleClass('swapped');
 
     selectedXParameter.set(getXAxisSelection());
     selectedYParameter.set(getYAxisSelection());
@@ -313,6 +319,9 @@ let getObservations = function() {
 
 
 Template.interactiveReportView.helpers({
+  isSelectedIndex: function(index) {
+    return parseInt(index) === 0;
+  },
   discourseDimensions: function() {
     return getDiscourseDimensions()
   },
@@ -344,9 +353,9 @@ Template.interactiveReportView.helpers({
 var d3 = require('d3');
 
 let getCurrentDiscourseSelection = function() {
-  let selected = $(".option--discourse.selected");
-  if (selected.length !== 0) {
-    return selected.attr('data-discourse-id');
+  let selected = $('.param-select-form-item[data-param-type="discourse"] option:selected');
+  if (selected.val()) {
+    return selected.val();
   }
   else {
     return false
@@ -354,9 +363,9 @@ let getCurrentDiscourseSelection = function() {
 }
 
 let getCurrentDemographicSelection = function() {
-  let selected = $(".option--demographic.selected");
-  if (selected.length !== 0) {
-    return selected.attr('data-demo-id');
+  let selected = $('.param-select-form-item[data-param-type="demographics"] option:selected');
+  if (selected.val()) {
+    return selected.val();
   }
   else {
     return false
@@ -388,14 +397,16 @@ let getAxisSelection = function(axis) {
   else {
     param_wrapper = $swappable.find('.param-select:last-child');
   }
-  let selected = $('.report-select__option.selected', param_wrapper);
+  let select_list = $('select', param_wrapper);
+  let selected = $('option:selected', param_wrapper);
 
-  if (selected.length === 0) {
+  if (!selected.val()) {
+    console.log('nothing selected for', axis, 'axis');
     return {};
   }
 
-  let selected_value = selected.attr('data-id');
-  let param_type = selected.attr('data-param-type');
+  let selected_value = selected.val();
+  let param_type = select_list.attr('data-param-type');
   let options = getParamOptions(param_type);
   let selected_option = options.filter(opt => opt.name === selected_value)[0];
   selected_option.option_list = selected_option.options.split(',').map(function(i) {return i.trim()})
@@ -408,7 +419,7 @@ let getAxisSelection = function(axis) {
     // selected_value_options: getParamOptions(self.param_type).filter(opt => opt.name === selected.attr('data-id'))
     // [0].split(',').map(function(i) {return i.trim()})
   }
-  // console.log('ret in y axis', ret);
+  console.log('ret in ', axis, ' axis', ret);
   return ret
 }
 
@@ -438,21 +449,26 @@ $(window).on('updated-filters', function() {
 let sidebar;
 let updateReport = function() {
 
-  let report_wrapper = $('.report-section--interactive-report')
+  let report_wrapper = $('.interactive-report-wrapper');
+  if (report_wrapper.length === 0) {
+    setTimeout(updateReport, 50);
+    return;
+  }
   report_wrapper.removeClass('inactive');
   if ($('.interactive-report', report_wrapper).length === 0) {
-    createReport()
+    console.log('about to create report');
+    createReport(report_wrapper);
     let sidebarLevels = {
-      0: 'key',
+      0: 'start',
       1: 'bar_tooltip',
     }
-    sidebar = new Sidebar('.interactive-report__key-sidebar', sidebarLevels);
+    sidebar = new Sidebar('.interactive-report__sidebar', sidebarLevels);
+    sidebar.setSlide('start', 'Hover a bar to see more information', '')
   }
-  updateReportTitle()
-  updateKeySidebar(); // todo, make the colors here match the actual graph
+  // updateReportTitle()
+  console.log('now making key');
+  updateKey('.interactive-report__graph-key');
   updateGraph();
-
-
 
   // update the report values
 }
@@ -468,6 +484,8 @@ let updateGraph = function() {
   // makeRatioGraphs(envId, graphData, demData);
   // console.log('graphData', graphData);
 
+
+  console.log('obsIds, xParams, yParams, envId', obsIds, xParams, yParams, envId)
   let contribData = compileContributionData(obsIds, xParams, yParams, envId);
 
   // options are 'contributions' or 'equity'
@@ -477,11 +495,20 @@ let updateGraph = function() {
 };
 
 let createGraph = function(contribData, containerSelector, dataset) {
-  svg = $('<svg width="668" height="500"></svg>');
+  svg = $('<svg width="668" height="500">' +
+    '<defs>\n' +
+    '  <style type="text/css">\n' +
+    '    @font-face {\n' +
+    '      font-family: Roboto;\n' +
+    '      @import url(\'https://fonts.googleapis.com/css?family=Roboto:300,400,700\');\n' +
+    '    }\n' +
+    '  </style>\n' +
+    '</defs>' +
+    '</svg>');
   $(containerSelector).html(svg);
 
   var svg = d3.select(containerSelector + " svg"),
-    margin = {top: 20, right: 20, bottom: 30, left: 50},
+    margin = {top: 20, right: 20, bottom: 40, left: 50},
     width = +svg.attr("width") - margin.left - margin.right,
     height = +svg.attr("height") - margin.top - margin.bottom,
     g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
@@ -541,27 +568,67 @@ let createGraph = function(contribData, containerSelector, dataset) {
       buildBarTooltipSlide(group, bar, contribData)
     })
     .on('mouseout', function() {
-      sidebar.setCurrentPanel('key')
+      sidebar.setCurrentPanel('start')
       // hover out
 
     });
 
+  let xAxis = d3.axisBottom(x0)
+    .tickFormat(function(d, i) {
+      return `${d}(n = ${contribData.x_axis_n_values[d].n})`
+    })
+    // .attr('n', function(d) {return contribData.x_axis_n_values[d].n});
+
   g.append("g")
     .attr("class", "axis axis--x")
     .attr("transform", "translate(0," + height + ")")
-    .call(d3.axisBottom(x0).tickFormat(function(d, i) { return `${d} (n = ${contribData.x_axis_n_values[d].n})`}));
+    .call(xAxis)
+    //
+    .selectAll('.tick text')
+    .call(function(text) {
+      text.each(function () {
+        let tick_text = d3.select(this),
+            y = tick_text.attr("y"),
+            dy = parseFloat(tick_text.attr("dy"));
+        let text = tick_text.text();
+        let rows = /(^.+)(\(n = \d+\)$)/.exec(text);
 
+        tick_text.text(null)
+        tick_text.append('tspan').attr('x', 0).attr('y', y).attr('dy', dy + 'em').text(rows[1]);
+        tick_text.append('tspan').attr('x', 0).attr('y', y).attr('dy', dy + 1.1 + 'em').text(rows[2]);
+      });
+    });
 
-  g.append("g")
-    .attr("class", "axis axis--y")
-    .call(d3.axisLeft(y).ticks(null, "s"))
-    .append("text")
+  let y_a;
+  if (dataset === 'contributions') {
+    y_a =
+      g.append("g")
+        .attr("class", "axis axis--y")
+        .call(d3.axisLeft(y).tickFormat(function(e){
+            if(Math.floor(e) !== e) {
+              return;
+            }
+            return e;
+          })
+        )
+  }
+  else {
+    y_a = g.append("g")
+      .attr("class", "axis axis--y")
+      .call(d3.axisLeft(y).ticks(null, "s")
+      )
+  }
+
+  y_a.append("text")
     .attr("x", 2)
     .attr("y", y(y.ticks().pop()) + 0.5)
-    .attr("dy", "0.32em")
+    .attr("dy", "-2.4em")
+    .attr("dx", height / -2)
     .attr("fill", "#000")
     .attr("font-weight", "bold")
-    .attr("text-anchor", "start")
+    .attr("text-anchor", "middle" +
+      "")
+    .attr("transform", "rotate(-90)")
     .text(y_label);
 
   let toggleTickDirection = function(tick) {
@@ -790,13 +857,22 @@ let compileContributionData = function(obsIds, xParams, yParams, envId) {
     delete column_values['student_contributions'];
     let equity_ratios = {}
     Object.keys(column_values).forEach(function(key) {
-      let percent_of_demo = contrib_data.student_body_demographic_ratios[y.column_name];
+      // console.log('contrib_data', contrib_data, 'key', key);
+
+      let demo_key = (yParams.param_type === 'demographics') ? key : y.column_name;
+      // let param_key = (yParams.param_type === 'discourse') ? key: y.column_name;
+
+      let percent_of_demo = contrib_data.student_body_demographic_ratios[demo_key];
       if (isNaN(percent_of_demo)) percent_of_demo = 0;
 
-      let percent_of_contribs = (column_values[key] / contrib_data.y_axis_n_values[key]);
+      let contrib_axis_n_value = (yParams.param_type === 'demographics') ? contrib_data.x_axis_n_values[y.column_name].n : contrib_data.y_axis_n_values[key];
+
+      console.log('column_values ', column_values);
+      let percent_of_contribs = (column_values[key] / contrib_axis_n_value);
       if (isNaN(percent_of_contribs)) percent_of_contribs = 0;
 
-      // console.log('percent of contribs', percent_of_contribs);
+      console.log('percent of contribs', percent_of_contribs);
+      console.log('percent_of_demo', percent_of_demo);
       equity_ratios[key] = percent_of_contribs / percent_of_demo
     });
     equity_ratios['column_name'] = y['column_name'];
@@ -844,10 +920,10 @@ let increaseValueForStudent = function(data, y, x, student) {
   }
 }
 
-let updateReportTitle = function() {
-  let title = `${getYAxisSelection().selected_value} <span class="deemphasize">by</span> ${getXAxisSelection().selected_value}`
-  $('.interactive-report__title').html(title)
-}
+// let updateReportTitle = function() {
+//   let title = `${getYAxisSelection().selected_value} <span class="deemphasize">by</span> ${getXAxisSelection().selected_value}`
+//   $('.interactive-report__title').html(title)
+// }
 
 
 class Sidebar {
@@ -911,16 +987,16 @@ class Sidebar {
   }
 }
 
-let updateKeySidebar = function() {
+let updateKey = function(key_wrapper) {
   let y_axis = getYAxisSelection();
   let label_colors = getLabelColors(y_axis.selected_option.option_list);
   let key_chunks = Object.keys(label_colors).map(function(label) {
     let color = label_colors[label]
-    return `<span class="key--label"><span class="key--color" style="background-color: ${color}"></span>${label}</span>`
+    return `<span class="key--label"><span class="key--color" style="background-color: ${color}"></span><span class="key--text">${label}</span></span>`
   })
 
   let html = `${key_chunks.join('')}`;
-  sidebar.setSlide('key', html, `Key: ${y_axis.selected_value}`)
+  $(key_wrapper).html(html)
 }
 
 
@@ -961,16 +1037,36 @@ let getLabelColors = function(labels) {
   return label_colors
 }
 
-let createReport = function() {
+let createReport = function(report_wrapper) {
+  let disc_select = '<select class="param-select-form-item" name="parameter-select" data-param-type="discourse">' +
+    getDiscourseDimensions().map(function(disc) {
+      return `<option value="${disc.name}">${disc.name}</option>`
+    }).join('')
+    + '</select>';
+  let demo_select = '<select class="param-select-form-item" name="demographic-select" data-param-type="demographics">' +
+    getDemographics().map(function(demo) {
+      return `<option value="${demo.name}">${demo.name}</option>`
+    }).join('')
+    + '</select>';
+
+
   let report_structure = $('<div class="interactive-report">' +
     '<div class="interactive-report__top-left"></div>' +
     '<div class="interactive-report__y-scale"></div>' +
-    '<div class="interactive-report__title"></div>' +
+    '<div class="interactive-report__title">' +
+      '<div class="param-selector-wrapper swappable">' +
+
+      '<div class="param-select">' + demo_select + '</div>' +
+      '<span class="deemphasize">by</span>' +
+      '<div class="param-select">' + disc_select + '</div>' +
+      '</div>' +
+      '<span class="swappable__button"><i class="fas fa-exchange-alt"></i></span>' +
+    '</div>' +
     '<div class="interactive-report__graph-type">Showing: <span class="graph-type-toggle-wrapper"><span class="toggle--graph-type" data-graph-type="' + graphType.get() + '">Equity Ratio</span> <span class="change-graph-type-link">Change</span></span></div>' +
     '<div class="interactive-report__graph" data-graph-type="' + graphType.get() + '"></div>' +
-    '<div class="interactive-report__key-sidebar"></div>' +
+    '<div class="interactive-report__graph-key"></div>' +
+    '<div class="interactive-report__sidebar"></div>' +
     '</div>')
-  $('.report-section--interactive-report').append(report_structure);
+  report_wrapper.append(report_structure);
+  console.log('created report structure');
 }
-
-
