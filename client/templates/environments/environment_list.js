@@ -2,6 +2,7 @@
 * JS file for environment_list.html
 */
 
+
 Template.environmentList.rendered = function() {
   if (document.querySelector(".toggle-accordion")) {
       document.querySelectorAll('.toggle-accordion')[0].click(); // main
@@ -9,10 +10,11 @@ Template.environmentList.rendered = function() {
   }
 
   var urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.has("onboarding")) {
-        $('#onboarding-modal').removeClass("is-active");
-        $('#env-create-modal').addClass("is-active");
-    }
+  if (urlParams.has("onboarding")) {
+      $('#onboarding-modal').removeClass("is-active");
+      $('#env-create-modal').addClass("is-active");
+  }
+  processDatepickers()
 }
 
 Template.environmentList.helpers({
@@ -26,6 +28,31 @@ Template.environmentList.helpers({
     var results = {list: envs, num_env: parseInt(envs.length), num_students: parseInt(total_students), num_obs: parseInt(total_obs)};
 
     return results;
+  },
+  currentUTCDate: function() {
+    let date = new Date();
+    function pad(number) {
+      if (number < 10) {
+        return '0' + number;
+      }
+      return number;
+    }
+    return date.getUTCFullYear() +
+    '-' + pad(date.getUTCMonth() + 1) +
+    '-' + pad(date.getUTCDate())
+  },
+  currentUSDate: function() {
+    let date = new Date();
+    function pad(number) {
+      if (number < 10) {
+        return '0' + number;
+      }
+      return number;
+    }
+    return
+    pad(date.getUTCMonth() + 1) +
+    '/' + pad(date.getUTCDate()) +
+    '/' + date.getUTCFullYear();
   },
   needsEnvironment: function() {
     var obj = Environments.find({}).fetch();
@@ -73,12 +100,23 @@ Template.environmentList.events({
 
     var observation = {
       name: $('#observationName').val(),
+      observationDate: $('#observationDate').val(),
       envId: id,
       timer: 0
     };
 
-    if ($('#observationName').val() == "") {
+    if (!observation.name) {
       alert("Observation name required.");
+      return;
+    }
+
+    if (!observation.observationDate) {
+      alert("Observation date required.");
+      return;
+    }
+
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(observation.observationDate)) {
+      alert('Please input a valid date in YYYY-MM-DD format');
       return;
     }
 
@@ -89,26 +127,18 @@ Template.environmentList.events({
 
     if (observations.length === 0 ) {
         var confirmation = getConfirmation();
-        if (confirmation) {
-            Meteor.call('observationInsert', observation, function(error, result) {
-              return 0;
-            });
-            $('#observationName').val('');
-            $('#obs-close-modal').click();
-            if (!$(obsAccordion).next().hasClass("show")) {
-                $(obsAccordion).click();
-            }
+        if (!confirmation) {
+          return;
         }
-    } else {
-        Meteor.call('observationInsert', observation, function(error, result) {
-          return 0;
-        });
-        $('#observationName').val('');
-        $('#obs-close-modal').click();
+    }
+    Meteor.call('observationInsert', observation, function(error, result) {
+      return 0;
+    });
+    $('#observationName').val('');
+    $('#obs-close-modal').click();
 
-        if (!$(obsAccordion).next().hasClass("show")) {
-            $(obsAccordion).click();
-        }
+    if (!$(obsAccordion).next().hasClass("show")) {
+      $(obsAccordion).click();
     }
 
     function getConfirmation() {
@@ -160,3 +190,12 @@ Template.environmentList.events({
     $('#environmentName').val('');
   }
 });
+
+
+function processDatepickers() {
+  $('.datepicker:not(.datepicker--processed)').addClass('datepicker--processed').datepicker({
+    dateFormat: 'mm/dd/yy',
+    altField: '#altObservationDate',
+    altFormat: 'yy-mm-dd'
+  })
+}

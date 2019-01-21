@@ -82,6 +82,7 @@ Template.observatory.rendered = function() {
       $('#seq-data-modal').removeClass('is-active');
     }
   });
+  processDatepickers();
 }
 
 function createToggle(params, label) {
@@ -167,6 +168,9 @@ Template.observatory.events({
   },
   'click .edit-observation-name': function(e) {
     editObservationName(this._id);
+  },
+  'click .edit-observation-date': function(e) {
+    editObservationDate(this._id);
   },
   'click #delete-observation': function(e) {
     deleteObservation(this._id);
@@ -382,31 +386,24 @@ function editObservationName(obsId) {
 
   var obs_name = $('.observation-name', context);
   var obs_name_wrapper = $('.observation-name-wrapper', context);
-  var currently_editing = !!(obs_name.hasClass('editing'));
-  var save_button = $('.edit-observation-name.button', context);
+  var save_button = $('.save-observation-name', context);
 
   save_button.addClass('is-loading');
 
-  if (!currently_editing) {
-    obs_name_wrapper.prepend($('<input>', {
-      class: 'edit-obs-name inherit-font-size',
-      value: obs_name.html()
-    }));
-
-    obs_name.addClass('editing');
-    obs_name.hide();
-    save_button.show();
-
-    $(context, '.edit-obs-name').on('keyup', function(e) {
-      if (e.keyCode === 13) {
-        save_button.click()
-      }
-    })
+  if (obs_name.hasClass('editing')) {
+    $('.edit-obs-name', context).remove();
+    save_button.hide();
+    obs_name.removeClass('editing');
+    obs_name.show();
   }
 
-  else {
+  save_button
+    .filter(':not(.save-observation-name--processed)')
+    .addClass('save-observation-name--processed')
+    .on('click', function() {
     var new_obs_name = $('.edit-obs-name', context);
     var new_name = new_obs_name.val();
+    console.log('new name', new_name);
 
     var args = {
       'obsId': obsId,
@@ -438,11 +435,113 @@ function editObservationName(obsId) {
       return 0;
     });
 
-    save_button.show();
+    save_button.hide();
     new_obs_name.remove();
     obs_name.removeClass('editing');
     obs_name.show();
+  })
+
+  obs_name_wrapper.prepend($('<input>', {
+    class: 'edit-obs-name inherit-font-size',
+    value: obs_name.html()
+  }));
+
+  obs_name.addClass('editing');
+  obs_name.hide();
+  save_button.show();
+
+  $('.edit-obs-name:not(.edit-obs-name--processed)', context).addClass('edit-obs-name--processed').on('keyup', function(e) {
+    if (e.keyCode === 13) {
+      save_button.click()
+    }
+  })
+
+  save_button.removeClass('is-loading');
+}
+
+function editObservationDate(obsId) {
+  let context = $('.observation[data-obs-id="' + obsId + '"]');
+
+  var obs_date = $('.observation-date', context);
+  var obs_wrapper = $('.observation-date-wrapper', context);
+  var save_button = $('.save-observation-date', context);
+
+  if (obs_date.hasClass('editing')) {
+    $('.edit-obs-date', context).remove();
+    save_button.hide()
+    obs_date.removeClass('editing');
+    obs_date.show();
   }
+
+  save_button.addClass('is-loading');
+
+  save_button
+    .filter(':not(.save-observation-date--processed)')
+    .addClass('save-observation-date--processed')
+    .on('click', function() {
+    var new_obs_date = $('.edit-obs-date', context);
+    var new_date = new_obs_date.val();
+    console.log('new date', new_date);
+
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(new_date)) {
+      alert('Please input a valid date in YYYY-MM-DD format');
+      return;
+    }
+
+    var args = {
+      'obsId': obsId,
+      'observationDate': new_date,
+    };
+
+    Meteor.call('observationUpdateDate', args, function(error, result) {
+      var message;
+      if (error) {
+        alert('error on date update, error')
+      }
+      if (result) {
+        message = $('<span/>', {
+          class: 'name-save-result tag is-success inline-block success-message',
+          text: 'Saved'
+        });
+        obs_date.html(new_date);
+        gtag('event', 'updateDate', {'event_category': 'observations'});
+      }
+      else {
+        message = $('<span/>', {
+          class: 'name-save-result tag is-warning inline-block error-message',
+          text: 'Failed to save. Try again later'
+        })
+      }
+      obs_wrapper.append(message);
+
+      setTimeout(function() {
+        message.remove();
+      }, 3000);
+
+      return 0;
+    });
+
+    save_button.hide();
+    new_obs_date.remove();
+    obs_date.removeClass('editing');
+    obs_date.show();
+  })
+
+  obs_wrapper.prepend($('<input>', {
+    class: 'edit-obs-date datepicker inherit-font-size',
+    value: obs_date.html()
+  }));
+  processDatepickers();
+
+  obs_date.addClass('editing');
+  obs_date.hide();
+  save_button.show();
+
+  $('.edit-obs-date:not(.edit-obs-date--processed)', context).addClass('edit-obs-date--processed').on('keyup', function(e) {
+    if (e.keyCode === 13) {
+      save_button.click()
+    }
+  })
 
   save_button.removeClass('is-loading');
 }
@@ -457,4 +556,12 @@ function deleteObservation(obsId) {
       }
     })
   }
+}
+
+function processDatepickers() {
+  $('.datepicker:not(.datepicker--processed)').addClass('datepicker--processed').datepicker({
+    dateFormat: 'mm/dd/yy',
+    altField: '#altObservationDate',
+    altFormat: 'yy-mm-dd'
+  })
 }

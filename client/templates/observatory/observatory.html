@@ -22,11 +22,20 @@
           </p>
       </div>
       <div class="columns c--observation-header__container">
-        <h2 class="column c--observation-header__title observation-name-wrapper">
-            <span class="observation-name">{{observation.name}}</span>
-            <button style="display:none;" class="edit-observation-name button is-small spaced-button">Save</button>
+        <h2 class="column c--observation-header__title">
+            <span class="observation-name-wrapper">
+                <span class="observation-name">{{observation.name}}</span>
+                <button style="display:none;" class="save-observation-name button is-small spaced-button">Save</button>
+            </span>
+           <span>|</span>
+            <span class="observation-date-wrapper">
+
+            <span class="observation-date">{{observation.observationDate}}</span>
+            <button style="display:none;" class="save-observation-date button is-small spaced-button">Save</button>
+            </span>
         </h2>
           <div class="toggle-sub">
+              <p class="o--toggle-links edit-observation-date">Change Date</p>
               <p class="o--toggle-links edit-observation-name">Rename</p>
               <p class="o--toggle-links" id="delete-observation">Delete</p>
           </div>
