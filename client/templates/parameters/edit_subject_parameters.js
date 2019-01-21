@@ -99,10 +99,6 @@ Template.editSubjectParameters.events({
    e.preventDefault();
    Router.go('environmentList');
  },
- 'click .back-to-class': function(e) {
-   e.preventDefault();
-   Router.go('observationList', {_envId:Router.current().params._envId});
- },
  'click .import-button': function (e) {
     var envId = Router.current().params._envId;
     var element = document.createElement('div');

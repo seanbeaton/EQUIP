@@ -361,7 +361,9 @@ function moveStudent(student, x, y) {
 
 function createTableOfStudents() {
   $('#data-modal-content').children().remove();
+  let envId = Router.current().params._envId;
   let students = getStudents(envId);
+  let allParams = setupSubjectParameters();
 
   var modal = document.getElementById("data-modal-content");
   modal.innerHTML += contributionTableTemplate(students, allParams);
