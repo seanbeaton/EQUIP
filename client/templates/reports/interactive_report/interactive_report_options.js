@@ -172,24 +172,8 @@ Template.interactiveReportOptions.events({
       updateReport();
       // setTimeout(function(){$(window).trigger('updated-filters')}, 100) // We're also forcing a graph update when you select new observations, not just changing params
     },
-    'click .graph-type-toggle-wrapper': function(e) {
-      let $target = $(e.target);
-
-      if (!$target.hasClass('graph-type-toggle-wrapper')) {
-        $target = $target.parents('.graph-type-toggle-wrapper')
-      }
-      $target = $('.toggle--graph-type', $target)
-
-      if ($target.attr('data-graph-type') === 'equity') {
-        $target.attr('data-graph-type', 'contributions')
-        graphType.set('contributions');
-        $target.text('Contributions');
-      }
-      else {
-        $target.attr('data-graph-type', 'equity');
-        graphType.set('equity');
-        $target.text('Equity Ratio');
-      }
+    'change .toggle--graph-type': function(e) {
+      graphType.set($('.toggle--graph-type option:selected').val());
 
       $('.interactive-report__graph').attr('data-graph-type', graphType.get());
       $(window).trigger('updated-filters') // We're also forcing a graph update when you select new observations, not just changing params
@@ -390,19 +374,19 @@ let xor = function(a, b) {
 
 let getAxisSelection = function(axis) {
   let $swappable = $('.swappable');
-  let param_wrapper;
+  let select_list;
 
   let swapped = $swappable.hasClass('swapped');
   let isXAxis = (axis === 'x' || axis === 'X');
   // Could totally refactor this to a ternary expression, but those are kinda hard to read/maintain.
   if (xor(swapped, isXAxis)) {
-    param_wrapper = $swappable.find('.param-select:first-child');
+    select_list = $swappable.find('select:first-child');
   }
   else {
-    param_wrapper = $swappable.find('.param-select:last-child');
+    select_list = $swappable.find('select:last-child');
   }
-  let select_list = $('select', param_wrapper);
-  let selected = $('option:selected', param_wrapper);
+  // let select_list = $('select', param_wrapper);
+  let selected = $('option:selected', select_list);
 
   if (!selected.val()) {
     console.log('nothing selected for', axis, 'axis');
@@ -420,8 +404,6 @@ let getAxisSelection = function(axis) {
     selected_option: selected_option,
     param_type: param_type,
     options: options,
-    // selected_value_options: getParamOptions(self.param_type).filter(opt => opt.name === selected.attr('data-id'))
-    // [0].split(',').map(function(i) {return i.trim()})
   }
   console.log('ret in ', axis, ' axis', ret);
   return ret
@@ -460,17 +442,15 @@ let updateReport = function() {
   }
   report_wrapper.removeClass('inactive');
   if ($('.interactive-report', report_wrapper).length === 0) {
-    console.log('about to create report');
     createReport(report_wrapper);
     let sidebarLevels = {
       0: 'start',
       1: 'bar_tooltip',
     }
     sidebar = new Sidebar('.interactive-report__sidebar', sidebarLevels);
-    sidebar.setSlide('start', 'Hover a bar to see more information', '')
+    sidebar.setSlide('start', 'Hover a bar (or tap on mobile) to see more information', '')
   }
   // updateReportTitle()
-  console.log('now making key');
   updateKey('.interactive-report__graph-key');
   updateGraph();
 
@@ -546,7 +526,7 @@ let createGraph = function(contribData, containerSelector, dataset) {
 
   x0.domain(data.map(function(d) { return d.column_name; }));
   x1.domain(keys).rangeRound([0, x0.bandwidth()]);
-  y.domain([0, d3.max(data, function(d) { return d3.max(keys, function(key) { return d[key]; }); })]).nice();
+  y.domain([0, Math.max(2, d3.max(data, function(d) { return d3.max(keys, function(key) { return d[key]; }); }))]).nice();
 
   g.append("g")
     .selectAll("g")
@@ -555,6 +535,7 @@ let createGraph = function(contribData, containerSelector, dataset) {
     .attr("transform", function(d) { return "translate(" + x0(d.column_name) + ",0)"; })
     .attr("class", 'bar-group')
     .attr("data-bar-group", function(d) { return d.column_name })
+    .attr("data-bar-group-type", function(d) { return contribData.x_axis_param_type })
     .selectAll("rect")
     .data(function(d) { return keys.map(function(key) { return {key: key, value: d[key]}; }); })
     .enter().append("rect")
@@ -565,14 +546,17 @@ let createGraph = function(contribData, containerSelector, dataset) {
     .attr("fill", function(d) { return z(d.key); })
     .attr("class", 'hover-bar')
     .attr("data-bar-x", function(d) { return d.key })
+    .attr("data-bar-x-type", function(d) { return contribData.y_axis_param_type })
     .on('mouseover', function() {
       // hover on
       let group = $(this).parent().attr('data-bar-group');
+      let group_type = $(this).parent().attr('data-bar-group-type');
       let bar = $(this).attr('data-bar-x');
-      buildBarTooltipSlide(group, bar, contribData)
+      let bar_type = $(this).attr('data-bar-x-type');
+      buildBarTooltipSlide(group, group_type, bar, bar_type, contribData)
     })
     .on('mouseout', function() {
-      sidebar.setCurrentPanel('start')
+      // sidebar.setCurrentPanel('start')
       // hover out
 
     });
@@ -681,13 +665,24 @@ let createGraph = function(contribData, containerSelector, dataset) {
 }
 
 
-let buildBarTooltipSlide = function(group, bar, contribData) {
+let buildBarTooltipSlide = function(group, group_type, bar, bar_type, contribData) {
   // console.log('building tooltip for group', group, 'bar', bar, 'with contribdata', contribData)
   let title = `${group} x ${bar}`;
   let num_contributions = contribData.x_axis_n_values[group].columns[bar];
   let total_contribs_in_group = contribData.x_axis_n_values[group].n;
   let total_contribs_of_type = contribData.y_axis_n_values[bar];
   let num_students_in_group = (contribData.student_body_demographic_ratios[group] * 100).toFixed(2) + '%';
+  console.log('current demo', contribData.selected_demographic);
+
+  let chosen_demo = (group_type === 'demographics') ? group : bar;
+
+  let students_in_demo = contribData.students.filter(student => student.info.demographics[contribData.selected_demographic] === chosen_demo);
+
+  let students_contribs = students_in_demo.map(student => student.info.demographics[contribData.selected_demographic] === chosen_demo);
+
+
+  console.log('students_in_demo', students_in_demo);
+
   let html = `
     <div class="stat-leadin">Of the contributions by demographic <span class="stat-group-name">${group}</span>...</div>
     <div class="stat">${num_contributions} of ${total_contribs_in_group} were <span class="stat-group-name">${bar}</span> (${(num_contributions / total_contribs_in_group * 100).toFixed(2)}%)</div>
@@ -717,9 +712,22 @@ let compileContributionData = function(obsIds, xParams, yParams, envId) {
   //   "Yes",
   //   "No",
   // ];
+  let contrib_data = {
+    y_axis: [],
+    y_axis_selected: yParams.selected_value,
+    x_axis_selected: xParams.selected_value,
+    y_axis_param_type: yParams.param_type,
+    x_axis_param_type: xParams.param_type,
+  };
 
-
-  let contrib_data = {y_axis: []};
+  if (yParams.param_type === 'demographics') {
+    contrib_data.selected_demographic = yParams.selected_value;
+    contrib_data.selected_discourse_dimension = xParams.selected_value;
+  }
+  else {
+    contrib_data.selected_demographic = xParams.selected_value;
+    contrib_data.selected_discourse_dimension = yParams.selected_value;
+  }
 
   // Add each coulumn of X
 
@@ -745,11 +753,19 @@ let compileContributionData = function(obsIds, xParams, yParams, envId) {
     contrib_data.y_axis.push(x_axis_obj)
   }
 
+  // Create by-student data structure
+  let students = getStudents(envId);
+  contrib_data.students = students.map(function(student) {
+    console.log('student', student);
+    student.contributions = [];
+    return student;
+  });
+
   // Record contributions
   // console.log('obsIds', obsIds);
 
-  // let observation = getObservation();
   for (let obsId_k in obsIds) {
+
     if (!obsIds.hasOwnProperty(obsId_k)) continue;
     let obsId = obsIds[obsId_k];
 
@@ -775,8 +791,15 @@ let compileContributionData = function(obsIds, xParams, yParams, envId) {
         sequence_x = sequence.info.parameters[xParams.selected_value];
       }
 
-      // console.log('sequence_y,',sequence_y);
-      // console.log('sequence_x,',sequence_x);
+      let student_index = contrib_data.students.findIndex(function(student) { return student._id === sequence.info.student.studentId });
+      contrib_data.students[student_index].contributions.push(sequence.info.parameters);
+
+      console.log('contrib_data.students', contrib_data.students);
+      console.log('sequence.info.student,',sequence.info.student);
+      console.log('sequence.info.parameters,',sequence.info.parameters);
+      console.log('sequence_y,',sequence_y);
+      console.log('sequence_x,',sequence_x);
+
       increaseValueForAxes(contrib_data.y_axis, sequence_y, sequence_x);
       increaseValueForStudent(contrib_data.y_axis, sequence_y, sequence_x, sequence.info.student);
 
@@ -841,7 +864,7 @@ let compileContributionData = function(obsIds, xParams, yParams, envId) {
   // by observation, then calculating the equity ratio per observation.
   // all equity ratios across all observations would then need to be averaged.
 
-  let students = getStudents(envId);
+  // Students were already created earlier.
   let demographics = getDemographics();
   let currentDemo = getCurrentDemographicSelection();
   let currentDemoOptions = demographics.filter(demo => demo.name === currentDemo)[0]
@@ -1057,15 +1080,22 @@ let createReport = function(report_wrapper) {
     '<div class="interactive-report__top-left"></div>' +
     '<div class="interactive-report__y-scale"></div>' +
     '<div class="interactive-report__title">' +
-      '<div class="param-selector-wrapper swappable">' +
+      '<div class="y-axis-label">' +
+      '<select class="toggle--graph-type">' +
+        '<option value="equity" ' + ((graphType.get() === 'equity') ? "selected" : "") + '>Equity Ratio</option>' +
+        '<option value="contributions" ' + ((graphType.get() === 'contributions') ? "selected" : "") + '>Contributions</option>' +
+      '</select><span class="deemphasize">by</span>' +
+      '</div>' +
+      '<div class="x-axis-label param-selector-wrapper swappable">' +
 
-      '<div class="param-select">' + demo_select + '</div>' +
-      '<span class="deemphasize">by</span>' +
-      '<div class="param-select">' + disc_select + '</div>' +
+      demo_select +
+      '<span class="deemphasize">and</span>' +
+      disc_select +
+
       '</div>' +
       '<span class="swappable__button"><i class="fas fa-exchange-alt"></i></span>' +
     '</div>' +
-    '<div class="interactive-report__graph-type">Showing: <span class="graph-type-toggle-wrapper"><span class="toggle--graph-type" data-graph-type="' + graphType.get() + '">Equity Ratio</span> <span class="change-graph-type-link">Change</span></span></div>' +
+    // '<div class="interactive-report__graph-type">Showing: <span class="graph-type-toggle-wrapper"><span class="toggle--graph-type" data-graph-type="' + graphType.get() + '">Equity Ratio</span> <span class="change-graph-type-link">Change</span></span></div>' +
     '<div class="interactive-report__graph" data-graph-type="' + graphType.get() + '"></div>' +
     '<div class="interactive-report__graph-key"></div>' +
     '<div class="interactive-report__sidebar"></div>' +

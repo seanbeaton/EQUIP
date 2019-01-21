@@ -30,13 +30,6 @@
 
 .interactive-report__title {
   grid-column-start: 2;
-  grid-column-end: 3;
-  grid-row-start: 1;
-  grid-row-end: 2;
-}
-
-.interactive-report__graph-type {
-  grid-column-start: 3;
   grid-column-end: 4;
   grid-row-start: 1;
   grid-row-end: 2;
@@ -73,7 +66,6 @@ $light-grid-color: #ddd;
   height: 100%;
 }
 
-.interactive-report__graph-type,
 .interactive-report__title {
   border-bottom: 1px solid $grid-color;
   height: 100%;
@@ -179,10 +171,6 @@ $light-grid-color: #ddd;
   color: var(--teal);
 }
 
-.interactive-report__graph-type {
-  line-height: 1;
-  font-size: 0.8rem;
-}
 .graph-type-toggle-wrapper {
   //display: block;
   //line-height: 1;
@@ -237,3 +225,26 @@ $light-grid-color: #ddd;
   margin: 0 0 0.2em;
 }
 
+
+.y-axis-label,
+.x-axis-label {
+  align-items: center;
+  select {
+    display: inline-block;
+    height: 29px;
+    font-size: 17px;
+    background: transparent;
+    border: none;
+  }
+  span {
+    padding: 0 4px;
+  }
+}
+
+.y-axis-label {
+  display: flex;
+  flex-flow: row nowrap;
+  span {
+    padding: 0 8px;
+  }
+}
