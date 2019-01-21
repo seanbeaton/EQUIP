@@ -248,3 +248,21 @@ $light-grid-color: #ddd;
     padding: 0 8px;
   }
 }
+
+.student-bar {
+  display: block;
+  margin: 0;
+  width: 100%;
+  padding: 4px 8px;
+}
+
+.stat--barchart {
+  padding: 0 0 10px;
+}
+.student-bar--non-contributor {
+  background-color: rgba(204,11,99,0.05)
+}
+
+.student-bar--contributor {
+  background-color: rgba(15,129,204,0.05)
+}

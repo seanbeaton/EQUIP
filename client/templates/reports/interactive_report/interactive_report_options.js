@@ -677,20 +677,32 @@ let buildBarTooltipSlide = function(group, group_type, bar, bar_type, contribDat
   let chosen_demo = (group_type === 'demographics') ? group : bar;
 
   let students_in_demo = contribData.students.filter(student => student.info.demographics[contribData.selected_demographic] === chosen_demo);
-
-  let students_contribs = students_in_demo.map(student => student.info.demographics[contribData.selected_demographic] === chosen_demo);
-
-
   console.log('students_in_demo', students_in_demo);
 
+  let contributing_students = students_in_demo.filter(student => student.contributions.length > 0);
+  console.log('contributing_students', contributing_students);
+
+  let non_contributing_students = students_in_demo.filter(student => student.contributions.length === 0);
+  console.log('non_contributing_students', non_contributing_students);
+
+  let max_contribs_contributing = Math.max(...contributing_students.map(student => student.contributions.length));
+  console.log('max_contribs_contributing', max_contribs_contributing);
+  let contributing_students_html = contributing_students.sort((a, b) => b.contributions.length - a.contributions.length).map(function(student) {
+    let max_contribs_percent = (student.contributions.length / max_contribs_contributing) * 100 + '%';
+    return `<span class="student-bar student-bar--contributor" style="background: linear-gradient(to right, rgba(15,129,204,0.15) 0%, rgba(15,129,204,0.15) ${max_contribs_percent}, rgba(15,129,204,0.05) ${max_contribs_percent}, rgba(15,129,204,0.05) 100%)">
+    ${student.info.name} (${student.contributions.length})
+    </span>`
+  }).join('');
+
+  let non_contributing_students_html = non_contributing_students.map(function(student) {
+    return `<span class="student-bar student-bar--non-contributor">${student.info.name} (0)</span>`
+  }).join('');
+
   let html = `
-    <div class="stat-leadin">Of the contributions by demographic <span class="stat-group-name">${group}</span>...</div>
-    <div class="stat">${num_contributions} of ${total_contribs_in_group} were <span class="stat-group-name">${bar}</span> (${(num_contributions / total_contribs_in_group * 100).toFixed(2)}%)</div>
-    <div class="stat-leadin">Of the contributions of type <span class="stat-group-name">${bar}</span>...</div>
-    <div class="stat">${num_contributions} of ${total_contribs_of_type} were by students in the demographic <span class="stat-group-name">${group}</span> (${(num_contributions / total_contribs_of_type * 100).toFixed(2)}%)</div>
-    <div class="stat-leadin">Of all students ${num_students_in_group} are <span class="stat-group-name">${group}</span></div>
-    <div class="stat-leadin">Participation:</div>
-    <div class="stat">tbd</div>
+    <div class="stat-leadin">Students that contributed:</div>
+    <div class="stat stat--barchart">${contributing_students_html}</div>
+    <div class="stat-leadin">Students that did not contribute:</div>
+    <div class="stat stat--barchart">${non_contributing_students_html}</div>
   `;
 
   sidebar.setSlide('bar_tooltip', html, title)
