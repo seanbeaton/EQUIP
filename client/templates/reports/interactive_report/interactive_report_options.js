@@ -479,7 +479,7 @@ let updateGraph = function() {
 };
 
 let createGraph = function(contribData, containerSelector, dataset) {
-  svg = $('<svg width="668" height="500">' +
+  svg = $('<svg width="718" height="540">' +
     '<defs>\n' +
     '  <style type="text/css">\n' +
     '    @font-face {\n' +
