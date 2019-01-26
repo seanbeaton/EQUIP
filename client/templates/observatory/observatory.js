@@ -121,6 +121,18 @@ Template.observatory.helpers({
   },
   subject: function() {
     return Subjects.find({envId: this.envId});
+  },
+  convertISODateToUS: function(isoDate) {
+    let date = new Date(Date.parse(isoDate));
+    function pad(number) {
+      if (number < 10) {
+        return '0' + number;
+      }
+      return number;
+    }
+    return pad(date.getUTCMonth() + 1) +
+      '/' + pad(date.getUTCDate()) +
+      '/' + date.getUTCFullYear();
   }
 });
 
@@ -462,15 +474,17 @@ function editObservationName(obsId) {
 function editObservationDate(obsId) {
   let context = $('.observation[data-obs-id="' + obsId + '"]');
 
-  var obs_date = $('.observation-date', context);
+  var obs_date = $('.observation-date--iso', context);
+  var obs_date_display = $('.observation-date--display', context);
   var obs_wrapper = $('.observation-date-wrapper', context);
   var save_button = $('.save-observation-date', context);
 
   if (obs_date.hasClass('editing')) {
     $('.edit-obs-date', context).remove();
-    save_button.hide()
+    $('.edit-obs-date--iso', context).remove();
+    save_button.hide();
     obs_date.removeClass('editing');
-    obs_date.show();
+    obs_date_display.show();
   }
 
   save_button.addClass('is-loading');
@@ -479,12 +493,13 @@ function editObservationDate(obsId) {
     .filter(':not(.save-observation-date--processed)')
     .addClass('save-observation-date--processed')
     .on('click', function() {
+    var new_obs_date_iso = $('.edit-obs-date--iso', context);
     var new_obs_date = $('.edit-obs-date', context);
-    var new_date = new_obs_date.val();
+    var new_date = new_obs_date_iso.val();
     console.log('new date', new_date);
 
     if (!/^\d{4}-\d{2}-\d{2}$/.test(new_date)) {
-      alert('Please input a valid date in YYYY-MM-DD format');
+      alert('Please input a valid date');
       return;
     }
 
@@ -522,19 +537,26 @@ function editObservationDate(obsId) {
     });
 
     save_button.hide();
+    new_obs_date_iso.remove();
     new_obs_date.remove();
     obs_date.removeClass('editing');
-    obs_date.show();
+    obs_date_display.show();
   })
 
   obs_wrapper.prepend($('<input>', {
     class: 'edit-obs-date datepicker inherit-font-size',
+    value: obs_date_display.html()
+  }));
+  obs_wrapper.prepend($('<input>', {
+    class: 'edit-obs-date--iso',
+    id: 'altObservationDate',
+    type: 'hidden',
     value: obs_date.html()
   }));
   processDatepickers();
 
   obs_date.addClass('editing');
-  obs_date.hide();
+  obs_date_display.hide();
   save_button.show();
 
   $('.edit-obs-date:not(.edit-obs-date--processed)', context).addClass('edit-obs-date--processed').on('keyup', function(e) {

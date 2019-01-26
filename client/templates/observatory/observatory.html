@@ -30,7 +30,8 @@
            <span>|</span>
             <span class="observation-date-wrapper">
 
-            <span class="observation-date">{{observation.observationDate}}</span>
+            <span class="observation-date observation-date--iso" style="display: none;">{{observation.observationDate}}</span>
+            <span class="observation-date observation-date--display" >{{convertISODateToUS observation.observationDate}}</span>
             <button style="display:none;" class="save-observation-date button is-small spaced-button">Save</button>
             </span>
         </h2>

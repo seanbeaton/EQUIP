@@ -49,8 +49,7 @@ Template.environmentList.helpers({
       }
       return number;
     }
-    return
-    pad(date.getUTCMonth() + 1) +
+    return pad(date.getUTCMonth() + 1) +
     '/' + pad(date.getUTCDate()) +
     '/' + date.getUTCFullYear();
   },
@@ -100,7 +99,7 @@ Template.environmentList.events({
 
     var observation = {
       name: $('#observationName').val(),
-      observationDate: $('#observationDate').val(),
+      observationDate: $('#altObservationDate').val(),
       envId: id,
       timer: 0
     };
