@@ -130,9 +130,9 @@ Template.observatory.helpers({
       }
       return number;
     }
-    return pad(date.getUTCMonth() + 1) +
-      '/' + pad(date.getUTCDate()) +
-      '/' + date.getUTCFullYear();
+    return pad(date.getMonth() + 1) +
+      '/' + pad(date.getDate()) +
+      '/' + date.getFullYear();
   }
 });
 

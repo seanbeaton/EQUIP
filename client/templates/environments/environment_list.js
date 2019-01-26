@@ -37,9 +37,9 @@ Template.environmentList.helpers({
       }
       return number;
     }
-    return date.getUTCFullYear() +
-    '-' + pad(date.getUTCMonth() + 1) +
-    '-' + pad(date.getUTCDate())
+    return date.getFullYear() +
+    '-' + pad(date.getMonth() + 1) +
+    '-' + pad(date.getDate())
   },
   currentUSDate: function() {
     let date = new Date();
@@ -49,9 +49,9 @@ Template.environmentList.helpers({
       }
       return number;
     }
-    return pad(date.getUTCMonth() + 1) +
-    '/' + pad(date.getUTCDate()) +
-    '/' + date.getUTCFullYear();
+    return pad(date.getMonth() + 1) +
+    '/' + pad(date.getDate()) +
+    '/' + date.getFullYear();
   },
   needsEnvironment: function() {
     var obj = Environments.find({}).fetch();
