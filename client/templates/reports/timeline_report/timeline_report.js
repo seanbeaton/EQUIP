@@ -1,4 +1,6 @@
 import vis from 'vis';
+let d3 = require('d3');
+
 import '/node_modules/vis/dist/vis.min.css';
 import {setupSequenceParameters, setupSubjectParameters} from "../../../helpers/parameters";
 
@@ -112,18 +114,87 @@ Template.timelineReport.events({
     console.log('disc-select,', selected.val());
     selectedDiscourseDimension.set(selected.val());
     $('#disc-opt-select').val('')
+    updateGraph()
   },
   'change #demo-select': function(e) {
     let selected = $('option:selected', e.target);
     console.log('demo-select,', selected.val());
     selectedDemographic.set(selected.val());
+    updateGraph()
   },
   'change #disc-opt-select': function(e) {
     let selected = $('option:selected', e.target);
     console.log('disc-opt-select,', selected.val());
     selectedDiscourseOption.set(selected.val());
+    updateGraph()
   },
 })
+
+let updateGraph = function() {
+  let timeline_wrapper = $('.timeline-report-wrapper');
+  let timeline_selector = '.timeline-report__graph';
+  let data = createTimelineData();
+  if (!timeline_wrapper.hasClass('timeline-created')) {
+    initTimelineGraph(data, timeline_selector)
+  }
+  else {
+    updateTimelineGraph(data, timeline_selector)
+  }
+}
+
+let initTimelineGraph = function(data, containerSelector) {
+  svg = $('<svg width="718" height="540">' +
+    '<defs>\n' +
+    '  <style type="text/css">\n' +
+    '    @font-face {\n' +
+    '      font-family: Roboto;\n' +
+    '      @import url(\'https://fonts.googleapis.com/css?family=Roboto:300,400,700\');\n' +
+    '    }\n' +
+    '  </style>\n' +
+    '</defs>' +
+    '</svg>');
+  $(containerSelector).html(svg);
+
+  var svg = d3.select(containerSelector + " svg"),
+    margin = {top: 30, right: 20, bottom: 40, left: 50},
+    width = +svg.attr("width") - margin.left - margin.right,
+    height = +svg.attr("height") - margin.top - margin.bottom,
+    g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+  let x = d3.scaleTime().range([0, width]);
+  let y = d3.scaleLinear().range([height, 0]);
+
+  let parseTime = d3.timeParse('%y-%b-%d');
+
+  var valLine = d3.line()
+    .x(function(d) {return x(d.date)})
+    .y(function(d) {return y(d.value)})
+
+  x.domain(d3.extent(data, d => d.date));
+  y.domain([0, d3.max(data, d => d.value)]);
+
+  svg.append('path')
+    .data([data])
+    .attr('class', 'line')
+    .attr('d', valLine);
+
+  svg.append("g")
+    .attr("transform", "translate(0," + height + ")")
+    .call(d3.axisBottom(x));
+
+  // Add the Y Axis
+  svg.append("g")
+    .call(d3.axisLeft(y));
+
+};
+
+let updateTimelineGraph = function(data) {
+
+};
+
+let createTimelineData = function() {
+  return []
+};
 
 Template.timelineReport.helpers({
   environments: function() {
