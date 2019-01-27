@@ -9,7 +9,10 @@ Template.reportsSelection.events({
         Router.go('staticReport')
     },
     'click .option--interactive': function() {
-        Router.go('interactiveReportOptions')
+        Router.go('interactiveReport')
+    },
+    'click .option--timeline': function() {
+        Router.go('timelineReport')
     }
 })
 

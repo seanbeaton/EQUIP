@@ -8,9 +8,7 @@ import {getStudent, getStudents} from "../../../helpers/students";
 // import {setupSubjectParameters, setupSequenceParameters} from "../../../helpers/parameters";
 
 
-
-
-Template.interactiveReportOptions.rendered = function() {
+Template.interactiveReport.rendered = function() {
     // show different report options
     // 'environments':
 }
@@ -57,7 +55,7 @@ let calculateSlidePosition = function(section) {
 
 
 
-Template.interactiveReportOptions.helpers({
+Template.interactiveReport.helpers({
     environments: function() {
         return Environments.find();
     },
@@ -94,7 +92,6 @@ var clearObservations = function() {
 
 };
 
-
 var clearParameters = function() {
   selectedXParameter.set(false);
   selectedYParameter.set(false);
@@ -103,7 +100,7 @@ var clearParameters = function() {
   $('.swappable').removeClass('swapped')
 };
 
-Template.interactiveReportOptions.events({
+Template.interactiveReport.events({
   'click .report-section-wrapper__fade': function(e) {
     lastSlide.get();
     let lastSlidePos = possibleSlides[lastSlide.get()].pos;
