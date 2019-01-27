@@ -253,7 +253,7 @@ Template.interactiveReportView.events({
     if (!$target.hasClass('.swappable__button')) {
       $target = $target.parents('.swappable__button');
     }
-    $target.siblings('.swappable').toggleClass('swapped');
+    $target.parents('.swappable').toggleClass('swapped');
 
     selectedXParameter.set(getXAxisSelection());
     selectedYParameter.set(getYAxisSelection());
@@ -380,10 +380,10 @@ let getAxisSelection = function(axis) {
   let isXAxis = (axis === 'x' || axis === 'X');
   // Could totally refactor this to a ternary expression, but those are kinda hard to read/maintain.
   if (xor(swapped, isXAxis)) {
-    select_list = $swappable.find('select:first-child');
+    select_list = $swappable.find('.select__wrapper:first-child select');
   }
   else {
-    select_list = $swappable.find('select:last-child');
+    select_list = $swappable.find('.select__wrapper:last-child select');
   }
   // let select_list = $('select', param_wrapper);
   let selected = $('option:selected', select_list);
@@ -556,7 +556,7 @@ let createGraph = function(contribData, containerSelector, dataset) {
       buildBarTooltipSlide(group, group_type, bar, bar_type, contribData)
     })
     .on('mouseout', function() {
-      sidebar.setCurrentPanel('start')
+        sidebar.setCurrentPanel('start', 250)
       // hover out
 
     });
@@ -667,30 +667,38 @@ let createGraph = function(contribData, containerSelector, dataset) {
 
 let buildBarTooltipSlide = function(group, group_type, bar, bar_type, contribData) {
   // console.log('building tooltip for group', group, 'bar', bar, 'with contribdata', contribData)
-  let title = `${group} x ${bar}`;
-  let num_contributions = contribData.x_axis_n_values[group].columns[bar];
-  let total_contribs_in_group = contribData.x_axis_n_values[group].n;
-  let total_contribs_of_type = contribData.y_axis_n_values[bar];
-  let num_students_in_group = (contribData.student_body_demographic_ratios[group] * 100).toFixed(2) + '%';
-  console.log('current demo', contribData.selected_demographic);
+  let title = `<span class="${contribData.x_axis_param_type}-color">${group}</span> x <span class="${contribData.y_axis_param_type}-color">${bar}</span>`;
+  // let num_contributions = contribData.x_axis_n_values[group].columns[bar];
+  // let total_contribs_in_group = contribData.x_axis_n_values[group].n;
+  // let total_contribs_of_type = contribData.y_axis_n_values[bar];
+  // let num_students_in_group = (contribData.student_body_demographic_ratios[group] * 100).toFixed(2) + '%';
+  // console.log('current demo', contribData.selected_demographic);
 
   let chosen_demo = (group_type === 'demographics') ? group : bar;
+  let chosen_discourse = (bar_type === 'discourse') ? bar : group;
 
   let students_in_demo = contribData.students.filter(student => student.info.demographics[contribData.selected_demographic] === chosen_demo);
   console.log('students_in_demo', students_in_demo);
 
-  let contributing_students = students_in_demo.filter(student => student.contributions.length > 0);
-  console.log('contributing_students', contributing_students);
+  let students_in_demo_contribs_updated = students_in_demo.map(function(student) {
+    student.relevant_contributions = student.contributions.filter(contrib => contrib[contribData.selected_discourse_dimension] === chosen_discourse);
+    return student;
+  });
 
-  let non_contributing_students = students_in_demo.filter(student => student.contributions.length === 0);
-  console.log('non_contributing_students', non_contributing_students);
+  // console.log(students_in_demo_contribs_updated);
 
-  let max_contribs_contributing = Math.max(...contributing_students.map(student => student.contributions.length));
+  let contributing_students = students_in_demo_contribs_updated.filter(student => student.relevant_contributions.length > 0);
+  // console.log('contributing_students', contributing_students);
+
+  let non_contributing_students = students_in_demo_contribs_updated.filter(student => student.relevant_contributions.length === 0);
+  // console.log('non_contributing_students', non_contributing_students);
+
+  let max_contribs_contributing = Math.max(...contributing_students.map(student => student.relevant_contributions.length));
   console.log('max_contribs_contributing', max_contribs_contributing);
-  let contributing_students_html = contributing_students.sort((a, b) => b.contributions.length - a.contributions.length).map(function(student) {
-    let max_contribs_percent = (student.contributions.length / max_contribs_contributing) * 100 + '%';
+  let contributing_students_html = contributing_students.sort((a, b) => b.relevant_contributions.length - a.relevant_contributions.length).map(function(student) {
+    let max_contribs_percent = (student.relevant_contributions.length / max_contribs_contributing) * 100 + '%';
     return `<span class="student-bar student-bar--contributor" style="background: linear-gradient(to right, rgba(15,129,204,0.15) 0%, rgba(15,129,204,0.15) ${max_contribs_percent}, rgba(15,129,204,0.05) ${max_contribs_percent}, rgba(15,129,204,0.05) 100%)">
-    ${student.info.name} (${student.contributions.length})
+    ${student.info.name} (${student.relevant_contributions.length})
     </span>`
   }).join('');
 
@@ -976,12 +984,24 @@ class Sidebar {
     let panels = {};
     Object.keys(this.levels).forEach(index => {panels[levels[index]] = {html: '', title: '', id: levels[index], index: index}});
     this.panels = panels;
+    this.panelChangeTimeout = false;
     let that = this;
     Object.keys(this.panels).forEach(function(id) {
       that.createPanel(that.panels[id])
     })
   }
-  setCurrentPanel(panel_id) {
+  setCurrentPanel(panel_id, timeout) {
+    if (this.panelChangeTimeout) {
+      clearTimeout(this.panelChangeTimeout);
+      this.panelChangeTimeout = false;
+    }
+    if (typeof timeout !== 'undefined') {
+      let that = this;
+      this.panelChangeTimeout = setTimeout(function() {
+        that.setCurrentPanel(panel_id)
+      }, timeout);
+      return;
+    }
     if (panel_id === this._currentPanelID) {
       // Same panel, no need to move
       return;
@@ -1076,12 +1096,12 @@ let getLabelColors = function(labels) {
 }
 
 let createReport = function(report_wrapper) {
-  let disc_select = '<select class="param-select-form-item" name="parameter-select" data-param-type="discourse">' +
+  let disc_select = '<select class="param-select-form-item discourse-color" name="parameter-select" data-param-type="discourse">' +
     getDiscourseDimensions().map(function(disc) {
       return `<option value="${disc.name}">${disc.name}</option>`
     }).join('')
     + '</select>';
-  let demo_select = '<select class="param-select-form-item" name="demographic-select" data-param-type="demographics">' +
+  let demo_select = '<select class="param-select-form-item demographics-color" name="demographic-select" data-param-type="demographics">' +
     getDemographics().map(function(demo) {
       return `<option value="${demo.name}">${demo.name}</option>`
     }).join('')
@@ -1093,19 +1113,23 @@ let createReport = function(report_wrapper) {
     '<div class="interactive-report__y-scale"></div>' +
     '<div class="interactive-report__title">' +
       '<div class="y-axis-label">' +
+      '<div class="select__wrapper select__wrapper--graph-type">' +
+      '<span class="explanation-text">Y axis</span>' +
       '<select class="toggle--graph-type">' +
         '<option value="equity" ' + ((graphType.get() === 'equity') ? "selected" : "") + '>Equity Ratio</option>' +
         '<option value="contributions" ' + ((graphType.get() === 'contributions') ? "selected" : "") + '>Contributions</option>' +
-      '</select><span class="deemphasize">by</span>' +
+      '</select>' +
+      '</div><span class="x-y-separator">|</span>' +
       '</div>' +
       '<div class="x-axis-label param-selector-wrapper swappable">' +
 
-      demo_select +
-      '<span class="deemphasize">and</span>' +
-      disc_select +
+      '<div class="select__wrapper select__wrapper--demo"><span class="explanation-text"><span class="explanation-text__group">X axis (groups)</span><span class="explanation-text__bar">X axis (bars)</span></span>' + demo_select + '</div>' +
+      '<span class="center_text"><span class="swappable__button"><i class="fas fa-exchange-alt"></i></span></span>' +
+    '<div class="select__wrapper select__wrapper--disc"><span class="explanation-text"><span class="explanation-text__group">X axis (groups)</span><span class="explanation-text__bar">X axis (bars)</span></span>' + disc_select + '</div>' +
+
+    // disc_select +
 
       '</div>' +
-      '<span class="swappable__button"><i class="fas fa-exchange-alt"></i></span>' +
     '</div>' +
     // '<div class="interactive-report__graph-type">Showing: <span class="graph-type-toggle-wrapper"><span class="toggle--graph-type" data-graph-type="' + graphType.get() + '">Equity Ratio</span> <span class="change-graph-type-link">Change</span></span></div>' +
     '<div class="interactive-report__graph" data-graph-type="' + graphType.get() + '"></div>' +

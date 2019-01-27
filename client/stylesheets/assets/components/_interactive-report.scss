@@ -244,9 +244,11 @@ $light-grid-color: #ddd;
 .y-axis-label {
   display: flex;
   flex-flow: row nowrap;
-  span {
-    padding: 0 8px;
-  }
+}
+
+.x-y-separator {
+  padding: 0 8px;
+  font-size: 20px;
 }
 
 .student-bar {
@@ -265,4 +267,23 @@ $light-grid-color: #ddd;
 
 .student-bar--contributor {
   background-color: rgba(15,129,204,0.05)
+}
+
+$demo-color: #332091;
+$disc-color: #921370;
+
+.demographics-color {
+  color: $demo-color;
+}
+.discourse-color {
+  color: $disc-color;
+}
+
+.toggle--graph-type {
+  font-weight: bold;
+}
+
+.center_text {
+  height: 100%;
+  justify-items: center;
 }
