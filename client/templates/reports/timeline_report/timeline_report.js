@@ -218,8 +218,6 @@ let createTimelineData = function() {
       }
 
       let seqDemoOption = sequence.info.student.demographics[demo];
-      // console.log('seqDemoOption', seqDemoOption);
-
 
       let ds_index = ret.contributions_dataset.findIndex(datapoint => datapoint.obsId === obsId);
 
@@ -378,7 +376,7 @@ let initTimelineGraph = function(full_data, containerSelector) {
     //   .x(function(d) { return x(d.d3date)})
     //   .y(function(d) { return y(d[demo.name])});
 
-    return line;
+    return {line: line, demo: demo};
   });
   //
   // let valLine = d3.line()
@@ -388,17 +386,25 @@ let initTimelineGraph = function(full_data, containerSelector) {
 
   g.append('path')
     .data([data])
-    .attr('class', 'line')
-    .style("stroke", "blue")
+    .attr('class', 'line line--totle')
+    .style("stroke-width", 2)
     .attr('d', total_line);
+
+  let key_colors = getLabelColors(getDemographicOptions().map(demo_opt => demo_opt.name));
+  let z = d3.scaleOrdinal()
+    .range(Object.values(key_colors));
+
+  console.log('key_colors', key_colors);
 
   lines.forEach(function(line) {
     console.log('data is', data);
+    console.log('z(line.demo)', z(line.demo.name), line.demo.name);
     g.append('path')
       .data([data])
       .attr('class', 'line')
-      .style("stroke", "red")
-      .attr('d', line);
+      .style("stroke", z(line.demo.name))
+      .style("stroke-width", 2)
+      .attr('d', line.line);
   });
 
   g.append("g")
@@ -410,6 +416,59 @@ let initTimelineGraph = function(full_data, containerSelector) {
     .call(d3.axisLeft(y));
 
 };
+
+
+let available_colors = [
+  "#003f5c",
+  "#2f4b7c",
+  "#665191",
+  "#a05195",
+  "#d45087",
+  "#f95d6a",
+  "#ff7c43",
+  "#ffa600"
+];
+
+let avail_colors_viridis = [
+  "#440154ff", "#440558ff", "#450a5cff", "#450e60ff", "#451465ff", "#461969ff",
+  "#461d6dff", "#462372ff", "#472775ff", "#472c7aff", "#46307cff", "#45337dff",
+  "#433880ff", "#423c81ff", "#404184ff", "#3f4686ff", "#3d4a88ff", "#3c4f8aff",
+  "#3b518bff", "#39558bff", "#37598cff", "#365c8cff", "#34608cff", "#33638dff",
+  "#31678dff", "#2f6b8dff", "#2d6e8eff", "#2c718eff", "#2b748eff", "#29788eff",
+  "#287c8eff", "#277f8eff", "#25848dff", "#24878dff", "#238b8dff", "#218f8dff",
+  "#21918dff", "#22958bff", "#23988aff", "#239b89ff", "#249f87ff", "#25a186ff",
+  "#25a584ff", "#26a883ff", "#27ab82ff", "#29ae80ff", "#2eb17dff", "#35b479ff",
+  "#3cb875ff", "#42bb72ff", "#49be6eff", "#4ec16bff", "#55c467ff", "#5cc863ff",
+  "#61c960ff", "#6bcc5aff", "#72ce55ff", "#7cd04fff", "#85d349ff", "#8dd544ff",
+  "#97d73eff", "#9ed93aff", "#a8db34ff", "#b0dd31ff", "#b8de30ff", "#c3df2eff",
+  "#cbe02dff", "#d6e22bff", "#e1e329ff", "#eae428ff", "#f5e626ff", "#fde725ff",
+];
+
+
+function shiftArrayToLeft(arr, places) {
+  arr.push.apply(arr, arr.splice(0,places));
+}
+
+let getLabelColors = function(labels) {
+  let local_colors = avail_colors_viridis.slice();
+
+  let spacing = Math.max(Math.floor(avail_colors_viridis.length / labels.length), 1);
+
+  let label_colors = {};
+  let _ = labels.map(function(label) {
+    if (typeof label_colors[label] === 'undefined') {
+      let new_color = local_colors[0];
+      local_colors.push(new_color);
+      label_colors[label] = new_color;
+      shiftArrayToLeft(local_colors, spacing);
+    }
+    else {
+
+    }
+  });
+  return label_colors
+}
+
 
 let updateTimelineGraph = function(data, containerSelector) {
   initTimelineGraph(data, containerSelector)
