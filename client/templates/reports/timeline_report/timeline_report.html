@@ -27,7 +27,7 @@
 
                 {{#if environmentChosen }}
                     <section data-slide-id="obs" class="report-section report-section--select report-section--select--obs">
-                        <h2>Choose one or more observations.</h2>
+                        <h2>Choose two or more observations.</h2>
                         <p>You can select multiple observations by holding down the control key (command on mac) and clicking more observations.</p>
                         <div class="report-select__options report-select__options--observations">
                         <div id="vis-container"></div>
@@ -63,6 +63,14 @@
                 <div class="timeline-report__y-scale"></div>
                 <div class="timeline-report__title">
                     <div class="parameter-options">
+                        <div class="dataset-type-select">
+                            <label for="dataset-type-select">Graph Type</label>
+                            <select id="dataset-type-select" class="dataset">
+                                {{#each dataset_types}}
+                                    <option {{default}} value="{{id}}">{{name}}</option>
+                                {{/each}}
+                            </select>
+                        </div>
                         <div class="demographic-select">
                             <label for="demo-select">Demographic</label>
                             <select id="demo-select" class="demographic">

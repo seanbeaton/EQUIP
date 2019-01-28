@@ -4,6 +4,7 @@ let d3 = require('d3');
 import '/node_modules/vis/dist/vis.min.css';
 import {setupSequenceParameters, setupSubjectParameters} from "../../../helpers/parameters";
 import {getSequences} from "../../../helpers/sequences";
+import {getStudents} from "../../../helpers/students";
 
 // const envSet = new ReactiveVar(false);
 const obsOptions = new ReactiveVar([]);
@@ -12,6 +13,7 @@ const selectedObservations = new ReactiveVar([]);
 const selectedDemographic = new ReactiveVar(false);
 const selectedDiscourseDimension = new ReactiveVar(false);
 const selectedDiscourseOption = new ReactiveVar(false);
+const selectedDatasetType = new ReactiveVar('equity');
 let timeline;
 
 Template.timelineReportView.helpers({
@@ -54,6 +56,20 @@ Template.timelineReportView.helpers({
   },
   selected_discourse_options: function() {
     return getDiscourseOptions();
+  },
+  dataset_types: function() {
+    return [
+      {
+        id: 'equity',
+        name: 'Equity Ratio',
+        default: 'default'
+      },
+      {
+        id: 'contributions',
+        name: 'Contributions',
+        default: ''
+      }
+    ]
   }
 });
 
@@ -71,8 +87,11 @@ let getDiscourseDimensions = function() {
 let getDiscourseOptions = function() {
   let options = getDiscourseDimensions();
   let selected_disc_dim = selectedDiscourseDimension.get();
+  if (selected_disc_dim === false) {
+    return [];
+  }
   console.log('options', options, 'selected_disc_dim', selected_disc_dim);
-  let opt =  options.find(opt => opt.name === selected_disc_dim);
+  let opt = options.find(opt => opt.name === selected_disc_dim);
   console.log('opt', opt);
   return opt
     .options.split(',').map(function(opt) {return {name: opt.trim()}})
@@ -140,6 +159,12 @@ Template.timelineReport.events({
     selectedDiscourseOption.set(selected.val());
     updateGraph()
   },
+  'change #dataset-type-select': function(e) {
+    let selected = $('option:selected', e.target);
+    console.log('dataset-type-select,', selected.val());
+    selectedDatasetType.set(selected.val());
+    updateGraph()
+  },
 })
 
 
@@ -153,6 +178,9 @@ let createTimelineData = function() {
   let demo = selectedDemographic.get();
   let dimension = selectedDiscourseDimension.get();
   let option = selectedDiscourseOption.get();
+  let allStudents = getStudents(envId);
+  let demo_opts = getDemographicOptions();
+
 
   console.log('creating data for ', obsIds, demo, dimension, option);
   for (let obsId_k in obsIds) {
@@ -181,7 +209,7 @@ let createTimelineData = function() {
           date: obs.observationDate,
           _total: 0,
         };
-        let demo_opts = getDemographicOptions();
+
         demo_opts.forEach(function (opt) {
           datapoint[opt.name] = 0
         });
@@ -202,9 +230,66 @@ let createTimelineData = function() {
 
     }
   }
+
+  ret.equity_dataset = [];
+
+  console.log('allStudents', allStudents);
+
+
+  let students_by_demo = demo_opts.map(function(demo_opt) {
+    console.log('demo_opt', demo_opt);
+    return {
+      name: demo_opt.name,
+      count: 0
+    };
+  });
+
+  allStudents.forEach(function(student) {
+    let demoCountIndex = students_by_demo.findIndex(demoopt => demoopt.name === student.info.demographics[demo])
+    students_by_demo[demoCountIndex].count++;
+  });
+
+  students_by_demo.forEach(function(demographic) {
+    demographic.percent = demographic.count / students_by_demo.reduce((t, d) => d.count + t, 0)
+  });
+
+  console.table(students_by_demo);
+
+  ret.equity_dataset = ret.contributions_dataset.map(function(observation) {
+    let obs_equity = {
+      _total: 1,
+      obsId: observation.obsId,
+      d3date: observation.d3date,
+      date: observation.date,
+    }
+    demo_opts.forEach(function(demo_opt) {
+      let percent_of_contribs = observation[demo_opt.name] / observation._total;
+      let percent_of_students = students_by_demo.find(demo => demo.name === demo_opt.name).percent;
+      if (percent_of_students === 0) {
+        obs_equity[demo_opt.name] = 0;
+      }
+      else {
+        obs_equity[demo_opt.name] = percent_of_contribs / percent_of_students;
+      }
+    });
+    return obs_equity
+  })
+
+
+  console.log('contribs dataset');
   console.table(ret.contributions_dataset);
+  console.log('equity dataset');
+  console.table(ret.equity_dataset);
 
 
+  ret.contributions_dataset.forEach(function(obs) {
+    obs.max = obs._total;
+  });
+  ret.equity_dataset.forEach(function(obs) {
+    let vals = demo_opts.map(demo_opt => obs[demo_opt.name]);
+    console.log('vals', vals);
+    obs.max = Math.max.apply(null, vals);
+  })
   return ret
 };
 
@@ -220,6 +305,10 @@ let updateGraph = function() {
     return;
   }
 
+  if (selectedObservations.get().length < 2) {
+    return;
+  }
+
   let data = createTimelineData();
   if (!timeline_wrapper.hasClass('timeline-created')) {
     initTimelineGraph(data, timeline_selector)
@@ -230,8 +319,14 @@ let updateGraph = function() {
 }
 
 let initTimelineGraph = function(full_data, containerSelector) {
+  let data;
 
-  let data = full_data.contributions_dataset;
+  if (selectedDatasetType.get() === 'contributions') {
+    data = full_data.contributions_dataset;
+  }
+  else {
+    data = full_data.equity_dataset;
+  }
 
   console.log('data before');
   console.table(data);
@@ -263,7 +358,7 @@ let initTimelineGraph = function(full_data, containerSelector) {
     .range([0, width]);
 
   let y = d3.scaleLinear()
-    .domain([0, d3.max(data, d => d._total)])
+    .domain([0, d3.max(data, d => d.max)])
     .range([height, 0]);
 
 
@@ -333,7 +428,7 @@ Template.timelineReport.helpers({
     return obsOptions.get()
   },
   observationChosen: function() {
-    return !!(selectedObservations.get().length)
+    return !!(selectedObservations.get().length >= 2)
   }
 })
 
