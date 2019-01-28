@@ -3,6 +3,7 @@ let d3 = require('d3');
 
 import '/node_modules/vis/dist/vis.min.css';
 import {setupSequenceParameters, setupSubjectParameters} from "../../../helpers/parameters";
+import {getSequences} from "../../../helpers/sequences";
 
 // const envSet = new ReactiveVar(false);
 const obsOptions = new ReactiveVar([]);
@@ -78,6 +79,16 @@ let getDiscourseOptions = function() {
 };
 
 
+let getDemographicOptions = function() {
+  let options = getDemographics();
+  let selected_demo = selectedDemographic.get();
+  let opt =  options.find(opt => opt.name === selected_demo);
+  console.log('opt', opt);
+  return opt
+    .options.split(',').map(function(opt) {return {name: opt.trim()}})
+};
+
+
 let getEnvironment = function() {
   let envId = selectedEnvironment.get();
   return Environments.findOne({_id: envId})
@@ -114,6 +125,7 @@ Template.timelineReport.events({
     console.log('disc-select,', selected.val());
     selectedDiscourseDimension.set(selected.val());
     $('#disc-opt-select').val('')
+    selectedDiscourseOption.set(false);
     updateGraph()
   },
   'change #demo-select': function(e) {
@@ -130,9 +142,84 @@ Template.timelineReport.events({
   },
 })
 
+
+let createTimelineData = function() {
+  let ret = {
+    contributions_dataset: []
+  };
+
+  let envId = selectedEnvironment.get();
+  let obsIds = selectedObservations.get();
+  let demo = selectedDemographic.get();
+  let dimension = selectedDiscourseDimension.get();
+  let option = selectedDiscourseOption.get();
+
+  console.log('creating data for ', obsIds, demo, dimension, option);
+  for (let obsId_k in obsIds) {
+
+    if (!obsIds.hasOwnProperty(obsId_k)) continue;
+    let obsId = obsIds[obsId_k];
+
+    let sequences = getSequences(obsId, envId);
+    for (let sequence_k in sequences) {
+      if (!sequences.hasOwnProperty(sequence_k)) continue;
+      let sequence = sequences[sequence_k];
+
+      // console.log('sequence', sequence);
+
+      if (!ret.contributions_dataset.find(datapoint => datapoint.obsId === obsId)) {
+        // If it wasn't there:
+        let obsers = getObservations();
+        console.log('getObservations()', obsers);
+
+        let obs = obsers.find(obs => obs._id === obsId);
+        let parseTime = d3.timeParse('%Y-%m-%d');
+        console.log('ob SEACH', obs);
+        let datapoint = {
+          obsId: obsId,
+          d3date: parseTime(obs.observationDate),
+          date: obs.observationDate,
+          _total: 0,
+        };
+        let demo_opts = getDemographicOptions();
+        demo_opts.forEach(function (opt) {
+          datapoint[opt.name] = 0
+        });
+
+        ret.contributions_dataset.push(datapoint)
+      }
+
+      let seqDemoOption = sequence.info.student.demographics[demo];
+      // console.log('seqDemoOption', seqDemoOption);
+
+
+      let ds_index = ret.contributions_dataset.findIndex(datapoint => datapoint.obsId === obsId);
+
+      if (sequence.info.parameters[dimension] === option) {
+        ret.contributions_dataset[ds_index]._total += 1;
+        ret.contributions_dataset[ds_index][seqDemoOption] += 1;
+      }
+
+    }
+  }
+  console.table(ret.contributions_dataset);
+
+
+  return ret
+};
+
 let updateGraph = function() {
   let timeline_wrapper = $('.timeline-report-wrapper');
   let timeline_selector = '.timeline-report__graph';
+
+  let demo = selectedDemographic.get();
+  let dimension = selectedDiscourseDimension.get();
+  let option = selectedDiscourseOption.get();
+
+  if (demo === false || dimension === false || option === false) {
+    return;
+  }
+
   let data = createTimelineData();
   if (!timeline_wrapper.hasClass('timeline-created')) {
     initTimelineGraph(data, timeline_selector)
@@ -142,8 +229,18 @@ let updateGraph = function() {
   }
 }
 
-let initTimelineGraph = function(data, containerSelector) {
-  svg = $('<svg width="718" height="540">' +
+let initTimelineGraph = function(full_data, containerSelector) {
+
+  let data = full_data.contributions_dataset;
+
+  console.log('data before');
+  console.table(data);
+  data = data.sort(function(a, b) {return a.d3date - b.d3date});
+  console.log('data after');
+  console.table(data);
+
+
+  svg = $('<svg width="718" height="500">' +
     '<defs>\n' +
     '  <style type="text/css">\n' +
     '    @font-face {\n' +
@@ -155,46 +252,74 @@ let initTimelineGraph = function(data, containerSelector) {
     '</svg>');
   $(containerSelector).html(svg);
 
-  var svg = d3.select(containerSelector + " svg"),
+  let svg = d3.select(containerSelector + " svg"),
     margin = {top: 30, right: 20, bottom: 40, left: 50},
     width = +svg.attr("width") - margin.left - margin.right,
     height = +svg.attr("height") - margin.top - margin.bottom,
     g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-  let x = d3.scaleTime().range([0, width]);
-  let y = d3.scaleLinear().range([height, 0]);
+  let x = d3.scaleTime()
+    .domain(d3.extent(data, d => d.d3date))
+    .range([0, width]);
 
-  let parseTime = d3.timeParse('%y-%b-%d');
+  let y = d3.scaleLinear()
+    .domain([0, d3.max(data, d => d._total)])
+    .range([height, 0]);
 
-  var valLine = d3.line()
-    .x(function(d) {return x(d.date)})
-    .y(function(d) {return y(d.value)})
 
-  x.domain(d3.extent(data, d => d.date));
-  y.domain([0, d3.max(data, d => d.value)]);
+  // let lines = [];
+  let demos = getDemographicOptions();
 
-  svg.append('path')
+  let total_line = d3.line()
+    .x(function(d) { return x(d.d3date)})
+    .y(function(d) { return y(d._total)});
+
+  let lines = demos.map(function(demo) {
+    let line = d3.line()
+      .x(d => x(d.d3date))
+      .y(d => y(d[demo.name]));
+    console.log('demo', demo.name);
+    // let line = d3.line()
+    //   .x(function(d) { return x(d.d3date)})
+    //   .y(function(d) { return y(d[demo.name])});
+
+    return line;
+  });
+  //
+  // let valLine = d3.line()
+  //   .x(function(d) {return x(d.date)})
+  //   .y(function(d) {return y(d.value)})
+
+
+  g.append('path')
     .data([data])
     .attr('class', 'line')
-    .attr('d', valLine);
+    .style("stroke", "blue")
+    .attr('d', total_line);
 
-  svg.append("g")
+  lines.forEach(function(line) {
+    console.log('data is', data);
+    g.append('path')
+      .data([data])
+      .attr('class', 'line')
+      .style("stroke", "red")
+      .attr('d', line);
+  });
+
+  g.append("g")
     .attr("transform", "translate(0," + height + ")")
     .call(d3.axisBottom(x));
 
   // Add the Y Axis
-  svg.append("g")
+  g.append("g")
     .call(d3.axisLeft(y));
 
 };
 
-let updateTimelineGraph = function(data) {
-
+let updateTimelineGraph = function(data, containerSelector) {
+  initTimelineGraph(data, containerSelector)
 };
 
-let createTimelineData = function() {
-  return []
-};
 
 Template.timelineReport.helpers({
   environments: function() {
@@ -230,7 +355,8 @@ let setupVis = function() {
   // console.log('timeline', timeline);
   timeline.on('select', function(props) {
     // console.log('selected items', props.items, 'props', props);
-    selectedObservations.set(props.items)
+    selectedObservations.set(props.items);
+    updateGraph();
   });
   return timeline
 }
