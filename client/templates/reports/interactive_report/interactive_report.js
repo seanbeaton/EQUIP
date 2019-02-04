@@ -1,6 +1,7 @@
 import {setupSequenceParameters, setupSubjectParameters} from "../../../helpers/parameters";
 import {getSequences} from "../../../helpers/sequences";
 import {getStudent, getStudents} from "../../../helpers/students";
+import {Sidebar} from '../../../helpers/graph_sidebar';
 
 
 // import {getSequence, getSequences} from "../../../helpers/sequences";
@@ -40,11 +41,11 @@ const lastSlide = new ReactiveVar('env');
 
 
 let calculateSlidePosition = function(section) {
-  console.log('calculateSlidePosition, going to slide', section);
+  //console.log('calculateSlidePosition, going to slide', section);
   lastSlide.set(section);
   let slideSettings = possibleSlides[lastSlide.get()];
   let prevSlides = Object.keys(possibleSlides).filter(item => possibleSlides[item].pos < slideSettings.pos);
-  console.log('prevsliders', prevSlides);
+  //console.log('prevsliders', prevSlides);
 
   let heights = prevSlides.map(prevSlide => $('.report-section[data-slide-id="' + prevSlide +'"]').height() + 40); // 40px margin
   let aboveItemsHeight = heights.reduce((a, b) => a + b, 0);  // sum
@@ -63,23 +64,23 @@ Template.interactiveReport.helpers({
         return !!(selectedEnvironment.get());
     },
     // observationsExist: function() {
-    //     console.log('checked if observations exist');
+    //     //console.log('checked if observations exist');
     //     return obsOptions.get().length !== 0
     // },
     observations: function() {
-        // console.log('obsOptions', obsOptions);
+        // //console.log('obsOptions', obsOptions);
         return obsOptions.get()
     },
     possibleSlides: function() {
-        // console.log('obsOptions', obsOptions);
+        // //console.log('obsOptions', obsOptions);
         return possibleSlides;
     },
     lastSlide: function() {
-        // console.log('obsOptions', obsOptions);
+        // //console.log('obsOptions', obsOptions);
         return lastSlide.get()
     },
     observationChosen: function() {
-        // console.log('observationChosen', obsOptions.get(), !!(obsOptions.get()));
+        // //console.log('observationChosen', obsOptions.get(), !!(obsOptions.get()));
 
         return !!(selectedObservations.get().length)
     }
@@ -105,11 +106,11 @@ Template.interactiveReport.events({
     lastSlide.get();
     let lastSlidePos = possibleSlides[lastSlide.get()].pos;
 
-    console.log('lastslidepos', lastSlidePos);
+    //console.log('lastslidepos', lastSlidePos);
 
     let prevSlide = Object.keys(possibleSlides).filter(item => possibleSlides[item].pos === lastSlidePos - 1);
 
-    console.log('prev slide', prevSlide);
+    //console.log('prev slide', prevSlide);
 
     if (typeof prevSlide[0] === 'undefined') {
       return
@@ -134,7 +135,7 @@ Template.interactiveReport.events({
         selectedEnvironment.set(getCurrentEnvId());
         obsOptions.set([]);
         obsOptions.set(getObsOptions());
-        // console.log('obs options get', obsOptions.get());
+        // //console.log('obs options get', obsOptions.get());
         envSet.set(!!getCurrentEnvId());
 
     },
@@ -198,7 +199,7 @@ Template.interactiveReport.events({
   //   $(window).trigger('updated-filters')
   // },
   // 'click .swappable__button': function(e) {
-  //   console.log('click');
+  //   //console.log('click');
   //   let $target = $(e.target);
   //   $target.parents('.swappable').toggleClass('swapped');
   //
@@ -386,7 +387,7 @@ let getAxisSelection = function(axis) {
   let selected = $('option:selected', select_list);
 
   if (!selected.val()) {
-    console.log('nothing selected for', axis, 'axis');
+    //console.log('nothing selected for', axis, 'axis');
     return {};
   }
 
@@ -402,7 +403,7 @@ let getAxisSelection = function(axis) {
     param_type: param_type,
     options: options,
   }
-  console.log('ret in ', axis, ' axis', ret);
+  //console.log('ret in ', axis, ' axis', ret);
   return ret
 }
 
@@ -463,10 +464,9 @@ let updateGraph = function() {
   // let graphData = getContributionData(obsIds, xParams, yParams, envId);
   // let demData = makeDemGraphs(envId, xParams, envId);
   // makeRatioGraphs(envId, graphData, demData);
-  // console.log('graphData', graphData);
+  // //console.log('graphData', graphData);
 
 
-  console.log('obsIds, xParams, yParams, envId', obsIds, xParams, yParams, envId)
   let contribData = compileContributionData(obsIds, xParams, yParams, envId);
 
   // options are 'contributions' or 'equity'
@@ -663,35 +663,35 @@ let createGraph = function(contribData, containerSelector, dataset) {
 
 
 let buildBarTooltipSlide = function(group, group_type, bar, bar_type, contribData) {
-  // console.log('building tooltip for group', group, 'bar', bar, 'with contribdata', contribData)
+  // //console.log('building tooltip for group', group, 'bar', bar, 'with contribdata', contribData)
   let title = `<span class="${contribData.x_axis_param_type}-color">${group}</span> x <span class="${contribData.y_axis_param_type}-color">${bar}</span>`;
   // let num_contributions = contribData.x_axis_n_values[group].columns[bar];
   // let total_contribs_in_group = contribData.x_axis_n_values[group].n;
   // let total_contribs_of_type = contribData.y_axis_n_values[bar];
   // let num_students_in_group = (contribData.student_body_demographic_ratios[group] * 100).toFixed(2) + '%';
-  // console.log('current demo', contribData.selected_demographic);
+  // //console.log('current demo', contribData.selected_demographic);
 
   let chosen_demo = (group_type === 'demographics') ? group : bar;
   let chosen_discourse = (bar_type === 'discourse') ? bar : group;
 
   let students_in_demo = contribData.students.filter(student => student.info.demographics[contribData.selected_demographic] === chosen_demo);
-  console.log('students_in_demo', students_in_demo);
+  //console.log('students_in_demo', students_in_demo);
 
   let students_in_demo_contribs_updated = students_in_demo.map(function(student) {
     student.relevant_contributions = student.contributions.filter(contrib => contrib[contribData.selected_discourse_dimension] === chosen_discourse);
     return student;
   });
 
-  // console.log(students_in_demo_contribs_updated);
+  // //console.log(students_in_demo_contribs_updated);
 
   let contributing_students = students_in_demo_contribs_updated.filter(student => student.relevant_contributions.length > 0);
-  // console.log('contributing_students', contributing_students);
+  // //console.log('contributing_students', contributing_students);
 
   let non_contributing_students = students_in_demo_contribs_updated.filter(student => student.relevant_contributions.length === 0);
-  // console.log('non_contributing_students', non_contributing_students);
+  // //console.log('non_contributing_students', non_contributing_students);
 
   let max_contribs_contributing = Math.max(...contributing_students.map(student => student.relevant_contributions.length));
-  console.log('max_contribs_contributing', max_contribs_contributing);
+  //console.log('max_contribs_contributing', max_contribs_contributing);
   let contributing_students_html = contributing_students.sort((a, b) => b.relevant_contributions.length - a.relevant_contributions.length).map(function(student) {
     let max_contribs_percent = (student.relevant_contributions.length / max_contribs_contributing) * 100 + '%';
     return `<span class="student-bar student-bar--contributor" style="background: linear-gradient(to right, rgba(15,129,204,0.15) 0%, rgba(15,129,204,0.15) ${max_contribs_percent}, rgba(15,129,204,0.05) ${max_contribs_percent}, rgba(15,129,204,0.05) 100%)">
@@ -773,13 +773,13 @@ let compileContributionData = function(obsIds, xParams, yParams, envId) {
   // Create by-student data structure
   let students = getStudents(envId);
   contrib_data.students = students.map(function(student) {
-    console.log('student', student);
+    //console.log('student', student);
     student.contributions = [];
     return student;
   });
 
   // Record contributions
-  // console.log('obsIds', obsIds);
+  // //console.log('obsIds', obsIds);
 
   for (let obsId_k in obsIds) {
 
@@ -790,7 +790,7 @@ let compileContributionData = function(obsIds, xParams, yParams, envId) {
     for (let sequence_k in sequences) {
       if (!sequences.hasOwnProperty(sequence_k)) continue;
       let sequence = sequences[sequence_k];
-      // console.log('sequence', sequence);
+      // //console.log('sequence', sequence);
 
       let sequence_y;
       if (yParams.param_type === 'demographics') {
@@ -811,22 +811,22 @@ let compileContributionData = function(obsIds, xParams, yParams, envId) {
       let student_index = contrib_data.students.findIndex(function(student) { return student._id === sequence.info.student.studentId });
       contrib_data.students[student_index].contributions.push(sequence.info.parameters);
 
-      console.log('contrib_data.students', contrib_data.students);
-      console.log('sequence.info.student,',sequence.info.student);
-      console.log('sequence.info.parameters,',sequence.info.parameters);
-      console.log('sequence_y,',sequence_y);
-      console.log('sequence_x,',sequence_x);
+      //console.log('contrib_data.students', contrib_data.students);
+      //console.log('sequence.info.student,',sequence.info.student);
+      //console.log('sequence.info.parameters,',sequence.info.parameters);
+      //console.log('sequence_y,',sequence_y);
+      //console.log('sequence_x,',sequence_x);
 
       increaseValueForAxes(contrib_data.y_axis, sequence_y, sequence_x);
       increaseValueForStudent(contrib_data.y_axis, sequence_y, sequence_x, sequence.info.student);
 
     }
   }
-  // console.log('xParams', xParams)
-  // console.log('yParams', yParams)
+  // //console.log('xParams', xParams)
+  // //console.log('yParams', yParams)
 
   // let sequences = ;
-  // console.log('obsIds', obsIds);
+  // //console.log('obsIds', obsIds);
 
 
   // Set up columns
@@ -839,7 +839,7 @@ let compileContributionData = function(obsIds, xParams, yParams, envId) {
     // get values of the column group
     let values = Object.keys(y_item).map(function(key) {if (key !== 'column_name') return y_item[key]}).filter(item => !isNaN(item));
     // total above values
-    // console.log('values', values);
+    // //console.log('values', values);
     let column_n_values = Object.assign({}, y_item);
     delete column_n_values['column_name'];
     delete column_n_values['student_contributions'];
@@ -855,7 +855,7 @@ let compileContributionData = function(obsIds, xParams, yParams, envId) {
   contrib_data.y_axis_n_values = {};
 
   contrib_data.y_axis.forEach(function(y_item) {
-    // console.log('y_item', y_item);
+    // //console.log('y_item', y_item);
     let y_axis_items = Object.assign({}, y_item);
     delete y_axis_items['column_name'];
     delete y_axis_items['student_contributions'];
@@ -901,7 +901,7 @@ let compileContributionData = function(obsIds, xParams, yParams, envId) {
     delete column_values['student_contributions'];
     let equity_ratios = {}
     Object.keys(column_values).forEach(function(key) {
-      // console.log('contrib_data', contrib_data, 'key', key);
+      // //console.log('contrib_data', contrib_data, 'key', key);
 
       let demo_key = (yParams.param_type === 'demographics') ? key : y.column_name;
       // let param_key = (yParams.param_type === 'discourse') ? key: y.column_name;
@@ -911,12 +911,12 @@ let compileContributionData = function(obsIds, xParams, yParams, envId) {
 
       let contrib_axis_n_value = (yParams.param_type === 'demographics') ? contrib_data.x_axis_n_values[y.column_name].n : contrib_data.y_axis_n_values[key];
 
-      console.log('column_values ', column_values);
+      //console.log('column_values ', column_values);
       let percent_of_contribs = (column_values[key] / contrib_axis_n_value);
       if (isNaN(percent_of_contribs)) percent_of_contribs = 0;
 
-      console.log('percent of contribs', percent_of_contribs);
-      console.log('percent_of_demo', percent_of_demo);
+      //console.log('percent of contribs', percent_of_contribs);
+      //console.log('percent_of_demo', percent_of_demo);
       equity_ratios[key] = percent_of_contribs / percent_of_demo
     });
     equity_ratios['column_name'] = y['column_name'];
@@ -926,7 +926,7 @@ let compileContributionData = function(obsIds, xParams, yParams, envId) {
 
   // and we're done
 
-  console.log('contrib_data', contrib_data);
+  //console.log('contrib_data', contrib_data);
 
   return contrib_data;
 }
@@ -968,79 +968,6 @@ let increaseValueForStudent = function(data, y, x, student) {
 //   let title = `${getYAxisSelection().selected_value} <span class="deemphasize">by</span> ${getXAxisSelection().selected_value}`
 //   $('.interactive-report__title').html(title)
 // }
-
-
-class Sidebar {
-  constructor(selector, levels) {
-    this.levels = levels;
-    this.selector = $(selector);
-    this.selector.html(`<div class="panels-flex" style="width: ${Object.keys(levels).length}00%"></div>`);
-    this.container = $('.panels-flex', this.selector);
-    this._currentPanelIndex = 0;
-    this._currentPanelID = levels[0];
-    let panels = {};
-    Object.keys(this.levels).forEach(index => {panels[levels[index]] = {html: '', title: '', id: levels[index], index: index}});
-    this.panels = panels;
-    this.panelChangeTimeout = false;
-    let that = this;
-    Object.keys(this.panels).forEach(function(id) {
-      that.createPanel(that.panels[id])
-    })
-  }
-  setCurrentPanel(panel_id, timeout) {
-    if (this.panelChangeTimeout) {
-      clearTimeout(this.panelChangeTimeout);
-      this.panelChangeTimeout = false;
-    }
-    if (typeof timeout !== 'undefined') {
-      let that = this;
-      this.panelChangeTimeout = setTimeout(function() {
-        that.setCurrentPanel(panel_id)
-      }, timeout);
-      return;
-    }
-    if (panel_id === this._currentPanelID) {
-      // Same panel, no need to move
-      return;
-    }
-    let that = this;
-    Object.keys(this.levels).forEach(function(index) {
-      if (that.levels[index] === panel_id) {
-        that._currentPanelIndex = index
-      }
-    });
-
-    // this.levels.findIndex(val => val === panel_id);
-    this._currentPanelID = panel_id;
-    this.animateToCurrentPanel()
-  }
-  setSlide(panel_id, html, title) {
-    this.panels[panel_id].html = html;
-    this.panels[panel_id].title = title;
-    this.updatePanelContent(this.panels[panel_id]);
-    this.setCurrentPanel(panel_id);
-  }
-  updatePanelContent(panel) {
-    let html = `
-    <div class="panel__interior">
-      <h4 class="panel__title">${panel.title}</h4>
-      <div class="panel__content">${panel.html}</div>
-    </div>
-    `
-    $('.sidebar-panel[data-panel-id="' + panel.id + '"]', this.container).html(html)
-  }
-  createPanel(panel) {
-    let html = `
-    <div class="sidebar-panel" data-panel-id="${panel.id}" style="order: ${panel.index}"></div>
-`;
-    console.log('creating panel', panel, 'html', html);
-    this.container.append(html);
-    this.updatePanelContent(panel);
-  }
-  animateToCurrentPanel() {
-    $('.panels-flex').css('margin-left', `-${this._currentPanelIndex}00%`)
-  }
-}
 
 let updateKey = function(key_wrapper) {
   let y_axis = getYAxisSelection();
@@ -1150,5 +1077,5 @@ let createReport = function(report_wrapper) {
     '<div class="interactive-report__sidebar"></div>' +
     '</div>')
   report_wrapper.append(report_structure);
-  console.log('created report structure');
+  //console.log('created report structure');
 }

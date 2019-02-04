@@ -1,10 +1,13 @@
 import vis from 'vis';
+import {Sidebar} from '../../../helpers/graph_sidebar';
 let d3 = require('d3');
 
 import '/node_modules/vis/dist/vis.min.css';
 import {setupSequenceParameters, setupSubjectParameters} from "../../../helpers/parameters";
 import {getSequences} from "../../../helpers/sequences";
 import {getStudents} from "../../../helpers/students";
+import {convertISODateToUS} from "../../../helpers/dates";
+import {clone_object} from "../../../helpers/objects";
 
 // const envSet = new ReactiveVar(false);
 const obsOptions = new ReactiveVar([]);
@@ -16,8 +19,39 @@ const selectedDiscourseOption = new ReactiveVar(false);
 const selectedDatasetType = new ReactiveVar('equity');
 let timeline;
 
-Template.timelineReportView.helpers({
 
+
+Template.timelineReport.helpers({
+  environments: function() {
+    // //console.log('envs', Environments.find());
+    let envs = Environments.find().fetch();
+    //console.log('envs', envs);
+    // let default_set = false;
+    envs = envs.map(function(env) {
+      let obsOpts = getObsOptions(env._id);
+      //console.log('obs_opts', obsOpts);
+      if (obsOpts.length === 0) {
+        env.envName += ' (no observations)';
+        env.disabled = 'disabled';
+      }
+      else if (obsOpts.length < 2) {
+        env.envName += ' (' + obsOpts.length + ')';
+        env.disabled = 'disabled';
+      }
+      // else if (!default_set) {
+        // default_set = true;
+        // env.default = 'selected';
+      // }
+      return env
+    });
+    return envs;
+  },
+  environmentChosen: function() {
+    return !!(selectedEnvironment.get());
+  },
+  observationChosen: function() {
+    return !!(selectedObservations.get().length >= 2)
+  },
   // discourseDimensions: function() {
   //   return getDiscourseDimensions()
   // },
@@ -45,14 +79,20 @@ Template.timelineReportView.helpers({
     }
   },
   demographics: function() {
-    console.log('getDemographics', getDemographics());
+    //console.log('getDemographics', getDemographics());
     return getDemographics();
   },
   discourseparams: function() {
     return getDiscourseDimensions();
   },
+  demo_available: function() {
+    return !!selectedEnvironment.get() && !!(selectedObservations.get().length >= 2) ? '' : 'disabled'
+  },
+  disc_available: function() {
+    return !!selectedEnvironment.get() && !!(selectedObservations.get().length >= 2) ? '' : 'disabled'
+  },
   disc_options_available: function() {
-    return !!selectedDiscourseDimension.get() ? '' : 'disabled'
+    return !!selectedDiscourseDimension.get() && !!selectedEnvironment.get() && !!(selectedObservations.get().length >= 2) ? '' : 'disabled'
   },
   selected_discourse_options: function() {
     return getDiscourseOptions();
@@ -90,9 +130,9 @@ let getDiscourseOptions = function() {
   if (selected_disc_dim === false) {
     return [];
   }
-  console.log('options', options, 'selected_disc_dim', selected_disc_dim);
+  //console.log('options', options, 'selected_disc_dim', selected_disc_dim);
   let opt = options.find(opt => opt.name === selected_disc_dim);
-  console.log('opt', opt);
+  //console.log('opt', opt);
   return opt
     .options.split(',').map(function(opt) {return {name: opt.trim()}})
 };
@@ -102,7 +142,7 @@ let getDemographicOptions = function() {
   let options = getDemographics();
   let selected_demo = selectedDemographic.get();
   let opt =  options.find(opt => opt.name === selected_demo);
-  console.log('opt', opt);
+  //console.log('opt', opt);
   return opt
     .options.split(',').map(function(opt) {return {name: opt.trim()}})
 };
@@ -120,48 +160,45 @@ let getObservations = function() {
 
 
 Template.timelineReport.events({
-  'click .option--environment': function(e) {
-    let $target = $(e.target);
-    if (!$target.hasClass('selected')) {
-      $('.option--environment').removeClass('selected');
-      $target.addClass('selected');
-    }
-    else {
-      return;
-    }
-    calculateSlidePosition('obs');
+  'change #env-select': function(e) {
 
+    let selected = $('option:selected', e.target);
+    //console.log('env-select,', selected.val());
+    selectedEnvironment.set(selected.val());
+    clearGraph();
+    selectedDiscourseOption.set(false);
     clearObservations();
-    selectedEnvironment.set(getCurrentEnvId());
-    obsOptions.set([]);
     obsOptions.set(getObsOptions());
-    // console.log('obs options get', obsOptions.get());
-    // envSet.set(!!getCurrentEnvId());
     setTimeout(setupVis, 50);
+
+    $('#disc-select').val('');
+    $('#demo-select').val('');
+    $('#disc-opt-select').val('');
   },
   'change #disc-select': function(e) {
     let selected = $('option:selected', e.target);
-    console.log('disc-select,', selected.val());
+    //console.log('disc-select,', selected.val());
     selectedDiscourseDimension.set(selected.val());
     $('#disc-opt-select').val('')
+    clearGraph();
     selectedDiscourseOption.set(false);
-    updateGraph()
+    updateGraph();
   },
   'change #demo-select': function(e) {
     let selected = $('option:selected', e.target);
-    console.log('demo-select,', selected.val());
+    //console.log('demo-select,', selected.val());
     selectedDemographic.set(selected.val());
     updateGraph()
   },
   'change #disc-opt-select': function(e) {
     let selected = $('option:selected', e.target);
-    console.log('disc-opt-select,', selected.val());
+    //console.log('disc-opt-select,', selected.val());
     selectedDiscourseOption.set(selected.val());
     updateGraph()
   },
   'change #dataset-type-select': function(e) {
     let selected = $('option:selected', e.target);
-    console.log('dataset-type-select,', selected.val());
+    //console.log('dataset-type-select,', selected.val());
     selectedDatasetType.set(selected.val());
     updateGraph()
   },
@@ -182,7 +219,27 @@ let createTimelineData = function() {
   let demo_opts = getDemographicOptions();
 
 
-  console.log('creating data for ', obsIds, demo, dimension, option);
+
+  let students_by_demo = demo_opts.map(function(demo_opt) {
+    //console.log('demo_opt', demo_opt);
+    return {
+      name: demo_opt.name,
+      count: 0
+    };
+  });
+
+  allStudents.forEach(function(student) {
+    let demoCountIndex = students_by_demo.findIndex(demoopt => demoopt.name === student.info.demographics[demo])
+    students_by_demo[demoCountIndex].count++;
+  });
+
+  students_by_demo.forEach(function(demographic) {
+    demographic.percent = demographic.count / students_by_demo.reduce((t, d) => d.count + t, 0)
+  });
+
+
+
+  //console.log('creating data for ', obsIds, demo, dimension, option);
   for (let obsId_k in obsIds) {
 
     if (!obsIds.hasOwnProperty(obsId_k)) continue;
@@ -193,20 +250,22 @@ let createTimelineData = function() {
       if (!sequences.hasOwnProperty(sequence_k)) continue;
       let sequence = sequences[sequence_k];
 
-      // console.log('sequence', sequence);
+      // //console.log('sequence', sequence);
 
       if (!ret.contributions_dataset.find(datapoint => datapoint.obsId === obsId)) {
         // If it wasn't there:
         let obsers = getObservations();
-        console.log('getObservations()', obsers);
+        //console.log('getObservations()', obsers);
 
         let obs = obsers.find(obs => obs._id === obsId);
         let parseTime = d3.timeParse('%Y-%m-%d');
-        console.log('ob SEACH', obs);
+        //console.log('ob SEACH', obs);
         let datapoint = {
           obsId: obsId,
           d3date: parseTime(obs.observationDate),
+          obsName: obs.name,
           date: obs.observationDate,
+          studentsByDemo: students_by_demo,
           _total: 0,
         };
 
@@ -231,37 +290,27 @@ let createTimelineData = function() {
 
   ret.equity_dataset = [];
 
-  console.log('allStudents', allStudents);
-
-
-  let students_by_demo = demo_opts.map(function(demo_opt) {
-    console.log('demo_opt', demo_opt);
-    return {
-      name: demo_opt.name,
-      count: 0
-    };
-  });
-
-  allStudents.forEach(function(student) {
-    let demoCountIndex = students_by_demo.findIndex(demoopt => demoopt.name === student.info.demographics[demo])
-    students_by_demo[demoCountIndex].count++;
-  });
-
-  students_by_demo.forEach(function(demographic) {
-    demographic.percent = demographic.count / students_by_demo.reduce((t, d) => d.count + t, 0)
-  });
-
-  console.table(students_by_demo);
+  //console.log('allStudents', allStudents);
 
   ret.equity_dataset = ret.contributions_dataset.map(function(observation) {
+    //console.log('obs', observation)
     let obs_equity = {
       _total: 1,
       obsId: observation.obsId,
+      obsName: observation.obsName,
       d3date: observation.d3date,
       date: observation.date,
+      studentsByDemo: students_by_demo,
+      contribsByDemo: [],
     }
     demo_opts.forEach(function(demo_opt) {
       let percent_of_contribs = observation[demo_opt.name] / observation._total;
+      obs_equity.contribsByDemo.push({
+        name: demo_opt.name,
+        percent: percent_of_contribs,
+        count: observation[demo_opt.name],
+        total: observation._total
+      })
       let percent_of_students = students_by_demo.find(demo => demo.name === demo_opt.name).percent;
       if (percent_of_students === 0) {
         obs_equity[demo_opt.name] = 0;
@@ -273,23 +322,24 @@ let createTimelineData = function() {
     return obs_equity
   })
 
-
-  console.log('contribs dataset');
-  console.table(ret.contributions_dataset);
-  console.log('equity dataset');
-  console.table(ret.equity_dataset);
-
-
   ret.contributions_dataset.forEach(function(obs) {
     obs.max = obs._total;
   });
   ret.equity_dataset.forEach(function(obs) {
     let vals = demo_opts.map(demo_opt => obs[demo_opt.name]);
-    console.log('vals', vals);
+    //console.log('vals', vals);
     obs.max = Math.max.apply(null, vals);
   })
   return ret
 };
+
+let sidebar;
+
+let clearGraph = function() {
+  //console.log('clearing-graph');
+  let timeline_selector = '.timeline-report__graph';
+  $(timeline_selector + ' svg').remove();
+}
 
 let updateGraph = function() {
   let timeline_wrapper = $('.timeline-report-wrapper');
@@ -309,12 +359,22 @@ let updateGraph = function() {
 
   let data = createTimelineData();
   if (!timeline_wrapper.hasClass('timeline-created')) {
+    timeline_wrapper.addClass('timeline-created');
+    let sidebarLevels = {
+      0: 'start',
+      1: 'bar_tooltip',
+    };
+    sidebar = new Sidebar('.timeline-report__sidebar', sidebarLevels);
+    sidebar.setSlide('start', 'Hover a point (or tap on mobile) to see more information', '')
+
     initTimelineGraph(data, timeline_selector)
   }
   else {
     updateTimelineGraph(data, timeline_selector)
   }
 }
+
+
 
 let initTimelineGraph = function(full_data, containerSelector) {
   let data;
@@ -326,12 +386,7 @@ let initTimelineGraph = function(full_data, containerSelector) {
     data = full_data.equity_dataset;
   }
 
-  console.log('data before');
-  console.table(data);
   data = data.sort(function(a, b) {return a.d3date - b.d3date});
-  console.log('data after');
-  console.table(data);
-
 
   svg = $('<svg width="718" height="500">' +
     '<defs>\n' +
@@ -349,7 +404,7 @@ let initTimelineGraph = function(full_data, containerSelector) {
     margin = {top: 30, right: 20, bottom: 40, left: 50},
     width = +svg.attr("width") - margin.left - margin.right,
     height = +svg.attr("height") - margin.top - margin.bottom,
-    g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    g = svg.append("g").attr('class', 'graph-container').attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
   let x = d3.scaleTime()
     .domain(d3.extent(data, d => d.d3date))
@@ -367,17 +422,20 @@ let initTimelineGraph = function(full_data, containerSelector) {
     .x(function(d) { return x(d.d3date)})
     .y(function(d) { return y(d._total)});
 
+
   let lines = demos.map(function(demo) {
     let line = d3.line()
       .x(d => x(d.d3date))
       .y(d => y(d[demo.name]));
-    console.log('demo', demo.name);
+    //console.log('demo', demo.name);
     // let line = d3.line()
     //   .x(function(d) { return x(d.d3date)})
     //   .y(function(d) { return y(d[demo.name])});
 
     return {line: line, demo: demo};
   });
+
+
   //
   // let valLine = d3.line()
   //   .x(function(d) {return x(d.date)})
@@ -386,7 +444,7 @@ let initTimelineGraph = function(full_data, containerSelector) {
 
   g.append('path')
     .data([data])
-    .attr('class', 'line line--totle')
+    .attr('class', 'line line--title')
     .style("stroke-width", 2)
     .attr('d', total_line);
 
@@ -394,27 +452,313 @@ let initTimelineGraph = function(full_data, containerSelector) {
   let z = d3.scaleOrdinal()
     .range(Object.values(key_colors));
 
-  console.log('key_colors', key_colors);
+  updateKey('.timeline-report__graph-key', demos, z)
+
+  //console.log('key_colors', key_colors);
 
   lines.forEach(function(line) {
-    console.log('data is', data);
-    console.log('z(line.demo)', z(line.demo.name), line.demo.name);
+    //console.log('data is', data);
+    //console.log('z(line.demo)', z(line.demo.name), line.demo.name);
+
+
     g.append('path')
       .data([data])
-      .attr('class', 'line')
+      .attr('class', 'line line--demo')
       .style("stroke", z(line.demo.name))
       .style("stroke-width", 2)
       .attr('d', line.line);
+
+    g.append('g')
+      .attr('class', 'dot-container')
+      .selectAll('dot')
+      .data(data)
+      .enter()
+      .append('circle')
+      .attr('r', 3)
+      .attr('class', 'dot')
+      .attr('cx', d => x(d.d3date))
+      .attr('cy', d => y(d[line.demo.name]))
+      .attr('data-demo-name', line.demo.name)
+      .style("fill", z(line.demo.name))
+      .on('mouseover', function(d) {
+        d['line_name'] = line.demo.name;
+        let data = [];
+        let circles = g.selectAll('circle[cx="' + x(d.d3date) + '"][cy="' + y(d[line.demo.name]) + '"]');
+        if (circles.size() > 1) {
+          //console.log('more than one circle');
+          //console.log('d', d);
+          //console.log('this', this);
+          //console.log('circles', circles);
+          circles.each(function(d) {
+            let datum = clone_object(d);
+            datum.line_name = $(this).attr('data-demo-name');
+            data.push(datum)
+          });
+        }
+        else {
+          data = [d];
+        }
+
+        //console.log('abut to use data', data);
+
+        buildBarTooltipSlide(data, z)
+      })
+      .on('mouseout', function() {
+        // sidebar.setCurrentPanel('start', 250)
+      });
+
   });
 
   g.append("g")
     .attr("transform", "translate(0," + height + ")")
+    .attr('class', 'x-axis')
     .call(d3.axisBottom(x));
 
   // Add the Y Axis
   g.append("g")
+    .attr('class', 'y-axis')
     .call(d3.axisLeft(y));
 
+};
+
+
+let updateTimelineGraph = function(full_data, containerSelector) {
+  // console.log('updating timeline graph');
+  initTimelineGraph(full_data, containerSelector)
+  // let data;
+  //
+  // if (selectedDatasetType.get() === 'contributions') {
+  //   data = full_data.contributions_dataset;
+  // }
+  // else {
+  //   data = full_data.equity_dataset;
+  // }
+  //
+  // data = data.sort(function(a, b) {return a.d3date - b.d3date});
+  // //
+  // // svg = $('<svg width="718" height="500">' +
+  // //   '<defs>\n' +
+  // //   '  <style type="text/css">\n' +
+  // //   '    @font-face {\n' +
+  // //   '      font-family: Roboto;\n' +
+  // //   '      @import url(\'https://fonts.googleapis.com/css?family=Roboto:300,400,700\');\n' +
+  // //   '    }\n' +
+  // //   '  </style>\n' +
+  // //   '</defs>' +
+  // //   '</svg>');
+  // // $(containerSelector).html(svg);
+  //
+  // let svg = d3.select(containerSelector + " svg"),
+  //   margin = {top: 30, right: 20, bottom: 40, left: 50},
+  //   width = +svg.attr("width") - margin.left - margin.right,
+  //   height = +svg.attr("height") - margin.top - margin.bottom,
+  //   // g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+  //   g = svg.select("g.graph-container")
+  //
+  // let x = d3.scaleTime()
+  //   .domain(d3.extent(data, d => d.d3date))
+  //   .range([0, width]);
+  //
+  // let y = d3.scaleLinear()
+  //   .domain([0, d3.max(data, d => d.max)])
+  //   .range([height, 0]);
+  //
+  //
+  // // let lines = [];
+  // let demos = getDemographicOptions();
+  //
+  // let total_line = d3.line()
+  //   .x(function(d) { return x(d.d3date)})
+  //   .y(function(d) { return y(d._total)});
+  //
+  //
+  // let lines = demos.map(function(demo) {
+  //   let line = d3.line()
+  //     .x(d => x(d.d3date))
+  //     .y(d => y(d[demo.name]));
+  //   //console.log('demo', demo.name);
+  //   // let line = d3.line()
+  //   //   .x(function(d) { return x(d.d3date)})
+  //   //   .y(function(d) { return y(d[demo.name])});
+  //
+  //   return {line: line, demo: demo};
+  // });
+  //
+  //
+  // //
+  // // let valLine = d3.line()
+  // //   .x(function(d) {return x(d.date)})
+  // //   .y(function(d) {return y(d.value)})
+  //
+  //
+  // g.select('path.line--title')
+  //   .data([data])
+  //   .attr('class', 'line line--title')
+  //   .style("stroke-width", 2)
+  //   .attr('d', total_line);
+  //
+  // let key_colors = getLabelColors(getDemographicOptions().map(demo_opt => demo_opt.name));
+  // let z = d3.scaleOrdinal()
+  //   .range(Object.values(key_colors));
+  //
+  // updateKey('.timeline-report__graph-key', demos, z)
+  //
+  // //console.log('key_colors', key_colors);
+  //
+  // lines.forEach(function(line) {
+  //   //console.log('data is', data);
+  //   //console.log('z(line.demo)', z(line.demo.name), line.demo.name);
+  //
+  //
+  //   let d3line = g.selectAll('path.line--demo')
+  //     .data([data]);
+  //
+  //   d3line.enter()
+  //     .append('path')
+  //     .attr('class', 'line line--demo')
+  //     .style("stroke", z(line.demo.name))
+  //     .style("stroke-width", 2)
+  //     .attr('d', line.line)
+  //     .merge(d3line)
+  //     .transition()
+  //     .duration(500)
+  //     .attr('d', line.line)
+  //
+  //   g.selectAll('dot')
+  //     .data(data)
+  //     .enter()
+  //     .transition()
+  //     // .append('circle')
+  //     .attr('r', 3)
+  //     .attr('class', 'dot')
+  //     .attr('cx', d => x(d.d3date))
+  //     .attr('cy', d => y(d[line.demo.name]))
+  //     .attr('data-demo-name', line.demo.name)
+  //     .style("fill", z(line.demo.name))
+  //     .on('mouseover', function(d) {
+  //       d['line_name'] = line.demo.name;
+  //       let data = [];
+  //       let circles = g.selectAll('circle[cx="' + x(d.d3date) + '"][cy="' + y(d[line.demo.name]) + '"]');
+  //       if (circles.size() > 1) {
+  //         //console.log('more than one circle');
+  //         //console.log('d', d);
+  //         //console.log('this', this);
+  //         //console.log('circles', circles);
+  //         circles.each(function(d) {
+  //           let datum = clone_object(d);
+  //           datum.line_name = $(this).attr('data-demo-name');
+  //           data.push(datum)
+  //         });
+  //       }
+  //       else {
+  //         data = [d];
+  //       }
+  //
+  //       //console.log('abut to use data', data);
+  //
+  //       buildBarTooltipSlide(data, z)
+  //     })
+  //     .on('mouseout', function() {
+  //       // sidebar.setCurrentPanel('start', 250)
+  //     });
+  //
+  // });
+  //
+  // g.select("g.x-axis")
+  //   .transition()
+  //   .attr("transform", "translate(0," + height + ")")
+  //   .call(d3.axisBottom(x));
+  //
+  // // Add the Y Axis
+  // g.select("g.y-axis")
+  //   .transition()
+  //   .call(d3.axisLeft(y));
+
+};
+
+let updateKey = function(key_wrapper, y_values, color_axis) {
+  let key_chunks = y_values.map(function(label) {
+    let color = color_axis(label.name)
+    return `<span class="key--label"><span class="key--color" style="background-color: ${color}"></span><span class="key--text">${label.name}</span></span>`
+  })
+
+  let html = `${key_chunks.join('')}`;
+  $(key_wrapper).html(html)
+}
+
+let buildBarTooltipSlide = function(data, demo_color_axis) {
+  let title = '',
+    html = '';
+
+  if (data.length > 1) {
+    title = 'Multiple datapoints'
+  } else {
+    title = `${data[0].obsName} </br> ${convertISODateToUS(data[0].date)}`;
+  }
+
+  //console.log('buidling sidebar, ', data);
+  if (selectedDatasetType.get() === 'contributions') {
+    html = data.map(function(datum) {
+      let ret = '';
+      if (data.length > 1) {
+          ret += `<h4 class="panel-section__title">${datum.obsName} </br> ${convertISODateToUS(datum.date)}</h4>`
+      }
+      ret += `
+    <div class="stat-group">
+      <div class="stat-leadin">By students in the demographic "${datum.line_name}" <span class="key--color" style="background-color: ${demo_color_axis(datum.line_name)}"></div>
+    </div>
+    <div class="stat-group stat-group--vert-centered">
+      <div class="stat-leadin">Contributions</div>
+      <div class="stat stat--large-value">${datum[datum.line_name]}</div>
+    </div>
+    <div class="stat stat--double">
+      <div class="stat-separator stat-separator--small">of</div>
+      <div class="stat-group stat-group--vert-centered">
+        <div class="stat stat--val stat--percent">${datum._total}</div>
+        <div class="stat-leadin">total contribs</div>
+      </div>
+      <div class="stat-separator stat-separator--small">by</div>
+      <div class="stat-group stat-group--vert-centered">
+        <div class="stat stat--val stat--percent">${(datum.studentsByDemo.find(d => d.name === datum.line_name).percent * 100).toFixed(2)}%</div>
+        <div class="stat-leadin">of all students</div>
+      </div>
+    </div>
+  `;
+      return ret;
+    }).join('');
+  }
+  else {
+    html = data.map(function(datum) {
+      let ret = '';
+      if (data.length > 1) {
+        ret += `<h4 class="panel-section__title">${datum.obsName} </br> ${convertISODateToUS(datum.date)}</h4>`
+      }
+      ret += `
+        <div class="stat-group">
+        <div class="stat-leadin">By students in the demographic "${datum.line_name}" <span class="key--color" style="background-color: ${demo_color_axis(datum.line_name)}"></span></div>
+      </div>
+      <div class="stat-group stat-group--vert-centered">
+        <div class="stat-leadin">Equity ratio</div>
+      <div class="stat stat--large-value">${(datum[datum.line_name]).toFixed(2)}</div>
+        </div>
+        <div class="stat stat--double">
+        <div class="stat-group stat-group--vert-centered">
+        <div class="stat stat--val stat--percent">${(datum.contribsByDemo.find(d => d.name === datum.line_name).percent * 100).toFixed(2)}%</div>
+        <div class="stat-leadin">of all contribs</div>
+      </div>
+      <div class="stat-separator">/</div>
+        <div class="stat-group stat-group--vert-centered">
+        <div class="stat stat--val stat--percent">${(datum.studentsByDemo.find(d => d.name === datum.line_name).percent * 100).toFixed(2)}%</div>
+        <div class="stat-leadin">of all students</div>
+      </div>
+      </div>
+        `;
+      return ret;
+    }).join('');
+  }
+
+
+  sidebar.setSlide('bar_tooltip', html, title)
 };
 
 
@@ -470,53 +814,35 @@ let getLabelColors = function(labels) {
 }
 
 
-let updateTimelineGraph = function(data, containerSelector) {
-  initTimelineGraph(data, containerSelector)
-};
-
-
-Template.timelineReport.helpers({
-  environments: function() {
-    console.log('envs', Environments.find());
-    return Environments.find();
-  },
-  environmentChosen: function() {
-    return !!(selectedEnvironment.get());
-  },
-  observations: function() {
-    return obsOptions.get()
-  },
-  observationChosen: function() {
-    return !!(selectedObservations.get().length >= 2)
-  }
-})
-
 let setupVis = function() {
   let observations = obsOptions.get();
-  console.log('observations', observations);
+  // //console.log('observations', observations);
   let items = new vis.DataSet(observations.map(function(obs) {
+    //console.log('obse', obs);
     return {
       id: obs._id,
       content: obs.name + '<br/>(' + obs.observationDate + ')',
       start: obs.observationDate,
+      className: getSequences(obs._id, obs.envId).length < 1 ? 'disabled' : ''
     }
   }));
   let container = document.getElementById('vis-container');
+  $(container).html('');
   let options = {
     multiselect: true
   }
   timeline = new vis.Timeline(container, items, options)
-  // console.log('timeline', timeline);
   timeline.on('select', function(props) {
-    // console.log('selected items', props.items, 'props', props);
     selectedObservations.set(props.items);
     updateGraph();
   });
   return timeline
 }
 
-let getObsOptions = function() {
-  let envId = getCurrentEnvId();
+let getObsOptions = function(envId) {
+  if (typeof envId === 'undefined') {
+    envId = selectedEnvironment.get();
+  }
   if (!!envId) {
     let obs = Observations.find({envId: envId}).fetch();
     return obs;
@@ -544,11 +870,11 @@ const possibleSlides = {
 const lastSlide = new ReactiveVar('env');
 
 let calculateSlidePosition = function(section) {
-  console.log('calculateSlidePosition, going to slide', section);
+  //console.log('calculateSlidePosition, going to slide', section);
   lastSlide.set(section);
   let slideSettings = possibleSlides[lastSlide.get()];
   let prevSlides = Object.keys(possibleSlides).filter(item => possibleSlides[item].pos < slideSettings.pos);
-  console.log('prevsliders', prevSlides);
+  //console.log('prevsliders', prevSlides);
 
   let heights = prevSlides.map(prevSlide => $('.report-section[data-slide-id="' + prevSlide +'"]').height() + 40); // 40px margin
   let aboveItemsHeight = heights.reduce((a, b) => a + b, 0);  // sum
@@ -558,7 +884,7 @@ let calculateSlidePosition = function(section) {
 }
 
 let clearObservations = function() {
-  console.log('TODO: CLEAN OBSERVATIONS');
+  //console.log('TODO: CLEAN OBSERVATIONS');
   clearParameters();
   selectedObservations.set([]);
   $('.option--observation').removeClass('selected');
@@ -566,15 +892,15 @@ let clearObservations = function() {
 };
 
 let clearParameters = function() {
-  console.log('TODO: CLEAN PARAMS')
+  //console.log('TODO: CLEAN PARAMS')
 };
 
-let getCurrentEnvId = function() {
-  let selected = $(".option--environment.selected");
-  if (selected.length !== 0) {
-    return selected.attr('data-env-id');
-  }
-  else {
-    return false
-  }
-};
+// let getCurrentEnvId = function() {
+//   let selected = $(".option--environment.selected");
+//   if (selected.length !== 0) {
+//     return selected.attr('data-env-id');
+//   }
+//   else {
+//     return false
+//   }
+// };

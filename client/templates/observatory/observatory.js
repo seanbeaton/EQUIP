@@ -8,6 +8,7 @@ var lastChoices = {};
 
 import * as observation_helpers from '/client/helpers/observations.js'
 import {updateStudent, updateStudents} from '/client/helpers/students.js'
+import {convertISODateToUS} from '/client/helpers/dates.js'
 
 
 Template.observatory.created = function() {
@@ -123,16 +124,7 @@ Template.observatory.helpers({
     return Subjects.find({envId: this.envId});
   },
   convertISODateToUS: function(isoDate) {
-    let date = new Date(Date.parse(isoDate));
-    function pad(number) {
-      if (number < 10) {
-        return '0' + number;
-      }
-      return number;
-    }
-    return pad(date.getMonth() + 1) +
-      '/' + pad(date.getDate()) +
-      '/' + date.getFullYear();
+    return convertISODateToUS(isoDate);
   }
 });
 
