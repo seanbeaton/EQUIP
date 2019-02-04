@@ -160,33 +160,33 @@ div {
   display: flex;
   flex-flow: column nowrap;
 }
-
-.swappable {
-  &:not(.swapped) {
-    .select__wrapper:first-child {
-      .explanation-text__bar {
-        display: none;
-      }
-    }
-    .select__wrapper:last-child {
-      .explanation-text__group {
-        display: none;
-      }
-    }
-  }
-  &.swapped {
-    .select__wrapper:first-child {
-      .explanation-text__group {
-        display: none;
-      }
-    }
-    .select__wrapper:last-child {
-      .explanation-text__bar {
-        display: none;
-      }
-    }
-  }
-}
+//
+//.swappable {
+//  &:not(.swapped) {
+//    .select__wrapper:first-child {
+//      .explanation-text__bar {
+//        display: none;
+//      }
+//    }
+//    .select__wrapper:last-child {
+//      .explanation-text__group {
+//        display: none;
+//      }
+//    }
+//  }
+//  &.swapped {
+//    .select__wrapper:first-child {
+//      .explanation-text__group {
+//        display: none;
+//      }
+//    }
+//    .select__wrapper:last-child {
+//      .explanation-text__bar {
+//        display: none;
+//      }
+//    }
+//  }
+//}
 
 
 .report-section-wrapper__prev-section-button {

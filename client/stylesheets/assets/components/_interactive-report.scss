@@ -6,7 +6,7 @@
   }
 
   grid-template-columns: 50px auto 250px;
-  grid-template-rows: 40px 500px;
+  grid-template-rows: 50px 500px;
 }
 
 .interactive-report {
@@ -237,8 +237,8 @@ $light-grid-color: #ddd;
   align-items: center;
   select {
     display: inline-block;
-    height: 29px;
-    font-size: 17px;
+    height: 35px;
+    font-size: 20px;
     background: transparent;
     border: none;
   }
@@ -275,8 +275,8 @@ $light-grid-color: #ddd;
   background-color: rgba(15,129,204,0.05)
 }
 
-$demo-color: #332091;
-$disc-color: #921370;
+$demo-color: #915727;
+$disc-color: #a607ce;
 
 .demographics-color {
   color: $demo-color;

@@ -14,13 +14,12 @@ Template.interactiveReport.rendered = function() {
     // 'environments':
 }
 
-const envSet = new ReactiveVar(false);
 const obsOptions = new ReactiveVar([]);
 const selectedEnvironment = new ReactiveVar(false);
 const selectedObservations = new ReactiveVar([]);
 const selectedXParameter = new ReactiveVar(false);
 const selectedYParameter = new ReactiveVar(false);
-const graphType = new ReactiveVar('equity');
+const selectedDatasetType = new ReactiveVar('equity');
 
 const possibleSlides = {
   env: {
@@ -57,9 +56,31 @@ let calculateSlidePosition = function(section) {
 
 
 Template.interactiveReport.helpers({
-    environments: function() {
-        return Environments.find();
-    },
+    // environments: function() {
+    //     return Environments.find();
+    // },
+  environments: function() {
+    let envs = Environments.find().fetch();
+    // let default_set = false;
+    envs = envs.map(function(env) {
+      let obsOpts = getObsOptions(env._id);
+      //console.log('obs_opts', obsOpts);
+      if (obsOpts.length === 0) {
+        env.envName += ' (no observations)';
+        env.disabled = 'disabled';
+      }
+      else if (obsOpts.length < 2) {
+        env.envName += ' (' + obsOpts.length + ')';
+        env.disabled = 'disabled';
+      }
+      // else if (!default_set) {
+      // default_set = true;
+      // env.default = 'selected';
+      // }
+      return env
+    });
+    return envs;
+  },
     environmentChosen: function() {
         return !!(selectedEnvironment.get());
     },
@@ -83,13 +104,52 @@ Template.interactiveReport.helpers({
         // //console.log('observationChosen', obsOptions.get(), !!(obsOptions.get()));
 
         return !!(selectedObservations.get().length)
-    }
+    },
+  demographics: function() {
+    //console.log('getDemographics', getDemographics());
+    return getDemographics();
+  },
+  discourseparams: function() {
+    return getDiscourseDimensions();
+  },
+  demo_available: function() {
+    return !!selectedEnvironment.get() && !!(selectedObservations.get().length >= 1) ? '' : 'disabled'
+  },
+  disc_available: function() {
+    return !!selectedEnvironment.get() && !!(selectedObservations.get().length >= 1) ? '' : 'disabled'
+  },
+  dataset_types: function() {
+    return [
+      {
+        id: 'equity',
+        name: 'Equity Ratio',
+        default: 'default'
+      },
+      {
+        id: 'contributions',
+        name: 'Contributions',
+        default: ''
+      }
+    ]
+  },
+  selectedDatasetType: function() {
+    return selectedDatasetType.get();
+  }
 });
+
+
+let clearGraph = function() {
+  //console.log('clearing-graph');
+  let timeline_selector = '.interactive-report__graph';
+  $(timeline_selector + ' svg').remove();
+}
+
 
 var clearObservations = function() {
   clearParameters();
   selectedObservations.set([]);
   $('.option--observation').removeClass('selected');
+  clearGraph();
 
 };
 
@@ -118,30 +178,44 @@ Template.interactiveReport.events({
 
     calculateSlidePosition(possibleSlides[prevSlide[0]].show);
   },
-    'click .option--environment': function(e) {
-      let $target = $(e.target);
-        if (!$target.hasClass('selected')) {
-            $('.option--environment').removeClass('selected');
-            $target.addClass('selected');
-        }
-        else {
-          return;
-        }
-      calculateSlidePosition('obs');
+    // 'click .option--environment': function(e) {
+    //   let $target = $(e.target);
+    //     if (!$target.hasClass('selected')) {
+    //         $('.option--environment').removeClass('selected');
+    //         $target.addClass('selected');
+    //     }
+    //     else {
+    //       return;
+    //     }
+    //   calculateSlidePosition('obs');
+    //
+    //   clearObservations();
+    //     envSet.set(false);
+    //     envSet.set(true);
+    //     selectedEnvironment.set(getCurrentEnvId());
+    //     obsOptions.set([]);
+    //     obsOptions.set(getObsOptions());
+    //     // //console.log('obs options get', obsOptions.get());
+    //     envSet.set(!!getCurrentEnvId());
+    //
+    // },
+  'change #env-select': function(e) {
 
-      clearObservations();
-        envSet.set(false);
-        envSet.set(true);
-        selectedEnvironment.set(getCurrentEnvId());
-        obsOptions.set([]);
-        obsOptions.set(getObsOptions());
-        // //console.log('obs options get', obsOptions.get());
-        envSet.set(!!getCurrentEnvId());
+    let selected = $('option:selected', e.target);
+    //console.log('env-select,', selected.val());
+    selectedEnvironment.set(selected.val());
+    clearGraph();
+    clearObservations();
+    obsOptions.set(getObsOptions());
 
-    },
+    $('#disc-select').val('');
+    $('#demo-select').val('');
+    $('#disc-opt-select').val('');
+  },
     'click .option--all-observations': function(e) {
       selectedObservations.set([])
       $('.option--observation').removeClass('selected').click()
+
     },
     'click .option--observation': function(e) {
       calculateSlidePosition('obs');
@@ -170,81 +244,17 @@ Template.interactiveReport.events({
       updateReport();
       // setTimeout(function(){$(window).trigger('updated-filters')}, 100) // We're also forcing a graph update when you select new observations, not just changing params
     },
-    'change .toggle--graph-type': function(e) {
-      graphType.set($('.toggle--graph-type option:selected').val());
-
-      $('.interactive-report__graph').attr('data-graph-type', graphType.get());
-      $(window).trigger('updated-filters') // We're also forcing a graph update when you select new observations, not just changing params
-    },
-  // 'click .option--demographic': function(e) {
-  //   let $target = $(e.target);
-  //   if (!$target.hasClass('selected')) {
-  //     $('.option--demographic').removeClass('selected');
-  //     $target.addClass('selected');
-  //   }
-  //
-  //   selectedXParameter.set(getXAxisSelection());
-  //   selectedYParameter.set(getYAxisSelection());
-  //   $(window).trigger('updated-filters')
-  // },
-  // 'click .option--discourse': function(e) {
-  //   let $target = $(e.target);
-  //   if (!$target.hasClass('selected')) {
-  //     $('.option--discourse').removeClass('selected');
-  //     $target.addClass('selected');
-  //   }
-  //
-  //   selectedXParameter.set(getXAxisSelection());
-  //   selectedYParameter.set(getYAxisSelection());
-  //   $(window).trigger('updated-filters')
-  // },
-  // 'click .swappable__button': function(e) {
-  //   //console.log('click');
-  //   let $target = $(e.target);
-  //   $target.parents('.swappable').toggleClass('swapped');
-  //
-  //   $(window).trigger('updated-filters');
-  // },
-});
-
-
-
-Template.interactiveReportView.rendered = function() {
-  // show different report options
-}
-
-Template.interactiveReportView.events({
-  'change .param-select-form-item': function(e) {
+  'change #dataset-type-select': function(e) {
+    let selected = $('option:selected', e.target);
+    selectedDatasetType.set(selected.val());
+    $(window).trigger('updated-filters') // We're also forcing a graph update when you select new observations, not just changing params
+  },
+  'change .select__wrapper select': function(e) {
     calculateSlidePosition('params');
     selectedXParameter.set(getXAxisSelection());
     selectedYParameter.set(getYAxisSelection());
     $(window).trigger('updated-filters')
   },
-  // 'click .option--demographic': function(e) {
-  //   calculateSlidePosition('params');
-  //
-  //   // let $target = $(e.target);
-  //   // if (!$target.hasClass('selected')) {
-  //   //   $('.option--demographic').removeClass('selected');
-  //   //   $target.addClass('selected');
-  //   // }
-  //
-  //   selectedXParameter.set(getXAxisSelection());
-  //   selectedYParameter.set(getYAxisSelection());
-  //   $(window).trigger('updated-filters')
-  // },
-  // 'click .option--discourse': function(e) {
-  //   // calculateSlidePosition('params');
-  //   let $target = $(e.target);
-  //   // if (!$target.hasClass('selected')) {
-  //   //   $('.option--discourse').removeClass('selected');
-  //   //   $target.addClass('selected');
-  //   // }
-  //
-  //   selectedXParameter.set(getXAxisSelection());
-  //   selectedYParameter.set(getYAxisSelection());
-  //   $(window).trigger('updated-filters')
-  // },
   'click .swappable__button': function(e) {
     calculateSlidePosition('params');
     let $target = $(e.target);
@@ -257,30 +267,31 @@ Template.interactiveReportView.events({
     selectedYParameter.set(getYAxisSelection());
     $(window).trigger('updated-filters');
   },
-})
+});
 
 
-
-let getObsOptions = function() {
-    let envId = getCurrentEnvId();
-    if (!!envId) {
-        let obs = Observations.find({envId: envId}).fetch();
-        return obs;
-    }
-    else {
-        return false;
-    }
+let getObsOptions = function(envId) {
+  if (typeof envId === 'undefined') {
+    envId = selectedEnvironment.get();
+  }
+  if (!!envId) {
+    let obs = Observations.find({envId: envId}).fetch();
+    return obs;
+  }
+  else {
+    return false;
+  }
 }
 
-let getCurrentEnvId = function() {
-    let selected = $(".option--environment.selected");
-    if (selected.length !== 0) {
-        return selected.attr('data-env-id');
-    }
-    else {
-        return false
-    }
-}
+// let getCurrentEnvId = function() {
+//     let selected = $(".option--environment.selected");
+//     if (selected.length !== 0) {
+//         return selected.attr('data-env-id');
+//     }
+//     else {
+//         return false
+//     }
+// }
 
 
 let getDemographics = function() {
@@ -303,38 +314,38 @@ let getObservations = function() {
   return Observations.find({_id: {$in: obsIds}}).fetch();
 }
 
-
-Template.interactiveReportView.helpers({
-  isSelectedIndex: function(index) {
-    return parseInt(index) === 0;
-  },
-  discourseDimensions: function() {
-    return getDiscourseDimensions()
-  },
-  demographics: function() {
-    return getDemographics()
-  },
-  environment: function() {
-    return getEnvironment();
-  },
-  observations: function() {
-    return getObservations();
-  },
-  observationNames: function() {
-    let observations = getObservations();
-    let obsNames = observations.map(obs => obs.name);
-
-    if (obsNames.length >= 3) {
-      return obsNames.slice(0,-1).join(', ') + ', and ' + obsNames[obsNames.length - 1]
-    }
-    else if (obsNames.length === 2) {
-      return obsNames.join(' and ');
-    }
-    else {
-      return obsNames[0]
-    }
-  }
-});
+//
+// Template.interactiveReportView.helpers({
+//   isSelectedIndex: function(index) {
+//     return parseInt(index) === 0;
+//   },
+//   discourseDimensions: function() {
+//     return getDiscourseDimensions()
+//   },
+//   demographics: function() {
+//     return getDemographics()
+//   },
+//   environment: function() {
+//     return getEnvironment();
+//   },
+//   observations: function() {
+//     return getObservations();
+//   },
+//   observationNames: function() {
+//     let observations = getObservations();
+//     let obsNames = observations.map(obs => obs.name);
+//
+//     if (obsNames.length >= 3) {
+//       return obsNames.slice(0,-1).join(', ') + ', and ' + obsNames[obsNames.length - 1]
+//     }
+//     else if (obsNames.length === 2) {
+//       return obsNames.join(' and ');
+//     }
+//     else {
+//       return obsNames[0]
+//     }
+//   }
+// });
 
 var d3 = require('d3');
 
@@ -383,18 +394,22 @@ let getAxisSelection = function(axis) {
   else {
     select_list = $swappable.find('.select__wrapper:last-child select');
   }
-  // let select_list = $('select', param_wrapper);
+  console.log('select', select_list);
   let selected = $('option:selected', select_list);
+  console.log('selected val', selected);
 
   if (!selected.val()) {
-    //console.log('nothing selected for', axis, 'axis');
-    return {};
+    console.log('nothing selected for', axis, 'axis');
+    return false;
   }
 
   let selected_value = selected.val();
   let param_type = select_list.attr('data-param-type');
   let options = getParamOptions(param_type);
+  console.log('options', options)
   let selected_option = options.filter(opt => opt.name === selected_value)[0];
+  console.log('selected_option', selected_option)
+
   selected_option.option_list = selected_option.options.split(',').map(function(i) {return i.trim()})
 
   let ret = {
@@ -434,13 +449,20 @@ let sidebar;
 let updateReport = function() {
 
   let report_wrapper = $('.interactive-report-wrapper');
-  if (report_wrapper.length === 0) {
-    setTimeout(updateReport, 50);
+  console.log('getXAxisSelection', getXAxisSelection());
+  console.log('getYAxisSelection', getYAxisSelection());
+  if (!getXAxisSelection() || !getYAxisSelection()) {
     return;
   }
+
+  if (selectedObservations.get().length < 1) {
+    clearGraph();
+    return;
+  }
+
   report_wrapper.removeClass('inactive');
-  if ($('.interactive-report', report_wrapper).length === 0) {
-    createReport(report_wrapper);
+  if (!report_wrapper.hasClass('timeline-created')) {
+    report_wrapper.addClass('timeline-created');
     let sidebarLevels = {
       0: 'start',
       1: 'bar_tooltip',
@@ -470,12 +492,23 @@ let updateGraph = function() {
   let contribData = compileContributionData(obsIds, xParams, yParams, envId);
 
   // options are 'contributions' or 'equity'
-  createGraph(contribData, '.interactive-report__graph', graphType.get())
+  createGraph(contribData, '.interactive-report__graph', selectedDatasetType.get())
 
 
 };
 
 let createGraph = function(contribData, containerSelector, dataset) {
+  let data,
+    y_label = '';
+  if (selectedDatasetType.get() === 'contributions') {
+    data = contribData.y_axis;
+    y_label = "Contributions";
+  }
+  else {
+    data = contribData.equity_ratio_data;
+    y_label = "Equity Ratio";
+  }
+
   svg = $('<svg width="718" height="540">' +
     '<defs>\n' +
     '  <style type="text/css">\n' +
@@ -504,16 +537,6 @@ let createGraph = function(contribData, containerSelector, dataset) {
   var y = d3.scaleLinear()
     .rangeRound([height, 0]);
 
-  // choose which data we're using, equity ratios or absolute contrib values:
-  let y_label = '';
-  if (dataset === 'contributions') {
-    data = contribData.y_axis;
-    y_label = "Contributions";
-
-  } else {
-    data = contribData.equity_ratio_data;
-    y_label = "Equity Ratio";
-  }
   // var keys = data.column_keys.slice(1);
   var keys = contribData.column_keys;
 
@@ -556,7 +579,30 @@ let createGraph = function(contribData, containerSelector, dataset) {
         sidebar.setCurrentPanel('start', 250)
       // hover out
 
-    });
+    })
+    // text labels for 0s
+
+  g.selectAll('g.bar-group')
+    .selectAll('text')
+    .data(function(d) { return keys.map(function(key) { return {key: key, value: d[key]}; }); })
+    .enter()
+    .append('text')
+    .text(function(d) {
+      if (d.value === 0) {
+        return '0';
+      }
+    })
+    .attr("text-anchor", "middle")
+    .attr("x", function(d) {
+      console.log('x, d', d);
+      return x1(d.key) + x1.bandwidth() / 2;
+    })
+    .attr("y", function(d) {
+      return y(d.value) - 6;
+    })
+    .attr("font-family", "sans-serif")
+    .attr("font-size", "16px")
+    .attr("fill", "black");
 
   let xAxis = d3.axisBottom(x0)
     .tickFormat(function(d, i) {
@@ -582,6 +628,12 @@ let createGraph = function(contribData, containerSelector, dataset) {
         tick_text.append('tspan').attr('x', 0).attr('y', y).attr('dy', dy + 'em').text(rows[1]);
         tick_text.append('tspan').attr('x', 0).attr('y', y).attr('dy', dy + 1.1 + 'em').text(rows[2]);
       });
+      text.each(function() {
+        let tick = d3.select(this)
+        if ($(this).width()) {
+
+        }
+      })
     });
 
   let y_a;
@@ -625,7 +677,7 @@ let createGraph = function(contribData, containerSelector, dataset) {
     }
   };
 
-  if (graphType.get() === 'equity') {
+  if (selectedDatasetType.get() === 'equity') {
     let center_line = $('.axis--y g').filter((idx, item) => parseFloat($('text', item).text()) === 1.);
     toggleTickDirection($('line', center_line[0]));
     $(center_line[0]).on('click', function(tick) {
@@ -971,6 +1023,7 @@ let increaseValueForStudent = function(data, y, x, student) {
 
 let updateKey = function(key_wrapper) {
   let y_axis = getYAxisSelection();
+  console.log('y axis', y_axis);
   let label_colors = getLabelColors(y_axis.selected_option.option_list);
   let key_chunks = Object.keys(label_colors).map(function(label) {
     let color = label_colors[label]
@@ -1034,48 +1087,40 @@ let getLabelColors = function(labels) {
   });
   return label_colors
 }
-
-let createReport = function(report_wrapper) {
-  let disc_select = '<select class="param-select-form-item discourse-color" name="parameter-select" data-param-type="discourse">' +
-    getDiscourseDimensions().map(function(disc) {
-      return `<option value="${disc.name}">${disc.name}</option>`
-    }).join('')
-    + '</select>';
-  let demo_select = '<select class="param-select-form-item demographics-color" name="demographic-select" data-param-type="demographics">' +
-    getDemographics().map(function(demo) {
-      return `<option value="${demo.name}">${demo.name}</option>`
-    }).join('')
-    + '</select>';
-
-
-  let report_structure = $('<div class="interactive-report">' +
-    '<div class="interactive-report__top-left"></div>' +
-    '<div class="interactive-report__y-scale"></div>' +
-    '<div class="interactive-report__title">' +
-      '<div class="y-axis-label">' +
-      '<div class="select__wrapper select__wrapper--graph-type">' +
-      '<span class="explanation-text">Y axis</span>' +
-      '<select class="toggle--graph-type">' +
-        '<option value="equity" ' + ((graphType.get() === 'equity') ? "selected" : "") + '>Equity Ratio</option>' +
-        '<option value="contributions" ' + ((graphType.get() === 'contributions') ? "selected" : "") + '>Contributions</option>' +
-      '</select>' +
-      '</div><span class="x-y-separator">|</span>' +
-      '</div>' +
-      '<div class="x-axis-label param-selector-wrapper swappable">' +
-
-      '<div class="select__wrapper select__wrapper--demo"><span class="explanation-text"><span class="explanation-text__group">X axis (groups)</span><span class="explanation-text__bar">X axis (bars)</span></span>' + demo_select + '</div>' +
-      '<span class="center_text"><span class="swappable__button"><i class="fas fa-exchange-alt"></i></span></span>' +
-    '<div class="select__wrapper select__wrapper--disc"><span class="explanation-text"><span class="explanation-text__group">X axis (groups)</span><span class="explanation-text__bar">X axis (bars)</span></span>' + disc_select + '</div>' +
-
-    // disc_select +
-
-      '</div>' +
-    '</div>' +
-    // '<div class="interactive-report__graph-type">Showing: <span class="graph-type-toggle-wrapper"><span class="toggle--graph-type" data-graph-type="' + graphType.get() + '">Equity Ratio</span> <span class="change-graph-type-link">Change</span></span></div>' +
-    '<div class="interactive-report__graph" data-graph-type="' + graphType.get() + '"></div>' +
-    '<div class="interactive-report__graph-key"></div>' +
-    '<div class="interactive-report__sidebar"></div>' +
-    '</div>')
-  report_wrapper.append(report_structure);
-  //console.log('created report structure');
-}
+//
+// let createReport = function(report_wrapper) {
+//   let disc_select = '<select class="param-select-form-item" name="parameter-select" data-param-type="discourse">' +
+//     getDiscourseDimensions().map(function(disc) {
+//       return `<option value="${disc.name}">${disc.name}</option>`
+//     }).join('')
+//     + '</select>';
+//   let demo_select = '<select class="param-select-form-item" name="demographic-select" data-param-type="demographics">' +
+//     getDemographics().map(function(demo) {
+//       return `<option value="${demo.name}">${demo.name}</option>`
+//     }).join('')
+//     + '</select>';
+//
+//
+//   let report_structure = $('<div class="interactive-report">' +
+//     '<div class="interactive-report__top-left"></div>' +
+//     '<div class="interactive-report__y-scale"></div>' +
+//     '<div class="interactive-report__title">' +
+//
+//       '<div class="x-axis-label param-selector-wrapper swappable">' +
+//
+//       '<div class="select__wrapper select__wrapper--demo"><span class="explanation-text demographics-color">Demographic</span>' + demo_select + '</div>' +
+//       '<span class="center_text"><span class="swappable__button"><i class="fas fa-exchange-alt"></i></span></span>' +
+//     '<div class="select__wrapper select__wrapper--disc"><span class="explanation-text discourse-color">Discourse Dimension</span>' + disc_select + '</div>' +
+//
+//     // disc_select +
+//
+//       '</div>' +
+//     '</div>' +
+//     // '<div class="interactive-report__graph-type">Showing: <span class="graph-type-toggle-wrapper"><span class="toggle--graph-type" data-graph-type="' + selectedDatasetType.get() + '">Equity Ratio</span> <span class="change-graph-type-link">Change</span></span></div>' +
+//     '<div class="interactive-report__graph" data-graph-type="' + selectedDatasetType.get() + '"></div>' +
+//     '<div class="interactive-report__graph-key"></div>' +
+//     '<div class="interactive-report__sidebar"></div>' +
+//     '</div>')
+//   report_wrapper.append(report_structure);
+//   //console.log('created report structure');
+// }

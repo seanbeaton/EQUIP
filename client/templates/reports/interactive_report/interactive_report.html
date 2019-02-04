@@ -10,42 +10,78 @@
     <div class="report-section-wrapper__slide-track">
         <div class="report-section-wrapper__slide">
 
-    <!-- HTML for displaying graphics (hidden at first) -->
-    <section data-slide-id="env" class="report-section report-section--select report-section--select--env">
-        <h2>Which classroom do you want to explore?</h2>
-        <div class="report-select__options report-select__options--environments">
-            {{#each environments }}
-                {{> envButton }}
+    <section data-slide-id="params" class="report-section report-section--select">
+        <h3>
+            {{#if environmentChosen }}Exploring <span class="dataset-type-select-inline">
+            <select id="dataset-type-select" class="dataset">
+                {{#each dataset_types}}
+                    <option {{default}} value="{{id}}">{{name}}</option>
+                {{/each}}
+            </select>
+        </span> analytics for
+            {{else}}
+                Which classroom do you want to explore?<br/>
+            {{/if}}
+            <div class="environment-select">
+                <select id="env-select" class="env-select">
+                    <option disabled selected value="">- Select -</option>
+                    {{#each environments}}
+                        <option {{default}} {{ disabled }} value="{{_id}}">{{envName}}</option>
+                    {{/each}}
+                </select>
+            </div>
+        </h3>
+        {{#if environmentChosen }}
+        <h4>Choose one or more observations.</h4>
+        <div class="report-select__options report-select__options--observations">
+            <div class="report-select__option option--all option--all-observations"><span class="option__text">Select All</span></div>
+            {{#each observations }}
+                {{> obsButton }}
+            {{else}}
+                The selected classroom doesn't have any observations.
             {{/each}}
             <div class="report-select__option report-select__option--spacer"></div>
             <div class="report-select__option report-select__option--spacer"></div>
             <div class="report-select__option report-select__option--spacer"></div>
             <div class="report-select__option report-select__option--spacer"></div>
+        </div>
+        {{/if}}
 
+        <div class="interactive-report-wrapper">
+            <div class="interactive-report">
+                <div class="interactive-report__top-left"></div>
+                <div class="interactive-report__y-scale"></div>
+                <div class="interactive-report__title">
+                    <div class="x-axis-label param-selector-wrapper swappable">
+
+                        <div class="select__wrapper select__wrapper--demo"><span
+                                class="explanation-text demographics-color">Demographic</span>
+                            <select id="demo-select" {{demo_available}} class="param-select-form-item demographic" name="demographic-select" data-param-type="demographics">
+                                <option disabled selected value="">- Select -</option>
+                                {{#each demographics}}
+                                    <option value="{{name}}">{{name}}</option>
+                                {{/each}}
+                            </select>
+                        </div>
+                        <span class="center_text"><span class="swappable__button"><i class="fas fa-exchange-alt"></i></span></span>
+                        <div class="select__wrapper select__wrapper--disc"><span
+                                class="explanation-text discourse-color">Discourse Dimension</span>
+                            <select id="disc-select" {{disc_available}} class="param-select-form-item discourse" name="parameter-select" data-param-type="discourse">
+                                <option disabled selected value="">- Select -</option>
+                                {{#each discourseparams}}
+                                    <option data-options="{{options}}" value="{{name}}">{{name}}</option>
+                                {{/each}}
+                            </select>
+                        </div>
+
+                    </div>
+                    </div>
+                <div class="interactive-report__graph" data-graph-type="{{selectedDatasetType}}"></div>
+                <div class="interactive-report__graph-key"></div>
+                <div class="interactive-report__sidebar"></div>
+                </div>'
         </div>
     </section>
-
-    {{#if environmentChosen }}
-        <section data-slide-id="obs" class="report-section report-section--select report-section--select--obs">
-            <h2>Choose one or more observations.</h2>
-            <div class="report-select__options report-select__options--observations">
-                <div class="report-select__option option--all option--all-observations"><span class="option__text">Select All</span></div>
-                {{#each observations }}
-                    {{> obsButton }}
-                {{else}}
-                    The selected classroom doesn't have any observations.
-                {{/each}}
-                <div class="report-select__option report-select__option--spacer"></div>
-                <div class="report-select__option report-select__option--spacer"></div>
-                <div class="report-select__option report-select__option--spacer"></div>
-                <div class="report-select__option report-select__option--spacer"></div>
-            </div>
-        </section>
-    {{/if}}
-
-    {{#if observationChosen }}
-        {{> interactiveReportView }}
-    {{/if}}
     </div></div></div>
 </template>
 
@@ -61,19 +97,6 @@
         <span class="option__text">{{ name }}</span>
     </div>
 </template>
-
-
-<template name="interactiveReportView">
-    {{> reportBackButton }}
-
-    <section data-slide-id="params" class="report-section report-section--select">
-        <h2>Exploring analytics for {{ environment.envName }} | {{ observationNames }}.</h2>
-        <div class="interactive-report-wrapper">
-
-        </div>
-    </section>
-</template>
-
 
 <template name="discourseButton">
     <div class="report-select__option option--discourse" data-discourse-id="{{name}}" data-id="{{name}}" data-param-type="discourse">
