@@ -296,11 +296,17 @@ let getObsOptions = function(envId) {
 
 let getDemographics = function() {
   let envId = selectedEnvironment.get();
+  if (!envId) {
+    return []
+  }
   return setupSubjectParameters(envId);
 };
 
 let getDiscourseDimensions = function() {
   let envId = selectedEnvironment.get();
+  if (!envId) {
+    return []
+  }
   return setupSequenceParameters(envId);
 };
 
@@ -509,7 +515,7 @@ let createGraph = function(contribData, containerSelector, dataset) {
     y_label = "Equity Ratio";
   }
 
-  svg = $('<svg width="718" height="540">' +
+  svg = $('<svg width="718" height="580">' +
     '<defs>\n' +
     '  <style type="text/css">\n' +
     '    @font-face {\n' +
@@ -522,7 +528,7 @@ let createGraph = function(contribData, containerSelector, dataset) {
   $(containerSelector).html(svg);
 
   var svg = d3.select(containerSelector + " svg"),
-    margin = {top: 30, right: 20, bottom: 40, left: 50},
+    margin = {top: 30, right: 20, bottom: 80, left: 50},
     width = +svg.attr("width") - margin.left - margin.right,
     height = +svg.attr("height") - margin.top - margin.bottom,
     g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
@@ -629,9 +635,19 @@ let createGraph = function(contribData, containerSelector, dataset) {
         tick_text.append('tspan').attr('x', 0).attr('y', y).attr('dy', dy + 1.1 + 'em').text(rows[2]);
       });
       text.each(function() {
-        let tick = d3.select(this)
-        if ($(this).width()) {
-
+        let $this = $(this);
+        if (x0.bandwidth() < $this[0].getBBox().width) {
+          $('.axis--x .tick text').attr('font-size', '14px');
+        }
+        if (x0.bandwidth() < $this[0].getBBox().width) {
+          let text_tags = $('.axis--x .tick text');
+          text_tags.attr('transform', 'rotate(-45)');
+          text_tags.attr('text-anchor', 'end');
+        }
+        console.log('bbox', $this[0].getBBox());
+        if (Math.sqrt(($this[0].getBBox().height ** 2) + ($this[0].getBBox().width ** 2)) > 80) {
+          let text_tags = $('.axis--x .tick text');
+          text_tags.attr('font-size', '11px');
         }
       })
     });
