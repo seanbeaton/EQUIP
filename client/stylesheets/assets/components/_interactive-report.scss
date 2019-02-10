@@ -1,12 +1,16 @@
 .interactive-report {
   display: grid;
-  margin: 0;
+  margin: 20px 0 0;
   div {
     margin: 0;
   }
 
   grid-template-columns: 50px auto 250px;
   grid-template-rows: 50px auto;
+}
+
+.interactive-report__graph {
+  min-height: 580px;
 }
 
 .interactive-report {
