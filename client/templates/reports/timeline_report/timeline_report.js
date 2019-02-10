@@ -116,11 +116,17 @@ Template.timelineReport.helpers({
 
 let getDemographics = function() {
   let envId = selectedEnvironment.get();
+  if (!envId) {
+    return []
+  }
   return setupSubjectParameters(envId);
 };
 
 let getDiscourseDimensions = function() {
   let envId = selectedEnvironment.get();
+  if (!envId) {
+    return []
+  }
   return setupSequenceParameters(envId);
 };
 
@@ -130,9 +136,9 @@ let getDiscourseOptions = function() {
   if (selected_disc_dim === false) {
     return [];
   }
-  //console.log('options', options, 'selected_disc_dim', selected_disc_dim);
+  // console.log('options', options, 'selected_disc_dim', selected_disc_dim);
   let opt = options.find(opt => opt.name === selected_disc_dim);
-  //console.log('opt', opt);
+  // console.log('opt', opt);
   return opt
     .options.split(',').map(function(opt) {return {name: opt.trim()}})
 };
@@ -305,18 +311,28 @@ let createTimelineData = function() {
     }
     demo_opts.forEach(function(demo_opt) {
       let percent_of_contribs = observation[demo_opt.name] / observation._total;
+      console.log('percent_of_contribs', percent_of_contribs);
+      if (isNaN(percent_of_contribs)) {
+        percent_of_contribs = 0;
+      }
+
       obs_equity.contribsByDemo.push({
         name: demo_opt.name,
         percent: percent_of_contribs,
         count: observation[demo_opt.name],
         total: observation._total
-      })
+      });
       let percent_of_students = students_by_demo.find(demo => demo.name === demo_opt.name).percent;
+      if (isNaN(percent_of_students)) {
+        percent_of_students = 0;
+      }
+
       if (percent_of_students === 0) {
         obs_equity[demo_opt.name] = 0;
       }
       else {
-        obs_equity[demo_opt.name] = percent_of_contribs / percent_of_students;
+        let equity_ratio = percent_of_contribs / percent_of_students;
+        obs_equity[demo_opt.name] = isNaN(equity_ratio) ? 0 : equity_ratio;
       }
     });
     return obs_equity
@@ -330,6 +346,9 @@ let createTimelineData = function() {
     //console.log('vals', vals);
     obs.max = Math.max.apply(null, vals);
   })
+
+  console.table(ret.contributions_dataset);
+  console.table(ret.equity_dataset);
   return ret
 };
 
