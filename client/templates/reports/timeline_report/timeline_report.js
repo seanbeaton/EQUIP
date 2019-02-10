@@ -544,6 +544,15 @@ let initTimelineGraph = function(full_data, containerSelector) {
 let updateTimelineGraph = function(full_data, containerSelector) {
   // console.log('updating timeline graph');
   initTimelineGraph(full_data, containerSelector)
+
+  // Disabling on the fly d3 updating due to some complications with
+  // figuring out which items need to be reassigned. When the parameters that create the data
+  // change whenever the graph needs to be updated, it's hard to make it work.
+  // Only time it could work is when you add a new observation, but that doesn't work
+  // as of yet.
+  // For now, we're going to rebuild the graph each time the parameters are updated.
+
+
   // let data;
   //
   // if (selectedDatasetType.get() === 'contributions') {
@@ -712,7 +721,7 @@ let buildBarTooltipSlide = function(data, demo_color_axis) {
   if (data.length > 1) {
     title = 'Multiple datapoints'
   } else {
-    title = `${data[0].obsName} </br> ${convertISODateToUS(data[0].date)}`;
+    title = `${data[0].obsName} <br/> ${convertISODateToUS(data[0].date)}`;
   }
 
   //console.log('buidling sidebar, ', data);
@@ -720,7 +729,7 @@ let buildBarTooltipSlide = function(data, demo_color_axis) {
     html = data.map(function(datum) {
       let ret = '';
       if (data.length > 1) {
-          ret += `<h4 class="panel-section__title">${datum.obsName} </br> ${convertISODateToUS(datum.date)}</h4>`
+          ret += `<h4 class="panel-section__title">${datum.obsName} <br/> ${convertISODateToUS(datum.date)}</h4>`
       }
       ret += `
     <div class="stat-group">
@@ -840,7 +849,8 @@ let setupVis = function() {
     //console.log('obse', obs);
     return {
       id: obs._id,
-      content: obs.name + '<br/>(' + obs.observationDate + ')',
+      // content: obs.name + '<br/>(' + obs.observationDate + ')',
+      content: obs.name + ' (' + obs.observationDate + ')',
       start: obs.observationDate,
       className: getSequences(obs._id, obs.envId).length < 1 ? 'disabled' : ''
     }
