@@ -23,8 +23,65 @@
 
                     <div class="heatmap-report-wrapper">
                         <div class="heatmap-report">
-                            <div class="heatmap-report__graph"></div>
+                            <div class="heatmap-report__graph">
+                                {{#if students }}
+                                <div class="subjects" id="heatmap-d3-wrapper">
+
+                                </div>
+                                {{/if}}
+                            </div>
                             <div class="heatmap-report__graph-key"></div>
+                            <div class="heatmap-report__student-spotlight {{#if selectedStudent}} student-spotlight--active {{/if}}">
+                                <div class="student-spotlight">
+                                    <div class="student-spotlight__close"><i class="fa fa-2x fa-times"></i></div>
+                                    {{#if selectedStudent}}
+                                        <h3 class="student-spotlight__name">{{selectedStudent.info.name}}</h3>
+                                        <div class="student-spotlight__demographics">
+                                            <h4>Demographics</h4>
+                                            <ul>
+                                                {{#each arrayify selectedStudent.info.demographics}}
+                                                    <li><span class="demo-label">{{name}}:</span> {{value}}</li>
+                                                {{/each}}
+                                            </ul>
+                                        </div>
+                                        <div class="student-spotlight__student-contributions">
+                                            <h4>Contributions</h4>
+                                            <div class="student-contributions-graph__discourse-type-select">
+                                                <label for="student-contributions-graph__disc-select">Discourse dimension</label>
+                                                <select id="student-contributions-graph__disc-select" class="discourse">
+                                                    <option disabled selected value="">- Select -</option>
+                                                    {{#each discourseparams}}
+                                                        <option data-options="{{options}}" value="{{name}}">{{name}}</option>
+                                                    {{/each}}
+                                                </select>
+                                            </div>
+                                            <div class="student-contributions-graph__graph"></div>
+                                        </div>
+                                        <div class="student-spotlight__student-participation-time">
+
+                                            <h4>Participation over time</h4>
+                                            {{#if multipleObservationsChosen }}
+                                                <div class="student-participation-time__discourse-type-select">
+                                                    <label for="student-participation-time__disc-select">Discourse dimension</label>
+                                                    <select id="student-participation-time__disc-select" class="discourse">
+                                                        <option disabled selected value="">- Select -</option>
+                                                        {{#each discourseparams}}
+                                                            <option data-options="{{options}}" value="{{name}}">{{name}}</option>
+                                                        {{/each}}
+                                                    </select>
+                                                </div>
+                                                <div class="student-participation-time__graph"></div>
+                                            {{ else }}
+                                                <div class="student-participation-time__no-data">
+                                                    You need to select at least two observations to see this student's participation over time.
+                                                </div>
+                                            {{/if}}
+                                        </div>
+                                    {{else}}
+                                        Oops, that student doesn't appear to have any data. If you think this is a bug, please report it to us using the link in the footer.
+                                    {{/if}}
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </section>

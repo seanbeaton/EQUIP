@@ -5,6 +5,14 @@
     margin: 0;
   }
 
+  .student-box {
+    cursor: pointer;
+    @include nt($prop: opacity);
+    &:hover {
+      opacity: 0.8;
+    }
+  }
+
   grid-template-columns: auto;
   grid-template-rows: auto auto;
 }
@@ -30,6 +38,13 @@
   grid-row-end: 3;
 }
 
+.heatmap-report__student-spotlight {
+  grid-column-start: 1;
+  grid-column-end: 2;
+  grid-row-start: 1;
+  grid-row-end: 3;
+}
+
 
 $grid-color: #333;
 $light-grid-color: #ddd;
@@ -40,3 +55,35 @@ $light-grid-color: #ddd;
   height: 100%;
 }
 
+.heatmap-report__student-spotlight {
+  background-color: white;
+  opacity: 0;
+  z-index: 1;
+  pointer-events: none;
+  @include nt($prop: opacity);
+  &.student-spotlight--active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+
+.student-spotlight {
+  position: relative;
+  padding: 20px;
+}
+
+.student-spotlight__close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  padding: 10px;
+}
+
+.student-spotlight__demographics {
+  .demo-label {
+    font-weight: 600;
+  }
+  li {
+    margin: 0;
+  }
+}

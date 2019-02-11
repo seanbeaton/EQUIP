@@ -1,19 +1,20 @@
-import vis from 'vis';
-import {Sidebar} from '../../../helpers/graph_sidebar';
-let d3 = require('d3');
+import {setupSequenceParameters} from "../../../helpers/parameters";
 
-import '/node_modules/vis/dist/vis.min.css';
-import {setupSequenceParameters, setupSubjectParameters} from "../../../helpers/parameters";
+let d3 = require('d3');
+let d3ScaleChromatic = require("d3-scale-chromatic");
+
 import {getSequences} from "../../../helpers/sequences";
-import {getStudents} from "../../../helpers/students";
-import {convertISODateToUS} from "../../../helpers/dates";
-import {clone_object} from "../../../helpers/objects";
+import {getStudents, getStudent} from "../../../helpers/students";
 
 // const envSet = new ReactiveVar(false);
 const obsOptions = new ReactiveVar([]);
 const selectedEnvironment = new ReactiveVar(false);
 const selectedObservations = new ReactiveVar([]);
-const selectedDatasetType = new ReactiveVar('equity');
+const selectedDatasetType = new ReactiveVar('contributions');
+const students = new ReactiveVar([]);
+const selectedStudent = new ReactiveVar(false);
+const selectedStudentContribDimension = new ReactiveVar(false);
+const selectedStudentTimeDimension = new ReactiveVar(false);
 
 // const selectedDemographic = new ReactiveVar(false);
 // const selectedDiscourseDimension = new ReactiveVar(false);
@@ -52,12 +53,16 @@ Template.heatmapReport.helpers({
   observationChosen: function() {
     return !!(selectedObservations.get().length >= 1)
   },
+  multipleObservationsChosen: function() {
+    return !!(selectedObservations.get().length >= 2)
+  },
   // discourseDimensions: function() {
   //   return getDiscourseDimensions()
   // },
   // demographics: function() {
   //   return getDemographics()
   // },
+
   environment: function() {
     return getEnvironment();
   },
@@ -113,6 +118,19 @@ Template.heatmapReport.helpers({
         default: 'default'
       }
     ]
+  },
+  students: function() {
+    return students.get();
+  },
+  selectedStudent: function() {
+    return selectedStudent.get();
+  },
+  arrayify: function(obj) {
+    let result = [];
+    for (let key in obj) {
+      result.push({name:key,value:obj[key]});
+    }
+    return result;
   }
 });
 
@@ -179,38 +197,33 @@ Template.heatmapReport.events({
     // selectedDiscourseOption.set(false);
     clearObservations();
     obsOptions.set(getObsOptions());
+    students.set(getStudents(selectedEnvironment.get()));
     // setTimeout(setupVis, 50);
 
     $('#disc-select').val('');
     $('#demo-select').val('');
     $('#disc-opt-select').val('');
   },
-  // 'change #disc-select': function(e) {
-  //   let selected = $('option:selected', e.target);
-  //   //console.log('disc-select,', selected.val());
-  //   selectedDiscourseDimension.set(selected.val());
-  //   $('#disc-opt-select').val('')
-  //   clearGraph();
-  //   selectedDiscourseOption.set(false);
-  //   updateGraph();
-  // },
-  // 'change #demo-select': function(e) {
-  //   let selected = $('option:selected', e.target);
-  //   //console.log('demo-select,', selected.val());
-  //   selectedDemographic.set(selected.val());
-  //   updateGraph()
-  // },
-  // 'change #disc-opt-select': function(e) {
-  //   let selected = $('option:selected', e.target);
-  //   //console.log('disc-opt-select,', selected.val());
-  //   selectedDiscourseOption.set(selected.val());
-  //   updateGraph()
-  // },
+
+  'change #student-contributions-graph__disc-select': function(e) {
+    let selected = $('option:selected', e.target);
+    //console.log('disc-opt-select,', selected.val());
+    selectedStudentContribDimension.set(selected.val());
+    updateStudentContribGraph()
+  },
+  'change #student-participation-time__disc-select': function(e) {
+    let selected = $('option:selected', e.target);
+    //console.log('disc-opt-select,', selected.val());
+    selectedStudentContribDimension.set(selected.val());
+    updateStudentTimeGraph()
+  },
   'change #dataset-type-select': function(e) {
     let selected = $('option:selected', e.target);
     //console.log('dataset-type-select,', selected.val());
     selectedDatasetType.set(selected.val());
-    updateGraph()
+    updateGraph();
+    updateStudentContribGraph();
+    updateStudentTimeGraph();
   },
   'click .option--all-observations': function(e) {
     selectedObservations.set([]);
@@ -238,8 +251,14 @@ Template.heatmapReport.events({
 
     selectedObservations.set(currentObsIds);
     updateGraph();
+
+    updateStudentContribGraph();
+    updateStudentTimeGraph();
     // setTimeout(function(){$(window).trigger('updated-filters')}, 100) // We're also forcing a graph update when you select new observations, not just changing params
   },
+  'click .student-spotlight__close': function() {
+    selectedStudent.set(false);
+  }
 })
 
 
@@ -256,10 +275,20 @@ let createHeatmapData = function() {
   let allStudents = getStudents(envId);
   // let demo_opts = getDemographicOptions();
 
+  ret.limit_x = 0;
+  ret.limit_y = 0;
   ret.contributions_dataset = allStudents.map(function(student) {
+    if (ret.limit_y > student.data_y) {
+      ret.limit_y = student.data_y
+    }
+    if (ret.limit_x > student.data_x) {
+      ret.limit_x = student.data_x
+    }
     return {
       studentId: student._id,
       student: student,
+      data_x: student.data_x,
+      data_y: student.data_y,
       count: 0,
     }
   });
@@ -274,134 +303,17 @@ let createHeatmapData = function() {
       for (let sequence_k in sequences) {
         if (!sequences.hasOwnProperty(sequence_k)) continue;
         let sequence = sequences[sequence_k];
-
-        // let seqDemoOption = sequence.info.student.demographics[demo];
-
-        let ds_index = ret.contributions_dataset.findIndex(datapoint => datapoint.obsId === obsId);
-
-        if (sequence.info.parameters[dimension] === option) {
-          ret.contributions_dataset[ds_index]._total += 1;
-          ret.contributions_dataset[ds_index][seqDemoOption] += 1;
+        // console.log('sequence', sequence);
+        let ds_index = ret.contributions_dataset.findIndex(datapoint => datapoint.studentId === student._id);
+        // console.log('dsIndex', ds_index);
+        if (sequence.info.student.studentId === student._id) {
+          ret.contributions_dataset[ds_index].count += 1;
         }
 
       }
     }
 
   });
-
-  //
-  // allStudents.forEach(function(student) {
-  //   let demoCountIndex = students_by_demo.findIndex(demoopt => demoopt.name === student.info.demographics[demo])
-  //   students_by_demo[demoCountIndex].count++;
-  // });
-  //
-  // students_by_demo.forEach(function(demographic) {
-  //   demographic.percent = demographic.count / students_by_demo.reduce((t, d) => d.count + t, 0)
-  // });
-  //
-  //
-  //
-  // //console.log('creating data for ', obsIds, demo, dimension, option);
-  // for (let obsId_k in obsIds) {
-  //
-  //   if (!obsIds.hasOwnProperty(obsId_k)) continue;
-  //   let obsId = obsIds[obsId_k];
-  //
-  //   let sequences = getSequences(obsId, envId);
-  //   for (let sequence_k in sequences) {
-  //     if (!sequences.hasOwnProperty(sequence_k)) continue;
-  //     let sequence = sequences[sequence_k];
-  //
-  //     // //console.log('sequence', sequence);
-  //
-  //     if (!ret.contributions_dataset.find(datapoint => datapoint.obsId === obsId)) {
-  //       // If it wasn't there:
-  //       let obsers = getObservations();
-  //       //console.log('getObservations()', obsers);
-  //
-  //       let obs = obsers.find(obs => obs._id === obsId);
-  //       let parseTime = d3.timeParse('%Y-%m-%d');
-  //       //console.log('ob SEACH', obs);
-  //       let datapoint = {
-  //         obsId: obsId,
-  //         d3date: parseTime(obs.observationDate),
-  //         obsName: obs.name,
-  //         date: obs.observationDate,
-  //         studentsByDemo: students_by_demo,
-  //         _total: 0,
-  //       };
-  //
-  //       demo_opts.forEach(function (opt) {
-  //         datapoint[opt.name] = 0
-  //       });
-  //
-  //       ret.contributions_dataset.push(datapoint)
-  //     }
-  //
-  //     let seqDemoOption = sequence.info.student.demographics[demo];
-  //
-  //     let ds_index = ret.contributions_dataset.findIndex(datapoint => datapoint.obsId === obsId);
-  //
-  //     if (sequence.info.parameters[dimension] === option) {
-  //       ret.contributions_dataset[ds_index]._total += 1;
-  //       ret.contributions_dataset[ds_index][seqDemoOption] += 1;
-  //     }
-  //
-  //   }
-  // }
-  //
-  // ret.equity_dataset = [];
-  //
-  // //console.log('allStudents', allStudents);
-  //
-  // ret.equity_dataset = ret.contributions_dataset.map(function(observation) {
-  //   //console.log('obs', observation)
-  //   let obs_equity = {
-  //     _total: 1,
-  //     obsId: observation.obsId,
-  //     obsName: observation.obsName,
-  //     d3date: observation.d3date,
-  //     date: observation.date,
-  //     studentsByDemo: students_by_demo,
-  //     contribsByDemo: [],
-  //   }
-  //   demo_opts.forEach(function(demo_opt) {
-  //     let percent_of_contribs = observation[demo_opt.name] / observation._total;
-  //     console.log('percent_of_contribs', percent_of_contribs);
-  //     if (isNaN(percent_of_contribs)) {
-  //       percent_of_contribs = 0;
-  //     }
-  //
-  //     obs_equity.contribsByDemo.push({
-  //       name: demo_opt.name,
-  //       percent: percent_of_contribs,
-  //       count: observation[demo_opt.name],
-  //       total: observation._total
-  //     });
-  //     let percent_of_students = students_by_demo.find(demo => demo.name === demo_opt.name).percent;
-  //     if (isNaN(percent_of_students)) {
-  //       percent_of_students = 0;
-  //     }
-  //
-  //     if (percent_of_students === 0) {
-  //       obs_equity[demo_opt.name] = 0;
-  //     }
-  //     else {
-  //       let equity_ratio = percent_of_contribs / percent_of_students;
-  //       obs_equity[demo_opt.name] = isNaN(equity_ratio) ? 0 : equity_ratio;
-  //     }
-  //   });
-  //   return obs_equity
-  // })
-  //
-  // ret.contributions_dataset.forEach(function(obs) {
-  //   obs.max = obs._total;
-  // });
-  // ret.equity_dataset.forEach(function(obs) {
-  //   let vals = demo_opts.map(demo_opt => obs[demo_opt.name]);
-  //   //console.log('vals', vals);
-  //   obs.max = Math.max.apply(null, vals);
-  // })
 
   return ret
 };
@@ -418,14 +330,6 @@ let updateGraph = function() {
   let heatmap_wrapper = $('.heatmap-report-wrapper');
   let heatmap_selector = '.heatmap-report__graph';
 
-  // let demo = selectedDemographic.get();
-  // let dimension = selectedDiscourseDimension.get();
-  // let option = selectedDiscourseOption.get();
-
-  // if (demo === false || dimension === false || option === false) {
-  //   return;
-  // }
-
   if (selectedObservations.get().length < 1) {
     return;
   }
@@ -433,12 +337,6 @@ let updateGraph = function() {
   let data = createHeatmapData();
   if (!heatmap_wrapper.hasClass('heatmap-created')) {
     heatmap_wrapper.addClass('heatmap-created');
-    // let sidebarLevels = {
-    //   0: 'start',
-    //   1: 'bar_tooltip',
-    // };
-    // sidebar = new Sidebar('.timeline-report__sidebar', sidebarLevels);
-    // sidebar.setSlide('start', 'Hover a point (or tap on mobile) to see more information', '')
 
     initHeatmapGraph(data, heatmap_selector)
   }
@@ -446,8 +344,6 @@ let updateGraph = function() {
     updateHeatmapGraph(data, heatmap_selector)
   }
 }
-
-
 
 let initHeatmapGraph = function(full_data, containerSelector) {
   let data;
@@ -458,314 +354,133 @@ let initHeatmapGraph = function(full_data, containerSelector) {
   else {
     data = full_data.equity_dataset;
   }
-  //
-  // data = data.sort(function(a, b) {return a.d3date - b.d3date});
-  //
-  // svg = $('<svg width="718" height="500">' +
-  //   '<defs>\n' +
-  //   '  <style type="text/css">\n' +
-  //   '    @font-face {\n' +
-  //   '      font-family: Roboto;\n' +
-  //   '      @import url(\'https://fonts.googleapis.com/css?family=Roboto:300,400,700\');\n' +
-  //   '    }\n' +
-  //   '  </style>\n' +
-  //   '</defs>' +
-  //   '</svg>');
-  // $(containerSelector).html(svg);
-  //
-  // let svg = d3.select(containerSelector + " svg"),
-  //   margin = {top: 30, right: 20, bottom: 40, left: 50},
-  //   width = +svg.attr("width") - margin.left - margin.right,
-  //   height = +svg.attr("height") - margin.top - margin.bottom,
-  //   g = svg.append("g").attr('class', 'graph-container').attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-  //
-  // let x = d3.scaleTime()
-  //   .domain(d3.extent(data, d => d.d3date))
-  //   .range([0, width]);
-  //
-  // let y = d3.scaleLinear()
-  //   .domain([0, d3.max(data, d => d.max)])
-  //   .range([height, 0]);
-  //
-  //
-  // // let lines = [];
-  // let demos = getDemographicOptions();
-  //
-  // let total_line = d3.line()
-  //   .x(function(d) { return x(d.d3date)})
-  //   .y(function(d) { return y(d._total)});
-  //
-  //
-  // let lines = demos.map(function(demo) {
-  //   let line = d3.line()
-  //     .x(d => x(d.d3date))
-  //     .y(d => y(d[demo.name]));
-  //   //console.log('demo', demo.name);
-  //   // let line = d3.line()
-  //   //   .x(function(d) { return x(d.d3date)})
-  //   //   .y(function(d) { return y(d[demo.name])});
-  //
-  //   return {line: line, demo: demo};
-  // });
-  //
-  //
-  // //
-  // // let valLine = d3.line()
-  // //   .x(function(d) {return x(d.date)})
-  // //   .y(function(d) {return y(d.value)})
-  //
-  //
-  // g.append('path')
-  //   .data([data])
-  //   .attr('class', 'line line--title')
-  //   .style("stroke-width", 2)
-  //   .attr('d', total_line);
-  //
-  // let key_colors = getLabelColors(getDemographicOptions().map(demo_opt => demo_opt.name));
-  // let z = d3.scaleOrdinal()
-  //   .range(Object.values(key_colors));
-  //
-  // updateKey('.timeline-report__graph-key', demos, z)
-  //
-  // //console.log('key_colors', key_colors);
-  //
-  // lines.forEach(function(line) {
-  //   //console.log('data is', data);
-  //   //console.log('z(line.demo)', z(line.demo.name), line.demo.name);
-  //
-  //
-  //   g.append('path')
-  //     .data([data])
-  //     .attr('class', 'line line--demo')
-  //     .style("stroke", z(line.demo.name))
-  //     .style("stroke-width", 2)
-  //     .attr('d', line.line);
-  //
-  //   g.append('g')
-  //     .attr('class', 'dot-container')
-  //     .selectAll('dot')
-  //     .data(data)
-  //     .enter()
-  //     .append('circle')
-  //     .attr('r', 3)
-  //     .attr('class', 'dot')
-  //     .attr('cx', d => x(d.d3date))
-  //     .attr('cy', d => y(d[line.demo.name]))
-  //     .attr('data-demo-name', line.demo.name)
-  //     .style("fill", z(line.demo.name))
-  //     .on('mouseover', function(d) {
-  //       d['line_name'] = line.demo.name;
-  //       let data = [];
-  //       let circles = g.selectAll('circle[cx="' + x(d.d3date) + '"][cy="' + y(d[line.demo.name]) + '"]');
-  //       if (circles.size() > 1) {
-  //         //console.log('more than one circle');
-  //         //console.log('d', d);
-  //         //console.log('this', this);
-  //         //console.log('circles', circles);
-  //         circles.each(function(d) {
-  //           let datum = clone_object(d);
-  //           datum.line_name = $(this).attr('data-demo-name');
-  //           data.push(datum)
-  //         });
-  //       }
-  //       else {
-  //         data = [d];
-  //       }
-  //
-  //       //console.log('abut to use data', data);
-  //
-  //       buildBarTooltipSlide(data, z)
-  //     })
-  //     .on('mouseout', function() {
-  //       // sidebar.setCurrentPanel('start', 250)
-  //     });
-  //
-  // });
-  //
-  // g.append("g")
-  //   .attr("transform", "translate(0," + height + ")")
-  //   .attr('class', 'x-axis')
-  //   .call(d3.axisBottom(x));
-  //
-  // // Add the Y Axis
-  // g.append("g")
-  //   .attr('class', 'y-axis')
-  //   .call(d3.axisLeft(y));
 
+  console.log('data is being reloaded');
+  console.table(data);
+
+  let count_scale = d3.scaleSequential(d3.interpolateViridis)
+    .domain([0, d3.max(data, d => d.count) * 1.2]);
+
+  updateKey('.heatmap-report__graph-key', count_scale);
+
+  let g = d3.select('#heatmap-d3-wrapper');
+  let boxes = g.selectAll(".student-box")
+    .data(data);
+
+  boxes.enter()
+    .append('div')
+    .attr('id', d => d.studentId)
+    .attr('data-x', d => d.student.data_x)
+    .attr('data-y', d => d.student.data_y)
+    .attr('data-contrib-count', d => d.count)
+    .attr('class', 'dragger student-box c--observation__student-box-container')
+    .html(d => '<p class="c--observation__student-box">' + d.student.info.name + ' (' + d.count + ')</p>')
+    .style('transform', function(d) { return "translate(" + d.student.data_x + "px, " + d.student.data_y + "px)" })
+    .style('background-color', function(d){console.log('d count_scale(d.count)',d, count_scale(d.count));return count_scale(d.count)})
+    .on('click', function() {
+      selectStudentForModal($(this).attr('id'));
+    });
+
+  scale = d3.select()
 };
 
+let selectStudentForModal = function(studentId) {
+  selectedStudent.set(getStudent(studentId, selectedEnvironment.get()));
+  console.log('selected student ', selectedStudent.get());
+}
 
 let updateHeatmapGraph = function(full_data, containerSelector) {
-  // console.log('updating timeline graph');
-  initHeatmapGraph(full_data, containerSelector)
+  console.log('updating heatmap');
 
-  // Disabling on the fly d3 updating due to some complications with
-  // figuring out which items need to be reassigned. When the parameters that create the data
-  // change whenever the graph needs to be updated, it's hard to make it work.
-  // Only time it could work is when you add a new observation, but that doesn't work
-  // as of yet.
-  // For now, we're going to rebuild the graph each time the parameters are updated.
+  let data;
+
+  if (selectedDatasetType.get() === 'contributions') {
+    data = full_data.contributions_dataset;
+  }
+  else {
+    data = full_data.equity_dataset;
+  }
+
+  // initHeatmapGraph(full_data, containerSelector)
+
+  let count_scale = d3.scaleSequential(d3.interpolateViridis)
+    .domain([0, d3.max(data, d => d.count) * 1.2]);
+
+  updateKey('.heatmap-report__graph-key', count_scale);
 
 
-  // let data;
-  //
-  // if (selectedDatasetType.get() === 'contributions') {
-  //   data = full_data.contributions_dataset;
-  // }
-  // else {
-  //   data = full_data.equity_dataset;
-  // }
-  //
-  // data = data.sort(function(a, b) {return a.d3date - b.d3date});
-  // //
-  // // svg = $('<svg width="718" height="500">' +
-  // //   '<defs>\n' +
-  // //   '  <style type="text/css">\n' +
-  // //   '    @font-face {\n' +
-  // //   '      font-family: Roboto;\n' +
-  // //   '      @import url(\'https://fonts.googleapis.com/css?family=Roboto:300,400,700\');\n' +
-  // //   '    }\n' +
-  // //   '  </style>\n' +
-  // //   '</defs>' +
-  // //   '</svg>');
-  // // $(containerSelector).html(svg);
-  //
-  // let svg = d3.select(containerSelector + " svg"),
-  //   margin = {top: 30, right: 20, bottom: 40, left: 50},
-  //   width = +svg.attr("width") - margin.left - margin.right,
-  //   height = +svg.attr("height") - margin.top - margin.bottom,
-  //   // g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-  //   g = svg.select("g.graph-container")
-  //
-  // let x = d3.scaleTime()
-  //   .domain(d3.extent(data, d => d.d3date))
-  //   .range([0, width]);
-  //
-  // let y = d3.scaleLinear()
-  //   .domain([0, d3.max(data, d => d.max)])
-  //   .range([height, 0]);
-  //
-  //
-  // // let lines = [];
-  // let demos = getDemographicOptions();
-  //
-  // let total_line = d3.line()
-  //   .x(function(d) { return x(d.d3date)})
-  //   .y(function(d) { return y(d._total)});
-  //
-  //
-  // let lines = demos.map(function(demo) {
-  //   let line = d3.line()
-  //     .x(d => x(d.d3date))
-  //     .y(d => y(d[demo.name]));
-  //   //console.log('demo', demo.name);
-  //   // let line = d3.line()
-  //   //   .x(function(d) { return x(d.d3date)})
-  //   //   .y(function(d) { return y(d[demo.name])});
-  //
-  //   return {line: line, demo: demo};
-  // });
-  //
-  //
-  // //
-  // // let valLine = d3.line()
-  // //   .x(function(d) {return x(d.date)})
-  // //   .y(function(d) {return y(d.value)})
-  //
-  //
-  // g.select('path.line--title')
-  //   .data([data])
-  //   .attr('class', 'line line--title')
-  //   .style("stroke-width", 2)
-  //   .attr('d', total_line);
-  //
-  // let key_colors = getLabelColors(getDemographicOptions().map(demo_opt => demo_opt.name));
-  // let z = d3.scaleOrdinal()
-  //   .range(Object.values(key_colors));
-  //
-  // updateKey('.timeline-report__graph-key', demos, z)
-  //
-  // //console.log('key_colors', key_colors);
-  //
-  // lines.forEach(function(line) {
-  //   //console.log('data is', data);
-  //   //console.log('z(line.demo)', z(line.demo.name), line.demo.name);
-  //
-  //
-  //   let d3line = g.selectAll('path.line--demo')
-  //     .data([data]);
-  //
-  //   d3line.enter()
-  //     .append('path')
-  //     .attr('class', 'line line--demo')
-  //     .style("stroke", z(line.demo.name))
-  //     .style("stroke-width", 2)
-  //     .attr('d', line.line)
-  //     .merge(d3line)
-  //     .transition()
-  //     .duration(500)
-  //     .attr('d', line.line)
-  //
-  //   g.selectAll('dot')
-  //     .data(data)
-  //     .enter()
-  //     .transition()
-  //     // .append('circle')
-  //     .attr('r', 3)
-  //     .attr('class', 'dot')
-  //     .attr('cx', d => x(d.d3date))
-  //     .attr('cy', d => y(d[line.demo.name]))
-  //     .attr('data-demo-name', line.demo.name)
-  //     .style("fill", z(line.demo.name))
-  //     .on('mouseover', function(d) {
-  //       d['line_name'] = line.demo.name;
-  //       let data = [];
-  //       let circles = g.selectAll('circle[cx="' + x(d.d3date) + '"][cy="' + y(d[line.demo.name]) + '"]');
-  //       if (circles.size() > 1) {
-  //         //console.log('more than one circle');
-  //         //console.log('d', d);
-  //         //console.log('this', this);
-  //         //console.log('circles', circles);
-  //         circles.each(function(d) {
-  //           let datum = clone_object(d);
-  //           datum.line_name = $(this).attr('data-demo-name');
-  //           data.push(datum)
-  //         });
-  //       }
-  //       else {
-  //         data = [d];
-  //       }
-  //
-  //       //console.log('abut to use data', data);
-  //
-  //       buildBarTooltipSlide(data, z)
-  //     })
-  //     .on('mouseout', function() {
-  //       // sidebar.setCurrentPanel('start', 250)
-  //     });
-  //
-  // });
-  //
-  // g.select("g.x-axis")
-  //   .transition()
-  //   .attr("transform", "translate(0," + height + ")")
-  //   .call(d3.axisBottom(x));
-  //
-  // // Add the Y Axis
-  // g.select("g.y-axis")
-  //   .transition()
-  //   .call(d3.axisLeft(y));
+  let g = d3.select('#heatmap-d3-wrapper');
+  let boxes = g.selectAll(".student-box")
+    .data(data);
 
+  boxes.enter()
+    .append('div')
+    .attr('id', d => d.studentId)
+    .attr('data-x', d => d.student.data_x)
+    .attr('data-y', d => d.student.data_y)
+    .attr('class', 'dragger student-box c--observation__student-box-container')
+    // .html(d => '<p class="c--observation__student-box">' + d.student.info.name + ' (' + d.count + ')</p>')
+    .style('transform', function(d) { return "translate(" + d.student.data_x + "px, " + d.student.data_y + "px)" })
+    .merge(boxes)
+    .html(d => '<p class="c--observation__student-box">' + d.student.info.name + ' (' + d.count + ')</p>')
+    .transition()
+    .duration(500)
+    .attr('data-contrib-count', d => d.count)
+    .style('background-color', function(d){console.log('d count_scale(d.count)',d, count_scale(d.count));return count_scale(d.count)});
 };
 
-let updateKey = function(key_wrapper, y_values, color_axis) {
-  let key_chunks = y_values.map(function (label) {
-    let color = color_axis(label.name)
-    return `<span class="key--label"><span class="key--color" style="background-color: ${color}"></span><span class="key--text">${label.name}</span></span>`
-  })
 
-  let html = `${key_chunks.join('')}`;
-  $(key_wrapper).html(html)
+
+let updateKey = function(selector, color_axis) {
+  $(selector).html('<div class="heatmap-key"></div>');
+
+  let key_height = 80;
+  let key_width = 400;
+  let margins = {top: 55, right: 10, bottom: 5, left: 10};
+
+  let container = d3.select('.heatmap-key')
+    .style("position", "relative")
+    .style("width", key_width + "px")
+    .style("height", key_height + "px");
+
+  let canvas = container.append("canvas")
+    .style("position", "absolute")
+    .style("width", (key_width - margins.left - margins.right) + "px")
+    .style("height", (key_height - margins.top - margins.bottom) + "px")
+    .style("top", (margins.top) + "px")
+    .style("left", (margins.left) + "px");
+
+  let ctx = canvas.node().getContext("2d");
+
+  let svg = container.append("svg")
+    .style('overflow', 'visible')
+    .style("position", "absolute")
+    .style("width", (key_width - margins.left - margins.right) + "px")
+    .style("height", (margins.top) + "px")
+    .style("bottom", (key_height - margins.top) + "px")
+    .style("left", (margins.left) + "px");
+
+  let key_scale = d3.scaleLinear()
+    .range([0, key_width - margins.left - margins.right])
+    .domain(color_axis.domain());
+
+  d3.range(0, 100, 0.001)
+    .forEach(function (d) {
+      ctx.beginPath();
+      ctx.strokeStyle = color_axis(d);
+      ctx.moveTo(key_scale(d), 0);
+      ctx.lineTo(key_scale(d), 500);
+      ctx.stroke();
+    });
+
+  let key_axis = d3.axisTop(key_scale)
+    .tickSize(6)
+    .ticks(d3.min([8, d3.max(color_axis.domain())]));
+
+  svg.append("g")
+    .attr("class", "axis")
+    .attr("transform", "translate(0," + margins.top +")")
+    .call(key_axis);
 }
 
 let avail_colors_viridis = [
@@ -834,3 +549,164 @@ let clearObservations = function() {
 let clearParameters = function() {
   //console.log('TODO: CLEAN PARAMS')
 };
+
+let getDiscourseDimensions = function() {
+  let envId = selectedEnvironment.get();
+  if (!envId) {
+    return []
+  }
+  return setupSequenceParameters(envId);
+};
+
+let getDiscourseOptionsForDimension = function(dimension) {
+  let options = getDiscourseDimensions();
+  if (dimension === false) {
+    return [];
+  }
+  let opt = options.find(opt => opt.name === dimension);
+  // console.log('opt', opt);
+  return opt
+    .options.split(',').map(function(opt) {return {name: opt.trim()}})
+};
+
+
+let updateStudentContribGraph = function () {
+  let selector = '.student-contributions-graph__graph';
+
+  let dimension = selectedStudentContribDimension.get();
+
+  if (dimension === false) {
+    return;
+  }
+  if (selectedObservations.get().length < 1) {
+    return;
+  }
+
+  let data = createStudentContribData();
+
+  studentContribGraph(data, selector)
+};
+
+let createStudentContribData = function() {
+  let ret = [];
+
+  let envId = selectedEnvironment.get();
+  let obsIds = selectedObservations.get();
+  let student = selectedStudent.get();
+
+  let dimension = selectedStudentContribDimension.get();
+  let disc_opts = getDiscourseOptionsForDimension(dimension);
+  // let demo_opts = getDemographicOptions();
+  ret = disc_opts.map(function(opt) {
+    return {
+      name: opt.name,
+      count: 0,
+    }
+  });
+
+  let total = 0;
+  for (let obsId_k in obsIds) {
+    if (!obsIds.hasOwnProperty(obsId_k)) continue;
+    let obsId = obsIds[obsId_k];
+    let sequences = getSequences(obsId, envId);
+    for (let sequence_k in sequences) {
+      if (!sequences.hasOwnProperty(sequence_k)) continue;
+      let sequence = sequences[sequence_k];
+      disc_opts.map(function(opt) {
+        if (sequence.info.parameters[dimension] === opt.name &&
+          sequence.info.student.studentId === student._id) {
+          let ds_index = ret.findIndex(datapoint => datapoint.name === opt.name);
+          ret[ds_index].count += 1;
+          total += 1;
+        }
+      });
+    }
+  }
+
+  ret.push({
+    name: 'Total',
+    count: total,
+  });
+
+  return ret
+};
+let studentContribGraph = function(data, selector) {
+  console.log('creating studentContribGraph', data);
+  svg = $('<svg width="718" height="400">' +
+    '<defs>\n' +
+    '  <style type="text/css">\n' +
+    '    @font-face {\n' +
+    '      font-family: Roboto;\n' +
+    '      @import url(\'https://fonts.googleapis.com/css?family=Roboto:300,400,700\');\n' +
+    '    }\n' +
+    '  </style>\n' +
+    '</defs>' +
+    '</svg>');
+  $(selector).html(svg);
+
+  let container = d3.select(selector + ' svg'),
+    margin = {top: 30, right: 20, bottom: 80, left: 50},
+    width = +svg.attr("width") - margin.left - margin.right,
+    height = +svg.attr("height") - margin.top - margin.bottom,
+    g = container.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+  let x = d3.scaleBand() // inside each group
+    .range([0, width])
+    .padding(0.10);
+
+  let y = d3.scaleLinear()
+    .rangeRound([height, 0]);
+
+
+  x.domain(data.map(d => d.name))
+  y.domain([0, d3.max(data, d => d.count)]);
+  console.log('d3.max(data, d => d.count)', d3.max(data, d => d.count));
+
+  g.selectAll("bar")
+    .data(data)
+    .enter().append("rect")
+    .style("fill", "steelblue")
+    .attr("x", function(d) { return x(d.name); })
+    .attr("width", x.bandwidth())
+    .attr("y", function(d) { return y(d.count); })
+    .attr("height", function(d) { return height - y(d.count); });
+
+  g.append('g')
+    // .attr("class", "axis axis--x")
+    .attr("transform", "translate(0," + height + ")")
+    .call(d3.axisBottom(x));
+
+  g.append("g")
+    // .attr("class", "axis axis--y")
+    .call(d3.axisLeft(y).tickFormat(function(e){
+        if(Math.floor(e) !== e) {
+          return;
+        }
+        return e;
+      })
+    )
+};
+
+let updateStudentTimeGraph = function () {
+  let selector = '.student-participation-time__graph';
+
+  let dimension = selectedStudentTimeDimension.get();
+
+  if (dimension === false) {
+    return;
+  }
+  if (selectedObservations.get().length < 2) {
+    return;
+  }
+
+  let data = createStudentTimeData();
+
+  studentTimeGraph(data, selector)
+}
+
+let createStudentTimeData = function() {
+
+}
+let studentTimeGraph = function(data, selector) {
+
+}
