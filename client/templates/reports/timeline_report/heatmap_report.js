@@ -5,6 +5,7 @@ let d3ScaleChromatic = require("d3-scale-chromatic");
 
 import {getSequences} from "../../../helpers/sequences";
 import {getStudents, getStudent} from "../../../helpers/students";
+import {clone_object} from "../../../helpers/objects";
 
 // const envSet = new ReactiveVar(false);
 const obsOptions = new ReactiveVar([]);
@@ -182,7 +183,7 @@ let getEnvironment = function() {
 
 let getSelectedObservations = function() {
   let obsIds = selectedObservations.get();
-  console.log('getSelectedObservations', obsIds);
+  // console.log('getSelectedObservations', obsIds);
   return Observations.find({_id: {$in: obsIds}}).fetch();
 }
 
@@ -207,19 +208,16 @@ Template.heatmapReport.events({
 
   'change #student-contributions-graph__disc-select': function(e) {
     let selected = $('option:selected', e.target);
-    //console.log('disc-opt-select,', selected.val());
     selectedStudentContribDimension.set(selected.val());
     updateStudentContribGraph()
   },
   'change #student-participation-time__disc-select': function(e) {
     let selected = $('option:selected', e.target);
-    //console.log('disc-opt-select,', selected.val());
-    selectedStudentContribDimension.set(selected.val());
+    selectedStudentTimeDimension.set(selected.val());
     updateStudentTimeGraph()
   },
   'change #dataset-type-select': function(e) {
     let selected = $('option:selected', e.target);
-    //console.log('dataset-type-select,', selected.val());
     selectedDatasetType.set(selected.val());
     updateGraph();
     updateStudentContribGraph();
@@ -355,13 +353,10 @@ let initHeatmapGraph = function(full_data, containerSelector) {
     data = full_data.equity_dataset;
   }
 
-  console.log('data is being reloaded');
-  console.table(data);
-
   let count_scale = d3.scaleSequential(d3.interpolateViridis)
     .domain([0, d3.max(data, d => d.count) * 1.2]);
 
-  updateKey('.heatmap-report__graph-key', count_scale);
+  updateHeatmapKey('.heatmap-report__graph-key', count_scale);
 
   let g = d3.select('#heatmap-d3-wrapper');
   let boxes = g.selectAll(".student-box")
@@ -376,7 +371,7 @@ let initHeatmapGraph = function(full_data, containerSelector) {
     .attr('class', 'dragger student-box c--observation__student-box-container')
     .html(d => '<p class="c--observation__student-box">' + d.student.info.name + ' (' + d.count + ')</p>')
     .style('transform', function(d) { return "translate(" + d.student.data_x + "px, " + d.student.data_y + "px)" })
-    .style('background-color', function(d){console.log('d count_scale(d.count)',d, count_scale(d.count));return count_scale(d.count)})
+    .style('background-color', d => count_scale(d.count))
     .on('click', function() {
       selectStudentForModal($(this).attr('id'));
     });
@@ -406,7 +401,7 @@ let updateHeatmapGraph = function(full_data, containerSelector) {
   let count_scale = d3.scaleSequential(d3.interpolateViridis)
     .domain([0, d3.max(data, d => d.count) * 1.2]);
 
-  updateKey('.heatmap-report__graph-key', count_scale);
+  updateHeatmapKey('.heatmap-report__graph-key', count_scale);
 
 
   let g = d3.select('#heatmap-d3-wrapper');
@@ -431,7 +426,7 @@ let updateHeatmapGraph = function(full_data, containerSelector) {
 
 
 
-let updateKey = function(selector, color_axis) {
+let updateHeatmapKey = function(selector, color_axis) {
   $(selector).html('<div class="heatmap-key"></div>');
 
   let key_height = 80;
@@ -529,8 +524,6 @@ let getObsOptions = function(envId) {
   }
   if (!!envId) {
     let obs = Observations.find({envId: envId}).fetch();
-    console.log('envid', envId);
-    console.log('observations', obs);
     return obs;
   }
   else {
@@ -549,6 +542,13 @@ let clearObservations = function() {
 let clearParameters = function() {
   //console.log('TODO: CLEAN PARAMS')
 };
+
+
+let getObservations = function() {
+  let obsIds = selectedObservations.get();
+  return Observations.find({_id: {$in: obsIds}}).fetch();
+}
+
 
 let getDiscourseDimensions = function() {
   let envId = selectedEnvironment.get();
@@ -604,7 +604,6 @@ let createStudentContribData = function() {
     }
   });
 
-  let total = 0;
   for (let obsId_k in obsIds) {
     if (!obsIds.hasOwnProperty(obsId_k)) continue;
     let obsId = obsIds[obsId_k];
@@ -617,11 +616,16 @@ let createStudentContribData = function() {
           sequence.info.student.studentId === student._id) {
           let ds_index = ret.findIndex(datapoint => datapoint.name === opt.name);
           ret[ds_index].count += 1;
-          total += 1;
+          // total += 1;
         }
       });
     }
   }
+
+  let total = 0;
+  ret.forEach(function(opt) {
+    total += opt.count;
+  });
 
   ret.push({
     name: 'Total',
@@ -690,12 +694,15 @@ let studentContribGraph = function(data, selector) {
 let updateStudentTimeGraph = function () {
   let selector = '.student-participation-time__graph';
 
+  console.log('updaing time graph;');
   let dimension = selectedStudentTimeDimension.get();
 
   if (dimension === false) {
+    console.log('bailing on no dim');
     return;
   }
   if (selectedObservations.get().length < 2) {
+    console.log('bailing on not enough obs');
     return;
   }
 
@@ -706,7 +713,215 @@ let updateStudentTimeGraph = function () {
 
 let createStudentTimeData = function() {
 
+  let ret = {
+    contributions_dataset: []
+  };
+
+  let student = selectedStudent.get();
+
+  let dimension = selectedStudentTimeDimension.get();
+  let disc_opts = getDiscourseOptionsForDimension(dimension);
+  console.log('disc_opts', disc_opts);
+
+  let envId = selectedEnvironment.get();
+  let obsIds = selectedObservations.get();
+
+
+  for (let obsId_k in obsIds) {
+
+    if (!obsIds.hasOwnProperty(obsId_k)) continue;
+    let obsId = obsIds[obsId_k];
+
+    let sequences = getSequences(obsId, envId);
+    for (let sequence_k in sequences) {
+      if (!sequences.hasOwnProperty(sequence_k)) continue;
+      let sequence = sequences[sequence_k];
+
+      // //console.log('sequence', sequence);
+
+      if (!ret.contributions_dataset.find(datapoint => datapoint.obsId === obsId)) {
+        // If it wasn't there:
+        let obsers = getObservations();
+        //console.log('getObservations()', obsers);
+
+        let obs = obsers.find(obs => obs._id === obsId);
+        let parseTime = d3.timeParse('%Y-%m-%d');
+        //console.log('ob SEACH', obs);
+        let datapoint = {
+          obsId: obsId,
+          d3date: parseTime(obs.observationDate),
+          obsName: obs.name,
+          date: obs.observationDate,
+          _total: 0,
+        };
+
+        disc_opts.forEach(function (opt) {
+          datapoint[opt.name] = 0
+        });
+
+        ret.contributions_dataset.push(datapoint)
+      }
+
+      if (sequence.info.student.studentId !== student._id) {
+        continue;
+      }
+
+      let seq_disc_opt = sequence.info.parameters[dimension];
+      let ds_index = ret.contributions_dataset.findIndex(datapoint => datapoint.obsId === obsId);
+
+      ret.contributions_dataset[ds_index]._total += 1;
+      ret.contributions_dataset[ds_index][seq_disc_opt] += 1;
+
+    }
+  }
+
+  ret.contributions_dataset.forEach(function(obs) {
+    obs.max = obs._total;
+  });
+
+  console.table(ret.contributions_dataset);
+  return ret.contributions_dataset
+
 }
 let studentTimeGraph = function(data, selector) {
 
+  data = data.sort(function(a, b) {return a.d3date - b.d3date});
+
+  svg = $('<svg width="718" height="500">' +
+    '<defs>\n' +
+    '  <style type="text/css">\n' +
+    '    @font-face {\n' +
+    '      font-family: Roboto;\n' +
+    '      @import url(\'https://fonts.googleapis.com/css?family=Roboto:300,400,700\');\n' +
+    '    }\n' +
+    '  </style>\n' +
+    '</defs>' +
+    '</svg>');
+  $(selector).html(svg);
+
+  let svg = d3.select(selector + " svg"),
+    margin = {top: 30, right: 20, bottom: 40, left: 50},
+    width = +svg.attr("width") - margin.left - margin.right,
+    height = +svg.attr("height") - margin.top - margin.bottom,
+    g = svg.append("g").attr('class', 'graph-container').attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+  let x = d3.scaleTime()
+    .domain(d3.extent(data, d => d.d3date))
+    .range([0, width]);
+
+  let y = d3.scaleLinear()
+    .domain([0, d3.max(data, d => d.max)])
+    .range([height, 0]);
+
+
+  // let lines = [];
+  let dim = selectedStudentTimeDimension.get();
+  let discdims = getDiscourseOptionsForDimension(dim);
+
+  let total_line = d3.line()
+    .x(function(d) { return x(d.d3date)})
+    .y(function(d) { return y(d._total)});
+
+  let lines = discdims.map(function(dim) {
+    let line = d3.line()
+      .x(d => x(d.d3date))
+      .y(d => y(d[dim.name]));
+
+    return {line: line, dim: dim};
+  });
+
+
+  //
+  // let valLine = d3.line()
+  //   .x(function(d) {return x(d.date)})
+  //   .y(function(d) {return y(d.value)})
+
+
+  g.append('path')
+    .data([data])
+    .attr('class', 'line line--total')
+    .style("stroke-width", 2)
+    .attr('d', total_line);
+
+  let key_colors = getLabelColors(getDiscourseOptionsForDimension(dim).map(demo_opt => demo_opt.name));
+  let z = d3.scaleOrdinal()
+    .range(Object.values(key_colors));
+
+  updateStudentTimeKey('.student-participation-time__graph_key', discdims, z)
+
+  //console.log('key_colors', key_colors);
+
+  lines.forEach(function(line) {
+    //console.log('data is', data);
+    //console.log('z(line.demo)', z(line.demo.name), line.demo.name);
+
+
+    g.append('path')
+      .data([data])
+      .attr('class', 'line line--discdim')
+      .style("stroke", z(line.dim.name))
+      .style("stroke-width", 2)
+      .attr('d', line.line);
+
+    g.append('g')
+      .attr('class', 'dot-container')
+      .selectAll('dot')
+      .data(data)
+      .enter()
+      .append('circle')
+      .attr('r', 3)
+      .attr('class', 'dot')
+      .attr('cx', d => x(d.d3date))
+      .attr('cy', d => y(d[line.dim.name]))
+      .attr('data-dim-name', line.dim.name)
+      .style("fill", z(line.dim.name))
+      // .on('mouseover', function(d) {
+        // d['line_name'] = line.dim.name;
+        // let data = [];
+        // let circles = g.selectAll('circle[cx="' + x(d.d3date) + '"][cy="' + y(d[line.dim.name]) + '"]');
+        // if (circles.size() > 1) {
+        //   //console.log('more than one circle');
+        //   //console.log('d', d);
+        //   //console.log('this', this);
+        //   //console.log('circles', circles);
+        //   circles.each(function(d) {
+        //     let datum = clone_object(d);
+        //     datum.line_name = $(this).attr('data-demo-name');
+        //     data.push(datum)
+        //   });
+        // }
+        // else {
+        //   data = [d];
+        // }
+
+        //console.log('abut to use data', data);
+
+        // buildBarTooltipSlide(data, z)
+      // })
+      // .on('mouseout', function() {
+      //   sidebar.setCurrentPanel('start', 250)
+      // });
+
+  });
+
+  g.append("g")
+    .attr("transform", "translate(0," + height + ")")
+    .attr('class', 'x-axis')
+    .call(d3.axisBottom(x));
+
+  // Add the Y Axis
+  g.append("g")
+    .attr('class', 'y-axis')
+    .call(d3.axisLeft(y));
+
+}
+
+let updateStudentTimeKey = function(key_wrapper, y_values, color_axis) {
+  let key_chunks = y_values.map(function(label) {
+    let color = color_axis(label.name)
+    return `<span class="key--label"><span class="key--color" style="background-color: ${color}"></span><span class="key--text">${label.name}</span></span>`
+  })
+
+  let html = `${key_chunks.join('')}`;
+  $(key_wrapper).html(html)
 }

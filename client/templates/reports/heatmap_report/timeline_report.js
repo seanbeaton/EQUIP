@@ -463,7 +463,7 @@ let initTimelineGraph = function(full_data, containerSelector) {
 
   g.append('path')
     .data([data])
-    .attr('class', 'line line--title')
+    .attr('class', 'line line--total')
     .style("stroke-width", 2)
     .attr('d', total_line);
 
@@ -619,9 +619,9 @@ let updateTimelineGraph = function(full_data, containerSelector) {
   // //   .y(function(d) {return y(d.value)})
   //
   //
-  // g.select('path.line--title')
+  // g.select('path.line--total')
   //   .data([data])
-  //   .attr('class', 'line line--title')
+  //   .attr('class', 'line line--total')
   //   .style("stroke-width", 2)
   //   .attr('d', total_line);
   //

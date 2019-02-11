@@ -119,13 +119,13 @@ $light-grid-color: #ddd;
   }
 }
 
-
+.graph-container,
 .timeline-report {
   .line {
     fill: none;
     //stroke: #000;
   }
-  .line--title {
+  .line--total {
     stroke: #0e301a;
   }
 }
