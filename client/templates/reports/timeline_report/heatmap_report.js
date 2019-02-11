@@ -36,10 +36,10 @@ Template.heatmapReport.helpers({
         env.envName += ' (no observations)';
         env.disabled = 'disabled';
       }
-      else if (obsOpts.length < 2) {
-        env.envName += ' (' + obsOpts.length + ')';
-        env.disabled = 'disabled';
-      }
+      // else if (obsOpts.length < 1) {
+      //   env.envName += ' (' + obsOpts.length + ')';
+      //   env.disabled = 'disabled';
+      // }
       // else if (!default_set) {
         // default_set = true;
         // env.default = 'selected';
