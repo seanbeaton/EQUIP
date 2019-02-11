@@ -187,6 +187,11 @@ Template.environmentList.events({
 
     $('#env-create-modal').removeClass("is-active");
     $('#environmentName').val('');
+  },
+  'click .generate-example-classroom': function() {
+    Meteor.call('environmentInsertExample', null, function(error, result) {
+      return 0;
+    });
   }
 });
 
