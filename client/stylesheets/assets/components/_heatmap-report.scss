@@ -1,0 +1,42 @@
+.heatmap-report {
+  display: grid;
+  margin: 20px 0 0;
+  div {
+    margin: 0;
+  }
+
+  grid-template-columns: auto;
+  grid-template-rows: auto auto;
+}
+
+.heatmap-report {
+  font-family: Roboto, sans-serif;
+}
+
+// Grid placements
+
+.heatmap-report__graph-key {
+  grid-column-start: 1;
+  grid-column-end: 2;
+  grid-row-start: 1;
+  grid-row-end: 2;
+  min-height: 50px;
+}
+
+.heatmap-report__graph {
+  grid-column-start: 1;
+  grid-column-end: 2;
+  grid-row-start: 2;
+  grid-row-end: 3;
+}
+
+
+$grid-color: #333;
+$light-grid-color: #ddd;
+
+// Grid lines
+.heatmap-report__graph-key {
+  border-bottom: 1px solid $grid-color;
+  height: 100%;
+}
+

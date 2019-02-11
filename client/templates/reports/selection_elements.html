@@ -1,0 +1,41 @@
+<template name="environmentSelect">
+    <div class="environment-select">
+        <select id="env-select" class="env-select">
+            <option disabled selected value="">- Select -</option>
+            {{#each environments}}
+                <option {{default}} {{ disabled }} value="{{_id}}">{{envName}}</option>
+            {{/each}}
+        </select>
+    </div>
+</template>
+
+<template name="inlineDataTypeSelect">
+    <span class="dataset-type-select-inline">
+        {{>dataTypeSelect dataset_types=dataset_types}}
+    </span>
+</template>
+
+
+<template name="dataTypeSelect">
+    <select id="dataset-type-select" class="dataset">
+    {{#each dataset_types}}
+        <option {{default}} value="{{id}}">{{name}}</option>
+    {{/each}}
+    </select>
+</template>
+
+
+<template name="observationsButtonSelect">
+    <div class="report-select__options report-select__options--observations">
+        <div class="report-select__option option--all option--all-observations"><span class="option__text">Select All</span></div>
+        {{#each observations }}
+            {{> obsButton }}
+        {{else}}
+            The selected classroom doesn't have any observations.
+        {{/each}}
+        <div class="report-select__option report-select__option--spacer"></div>
+        <div class="report-select__option report-select__option--spacer"></div>
+        <div class="report-select__option report-select__option--spacer"></div>
+        <div class="report-select__option report-select__option--spacer"></div>
+    </div>
+</template>

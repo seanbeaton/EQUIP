@@ -13,7 +13,10 @@ Template.reportsSelection.events({
     },
     'click .option--timeline': function() {
         Router.go('timelineReport')
-    }
+    },
+    'click .option--heatmap': function() {
+        Router.go('heatmapReport')
+    },
 })
 
 Template.reportBackButton.events({

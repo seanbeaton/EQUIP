@@ -12,39 +12,16 @@
 
     <section data-slide-id="params" class="report-section report-section--select">
         <h3>
-            {{#if environmentChosen }}Exploring <span class="dataset-type-select-inline">
-            <select id="dataset-type-select" class="dataset">
-                {{#each dataset_types}}
-                    <option {{default}} value="{{id}}">{{name}}</option>
-                {{/each}}
-            </select>
-        </span> analytics for
+            {{#if environmentChosen }}
+                    Exploring {{> inlineDataTypeSelect dataset_types=dataset_types}} analytics for
             {{else}}
-                Which classroom do you want to explore?<br/>
+                    Which classroom do you want to explore?<br/>
             {{/if}}
-            <div class="environment-select">
-                <select id="env-select" class="env-select">
-                    <option disabled selected value="">- Select -</option>
-                    {{#each environments}}
-                        <option {{default}} {{ disabled }} value="{{_id}}">{{envName}}</option>
-                    {{/each}}
-                </select>
-            </div>
+            {{>environmentSelect environments=environments}}
         </h3>
         {{#if environmentChosen }}
         <h4>Choose one or more observations.</h4>
-        <div class="report-select__options report-select__options--observations">
-            <div class="report-select__option option--all option--all-observations"><span class="option__text">Select All</span></div>
-            {{#each observations }}
-                {{> obsButton }}
-            {{else}}
-                The selected classroom doesn't have any observations.
-            {{/each}}
-            <div class="report-select__option report-select__option--spacer"></div>
-            <div class="report-select__option report-select__option--spacer"></div>
-            <div class="report-select__option report-select__option--spacer"></div>
-            <div class="report-select__option report-select__option--spacer"></div>
-        </div>
+            {{>observationsButtonSelect observations=observations}}
         {{/if}}
 
         <div class="interactive-report-wrapper">

@@ -1,0 +1,836 @@
+import vis from 'vis';
+import {Sidebar} from '../../../helpers/graph_sidebar';
+let d3 = require('d3');
+
+import '/node_modules/vis/dist/vis.min.css';
+import {setupSequenceParameters, setupSubjectParameters} from "../../../helpers/parameters";
+import {getSequences} from "../../../helpers/sequences";
+import {getStudents} from "../../../helpers/students";
+import {convertISODateToUS} from "../../../helpers/dates";
+import {clone_object} from "../../../helpers/objects";
+
+// const envSet = new ReactiveVar(false);
+const obsOptions = new ReactiveVar([]);
+const selectedEnvironment = new ReactiveVar(false);
+const selectedObservations = new ReactiveVar([]);
+const selectedDatasetType = new ReactiveVar('equity');
+
+// const selectedDemographic = new ReactiveVar(false);
+// const selectedDiscourseDimension = new ReactiveVar(false);
+// const selectedDiscourseOption = new ReactiveVar(false);
+// let timeline;
+
+
+Template.heatmapReport.helpers({
+  environments: function() {
+    // //console.log('envs', Environments.find());
+    let envs = Environments.find().fetch();
+    //console.log('envs', envs);
+    // let default_set = false;
+    envs = envs.map(function(env) {
+      let obsOpts = getObsOptions(env._id);
+      //console.log('obs_opts', obsOpts);
+      if (obsOpts.length === 0) {
+        env.envName += ' (no observations)';
+        env.disabled = 'disabled';
+      }
+      else if (obsOpts.length < 2) {
+        env.envName += ' (' + obsOpts.length + ')';
+        env.disabled = 'disabled';
+      }
+      // else if (!default_set) {
+        // default_set = true;
+        // env.default = 'selected';
+      // }
+      return env
+    });
+    return envs;
+  },
+  environmentChosen: function() {
+    return !!(selectedEnvironment.get());
+  },
+  observationChosen: function() {
+    return !!(selectedObservations.get().length >= 1)
+  },
+  // discourseDimensions: function() {
+  //   return getDiscourseDimensions()
+  // },
+  // demographics: function() {
+  //   return getDemographics()
+  // },
+  environment: function() {
+    return getEnvironment();
+  },
+  observations: function() {
+    return getSelectedObservations();
+  },
+  observationsOptions: function() {
+    return obsOptions.get();
+  },
+  observationNames: function() {
+    let observations = getSelectedObservations();
+    let obsNames = observations.map(obs => obs.name);
+
+    if (obsNames.length >= 3) {
+      return obsNames.slice(0,-1).join(', ') + ', and ' + obsNames[obsNames.length - 1]
+    }
+    else if (obsNames.length === 2) {
+      return obsNames.join(' and ');
+    }
+    else {
+      return obsNames[0]
+    }
+  },
+  demographics: function() {
+    //console.log('getDemographics', getDemographics());
+    return getDemographics();
+  },
+  discourseparams: function() {
+    return getDiscourseDimensions();
+  },
+  demo_available: function() {
+    return !!selectedEnvironment.get() && !!(selectedObservations.get().length >= 2) ? '' : 'disabled'
+  },
+  disc_available: function() {
+    return !!selectedEnvironment.get() && !!(selectedObservations.get().length >= 2) ? '' : 'disabled'
+  },
+  disc_options_available: function() {
+    return !!selectedDiscourseDimension.get() && !!selectedEnvironment.get() && !!(selectedObservations.get().length >= 2) ? '' : 'disabled'
+  },
+  selected_discourse_options: function() {
+    return getDiscourseOptions();
+  },
+  dataset_types: function() {
+    return [
+      // {
+      //   id: 'equity',
+      //   name: 'Equity Ratio',
+      //   default: 'default'
+      // },
+      {
+        id: 'contributions',
+        name: 'Contributions',
+        default: 'default'
+      }
+    ]
+  }
+});
+
+//
+// let getDemographics = function() {
+//   let envId = selectedEnvironment.get();
+//   if (!envId) {
+//     return []
+//   }
+//   return setupSubjectParameters(envId);
+// };
+//
+// let getDiscourseDimensions = function() {
+//   let envId = selectedEnvironment.get();
+//   if (!envId) {
+//     return []
+//   }
+//   return setupSequenceParameters(envId);
+// };
+//
+// let getDiscourseOptions = function() {
+//   let options = getDiscourseDimensions();
+//   let selected_disc_dim = selectedDiscourseDimension.get();
+//   if (selected_disc_dim === false) {
+//     return [];
+//   }
+//   // console.log('options', options, 'selected_disc_dim', selected_disc_dim);
+//   let opt = options.find(opt => opt.name === selected_disc_dim);
+//   // console.log('opt', opt);
+//   return opt
+//     .options.split(',').map(function(opt) {return {name: opt.trim()}})
+// };
+
+//
+// let getDemographicOptions = function() {
+//   let options = getDemographics();
+//   let selected_demo = selectedDemographic.get();
+//   let opt =  options.find(opt => opt.name === selected_demo);
+//   //console.log('opt', opt);
+//   return opt
+//     .options.split(',').map(function(opt) {return {name: opt.trim()}})
+// };
+//
+
+let getEnvironment = function() {
+  let envId = selectedEnvironment.get();
+  return Environments.findOne({_id: envId})
+}
+
+let getSelectedObservations = function() {
+  let obsIds = selectedObservations.get();
+  console.log('getSelectedObservations', obsIds);
+  return Observations.find({_id: {$in: obsIds}}).fetch();
+}
+
+
+Template.heatmapReport.events({
+  'change #env-select': function(e) {
+
+    let selected = $('option:selected', e.target);
+    //console.log('env-select,', selected.val());
+    selectedEnvironment.set(selected.val());
+    clearGraph();
+    // selectedDiscourseOption.set(false);
+    clearObservations();
+    obsOptions.set(getObsOptions());
+    // setTimeout(setupVis, 50);
+
+    $('#disc-select').val('');
+    $('#demo-select').val('');
+    $('#disc-opt-select').val('');
+  },
+  // 'change #disc-select': function(e) {
+  //   let selected = $('option:selected', e.target);
+  //   //console.log('disc-select,', selected.val());
+  //   selectedDiscourseDimension.set(selected.val());
+  //   $('#disc-opt-select').val('')
+  //   clearGraph();
+  //   selectedDiscourseOption.set(false);
+  //   updateGraph();
+  // },
+  // 'change #demo-select': function(e) {
+  //   let selected = $('option:selected', e.target);
+  //   //console.log('demo-select,', selected.val());
+  //   selectedDemographic.set(selected.val());
+  //   updateGraph()
+  // },
+  // 'change #disc-opt-select': function(e) {
+  //   let selected = $('option:selected', e.target);
+  //   //console.log('disc-opt-select,', selected.val());
+  //   selectedDiscourseOption.set(selected.val());
+  //   updateGraph()
+  // },
+  'change #dataset-type-select': function(e) {
+    let selected = $('option:selected', e.target);
+    //console.log('dataset-type-select,', selected.val());
+    selectedDatasetType.set(selected.val());
+    updateGraph()
+  },
+  'click .option--all-observations': function(e) {
+    selectedObservations.set([]);
+    $('.option--observation').removeClass('selected').click()
+
+  },
+  'click .option--observation': function(e) {
+    let $target = $(e.target);
+    if (!$target.hasClass('selected')) {
+      $target.addClass('selected');
+    }
+    else {
+      $target.removeClass('selected');
+    }
+
+    let clickedObservationId = $(e.target).attr('data-obs-id');
+    let currentObsIds = selectedObservations.get();
+
+    if (currentObsIds.find(id => id === clickedObservationId)) {
+      currentObsIds.splice(currentObsIds.indexOf(clickedObservationId), 1);
+    }
+    else {
+      currentObsIds.push(clickedObservationId);
+    }
+
+    selectedObservations.set(currentObsIds);
+    updateGraph();
+    // setTimeout(function(){$(window).trigger('updated-filters')}, 100) // We're also forcing a graph update when you select new observations, not just changing params
+  },
+})
+
+
+let createHeatmapData = function() {
+  let ret = {
+    contributions_dataset: []
+  };
+
+  let envId = selectedEnvironment.get();
+  let obsIds = selectedObservations.get();
+  // let demo = selectedDemographic.get();
+  // let dimension = selectedDiscourseDimension.get();
+  // let option = selectedDiscourseOption.get();
+  let allStudents = getStudents(envId);
+  // let demo_opts = getDemographicOptions();
+
+  ret.contributions_dataset = allStudents.map(function(student) {
+    return {
+      studentId: student._id,
+      student: student,
+      count: 0,
+    }
+  });
+
+  allStudents.map(function(student) {
+    for (let obsId_k in obsIds) {
+
+      if (!obsIds.hasOwnProperty(obsId_k)) continue;
+      let obsId = obsIds[obsId_k];
+
+      let sequences = getSequences(obsId, envId);
+      for (let sequence_k in sequences) {
+        if (!sequences.hasOwnProperty(sequence_k)) continue;
+        let sequence = sequences[sequence_k];
+
+        // let seqDemoOption = sequence.info.student.demographics[demo];
+
+        let ds_index = ret.contributions_dataset.findIndex(datapoint => datapoint.obsId === obsId);
+
+        if (sequence.info.parameters[dimension] === option) {
+          ret.contributions_dataset[ds_index]._total += 1;
+          ret.contributions_dataset[ds_index][seqDemoOption] += 1;
+        }
+
+      }
+    }
+
+  });
+
+  //
+  // allStudents.forEach(function(student) {
+  //   let demoCountIndex = students_by_demo.findIndex(demoopt => demoopt.name === student.info.demographics[demo])
+  //   students_by_demo[demoCountIndex].count++;
+  // });
+  //
+  // students_by_demo.forEach(function(demographic) {
+  //   demographic.percent = demographic.count / students_by_demo.reduce((t, d) => d.count + t, 0)
+  // });
+  //
+  //
+  //
+  // //console.log('creating data for ', obsIds, demo, dimension, option);
+  // for (let obsId_k in obsIds) {
+  //
+  //   if (!obsIds.hasOwnProperty(obsId_k)) continue;
+  //   let obsId = obsIds[obsId_k];
+  //
+  //   let sequences = getSequences(obsId, envId);
+  //   for (let sequence_k in sequences) {
+  //     if (!sequences.hasOwnProperty(sequence_k)) continue;
+  //     let sequence = sequences[sequence_k];
+  //
+  //     // //console.log('sequence', sequence);
+  //
+  //     if (!ret.contributions_dataset.find(datapoint => datapoint.obsId === obsId)) {
+  //       // If it wasn't there:
+  //       let obsers = getObservations();
+  //       //console.log('getObservations()', obsers);
+  //
+  //       let obs = obsers.find(obs => obs._id === obsId);
+  //       let parseTime = d3.timeParse('%Y-%m-%d');
+  //       //console.log('ob SEACH', obs);
+  //       let datapoint = {
+  //         obsId: obsId,
+  //         d3date: parseTime(obs.observationDate),
+  //         obsName: obs.name,
+  //         date: obs.observationDate,
+  //         studentsByDemo: students_by_demo,
+  //         _total: 0,
+  //       };
+  //
+  //       demo_opts.forEach(function (opt) {
+  //         datapoint[opt.name] = 0
+  //       });
+  //
+  //       ret.contributions_dataset.push(datapoint)
+  //     }
+  //
+  //     let seqDemoOption = sequence.info.student.demographics[demo];
+  //
+  //     let ds_index = ret.contributions_dataset.findIndex(datapoint => datapoint.obsId === obsId);
+  //
+  //     if (sequence.info.parameters[dimension] === option) {
+  //       ret.contributions_dataset[ds_index]._total += 1;
+  //       ret.contributions_dataset[ds_index][seqDemoOption] += 1;
+  //     }
+  //
+  //   }
+  // }
+  //
+  // ret.equity_dataset = [];
+  //
+  // //console.log('allStudents', allStudents);
+  //
+  // ret.equity_dataset = ret.contributions_dataset.map(function(observation) {
+  //   //console.log('obs', observation)
+  //   let obs_equity = {
+  //     _total: 1,
+  //     obsId: observation.obsId,
+  //     obsName: observation.obsName,
+  //     d3date: observation.d3date,
+  //     date: observation.date,
+  //     studentsByDemo: students_by_demo,
+  //     contribsByDemo: [],
+  //   }
+  //   demo_opts.forEach(function(demo_opt) {
+  //     let percent_of_contribs = observation[demo_opt.name] / observation._total;
+  //     console.log('percent_of_contribs', percent_of_contribs);
+  //     if (isNaN(percent_of_contribs)) {
+  //       percent_of_contribs = 0;
+  //     }
+  //
+  //     obs_equity.contribsByDemo.push({
+  //       name: demo_opt.name,
+  //       percent: percent_of_contribs,
+  //       count: observation[demo_opt.name],
+  //       total: observation._total
+  //     });
+  //     let percent_of_students = students_by_demo.find(demo => demo.name === demo_opt.name).percent;
+  //     if (isNaN(percent_of_students)) {
+  //       percent_of_students = 0;
+  //     }
+  //
+  //     if (percent_of_students === 0) {
+  //       obs_equity[demo_opt.name] = 0;
+  //     }
+  //     else {
+  //       let equity_ratio = percent_of_contribs / percent_of_students;
+  //       obs_equity[demo_opt.name] = isNaN(equity_ratio) ? 0 : equity_ratio;
+  //     }
+  //   });
+  //   return obs_equity
+  // })
+  //
+  // ret.contributions_dataset.forEach(function(obs) {
+  //   obs.max = obs._total;
+  // });
+  // ret.equity_dataset.forEach(function(obs) {
+  //   let vals = demo_opts.map(demo_opt => obs[demo_opt.name]);
+  //   //console.log('vals', vals);
+  //   obs.max = Math.max.apply(null, vals);
+  // })
+
+  return ret
+};
+
+let sidebar;
+
+let clearGraph = function() {
+  //console.log('clearing-graph');
+  let timeline_selector = '.heatmap-report__graph';
+  $(timeline_selector + ' svg').remove();
+}
+
+let updateGraph = function() {
+  let heatmap_wrapper = $('.heatmap-report-wrapper');
+  let heatmap_selector = '.heatmap-report__graph';
+
+  // let demo = selectedDemographic.get();
+  // let dimension = selectedDiscourseDimension.get();
+  // let option = selectedDiscourseOption.get();
+
+  // if (demo === false || dimension === false || option === false) {
+  //   return;
+  // }
+
+  if (selectedObservations.get().length < 1) {
+    return;
+  }
+
+  let data = createHeatmapData();
+  if (!heatmap_wrapper.hasClass('heatmap-created')) {
+    heatmap_wrapper.addClass('heatmap-created');
+    // let sidebarLevels = {
+    //   0: 'start',
+    //   1: 'bar_tooltip',
+    // };
+    // sidebar = new Sidebar('.timeline-report__sidebar', sidebarLevels);
+    // sidebar.setSlide('start', 'Hover a point (or tap on mobile) to see more information', '')
+
+    initHeatmapGraph(data, heatmap_selector)
+  }
+  else {
+    updateHeatmapGraph(data, heatmap_selector)
+  }
+}
+
+
+
+let initHeatmapGraph = function(full_data, containerSelector) {
+  let data;
+
+  if (selectedDatasetType.get() === 'contributions') {
+    data = full_data.contributions_dataset;
+  }
+  else {
+    data = full_data.equity_dataset;
+  }
+  //
+  // data = data.sort(function(a, b) {return a.d3date - b.d3date});
+  //
+  // svg = $('<svg width="718" height="500">' +
+  //   '<defs>\n' +
+  //   '  <style type="text/css">\n' +
+  //   '    @font-face {\n' +
+  //   '      font-family: Roboto;\n' +
+  //   '      @import url(\'https://fonts.googleapis.com/css?family=Roboto:300,400,700\');\n' +
+  //   '    }\n' +
+  //   '  </style>\n' +
+  //   '</defs>' +
+  //   '</svg>');
+  // $(containerSelector).html(svg);
+  //
+  // let svg = d3.select(containerSelector + " svg"),
+  //   margin = {top: 30, right: 20, bottom: 40, left: 50},
+  //   width = +svg.attr("width") - margin.left - margin.right,
+  //   height = +svg.attr("height") - margin.top - margin.bottom,
+  //   g = svg.append("g").attr('class', 'graph-container').attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+  //
+  // let x = d3.scaleTime()
+  //   .domain(d3.extent(data, d => d.d3date))
+  //   .range([0, width]);
+  //
+  // let y = d3.scaleLinear()
+  //   .domain([0, d3.max(data, d => d.max)])
+  //   .range([height, 0]);
+  //
+  //
+  // // let lines = [];
+  // let demos = getDemographicOptions();
+  //
+  // let total_line = d3.line()
+  //   .x(function(d) { return x(d.d3date)})
+  //   .y(function(d) { return y(d._total)});
+  //
+  //
+  // let lines = demos.map(function(demo) {
+  //   let line = d3.line()
+  //     .x(d => x(d.d3date))
+  //     .y(d => y(d[demo.name]));
+  //   //console.log('demo', demo.name);
+  //   // let line = d3.line()
+  //   //   .x(function(d) { return x(d.d3date)})
+  //   //   .y(function(d) { return y(d[demo.name])});
+  //
+  //   return {line: line, demo: demo};
+  // });
+  //
+  //
+  // //
+  // // let valLine = d3.line()
+  // //   .x(function(d) {return x(d.date)})
+  // //   .y(function(d) {return y(d.value)})
+  //
+  //
+  // g.append('path')
+  //   .data([data])
+  //   .attr('class', 'line line--title')
+  //   .style("stroke-width", 2)
+  //   .attr('d', total_line);
+  //
+  // let key_colors = getLabelColors(getDemographicOptions().map(demo_opt => demo_opt.name));
+  // let z = d3.scaleOrdinal()
+  //   .range(Object.values(key_colors));
+  //
+  // updateKey('.timeline-report__graph-key', demos, z)
+  //
+  // //console.log('key_colors', key_colors);
+  //
+  // lines.forEach(function(line) {
+  //   //console.log('data is', data);
+  //   //console.log('z(line.demo)', z(line.demo.name), line.demo.name);
+  //
+  //
+  //   g.append('path')
+  //     .data([data])
+  //     .attr('class', 'line line--demo')
+  //     .style("stroke", z(line.demo.name))
+  //     .style("stroke-width", 2)
+  //     .attr('d', line.line);
+  //
+  //   g.append('g')
+  //     .attr('class', 'dot-container')
+  //     .selectAll('dot')
+  //     .data(data)
+  //     .enter()
+  //     .append('circle')
+  //     .attr('r', 3)
+  //     .attr('class', 'dot')
+  //     .attr('cx', d => x(d.d3date))
+  //     .attr('cy', d => y(d[line.demo.name]))
+  //     .attr('data-demo-name', line.demo.name)
+  //     .style("fill", z(line.demo.name))
+  //     .on('mouseover', function(d) {
+  //       d['line_name'] = line.demo.name;
+  //       let data = [];
+  //       let circles = g.selectAll('circle[cx="' + x(d.d3date) + '"][cy="' + y(d[line.demo.name]) + '"]');
+  //       if (circles.size() > 1) {
+  //         //console.log('more than one circle');
+  //         //console.log('d', d);
+  //         //console.log('this', this);
+  //         //console.log('circles', circles);
+  //         circles.each(function(d) {
+  //           let datum = clone_object(d);
+  //           datum.line_name = $(this).attr('data-demo-name');
+  //           data.push(datum)
+  //         });
+  //       }
+  //       else {
+  //         data = [d];
+  //       }
+  //
+  //       //console.log('abut to use data', data);
+  //
+  //       buildBarTooltipSlide(data, z)
+  //     })
+  //     .on('mouseout', function() {
+  //       // sidebar.setCurrentPanel('start', 250)
+  //     });
+  //
+  // });
+  //
+  // g.append("g")
+  //   .attr("transform", "translate(0," + height + ")")
+  //   .attr('class', 'x-axis')
+  //   .call(d3.axisBottom(x));
+  //
+  // // Add the Y Axis
+  // g.append("g")
+  //   .attr('class', 'y-axis')
+  //   .call(d3.axisLeft(y));
+
+};
+
+
+let updateHeatmapGraph = function(full_data, containerSelector) {
+  // console.log('updating timeline graph');
+  initHeatmapGraph(full_data, containerSelector)
+
+  // Disabling on the fly d3 updating due to some complications with
+  // figuring out which items need to be reassigned. When the parameters that create the data
+  // change whenever the graph needs to be updated, it's hard to make it work.
+  // Only time it could work is when you add a new observation, but that doesn't work
+  // as of yet.
+  // For now, we're going to rebuild the graph each time the parameters are updated.
+
+
+  // let data;
+  //
+  // if (selectedDatasetType.get() === 'contributions') {
+  //   data = full_data.contributions_dataset;
+  // }
+  // else {
+  //   data = full_data.equity_dataset;
+  // }
+  //
+  // data = data.sort(function(a, b) {return a.d3date - b.d3date});
+  // //
+  // // svg = $('<svg width="718" height="500">' +
+  // //   '<defs>\n' +
+  // //   '  <style type="text/css">\n' +
+  // //   '    @font-face {\n' +
+  // //   '      font-family: Roboto;\n' +
+  // //   '      @import url(\'https://fonts.googleapis.com/css?family=Roboto:300,400,700\');\n' +
+  // //   '    }\n' +
+  // //   '  </style>\n' +
+  // //   '</defs>' +
+  // //   '</svg>');
+  // // $(containerSelector).html(svg);
+  //
+  // let svg = d3.select(containerSelector + " svg"),
+  //   margin = {top: 30, right: 20, bottom: 40, left: 50},
+  //   width = +svg.attr("width") - margin.left - margin.right,
+  //   height = +svg.attr("height") - margin.top - margin.bottom,
+  //   // g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+  //   g = svg.select("g.graph-container")
+  //
+  // let x = d3.scaleTime()
+  //   .domain(d3.extent(data, d => d.d3date))
+  //   .range([0, width]);
+  //
+  // let y = d3.scaleLinear()
+  //   .domain([0, d3.max(data, d => d.max)])
+  //   .range([height, 0]);
+  //
+  //
+  // // let lines = [];
+  // let demos = getDemographicOptions();
+  //
+  // let total_line = d3.line()
+  //   .x(function(d) { return x(d.d3date)})
+  //   .y(function(d) { return y(d._total)});
+  //
+  //
+  // let lines = demos.map(function(demo) {
+  //   let line = d3.line()
+  //     .x(d => x(d.d3date))
+  //     .y(d => y(d[demo.name]));
+  //   //console.log('demo', demo.name);
+  //   // let line = d3.line()
+  //   //   .x(function(d) { return x(d.d3date)})
+  //   //   .y(function(d) { return y(d[demo.name])});
+  //
+  //   return {line: line, demo: demo};
+  // });
+  //
+  //
+  // //
+  // // let valLine = d3.line()
+  // //   .x(function(d) {return x(d.date)})
+  // //   .y(function(d) {return y(d.value)})
+  //
+  //
+  // g.select('path.line--title')
+  //   .data([data])
+  //   .attr('class', 'line line--title')
+  //   .style("stroke-width", 2)
+  //   .attr('d', total_line);
+  //
+  // let key_colors = getLabelColors(getDemographicOptions().map(demo_opt => demo_opt.name));
+  // let z = d3.scaleOrdinal()
+  //   .range(Object.values(key_colors));
+  //
+  // updateKey('.timeline-report__graph-key', demos, z)
+  //
+  // //console.log('key_colors', key_colors);
+  //
+  // lines.forEach(function(line) {
+  //   //console.log('data is', data);
+  //   //console.log('z(line.demo)', z(line.demo.name), line.demo.name);
+  //
+  //
+  //   let d3line = g.selectAll('path.line--demo')
+  //     .data([data]);
+  //
+  //   d3line.enter()
+  //     .append('path')
+  //     .attr('class', 'line line--demo')
+  //     .style("stroke", z(line.demo.name))
+  //     .style("stroke-width", 2)
+  //     .attr('d', line.line)
+  //     .merge(d3line)
+  //     .transition()
+  //     .duration(500)
+  //     .attr('d', line.line)
+  //
+  //   g.selectAll('dot')
+  //     .data(data)
+  //     .enter()
+  //     .transition()
+  //     // .append('circle')
+  //     .attr('r', 3)
+  //     .attr('class', 'dot')
+  //     .attr('cx', d => x(d.d3date))
+  //     .attr('cy', d => y(d[line.demo.name]))
+  //     .attr('data-demo-name', line.demo.name)
+  //     .style("fill", z(line.demo.name))
+  //     .on('mouseover', function(d) {
+  //       d['line_name'] = line.demo.name;
+  //       let data = [];
+  //       let circles = g.selectAll('circle[cx="' + x(d.d3date) + '"][cy="' + y(d[line.demo.name]) + '"]');
+  //       if (circles.size() > 1) {
+  //         //console.log('more than one circle');
+  //         //console.log('d', d);
+  //         //console.log('this', this);
+  //         //console.log('circles', circles);
+  //         circles.each(function(d) {
+  //           let datum = clone_object(d);
+  //           datum.line_name = $(this).attr('data-demo-name');
+  //           data.push(datum)
+  //         });
+  //       }
+  //       else {
+  //         data = [d];
+  //       }
+  //
+  //       //console.log('abut to use data', data);
+  //
+  //       buildBarTooltipSlide(data, z)
+  //     })
+  //     .on('mouseout', function() {
+  //       // sidebar.setCurrentPanel('start', 250)
+  //     });
+  //
+  // });
+  //
+  // g.select("g.x-axis")
+  //   .transition()
+  //   .attr("transform", "translate(0," + height + ")")
+  //   .call(d3.axisBottom(x));
+  //
+  // // Add the Y Axis
+  // g.select("g.y-axis")
+  //   .transition()
+  //   .call(d3.axisLeft(y));
+
+};
+
+let updateKey = function(key_wrapper, y_values, color_axis) {
+  let key_chunks = y_values.map(function (label) {
+    let color = color_axis(label.name)
+    return `<span class="key--label"><span class="key--color" style="background-color: ${color}"></span><span class="key--text">${label.name}</span></span>`
+  })
+
+  let html = `${key_chunks.join('')}`;
+  $(key_wrapper).html(html)
+}
+
+let avail_colors_viridis = [
+  "#440154ff", "#440558ff", "#450a5cff", "#450e60ff", "#451465ff", "#461969ff",
+  "#461d6dff", "#462372ff", "#472775ff", "#472c7aff", "#46307cff", "#45337dff",
+  "#433880ff", "#423c81ff", "#404184ff", "#3f4686ff", "#3d4a88ff", "#3c4f8aff",
+  "#3b518bff", "#39558bff", "#37598cff", "#365c8cff", "#34608cff", "#33638dff",
+  "#31678dff", "#2f6b8dff", "#2d6e8eff", "#2c718eff", "#2b748eff", "#29788eff",
+  "#287c8eff", "#277f8eff", "#25848dff", "#24878dff", "#238b8dff", "#218f8dff",
+  "#21918dff", "#22958bff", "#23988aff", "#239b89ff", "#249f87ff", "#25a186ff",
+  "#25a584ff", "#26a883ff", "#27ab82ff", "#29ae80ff", "#2eb17dff", "#35b479ff",
+  "#3cb875ff", "#42bb72ff", "#49be6eff", "#4ec16bff", "#55c467ff", "#5cc863ff",
+  "#61c960ff", "#6bcc5aff", "#72ce55ff", "#7cd04fff", "#85d349ff", "#8dd544ff",
+  "#97d73eff", "#9ed93aff", "#a8db34ff", "#b0dd31ff", "#b8de30ff", "#c3df2eff",
+  "#cbe02dff", "#d6e22bff", "#e1e329ff", "#eae428ff", "#f5e626ff", "#fde725ff",
+];
+
+
+function shiftArrayToLeft(arr, places) {
+  arr.push.apply(arr, arr.splice(0,places));
+}
+
+let getLabelColors = function(labels) {
+  let local_colors = avail_colors_viridis.slice();
+
+  let spacing = Math.max(Math.floor(avail_colors_viridis.length / labels.length), 1);
+
+  let label_colors = {};
+  let _ = labels.map(function(label) {
+    if (typeof label_colors[label] === 'undefined') {
+      let new_color = local_colors[0];
+      local_colors.push(new_color);
+      label_colors[label] = new_color;
+      shiftArrayToLeft(local_colors, spacing);
+    }
+    else {
+
+    }
+  });
+  return label_colors
+}
+
+let getObsOptions = function(envId) {
+  if (typeof envId === 'undefined') {
+    envId = selectedEnvironment.get();
+  }
+  if (!!envId) {
+    let obs = Observations.find({envId: envId}).fetch();
+    console.log('envid', envId);
+    console.log('observations', obs);
+    return obs;
+  }
+  else {
+    return false;
+  }
+}
+
+let clearObservations = function() {
+  //console.log('TODO: CLEAN OBSERVATIONS');
+  clearParameters();
+  selectedObservations.set([]);
+  $('.option--observation').removeClass('selected');
+
+};
+
+let clearParameters = function() {
+  //console.log('TODO: CLEAN PARAMS')
+};

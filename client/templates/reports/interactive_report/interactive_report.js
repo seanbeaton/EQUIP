@@ -315,7 +315,7 @@ let getEnvironment = function() {
   return Environments.findOne({_id: envId})
 }
 
-let getObservations = function() {
+let getSelectedObservations = function() {
   let obsIds = selectedObservations.get();
   return Observations.find({_id: {$in: obsIds}}).fetch();
 }
@@ -478,7 +478,7 @@ let updateReport = function() {
 
 let updateGraph = function() {
   let envId = getEnvironment()._id;
-  let obsIds = getObservations().map(obs => obs._id); // todo allow passing the full obs object so we don't need to create it later
+  let obsIds = getSelectedObservations().map(obs => obs._id); // todo allow passing the full obs object so we don't need to create it later
   let xParams = getXAxisSelection();
   let yParams = getYAxisSelection();
 

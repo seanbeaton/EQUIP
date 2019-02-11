@@ -10,21 +10,14 @@
             <div class="report-section-wrapper__slide">
 
                 <section data-slide-id="params" class="report-section report-section--select">
-                    <h2>{{#if environmentChosen }}Exploring <span class="dataset-type-select-inline">
-            <select id="dataset-type-select" class="dataset">
-                {{#each dataset_types}}
-                    <option {{default}} value="{{id}}">{{name}}</option>
-                {{/each}}
-            </select>
-        </span> analytics for{{else}}Which classroom do you want to explore?<br/>{{/if}}
-                        <div class="environment-select">
-                            <select id="env-select" class="env-select">
-                                <option disabled selected value="">- Select -</option>
-                                {{#each environments}}
-                                    <option {{default}} {{ disabled }} value="{{_id}}">{{envName}}</option>
-                                {{/each}}
-                            </select>
-                        </div></h2>
+                    <h2>
+                        {{#if environmentChosen }}
+                                Exploring {{> inlineDataTypeSelect dataset_types=dataset_types}} analytics for
+                        {{else}}
+                                Which classroom do you want to explore?<br/>
+                        {{/if}}
+                        {{>environmentSelect environments=environments}}
+                    </h2>
                     {{#if environmentChosen }}
                         <h2>Choose two or more observations.</h2>
                         <p>You can select multiple observations by holding down the control key (command on mac) and clicking more observations.</p>

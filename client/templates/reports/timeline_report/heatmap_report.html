@@ -1,0 +1,34 @@
+
+<template name="heatmapReport">
+    {{> reportBackButton }}
+
+    <div class="report-section-wrapper">
+        <div class="report-section-wrapper__slide-track">
+            <div class="report-section-wrapper__slide">
+
+                <section data-slide-id="params" class="report-section report-section--select">
+                    <h2>
+                        {{#if environmentChosen }}
+                            Exploring {{> inlineDataTypeSelect dataset_types=dataset_types}} analytics for
+                        {{else}}
+                            Which classroom do you want to explore?<br/>
+                        {{/if}}
+                        {{>environmentSelect environments=environments}}
+                    </h2>
+                    {{#if environmentChosen }}
+                        <h2>Choose one or more observations.</h2>
+                        {{>observationsButtonSelect observations=observationsOptions}}
+                    {{/if}}
+                    {{#if observationNames}} <h3>Observations: {{ observationNames }}</h3> {{/if }}
+
+                    <div class="heatmap-report-wrapper">
+                        <div class="heatmap-report">
+                            <div class="heatmap-report__graph"></div>
+                            <div class="heatmap-report__graph-key"></div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</template>
