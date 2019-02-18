@@ -314,15 +314,11 @@ Template.heatmapReport.events({
     student_boxes.each(function(student_key) {
       let $student = $(student_boxes[student_key]);
       let student_data = students.get().find(student => student._id === $student.attr('id'))
+
       let allowed = selected_filters.map(function(filter) {
-        // console.log('checking filter', filter);
-        // console.log('against ', student_data.info[filter.name])
         if (filter.selected.length === 0) {
           return true;
         }
-        // console.log('has it ',filter.selected.indexOf(student_data.info[filter.name]) >= 0);
-        // console.log('index ',filter.selected.indexOf(student_data.info[filter.name]));
-
         return (filter.selected.indexOf(student_data.info[filter.name]) >= 0)
       }).reduce((a,b) => a && b);
 
@@ -332,6 +328,7 @@ Template.heatmapReport.events({
       }
       // console.log('student', student_data, 'allowed', allowed);
     })
+    updateGraph()
   }
 })
 
@@ -416,6 +413,8 @@ let updateGraph = function() {
   }
 
   let data = createHeatmapData();
+  updateTotalContribs(data.contributions_dataset);
+
   if (!heatmap_wrapper.hasClass('heatmap-created')) {
     heatmap_wrapper.addClass('heatmap-created');
 
@@ -426,19 +425,55 @@ let updateGraph = function() {
   }
 }
 
+let updateTotalContribs = function(data) {
+  let student_boxes = $('.student-box');
+
+  if (student_boxes.length === 0) {
+    setTimeout(function() {
+      updateTotalContribs(data);
+    }, 100);
+    return;
+  }
+  let filters = currentDemoFilters.get();
+
+  let allowed_students = [];
+  console.log('student boxes', student_boxes);
+
+  student_boxes.each(function(student_key) {
+    let $student = $(student_boxes[student_key]);
+    let student_data = students.get().find(student => student._id === $student.attr('id'))
+
+    // creates an array of boolean values for if the student matches each filter, then reduces it.
+    console.log('filters', filters);
+
+    let allowed = filters.map(function(filter) {
+      if (filter.selected.length === 0) {
+        return true;
+      }
+      return (filter.selected.indexOf(student_data.info[filter.name]) >= 0)
+    }).reduce((a,b) => a && b);
+
+    $student.removeClass('disabled-student');
+    if (!allowed) {
+      $student.addClass('disabled-student');
+    }
+    else {
+      console.log('adding studnet to reduced students', $student);
+      allowed_students.push($student.attr('id'))
+    }
+    // console.log('student', student_data, 'allowed', allowed);
+  })
+
+  console.log('allowed_students',allowed_students);
+  let full_count = data.filter(datum => allowed_students.indexOf(datum.studentId) >= 0).map(datum => datum.count).reduce((a, b) => a + b, 0);
+  console.log('full_count', full_count);
+  totalContributions.set(full_count);
+};
+
 let initHeatmapGraph = function(full_data, containerSelector) {
   let data;
 
-  if (selectedDatasetType.get() === 'contributions') {
-    data = full_data.contributions_dataset;
-  }
-  else {
-    data = full_data.equity_dataset;
-  }
-
-  let full_count = data.map(datum => datum.count).reduce((a, b) => a + b);
-  console.log('full_count', full_count);
-  totalContributions.set(full_count);
+  data = full_data.contributions_dataset;
 
   let count_scale = d3.scaleSequential(d3.interpolateViridis)
     .domain([0, d3.max(data, d => d.count)]);
@@ -476,16 +511,7 @@ let updateHeatmapGraph = function(full_data, containerSelector) {
 
   let data;
 
-  if (selectedDatasetType.get() === 'contributions') {
-    data = full_data.contributions_dataset;
-  }
-  else {
-    data = full_data.equity_dataset;
-  }
-
-  let full_count = data.map(datum => datum.count).reduce((a, b) => a + b);
-  console.log('full_count', full_count);
-  totalContributions.set(full_count);
+  data = full_data.contributions_dataset;
 
   // initHeatmapGraph(full_data, containerSelector)
 
