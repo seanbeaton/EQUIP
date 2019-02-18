@@ -855,26 +855,35 @@ let getLabelColors = function(labels) {
 let setupVis = function() {
   let observations = obsOptions.get();
   // //console.log('observations', observations);
-  let items = new vis.DataSet(observations.map(function(obs) {
-    //console.log('obse', obs);
+  let obs = observations.map(function(obs) {
+    // console.log('obse', obs);
     return {
       id: obs._id,
       // content: obs.name + '<br/>(' + obs.observationDate + ')',
       content: obs.name + ' (' + obs.observationDate + ')',
+      compare_date: new Date(obs.observationDate),
       start: obs.observationDate,
       className: getSequences(obs._id, obs.envId).length < 1 ? 'disabled' : ''
     }
-  }));
+  })
+  let items = new vis.DataSet(obs);
   let container = document.getElementById('vis-container');
   $(container).html('');
   let options = {
-    multiselect: true
+    multiselect: true,
+    zoomable: false,
   }
   timeline = new vis.Timeline(container, items, options)
   timeline.on('select', function(props) {
     selectedObservations.set(props.items);
     updateGraph();
   });
+
+  let recent_obs = obs.sort(function(a, b) {return a.compare_date - b.compare_date}).slice(Math.max(obs.length - 8, 1));
+  console.log('recent_obs', recent_obs)
+  let recent_obs_ids = recent_obs.map(obs => obs.id);
+  console.log('recent_obs_ids', recent_obs_ids)
+  timeline.focus(recent_obs_ids);
   return timeline
 }
 
