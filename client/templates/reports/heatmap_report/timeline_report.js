@@ -543,10 +543,14 @@ let initTimelineGraph = function(full_data, containerSelector) {
 
   });
 
+  let ticks = data.map(datum => datum.d3date);
+
   g.append("g")
     .attr("transform", "translate(0," + height + ")")
     .attr('class', 'x-axis')
-    .call(d3.axisBottom(x));
+    .call(d3.axisBottom(x)
+      .tickValues(ticks))
+  ;
 
   // Add the Y Axis
   g.append("g")
