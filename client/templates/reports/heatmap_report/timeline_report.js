@@ -884,6 +884,7 @@ let setupVis = function() {
   let recent_obs_ids = recent_obs.map(obs => obs.id);
   console.log('recent_obs_ids', recent_obs_ids)
   timeline.focus(recent_obs_ids);
+
   return timeline
 }
 
