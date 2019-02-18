@@ -389,6 +389,7 @@ let updateGraph = function() {
     return;
   }
 
+
   let data = createTimelineData();
   if (!timeline_wrapper.hasClass('timeline-created')) {
     timeline_wrapper.addClass('timeline-created');
@@ -402,6 +403,7 @@ let updateGraph = function() {
     initTimelineGraph(data, timeline_selector)
   }
   else {
+    sidebar.setCurrentPanel('start');
     updateTimelineGraph(data, timeline_selector)
   }
 }
@@ -746,10 +748,10 @@ let buildBarTooltipSlide = function(data, demo_color_axis) {
       }
       ret += `
     <div class="stat-group">
-      <div class="stat-leadin">By students in the demographic "${datum.line_name}" <span class="key--color" style="background-color: ${demo_color_axis(datum.line_name)}"></div>
+      <div class="stat-leadin">Demographic "${datum.line_name}" <span class="key--color" style="background-color: ${demo_color_axis(datum.line_name)}"></div>
     </div>
     <div class="stat-group stat-group--vert-centered">
-      <div class="stat-leadin">Contributions</div>
+      <div class="stat-leadin">Number of Contributions</div>
       <div class="stat stat--large-value">${datum[datum.line_name]}</div>
     </div>
     <div class="stat stat--double">
@@ -776,7 +778,7 @@ let buildBarTooltipSlide = function(data, demo_color_axis) {
       }
       ret += `
         <div class="stat-group">
-        <div class="stat-leadin">By students in the demographic "${datum.line_name}" <span class="key--color" style="background-color: ${demo_color_axis(datum.line_name)}"></span></div>
+        <div class="stat-leadin">Demographic "${datum.line_name}" <span class="key--color" style="background-color: ${demo_color_axis(datum.line_name)}"></span></div>
       </div>
       <div class="stat-group stat-group--vert-centered">
         <div class="stat-leadin">Equity ratio</div>
