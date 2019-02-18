@@ -349,7 +349,10 @@ let createTimelineData = function() {
   })
 
   ret.contributions_dataset.forEach(function(obs) {
-    obs.max = obs._total;
+    // obs.max = obs._total;
+    let vals = demo_opts.map(demo_opt => obs[demo_opt.name]);
+    //console.log('vals', vals);
+    obs.max = Math.max.apply(null, vals);
   });
   ret.equity_dataset.forEach(function(obs) {
     let vals = demo_opts.map(demo_opt => obs[demo_opt.name]);
@@ -447,9 +450,9 @@ let initTimelineGraph = function(full_data, containerSelector) {
   // let lines = [];
   let demos = getDemographicOptions();
 
-  let total_line = d3.line()
-    .x(function(d) { return x(d.d3date)})
-    .y(function(d) { return y(d._total)});
+  // let total_line = d3.line()
+  //   .x(function(d) { return x(d.d3date)})
+  //   .y(function(d) { return y(d._total)});
 
 
   let lines = demos.map(function(demo) {
@@ -471,11 +474,11 @@ let initTimelineGraph = function(full_data, containerSelector) {
   //   .y(function(d) {return y(d.value)})
 
 
-  g.append('path')
-    .data([data])
-    .attr('class', 'line line--total')
-    .style("stroke-width", 2)
-    .attr('d', total_line);
+  // g.append('path')
+  //   .data([data])
+  //   .attr('class', 'line line--total')
+  //   .style("stroke-width", 2)
+  //   .attr('d', total_line);
 
   let key_colors = getLabelColors(getDemographicOptions().map(demo_opt => demo_opt.name));
   let z = d3.scaleOrdinal()
