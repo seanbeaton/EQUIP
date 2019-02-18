@@ -13,7 +13,7 @@
     }
   }
 
-  grid-template-columns: auto;
+  grid-template-columns: 50% 50%;
   grid-template-rows: auto auto;
 }
 
@@ -31,16 +31,24 @@
   min-height: 50px;
 }
 
+.heatmap-report__graph-stat {
+  grid-column-start: 2;
+  grid-column-end: 3;
+  grid-row-start: 1;
+  grid-row-end: 2;
+  min-height: 50px;
+}
+
 .heatmap-report__graph {
   grid-column-start: 1;
-  grid-column-end: 2;
+  grid-column-end: 3;
   grid-row-start: 2;
   grid-row-end: 3;
 }
 
 .heatmap-report__student-spotlight {
   grid-column-start: 1;
-  grid-column-end: 2;
+  grid-column-end: 3;
   grid-row-start: 1;
   grid-row-end: 3;
 }
@@ -51,8 +59,16 @@ $light-grid-color: #ddd;
 
 // Grid lines
 .heatmap-report__graph-key {
-  border-bottom: 1px solid $grid-color;
+  //border-bottom: 1px solid $grid-color;
   height: 100%;
+}
+
+.heatmap-report__graph-stat {
+  display: flex;
+  flex-flow: column nowrap;
+  h4 {
+    margin-top: auto;
+  }
 }
 
 .heatmap-report__student-spotlight {

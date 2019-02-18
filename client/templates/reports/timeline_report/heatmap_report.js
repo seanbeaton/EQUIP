@@ -17,6 +17,7 @@ const students = new ReactiveVar([]);
 const selectedStudent = new ReactiveVar(false);
 const selectedStudentContribDimension = new ReactiveVar(false);
 const selectedStudentTimeDimension = new ReactiveVar(false);
+const totalContributions = new ReactiveVar(0);
 
 // const selectedDemographic = new ReactiveVar(false);
 // const selectedDiscourseDimension = new ReactiveVar(false);
@@ -136,6 +137,9 @@ Template.heatmapReport.helpers({
       result.push({name:key,value:obj[key]});
     }
     return result;
+  },
+  totalContributions: function() {
+    return totalContributions.get()
   }
 });
 
@@ -311,10 +315,8 @@ let createHeatmapData = function() {
         if (sequence.info.student.studentId === student._id) {
           ret.contributions_dataset[ds_index].count += 1;
         }
-
       }
     }
-
   });
 
   return ret
@@ -356,6 +358,10 @@ let initHeatmapGraph = function(full_data, containerSelector) {
   else {
     data = full_data.equity_dataset;
   }
+
+  let full_count = data.map(datum => datum.count).reduce((a, b) => a + b);
+  console.log('full_count', full_count);
+  totalContributions.set(full_count);
 
   let count_scale = d3.scaleSequential(d3.interpolateViridis)
     .domain([0, d3.max(data, d => d.count)]);
@@ -399,6 +405,10 @@ let updateHeatmapGraph = function(full_data, containerSelector) {
   else {
     data = full_data.equity_dataset;
   }
+
+  let full_count = data.map(datum => datum.count).reduce((a, b) => a + b);
+  console.log('full_count', full_count);
+  totalContributions.set(full_count);
 
   // initHeatmapGraph(full_data, containerSelector)
 
