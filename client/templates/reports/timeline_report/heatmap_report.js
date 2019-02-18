@@ -201,8 +201,9 @@ Template.heatmapReport.events({
 
     let selected = $('option:selected', e.target);
     //console.log('env-select,', selected.val());
-    selectedEnvironment.set(selected.val());
     clearGraph();
+
+    selectedEnvironment.set(selected.val());
     // selectedDiscourseOption.set(false);
     clearObservations();
     obsOptions.set(getObsOptions());
@@ -256,6 +257,11 @@ Template.heatmapReport.events({
     }
 
     selectedObservations.set(currentObsIds);
+
+    if (currentObsIds.length === 0) {
+      selectedStudent.set(false);
+    }
+
     updateGraph();
 
     updateStudentContribGraph();
@@ -325,9 +331,16 @@ let createHeatmapData = function() {
 let sidebar;
 
 let clearGraph = function() {
-  //console.log('clearing-graph');
-  let timeline_selector = '.heatmap-report__graph';
-  $(timeline_selector + ' svg').remove();
+  console.log('clearing-graph');
+  students.set([])
+  selectedObservations.set([]);
+  selectedStudent.set(false);
+  totalContributions.set(0);
+  $('.heatmap-report-wrapper').removeClass('heatmap-created');
+  $('#heatmap-d3-wrapper').html('');
+  $('.heatmap-report__graph-key').html('');
+  // let timeline_selector = '.heatmap-report__graph';
+  // $(timeline_selector + ' svg').remove();
 }
 
 let updateGraph = function() {
@@ -335,6 +348,8 @@ let updateGraph = function() {
   let heatmap_selector = '.heatmap-report__graph';
 
   if (selectedObservations.get().length < 1) {
+    // heatmap_wrapper.html('');
+    // heatmap_wrapper.removeClass('heatmap-created')
     return;
   }
 

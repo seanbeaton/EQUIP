@@ -10,9 +10,6 @@
             <h3>
                 Classroom: {{>environmentSelect environments=environments}}
             </h3>
-            <h3>
-                Graph type: {{> inlineDataTypeSelect dataset_types=dataset_types}}
-            </h3>
             {{#if environmentChosen }}
                 <h2>Choose one or more observations.</h2>
                 {{>observationsButtonSelect observations=observationsOptions}}

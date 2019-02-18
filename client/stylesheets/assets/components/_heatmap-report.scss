@@ -103,3 +103,8 @@ $light-grid-color: #ddd;
     margin: 0;
   }
 }
+
+#heatmap-d3-wrapper {
+  overflow-x: scroll;
+  position: relative;
+}
