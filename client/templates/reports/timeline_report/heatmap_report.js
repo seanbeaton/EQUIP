@@ -297,10 +297,8 @@ Template.heatmapReport.events({
   'change .filters__wrapper .filter': function() {
     let selected_filters = getDemographics().map(function(demo) {
       let selected_options = $('.filters__wrapper .filter[data-filter-demo-name="' + demo.name + '"] option:selected');
-      console.log('selected_options', selected_options);
       let opts = []
       selected_options.each(function(key) {
-        console.log('item', selected_options[key]);
         opts.push($(selected_options[key]).val());
       })
       return {
@@ -309,7 +307,6 @@ Template.heatmapReport.events({
       }
     })
     currentDemoFilters.set(selected_filters);
-    console.log('demo filters', selected_filters);
     let student_boxes = $('.student-box');
     student_boxes.each(function(student_key) {
       let $student = $(student_boxes[student_key]);
@@ -326,7 +323,6 @@ Template.heatmapReport.events({
       if (!allowed) {
         $student.addClass('disabled-student');
       }
-      // console.log('student', student_data, 'allowed', allowed);
     })
     updateGraph()
   }
@@ -374,9 +370,7 @@ let createHeatmapData = function() {
       for (let sequence_k in sequences) {
         if (!sequences.hasOwnProperty(sequence_k)) continue;
         let sequence = sequences[sequence_k];
-        // console.log('sequence', sequence);
         let ds_index = ret.contributions_dataset.findIndex(datapoint => datapoint.studentId === student._id);
-        // console.log('dsIndex', ds_index);
         if (sequence.info.student.studentId === student._id) {
           ret.contributions_dataset[ds_index].count += 1;
         }
@@ -390,7 +384,6 @@ let createHeatmapData = function() {
 let sidebar;
 
 let clearGraph = function() {
-  console.log('clearing-graph');
   students.set([])
   selectedObservations.set([]);
   selectedStudent.set(false);
@@ -437,15 +430,12 @@ let updateTotalContribs = function(data) {
   let filters = currentDemoFilters.get();
 
   let allowed_students = [];
-  console.log('student boxes', student_boxes);
 
   student_boxes.each(function(student_key) {
     let $student = $(student_boxes[student_key]);
     let student_data = students.get().find(student => student._id === $student.attr('id'))
 
     // creates an array of boolean values for if the student matches each filter, then reduces it.
-    console.log('filters', filters);
-
     let allowed = filters.map(function(filter) {
       if (filter.selected.length === 0) {
         return true;
@@ -458,15 +448,11 @@ let updateTotalContribs = function(data) {
       $student.addClass('disabled-student');
     }
     else {
-      console.log('adding studnet to reduced students', $student);
       allowed_students.push($student.attr('id'))
     }
-    // console.log('student', student_data, 'allowed', allowed);
   })
 
-  console.log('allowed_students',allowed_students);
   let full_count = data.filter(datum => allowed_students.indexOf(datum.studentId) >= 0).map(datum => datum.count).reduce((a, b) => a + b, 0);
-  console.log('full_count', full_count);
   totalContributions.set(full_count);
 };
 
@@ -503,12 +489,9 @@ let initHeatmapGraph = function(full_data, containerSelector) {
 
 let selectStudentForModal = function(studentId) {
   selectedStudent.set(getStudent(studentId, selectedEnvironment.get()));
-  console.log('selected student ', selectedStudent.get());
 }
 
 let updateHeatmapGraph = function(full_data, containerSelector) {
-  console.log('updating heatmap');
-
   let data;
 
   data = full_data.contributions_dataset;
@@ -752,7 +735,6 @@ let createStudentContribData = function() {
   return ret
 };
 let studentContribGraph = function(data, selector) {
-  console.log('creating studentContribGraph', data);
   svg = $('<svg width="718" height="400">' +
     '<defs>\n' +
     '  <style type="text/css">\n' +
@@ -778,10 +760,8 @@ let studentContribGraph = function(data, selector) {
   let y = d3.scaleLinear()
     .rangeRound([height, 0]);
 
-
   x.domain(data.map(d => d.name))
   y.domain([0, d3.max(data, d => d.count)]);
-  console.log('d3.max(data, d => d.count)', d3.max(data, d => d.count));
 
   g.selectAll("bar")
     .data(data)
@@ -811,15 +791,12 @@ let studentContribGraph = function(data, selector) {
 let updateStudentTimeGraph = function () {
   let selector = '.student-participation-time__graph';
 
-  console.log('updaing time graph;');
   let dimension = selectedStudentTimeDimension.get();
 
   if (dimension === false) {
-    console.log('bailing on no dim');
     return;
   }
   if (selectedObservations.get().length < 2) {
-    console.log('bailing on not enough obs');
     return;
   }
 
@@ -838,7 +815,6 @@ let createStudentTimeData = function() {
 
   let dimension = selectedStudentTimeDimension.get();
   let disc_opts = getDiscourseOptionsForDimension(dimension);
-  console.log('disc_opts', disc_opts);
 
   let envId = selectedEnvironment.get();
   let obsIds = selectedObservations.get();
@@ -854,16 +830,12 @@ let createStudentTimeData = function() {
       if (!sequences.hasOwnProperty(sequence_k)) continue;
       let sequence = sequences[sequence_k];
 
-      // //console.log('sequence', sequence);
-
       if (!ret.contributions_dataset.find(datapoint => datapoint.obsId === obsId)) {
         // If it wasn't there:
         let obsers = getObservations();
-        //console.log('getObservations()', obsers);
 
         let obs = obsers.find(obs => obs._id === obsId);
         let parseTime = d3.timeParse('%Y-%m-%d');
-        //console.log('ob SEACH', obs);
         let datapoint = {
           obsId: obsId,
           d3date: parseTime(obs.observationDate),
@@ -966,12 +938,7 @@ let studentTimeGraph = function(data, selector) {
 
   updateStudentTimeKey('.student-participation-time__graph_key', discdims, z)
 
-  //console.log('key_colors', key_colors);
-
   lines.forEach(function(line) {
-    //console.log('data is', data);
-    //console.log('z(line.demo)', z(line.demo.name), line.demo.name);
-
 
     g.append('path')
       .data([data])

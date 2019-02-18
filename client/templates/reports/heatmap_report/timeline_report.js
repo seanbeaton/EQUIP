@@ -321,7 +321,7 @@ let createTimelineData = function() {
     }
     demo_opts.forEach(function(demo_opt) {
       let percent_of_contribs = observation[demo_opt.name] / observation._total;
-      console.log('percent_of_contribs', percent_of_contribs);
+      // console.log('percent_of_contribs', percent_of_contribs);
       if (isNaN(percent_of_contribs)) {
         percent_of_contribs = 0;
       }
@@ -893,9 +893,9 @@ let setupVis = function() {
   });
 
   let recent_obs = obs.sort(function(a, b) {return a.compare_date - b.compare_date}).slice(Math.max(obs.length - 8, 1));
-  console.log('recent_obs', recent_obs)
+  // console.log('recent_obs', recent_obs)
   let recent_obs_ids = recent_obs.map(obs => obs.id);
-  console.log('recent_obs_ids', recent_obs_ids)
+  // console.log('recent_obs_ids', recent_obs_ids)
   timeline.focus(recent_obs_ids);
 
   return timeline
