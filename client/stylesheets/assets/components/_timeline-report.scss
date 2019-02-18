@@ -142,6 +142,17 @@ $light-grid-color: #ddd;
   .stat-leadin {
     font-size: 14px;
   }
+  .stat-leadin--small {
+    opacity: 0.9;
+    font-size: 12px;
+  }
+}
+
+.stat-group--vert-centered {
+  .stat-leadin--large {
+    margin-top: 10px;
+    font-size: 20px;
+  }
 }
 
 .panel__content .stat {

@@ -751,19 +751,21 @@ let buildBarTooltipSlide = function(data, demo_color_axis) {
       <div class="stat-leadin">Demographic "${datum.line_name}" <span class="key--color" style="background-color: ${demo_color_axis(datum.line_name)}"></div>
     </div>
     <div class="stat-group stat-group--vert-centered">
-      <div class="stat-leadin">Number of Contributions</div>
+      <div class="stat-leadin stat-leadin--large">Number of Contributions</div>
       <div class="stat stat--large-value">${datum[datum.line_name]}</div>
     </div>
     <div class="stat stat--double">
       <div class="stat-separator stat-separator--small">of</div>
       <div class="stat-group stat-group--vert-centered">
         <div class="stat stat--val stat--percent">${datum._total}</div>
-        <div class="stat-leadin">total contribs</div>
+        <div class="stat-leadin">Actual</div>
+        <div class="stat-leadin--small">total contribs</div>
       </div>
       <div class="stat-separator stat-separator--small">by</div>
       <div class="stat-group stat-group--vert-centered">
         <div class="stat stat--val stat--percent">${(datum.studentsByDemo.find(d => d.name === datum.line_name).percent * 100).toFixed(2)}%</div>
-        <div class="stat-leadin">of all students</div>
+        <div class="stat-leadin">Expected</div>
+        <div class="stat-leadin--small">of all students</div>
       </div>
     </div>
   `;
@@ -781,18 +783,20 @@ let buildBarTooltipSlide = function(data, demo_color_axis) {
         <div class="stat-leadin">Demographic "${datum.line_name}" <span class="key--color" style="background-color: ${demo_color_axis(datum.line_name)}"></span></div>
       </div>
       <div class="stat-group stat-group--vert-centered">
-        <div class="stat-leadin">Equity ratio</div>
+        <div class="stat-leadin stat-leadin--large">Equity ratio</div>
       <div class="stat stat--large-value">${(datum[datum.line_name]).toFixed(2)}</div>
         </div>
         <div class="stat stat--double">
         <div class="stat-group stat-group--vert-centered">
         <div class="stat stat--val stat--percent">${(datum.contribsByDemo.find(d => d.name === datum.line_name).percent * 100).toFixed(2)}%</div>
-        <div class="stat-leadin">of all contribs</div>
+        <div class="stat-leadin">Actual</div>
+        <div class="stat-leadin--small">of all contribs</div>
       </div>
       <div class="stat-separator">/</div>
         <div class="stat-group stat-group--vert-centered">
         <div class="stat stat--val stat--percent">${(datum.studentsByDemo.find(d => d.name === datum.line_name).percent * 100).toFixed(2)}%</div>
-        <div class="stat-leadin">of all students</div>
+        <div class="stat-leadin">Expected</div>
+        <div class="stat-leadin--small">of all students</div>
       </div>
       </div>
         `;
