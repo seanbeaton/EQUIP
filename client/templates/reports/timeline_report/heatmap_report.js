@@ -1,4 +1,4 @@
-import {setupSequenceParameters} from "../../../helpers/parameters";
+import {setupSequenceParameters, setupSubjectParameters} from "../../../helpers/parameters";
 
 let d3 = require('d3');
 let d3ScaleChromatic = require("d3-scale-chromatic");
@@ -23,7 +23,6 @@ const totalContributions = new ReactiveVar(0);
 // const selectedDiscourseDimension = new ReactiveVar(false);
 // const selectedDiscourseOption = new ReactiveVar(false);
 // let timeline;
-
 
 Template.heatmapReport.helpers({
   environments: function() {
@@ -90,11 +89,24 @@ Template.heatmapReport.helpers({
     }
   },
   demographics: function() {
-    //console.log('getDemographics', getDemographics());
     return getDemographics();
+  },
+  demographic_filters: function() {
+    let demo_options = getDemographics();
+    demo_options = demo_options.map(function(demo_opt) {
+      demo_opt.options = demo_opt.options.split(',').map(function(item) { return item.trim() });
+      return demo_opt;
+    });
+
+    console.log('demo_options', demo_options);
+
+    return demo_options;
   },
   discourseparams: function() {
     return getDiscourseDimensions();
+  },
+  showFilters: function() {
+    return (students.get().length > 0) && (selectedObservations.get().length > 0);
   },
   demo_available: function() {
     setTimeout(function(){$(".chosen-select").trigger("chosen:updated");}, 100);
@@ -143,14 +155,14 @@ Template.heatmapReport.helpers({
   }
 });
 
-//
-// let getDemographics = function() {
-//   let envId = selectedEnvironment.get();
-//   if (!envId) {
-//     return []
-//   }
-//   return setupSubjectParameters(envId);
-// };
+
+let getDemographics = function() {
+  let envId = selectedEnvironment.get();
+  if (!envId) {
+    return []
+  }
+  return setupSubjectParameters(envId);
+};
 //
 // let getDiscourseDimensions = function() {
 //   let envId = selectedEnvironment.get();
@@ -260,6 +272,7 @@ Template.heatmapReport.events({
 
     if (currentObsIds.length === 0) {
       selectedStudent.set(false);
+      // students.set([]);
     }
 
     updateGraph();
@@ -450,7 +463,7 @@ let updateHeatmapGraph = function(full_data, containerSelector) {
     .transition()
     .duration(500)
     .attr('data-contrib-count', d => d.count)
-    .style('background-color', function(d){console.log('d count_scale(d.count)',d, count_scale(d.count));return count_scale(d.count)});
+    .style('background-color', function(d){return count_scale(d.count)});
 };
 
 

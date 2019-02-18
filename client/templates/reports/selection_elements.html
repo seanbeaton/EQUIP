@@ -39,3 +39,15 @@
         <div class="report-select__option report-select__option--spacer"></div>
     </div>
 </template>
+
+<template name="demographicHeatmapFilter">
+    <span class="select__wrapper">
+        <label class="explanation-text">{{filter.name}}</label>
+        <select multiple class="filter chosen-select" data-filter-demo-name="{{filter.name}}">
+            <!--<option selected value="">All</option>-->
+            {{#each opt in filter.options}}
+                <option value="{{opt}}">{{opt}}</option>
+            {{/each}}
+        </select>
+    </span>
+</template>

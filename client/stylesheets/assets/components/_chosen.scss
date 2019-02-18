@@ -6,6 +6,7 @@ $box-shadow: rgba(0,0,0,0.15);
   box-shadow: 0px 1px 2px 0px $box-shadow;
 }
 
+$text-color: #333;
 $text-size: 24px;
 
 $icon-color: transparent;
@@ -24,7 +25,7 @@ $chosen-border: $icon-color;
 $dropdown-icon-width: $chosen-padding * 2 + $text-size;
 $chosen-height: $text-size + $chosen-padding * 2;
 
-
+$multi-border: #8c8c8c;
 
 /// Overrides for drupal
 
@@ -68,6 +69,15 @@ $chosen-height: $text-size + $chosen-padding * 2;
     border-top: 0;
     background: #fff;
     @include card-shadow;
+  }
+  &.chosen-container-multi {
+    .chosen-choices {
+      border: 1px solid $multi-border;
+    }
+    .chosen-drop {
+      border: 1px solid $multi-border;
+      border-top: 0;
+    }
   }
   &.chosen-with-drop .chosen-drop {
     left: 0;
@@ -303,7 +313,7 @@ $chosen-height: $text-size + $chosen-padding * 2;
     max-width: 100%;
     box-sizing: border-box;
     background-color: $accent-blue;
-    color: white;
+    color: $text-color;
     background-size: 100% 19px;
     border: 0;
     background-repeat: repeat-x;
@@ -322,9 +332,9 @@ $chosen-height: $text-size + $chosen-padding * 2;
     display: block;
     height: 100%;
     width: $dropdown-icon-width / 2;
-    background: url('/icons/x-white.svg') no-repeat;
+    background: url('/icons/x-grey.svg') no-repeat;
     background-position: right $chosen-padding / 2 center;
-    background-size: $dropdown-icon-width - 2.5 * $chosen-padding;
+    background-size: $dropdown-icon-width - 3 * $chosen-padding;
     font-size: 1px;
   }
   .chosen-choices li.search-choice .search-choice-close:hover {

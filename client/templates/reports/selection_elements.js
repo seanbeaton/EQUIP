@@ -77,6 +77,13 @@ Template.interactiveReport.rendered = function(){
 };
 
 
+Template.demographicHeatmapFilter.rendered = function() {
+  $('.filter.chosen-select')
+    .filter(':not(.chosen--processed)').addClass('chosen--processed')
+    .chosen({disable_search_threshold: 10, width: "250px"});
+}
+
+
 //
 // let getObsOptions = function(envId) {
 //   if (!!envId) {
