@@ -358,7 +358,7 @@ let initHeatmapGraph = function(full_data, containerSelector) {
   }
 
   let count_scale = d3.scaleSequential(d3.interpolateViridis)
-    .domain([0, d3.max(data, d => d.count) * 1.2]);
+    .domain([0, d3.max(data, d => d.count)]);
 
   updateHeatmapKey('.heatmap-report__graph-key', count_scale);
 
@@ -466,14 +466,14 @@ let updateHeatmapKey = function(selector, color_axis) {
   d3.range(0, 100, 0.001)
     .forEach(function (d) {
       ctx.beginPath();
-      ctx.strokeStyle = color_axis(d);
+      ctx.strokeStyle = color_axis(d * 1.28);
       ctx.moveTo(key_scale(d), 0);
       ctx.lineTo(key_scale(d), 500);
       ctx.stroke();
     });
 
   let key_axis = d3.axisTop(key_scale)
-    .tickSize(6)
+    // .tickSize(6)
     .ticks(d3.min([8, d3.max(color_axis.domain())]));
 
   svg.append("g")
