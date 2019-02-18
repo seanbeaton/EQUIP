@@ -1,6 +1,6 @@
 <template name="environmentSelect">
     <div class="environment-select">
-        <select id="env-select" class="env-select">
+        <select id="env-select" class="env-select chosen-select">
             <option disabled selected value="">- Select -</option>
             {{#each environments}}
                 <option {{default}} {{ disabled }} value="{{_id}}">{{envName}}</option>
@@ -17,7 +17,7 @@
 
 
 <template name="dataTypeSelect">
-    <select id="dataset-type-select" class="dataset">
+    <select id="dataset-type-select" class="dataset chosen-select">
     {{#each dataset_types}}
         <option {{default}} value="{{id}}">{{name}}</option>
     {{/each}}

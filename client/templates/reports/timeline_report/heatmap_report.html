@@ -7,14 +7,12 @@
             <!--<div class="report-section-wrapper__slide">-->
 
         <section data-slide-id="params" class="report-section report-section--select">
-            <h2>
-                {{#if environmentChosen }}
-                    Exploring {{> inlineDataTypeSelect dataset_types=dataset_types}} analytics for
-                {{else}}
-                    Which classroom do you want to explore?<br/>
-                {{/if}}
-                {{>environmentSelect environments=environments}}
-            </h2>
+            <h3>
+                Classroom: {{>environmentSelect environments=environments}}
+            </h3>
+            <h3>
+                Graph type: {{> inlineDataTypeSelect dataset_types=dataset_types}}
+            </h3>
             {{#if environmentChosen }}
                 <h2>Choose one or more observations.</h2>
                 {{>observationsButtonSelect observations=observationsOptions}}

@@ -8,11 +8,37 @@ import {Sidebar} from '../../../helpers/graph_sidebar';
 // import {getStudent, getStudents} from "../../../helpers/students";
 // import {setupSubjectParameters, setupSequenceParameters} from "../../../helpers/parameters";
 
+//
+// Template.interactiveReport.rendered = function() {
+//     // show different report options
+//     // 'environments':
+//   console.log('rendered interactiveReport');
+//   $(".chosen-select").trigger("chosen:updated");   // update chosen to take the updated values into account
+// }
+//
+// Template.interactiveReport.rendered = function() {
+//   Meteor.defer(function () {
+//     // fixes the persistent dropdown selection
+//     let chosenElements = $(".chosen-select");
+//     let correctVal = chosenElements.eq(lastRemovedId).children().first().text();
+//     chosenElements.eq(lastRemovedId).val(correctVal);
+//
+//     // update chosen
+//     chosenElements.trigger("chosen:updated");
+//   });
+// }
 
-Template.interactiveReport.rendered = function() {
-    // show different report options
-    // 'environments':
-}
+// Template.interactiveReport.destroyed(function() {
+//   // run in async after the rest of the tasks have been executed
+//   Meteor.defer(function () {
+//     // fixes the persistent dropdown selection
+//     let chosenElements =
+//     let correctVal = chosenElements.eq(lastRemovedId).children().first().text();
+//     chosenElements.eq(lastRemovedId).val(correctVal);
+//
+//     // update chosen
+//   });
+// });
 
 const obsOptions = new ReactiveVar([]);
 const selectedEnvironment = new ReactiveVar(false);
@@ -113,9 +139,11 @@ Template.interactiveReport.helpers({
     return getDiscourseDimensions();
   },
   demo_available: function() {
+    setTimeout(function(){$(".chosen-select").trigger("chosen:updated");}, 100);
     return !!selectedEnvironment.get() && !!(selectedObservations.get().length >= 1) ? '' : 'disabled'
   },
   disc_available: function() {
+    setTimeout(function(){$(".chosen-select").trigger("chosen:updated");}, 100);
     return !!selectedEnvironment.get() && !!(selectedObservations.get().length >= 1) ? '' : 'disabled'
   },
   dataset_types: function() {

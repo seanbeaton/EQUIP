@@ -20,6 +20,13 @@ const selectedDatasetType = new ReactiveVar('equity');
 let timeline;
 
 
+Template.timelineReport.rendered = function(){
+  $('.timeline-param-select.chosen-select')
+    .filter(':not(.chosen--processed)').addClass('chosen--processed')
+    .chosen({disable_search_threshold: 10, width: "300px"});
+  // $(".param-select-form-item.chosen-select").trigger("chosen:updated");   // update chosen to take the updated values into account
+};
+
 
 Template.timelineReport.helpers({
   environments: function() {
@@ -86,12 +93,15 @@ Template.timelineReport.helpers({
     return getDiscourseDimensions();
   },
   demo_available: function() {
+    setTimeout(function(){$(".chosen-select").trigger("chosen:updated");}, 100);
     return !!selectedEnvironment.get() && !!(selectedObservations.get().length >= 2) ? '' : 'disabled'
   },
   disc_available: function() {
+    setTimeout(function(){$(".chosen-select").trigger("chosen:updated");}, 100);
     return !!selectedEnvironment.get() && !!(selectedObservations.get().length >= 2) ? '' : 'disabled'
   },
   disc_options_available: function() {
+    setTimeout(function(){$(".chosen-select").trigger("chosen:updated");}, 100);
     return !!selectedDiscourseDimension.get() && !!selectedEnvironment.get() && !!(selectedObservations.get().length >= 2) ? '' : 'disabled'
   },
   selected_discourse_options: function() {
@@ -484,7 +494,7 @@ let initTimelineGraph = function(full_data, containerSelector) {
       .data([data])
       .attr('class', 'line line--demo')
       .style("stroke", z(line.demo.name))
-      .style("stroke-width", 2)
+      .style("stroke-width", 4)
       .attr('d', line.line);
 
     g.append('g')
@@ -493,7 +503,7 @@ let initTimelineGraph = function(full_data, containerSelector) {
       .data(data)
       .enter()
       .append('circle')
-      .attr('r', 3)
+      .attr('r', 6)
       .attr('class', 'dot')
       .attr('cx', d => x(d.d3date))
       .attr('cy', d => y(d[line.demo.name]))

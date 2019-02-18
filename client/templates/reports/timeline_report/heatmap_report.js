@@ -2,6 +2,7 @@ import {setupSequenceParameters} from "../../../helpers/parameters";
 
 let d3 = require('d3');
 let d3ScaleChromatic = require("d3-scale-chromatic");
+let chosen = require("chosen-js");
 
 import {getSequences} from "../../../helpers/sequences";
 import {getStudents, getStudent} from "../../../helpers/students";
@@ -95,12 +96,15 @@ Template.heatmapReport.helpers({
     return getDiscourseDimensions();
   },
   demo_available: function() {
+    setTimeout(function(){$(".chosen-select").trigger("chosen:updated");}, 100);
     return !!selectedEnvironment.get() && !!(selectedObservations.get().length >= 2) ? '' : 'disabled'
   },
   disc_available: function() {
+    setTimeout(function(){$(".chosen-select").trigger("chosen:updated");}, 100);
     return !!selectedEnvironment.get() && !!(selectedObservations.get().length >= 2) ? '' : 'disabled'
   },
   disc_options_available: function() {
+    setTimeout(function(){$(".chosen-select").trigger("chosen:updated");}, 100);
     return !!selectedDiscourseDimension.get() && !!selectedEnvironment.get() && !!(selectedObservations.get().length >= 2) ? '' : 'disabled'
   },
   selected_discourse_options: function() {

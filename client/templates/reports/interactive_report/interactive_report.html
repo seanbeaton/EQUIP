@@ -12,12 +12,10 @@
 
     <section data-slide-id="params" class="report-section report-section--select">
         <h3>
-            {{#if environmentChosen }}
-                    Exploring {{> inlineDataTypeSelect dataset_types=dataset_types}} analytics for
-            {{else}}
-                    Which classroom do you want to explore?<br/>
-            {{/if}}
-            {{>environmentSelect environments=environments}}
+            Classroom: {{>environmentSelect environments=environments}}
+        </h3>
+        <h3>
+            Graph type: {{> inlineDataTypeSelect dataset_types=dataset_types}}
         </h3>
         {{#if environmentChosen }}
         <h4>Choose one or more observations.</h4>
@@ -32,8 +30,8 @@
                     <div class="x-axis-label param-selector-wrapper swappable">
 
                         <div class="select__wrapper select__wrapper--demo"><span
-                                class="explanation-text demographics-color">Demographic</span>
-                            <select id="demo-select" {{demo_available}} class="param-select-form-item demographic" name="demographic-select" data-param-type="demographics">
+                                class="explanation-text">Demographic</span>
+                            <select id="demo-select" {{demo_available}} class="param-select-form-item demographic chosen-select" name="demographic-select" data-param-type="demographics">
                                 <option disabled selected value="">- Select -</option>
                                 {{#each demographics}}
                                     <option value="{{name}}">{{name}}</option>
@@ -42,8 +40,8 @@
                         </div>
                         <span class="center_text"><span class="swappable__button"><i class="fas fa-exchange-alt"></i></span></span>
                         <div class="select__wrapper select__wrapper--disc"><span
-                                class="explanation-text discourse-color">Discourse Dimension</span>
-                            <select id="disc-select" {{disc_available}} class="param-select-form-item discourse" name="parameter-select" data-param-type="discourse">
+                                class="explanation-text">Discourse Dimension</span>
+                            <select id="disc-select" {{disc_available}} class="param-select-form-item discourse chosen-select" name="parameter-select" data-param-type="discourse">
                                 <option disabled selected value="">- Select -</option>
                                 {{#each discourseparams}}
                                     <option data-options="{{options}}" value="{{name}}">{{name}}</option>
