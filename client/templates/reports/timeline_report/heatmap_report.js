@@ -19,6 +19,8 @@ const selectedStudentContribDimension = new ReactiveVar(false);
 const selectedStudentTimeDimension = new ReactiveVar(false);
 const totalContributions = new ReactiveVar(0);
 
+const currentDemoFilters = new ReactiveVar(false);
+
 // const selectedDemographic = new ReactiveVar(false);
 // const selectedDiscourseDimension = new ReactiveVar(false);
 // const selectedDiscourseOption = new ReactiveVar(false);
@@ -225,6 +227,14 @@ Template.heatmapReport.events({
     $('#disc-select').val('');
     $('#demo-select').val('');
     $('#disc-opt-select').val('');
+
+    let blank_filters = getDemographics().map(function(demo) {
+      return {
+        name: demo.name,
+        selected: []
+      }
+    })
+    currentDemoFilters.set(blank_filters);
   },
 
   'change #student-contributions-graph__disc-select': function(e) {
@@ -283,6 +293,45 @@ Template.heatmapReport.events({
   },
   'click .student-spotlight__close': function() {
     selectedStudent.set(false);
+  },
+  'change .filters__wrapper .filter': function() {
+    let selected_filters = getDemographics().map(function(demo) {
+      let selected_options = $('.filters__wrapper .filter[data-filter-demo-name="' + demo.name + '"] option:selected');
+      console.log('selected_options', selected_options);
+      let opts = []
+      selected_options.each(function(key) {
+        console.log('item', selected_options[key]);
+        opts.push($(selected_options[key]).val());
+      })
+      return {
+        name: demo.name,
+        selected: opts
+      }
+    })
+    currentDemoFilters.set(selected_filters);
+    console.log('demo filters', selected_filters);
+    let student_boxes = $('.student-box');
+    student_boxes.each(function(student_key) {
+      let $student = $(student_boxes[student_key]);
+      let student_data = students.get().find(student => student._id === $student.attr('id'))
+      let allowed = selected_filters.map(function(filter) {
+        // console.log('checking filter', filter);
+        // console.log('against ', student_data.info[filter.name])
+        if (filter.selected.length === 0) {
+          return true;
+        }
+        // console.log('has it ',filter.selected.indexOf(student_data.info[filter.name]) >= 0);
+        // console.log('index ',filter.selected.indexOf(student_data.info[filter.name]));
+
+        return (filter.selected.indexOf(student_data.info[filter.name]) >= 0)
+      }).reduce((a,b) => a && b);
+
+      $student.removeClass('disabled-student');
+      if (!allowed) {
+        $student.addClass('disabled-student');
+      }
+      // console.log('student', student_data, 'allowed', allowed);
+    })
   }
 })
 

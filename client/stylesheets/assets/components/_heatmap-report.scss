@@ -126,3 +126,9 @@ $light-grid-color: #ddd;
   overflow-x: scroll;
   position: relative;
 }
+
+
+.disabled-student {
+  pointer-events: none;
+  opacity: 0.5;
+}
