@@ -603,7 +603,7 @@ let createGraph = function(contribData, containerSelector, dataset) {
       buildBarTooltipSlide(group, group_type, bar, bar_type, contribData)
     })
     .on('mouseout', function() {
-        sidebar.setCurrentPanel('start', 250)
+        // sidebar.setCurrentPanel('start', 250)
       // hover out
 
     })
@@ -750,7 +750,7 @@ let createGraph = function(contribData, containerSelector, dataset) {
 
 
 let buildBarTooltipSlide = function(group, group_type, bar, bar_type, contribData) {
-  let title = `<span class="${contribData.x_axis_param_type}-color">${group}</span> x <span class="${contribData.y_axis_param_type}-color">${bar}</span>`;
+  let title = `<span class="group">${group}</span> <span class="deemphasize">x</span> <span class="bar">${bar}</span>`;
 
   let chosen_demo = (group_type === 'demographics') ? group : bar;
   let chosen_discourse = (bar_type === 'discourse') ? bar : group;
@@ -779,10 +779,8 @@ let buildBarTooltipSlide = function(group, group_type, bar, bar_type, contribDat
   }).join('');
 
   let html = `
-    <div class="stat-leadin">Students that contributed:</div>
-    <div class="stat stat--barchart">${contributing_students_html}</div>
-    <div class="stat-leadin">Students that did not contribute:</div>
-    <div class="stat stat--barchart">${non_contributing_students_html}</div>
+    <div class="stat-leadin">Number of contributions</div>
+    <div class="stat stat--barchart">${contributing_students_html}${non_contributing_students_html}</div>
   `;
 
   sidebar.setSlide('bar_tooltip', html, title)
