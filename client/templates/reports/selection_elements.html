@@ -51,3 +51,14 @@
         </select>
     </span>
 </template>
+
+
+<template name="spotlightDiscourseSelect">
+    <label for="student-spotlight__discourse-select">Discourse dimension</label>
+    <select id="student-spotlight__discourse-select" class="discourse disc-select-chosen">
+        <option disabled selected value="">- Select -</option>
+        {{#each discourseparams}}
+            <option data-options="{{options}}" value="{{name}}">{{name}}</option>
+        {{/each}}
+    </select>
+</template>

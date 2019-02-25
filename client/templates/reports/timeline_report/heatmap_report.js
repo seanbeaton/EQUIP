@@ -15,8 +15,8 @@ const selectedObservations = new ReactiveVar([]);
 const selectedDatasetType = new ReactiveVar('contributions');
 const students = new ReactiveVar([]);
 const selectedStudent = new ReactiveVar(false);
-const selectedStudentContribDimension = new ReactiveVar(false);
-const selectedStudentTimeDimension = new ReactiveVar(false);
+const selectedSpotlightDimension = new ReactiveVar(false);
+
 const totalContributions = new ReactiveVar(0);
 
 const currentDemoFilters = new ReactiveVar(false);
@@ -139,6 +139,25 @@ Template.heatmapReport.helpers({
       }
     ]
   },
+  tourData: function() {
+    let a = {
+      id: 'heatmap-tour',
+      steps: [
+        // {
+        //   content: 'Tour.',
+        // },
+        {
+          class: 'environment-select',
+          content: 'First, select a classroom with the dropdown.',
+        },
+        // {
+        //   class: 'environment-select',
+        //   content: 'First, select a classroom with the dropdown.',
+        // },
+      ]
+    };
+    return {};
+  },
   students: function() {
     return students.get();
   },
@@ -237,15 +256,11 @@ Template.heatmapReport.events({
     currentDemoFilters.set(blank_filters);
   },
 
-  'change #student-contributions-graph__disc-select': function(e) {
+  'change #student-spotlight__discourse-select': function(e) {
     let selected = $('option:selected', e.target);
-    selectedStudentContribDimension.set(selected.val());
-    updateStudentContribGraph()
-  },
-  'change #student-participation-time__disc-select': function(e) {
-    let selected = $('option:selected', e.target);
-    selectedStudentTimeDimension.set(selected.val());
-    updateStudentTimeGraph()
+    selectedSpotlightDimension.set(selected.val());
+    updateStudentContribGraph();
+    updateStudentTimeGraph();
   },
   'change #dataset-type-select': function(e) {
     let selected = $('option:selected', e.target);
@@ -461,7 +476,7 @@ let initHeatmapGraph = function(full_data, containerSelector) {
 
   data = full_data.contributions_dataset;
 
-  let count_scale = d3.scaleSequential(d3.interpolateViridis)
+  let count_scale = d3.scaleSequential(d3.interpolatePlasma)
     .domain([0, d3.max(data, d => d.count)]);
 
   updateHeatmapKey('.heatmap-report__graph-key', count_scale);
@@ -498,7 +513,7 @@ let updateHeatmapGraph = function(full_data, containerSelector) {
 
   // initHeatmapGraph(full_data, containerSelector)
 
-  let count_scale = d3.scaleSequential(d3.interpolateViridis)
+  let count_scale = d3.scaleSequential(d3.interpolatePlasma)
     .domain([0, d3.max(data, d => d.count) * 1.2]);
 
   updateHeatmapKey('.heatmap-report__graph-key', count_scale);
@@ -664,16 +679,19 @@ let getDiscourseOptionsForDimension = function(dimension) {
     return [];
   }
   let opt = options.find(opt => opt.name === dimension);
-  // console.log('opt', opt);
+  if (typeof opt === 'undefined') {
+    return [];
+  }
   return opt
     .options.split(',').map(function(opt) {return {name: opt.trim()}})
 };
 
 
-let updateStudentContribGraph = function () {
+let updateStudentContribGraph = function() {
+  console.log('updateStudentContribGraph');
   let selector = '.student-contributions-graph__graph';
 
-  let dimension = selectedStudentContribDimension.get();
+  let dimension = selectedSpotlightDimension.get();
 
   if (dimension === false) {
     return;
@@ -694,7 +712,7 @@ let createStudentContribData = function() {
   let obsIds = selectedObservations.get();
   let student = selectedStudent.get();
 
-  let dimension = selectedStudentContribDimension.get();
+  let dimension = selectedSpotlightDimension.get();
   let disc_opts = getDiscourseOptionsForDimension(dimension);
   // let demo_opts = getDemographicOptions();
   ret = disc_opts.map(function(opt) {
@@ -791,7 +809,7 @@ let studentContribGraph = function(data, selector) {
 let updateStudentTimeGraph = function () {
   let selector = '.student-participation-time__graph';
 
-  let dimension = selectedStudentTimeDimension.get();
+  let dimension = selectedSpotlightDimension.get();
 
   if (dimension === false) {
     return;
@@ -813,7 +831,7 @@ let createStudentTimeData = function() {
 
   let student = selectedStudent.get();
 
-  let dimension = selectedStudentTimeDimension.get();
+  let dimension = selectedSpotlightDimension.get();
   let disc_opts = getDiscourseOptionsForDimension(dimension);
 
   let envId = selectedEnvironment.get();
@@ -904,7 +922,7 @@ let studentTimeGraph = function(data, selector) {
 
 
   // let lines = [];
-  let dim = selectedStudentTimeDimension.get();
+  let dim = selectedSpotlightDimension.get();
   let discdims = getDiscourseOptionsForDimension(dim);
 
   let total_line = d3.line()

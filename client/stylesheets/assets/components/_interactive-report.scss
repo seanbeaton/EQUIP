@@ -146,6 +146,9 @@ $light-grid-color: #ddd;
     border: 1px solid black;
     font-weight: bold;
   }
+  line {
+    stroke: rgba(0,0,0,0.4);
+  }
 }
 
 .interactive-report__title {

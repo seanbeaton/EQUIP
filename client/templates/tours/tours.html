@@ -1,0 +1,7 @@
+<template name="tour">
+    <ol class="tour-list hidden" id="{{tourData.id}}">
+        {{#each step in tourData.steps}}
+            <li data-id="{{step.id}}" data-class="{{step.class}}">{{step.content}}</li>
+        {{/each}}
+    </ol>
+</template>

@@ -554,8 +554,27 @@ let initTimelineGraph = function(full_data, containerSelector) {
 
   // Add the Y Axis
   g.append("g")
-    .attr('class', 'y-axis')
+    .attr('class', 'axis--y')
     .call(d3.axisLeft(y));
+
+
+  let toggleTickDirection = function(tick) {
+    if ($(tick).attr('x2') === "-6") {
+      $(tick).attr('x2', width)
+    }
+    else {
+      $(tick).attr('x2', "-6")
+    }
+  };
+
+  if (selectedDatasetType.get() === 'equity') {
+    let center_line = $('.axis--y g').filter((idx, item) => parseFloat($('text', item).text()) === 1.);
+    toggleTickDirection($('line', center_line[0]));
+    $(center_line[0]).on('click', function(tick) {
+      toggleTickDirection($('line', center_line[0]));
+    });
+    $(center_line[0]).addClass('clickable-tick')
+  }
 
 };
 
@@ -758,20 +777,6 @@ let buildBarTooltipSlide = function(data, demo_color_axis) {
       <div class="stat-leadin stat-leadin--large">Number of Contributions</div>
       <div class="stat stat--large-value">${datum[datum.line_name]}</div>
     </div>
-    <div class="stat stat--double">
-      <div class="stat-separator stat-separator--small">of</div>
-      <div class="stat-group stat-group--vert-centered">
-        <div class="stat stat--val stat--percent">${datum._total}</div>
-        <div class="stat-leadin">Actual</div>
-        <div class="stat-leadin--small">total contribs</div>
-      </div>
-      <div class="stat-separator stat-separator--small">by</div>
-      <div class="stat-group stat-group--vert-centered">
-        <div class="stat stat--val stat--percent">${(datum.studentsByDemo.find(d => d.name === datum.line_name).percent * 100).toFixed(2)}%</div>
-        <div class="stat-leadin">Expected</div>
-        <div class="stat-leadin--small">of all students</div>
-      </div>
-    </div>
   `;
       return ret;
     }).join('');
@@ -793,14 +798,14 @@ let buildBarTooltipSlide = function(data, demo_color_axis) {
         <div class="stat stat--double">
         <div class="stat-group stat-group--vert-centered">
         <div class="stat stat--val stat--percent">${(datum.contribsByDemo.find(d => d.name === datum.line_name).percent * 100).toFixed(2)}%</div>
+          <div class="stat-leadin--small">of all contribs</div>
         <div class="stat-leadin">Actual</div>
-        <div class="stat-leadin--small">of all contribs</div>
       </div>
       <div class="stat-separator">/</div>
         <div class="stat-group stat-group--vert-centered">
         <div class="stat stat--val stat--percent">${(datum.studentsByDemo.find(d => d.name === datum.line_name).percent * 100).toFixed(2)}%</div>
-        <div class="stat-leadin">Expected</div>
         <div class="stat-leadin--small">of all students</div>
+        <div class="stat-leadin">Expected</div>
       </div>
       </div>
         `;

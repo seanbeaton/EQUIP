@@ -83,6 +83,12 @@ Template.demographicHeatmapFilter.rendered = function() {
     .chosen({disable_search_threshold: 10, width: "250px"});
 }
 
+Template.spotlightDiscourseSelect.rendered = function() {
+  $('.disc-select-chosen')
+    .filter(':not(.chosen--processed)').addClass('chosen--processed')
+    .chosen({disable_search_threshold: 10, width: "250px"});
+}
+
 
 //
 // let getObsOptions = function(envId) {
