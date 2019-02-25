@@ -2,6 +2,7 @@ import {setupSequenceParameters, setupSubjectParameters} from "../../../helpers/
 
 let d3 = require('d3');
 let d3ScaleChromatic = require("d3-scale-chromatic");
+let d3Interpolate = require("d3-interpolate");
 let chosen = require("chosen-js");
 
 import {getSequences} from "../../../helpers/sequences";
@@ -476,7 +477,7 @@ let initHeatmapGraph = function(full_data, containerSelector) {
 
   data = full_data.contributions_dataset;
 
-  let count_scale = d3.scaleSequential(d3.interpolatePlasma)
+  let count_scale = d3.scaleSequential(d3Interpolate.interpolateRgb('#bbbbbb', '#cc0000'))
     .domain([0, d3.max(data, d => d.count)]);
 
   updateHeatmapKey('.heatmap-report__graph-key', count_scale);
@@ -513,7 +514,7 @@ let updateHeatmapGraph = function(full_data, containerSelector) {
 
   // initHeatmapGraph(full_data, containerSelector)
 
-  let count_scale = d3.scaleSequential(d3.interpolatePlasma)
+  let count_scale = d3.scaleSequential(d3Interpolate.interpolateRgb('#bbbbbb', '#cc0000'))
     .domain([0, d3.max(data, d => d.count) * 1.2]);
 
   updateHeatmapKey('.heatmap-report__graph-key', count_scale);
