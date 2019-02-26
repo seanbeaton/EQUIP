@@ -65,7 +65,10 @@
 // }
 
 
-function createTableOfContributions() {
+function createTableOfContributions(obsId) {
+  if (typeof obsId === 'undefined') {
+    obsId = Router.current().params._obsId;
+  }
   $('#data-modal-content').children().remove();
   var envId = Router.current().params._envId
   var seqs = Sequences.find({obsId:Router.current().params._obsId}).fetch();
@@ -407,13 +410,13 @@ function deleteContribution(e) {
     gtag('event', 'delete_cancelled', {'event_category': 'sequences'});
     return;
   }
-  const obsId = seq['obsId'];
-  const seqId = $(e.target).attr("data_id");
+  // const obsId = Router.current().params._obsId;
+  const seqId = $(e.target).attr("data-id");
   Meteor.call('sequenceDelete', seqId, function (error, result) {
     gtag('event', 'delete', {'event_category': 'sequences'});
     return 0;
   });
-  createTableOfContributions(obsId);
+  createTableOfContributions();
 }
 
 export {editParamBoxes, createTableOfContributions, populateParamBoxes, editContribution, deleteContribution}
