@@ -549,8 +549,7 @@ let initTimelineGraph = function(full_data, containerSelector) {
     .attr("transform", "translate(0," + height + ")")
     .attr('class', 'x-axis')
     .call(d3.axisBottom(x)
-      .tickValues(ticks))
-  ;
+      .tickValues(ticks));
 
   // Add the Y Axis
   g.append("g")

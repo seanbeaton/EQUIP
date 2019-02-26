@@ -186,6 +186,12 @@ Template.heatmapReport.helpers({
   },
   totalContributions: function() {
     return totalContributions.get()
+  },
+  selectedEnvironment: function() {
+    return selectedEnvironment.get();
+  },
+  selectedObservations: function() {
+    return selectedObservations.get();
   }
 });
 
@@ -268,8 +274,7 @@ Template.heatmapReport.events({
     })
     currentDemoFilters.set(blank_filters);
   },
-
-  'change #student-spostudent-sorttlight__discourse-select': function(e) {
+  'change #student-spotlight__discourse-select': function(e) {
     let selected = $('option:selected', e.target);
     selectedSpotlightDimension.set(selected.val());
     updateStudentContribGraph();
@@ -892,6 +897,7 @@ let createStudentContribData = function() {
 
   return ret
 };
+
 let studentContribGraph = function(data, selector) {
   svg = $('<svg width="718" height="400">' +
     '<defs>\n' +
@@ -948,6 +954,14 @@ let studentContribGraph = function(data, selector) {
 
 let updateStudentTimeGraph = function () {
   let selector = '.student-participation-time__graph';
+
+  let $selector = $(selector);
+
+  // Wait till the graph exists.
+  if ($selector.length === 0) {
+    setTimeout(updateStudentTimeGraph, 50);
+    return;
+  }
 
   let dimension = selectedSpotlightDimension.get();
 
@@ -1117,39 +1131,14 @@ let studentTimeGraph = function(data, selector) {
       .attr('cy', d => y(d[line.dim.name]))
       .attr('data-dim-name', line.dim.name)
       .style("fill", z(line.dim.name))
-      // .on('mouseover', function(d) {
-        // d['line_name'] = line.dim.name;
-        // let data = [];
-        // let circles = g.selectAll('circle[cx="' + x(d.d3date) + '"][cy="' + y(d[line.dim.name]) + '"]');
-        // if (circles.size() > 1) {
-        //   //console.log('more than one circle');
-        //   //console.log('d', d);
-        //   //console.log('this', this);
-        //   //console.log('circles', circles);
-        //   circles.each(function(d) {
-        //     let datum = clone_object(d);
-        //     datum.line_name = $(this).attr('data-demo-name');
-        //     data.push(datum)
-        //   });
-        // }
-        // else {
-        //   data = [d];
-        // }
-
-        //console.log('abut to use data', data);
-
-        // buildBarTooltipSlide(data, z)
-      // })
-      // .on('mouseout', function() {
-      //   sidebar.setCurrentPanel('start', 250)
-      // });
-
   });
+
+  let ticks = data.map(datum => datum.d3date);
 
   g.append("g")
     .attr("transform", "translate(0," + height + ")")
     .attr('class', 'x-axis')
-    .call(d3.axisBottom(x));
+    .call(d3.axisBottom(x).tickValues(ticks));
 
   // Add the Y Axis
   g.append("g")

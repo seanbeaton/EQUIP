@@ -88,3 +88,43 @@
         {{/each}}
     </select>
 </template>
+
+<template name="studentSpotlight">
+    <div class="student-spotlight">
+        <div class="student-spotlight__close"><i class="fa fa-2x fa-times"></i></div>
+        {{#if selectedStudent}}
+            <h3 class="student-spotlight__name">{{selectedStudent.info.name}}</h3>
+            <div class="student-spotlight__demographics">
+                <h4>Demographics</h4>
+                <ul>
+                    {{#each arrayify selectedStudent.info.demographics}}
+                        <li><span class="demo-label">{{name}}:</span> {{value}}</li>
+                    {{/each}}
+                </ul>
+            </div>
+            <div class="student-spotlight__discourse-type-select">
+                <h4>Student information graphs</h4>
+                <p>Choose which discourse dimension you want to view graphs for.</p>
+                {{>spotlightDiscourseSelect discourseparams=discourseparams }}
+            </div>
+            <div class="student-spotlight__student-contributions">
+                <h4>Contributions</h4>
+                <div class="student-contributions-graph__graph"></div>
+            </div>
+            <div class="student-spotlight__student-participation-time">
+
+                <h4>Participation over time</h4>
+                {{#if multipleObservationsChosen }}
+                    <div class="student-participation-time__graph_key"></div>
+                    <div class="student-participation-time__graph"></div>
+                {{ else }}
+                    <div class="student-participation-time__no-data">
+                        You need to select at least two observations to see this student's participation over time.
+                    </div>
+                {{/if}}
+            </div>
+        {{else}}
+            <p>Oops, that student doesn't appear to have any data. If you think this is a bug, please report it to us using the link in the footer.</p>
+        {{/if}}
+    </div>
+</template>

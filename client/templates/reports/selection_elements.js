@@ -128,6 +128,28 @@ Template.heatmapReportSortDemo.events({
     $(window).trigger('heatmap_student_sort_demo_updated', selected.val())
   }
 })
+
+Template.studentSpotlight.helpers({
+  arrayify: function(obj) {
+    let result = [];
+    for (let key in obj) {
+      result.push({name:key,value:obj[key]});
+    }
+    return result;
+  },
+})
+
+// const selectedSpotlightDimension = new ReactiveVar(false);
+
+// Template.studentSpotlight.events({
+//   'change #student-spotlight__discourse-select': function(e) {
+//     let selected = $('option:selected', e.target);
+//     console.log('this', this);
+//     selectedSpotlightDimension.set(selected.val());
+//     updateStudentContribGraph();
+//     updateStudentTimeGraph();
+//   },
+// })
 //
 // let getObsOptions = function(envId) {
 //   if (!!envId) {
