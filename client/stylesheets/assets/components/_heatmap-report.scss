@@ -166,3 +166,8 @@ $light-grid-color: #ddd;
   pointer-events: none;
   opacity: 0.3;
 }
+
+.heatmap-report__sort {
+  display: flex;
+  flex-flow: row wrap;
+}
