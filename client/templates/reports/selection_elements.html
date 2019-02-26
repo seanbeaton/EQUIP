@@ -65,7 +65,7 @@
 
 <template name="heatmapReportSort">
     <div class="heatmap-sort-select-wrapper">
-        <label for="students-sort">Sort display</label>
+        <label for="students-sort">Sort:</label>
         <select id="students-sort" class="students-select-sort">
             <option selected value="classroom">Classroom</option>
             <!--<option value="quintiles">Contribution Count</option>-->
@@ -81,7 +81,7 @@
 </template>
 
 <template name="heatmapReportSortDemo">
-    <label for="students-buckets-demo">By demographic</label>
+    <label for="students-buckets-demo">Demographic:</label>
     <select id="students-buckets-demo" class="students-select-buckets-demo">
         {{#each demoParams }}
             <option {{default}} value="{{name}}">{{name}}</option>
