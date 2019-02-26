@@ -17,6 +17,9 @@ Template.reportsSelection.events({
     'click .option--heatmap': function() {
         Router.go('heatmapReport')
     },
+    'click .option--student-histogram': function() {
+        Router.go('histogramReport')
+    },
 })
 
 Template.reportBackButton.events({
