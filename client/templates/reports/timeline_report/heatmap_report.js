@@ -673,6 +673,10 @@ let updateHeatmapGraph = function(full_data, containerSelector) {
     .duration(500)
     .attr('data-contrib-count', d => d.count)
     .style('background-color', function(d){return count_scale(d.count)});
+
+  new_boxes.on('click', function() {
+      selectStudentForModal($(this).attr('id'));
+    });
 };
 
 
