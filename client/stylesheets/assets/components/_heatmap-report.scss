@@ -6,13 +6,40 @@
   }
 
   .student-box {
+    position: relative;
     cursor: pointer;
+    float: left;
+    margin: 5px;
     @include nt($prop: opacity);
     &:hover {
       opacity: 0.8;
     }
+    &.demo-label {
+      clear: both;
+      &,
+      &[style] {
+        background: 0 !important;
+      }
+      p {
+        color: #333;
+        background: 0;
+      }
+      + .student-box {
+        clear: left;
+      }
+    }
   }
-
+  .subjects {
+    padding: 7px 20px;
+    display: block;
+    flex-flow: row wrap;
+    min-height: auto;
+    height: auto;
+    &.subjects--fixed-height {
+      min-height: 1200px;
+      height: 1200px;
+    }
+  }
   grid-template-columns: 50% 50%;
   grid-template-rows: auto auto auto auto;
 }

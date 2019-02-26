@@ -7,6 +7,7 @@ let chosen = require("chosen-js");
 
 import {getSequences} from "../../../helpers/sequences";
 import {getStudents, getStudent} from "../../../helpers/students";
+import {heatmapReportSortDemoChosen, heatmapReportSortType} from "../selection_elements";
 import {clone_object} from "../../../helpers/objects";
 
 // const envSet = new ReactiveVar(false);
@@ -98,10 +99,15 @@ Template.heatmapReport.helpers({
     let demo_options = getDemographics();
     demo_options = demo_options.map(function(demo_opt) {
       demo_opt.options = demo_opt.options.split(',').map(function(item) { return item.trim() });
+      demo_opt.default = '';
       return demo_opt;
     });
 
     console.log('demo_options', demo_options);
+
+    if (typeof demo_options[0] !== 'undefined') {
+      demo_options[0].default = 'default'
+    }
 
     return demo_options;
   },
@@ -161,6 +167,12 @@ Template.heatmapReport.helpers({
   },
   students: function() {
     return students.get();
+  },
+  studentsHeatmapSortType: function() {
+    heatmapReportSortType.get()
+  },
+  studentsHeatmapSortDemoChosen: function() {
+    heatmapReportSortDemoChosen.get()
   },
   selectedStudent: function() {
     return selectedStudent.get();
@@ -257,7 +269,7 @@ Template.heatmapReport.events({
     currentDemoFilters.set(blank_filters);
   },
 
-  'change #student-spotlight__discourse-select': function(e) {
+  'change #student-spostudent-sorttlight__discourse-select': function(e) {
     let selected = $('option:selected', e.target);
     selectedSpotlightDimension.set(selected.val());
     updateStudentContribGraph();
@@ -323,27 +335,24 @@ Template.heatmapReport.events({
       }
     })
     currentDemoFilters.set(selected_filters);
-    let student_boxes = $('.student-box');
-    student_boxes.each(function(student_key) {
-      let $student = $(student_boxes[student_key]);
-      let student_data = students.get().find(student => student._id === $student.attr('id'))
 
-      let allowed = selected_filters.map(function(filter) {
-        if (filter.selected.length === 0) {
-          return true;
-        }
-        return (filter.selected.indexOf(student_data.info[filter.name]) >= 0)
-      }).reduce((a,b) => a && b);
-
-      $student.removeClass('disabled-student');
-      if (!allowed) {
-        $student.addClass('disabled-student');
-      }
-    })
+    $('.students').html('');
     updateGraph()
+  },
+  'heatmap_student_sort_demo_updated window': function() {
+    console.log('testing if event works heatmap_student_sort_demo_updated');
   }
 })
 
+$(window).on('heatmap_student_sort_updated', function(e, sort_type) {
+  updateGraph();
+  console.log('currentValue sort', sort_type, heatmapReportSortType.get())
+})
+
+$(window).on('heatmap_student_sort_demo_updated', function(e, sort_buckets_demo) {
+  updateGraph();
+  console.log('demo val', sort_buckets_demo, heatmapReportSortDemoChosen.get());
+})
 
 let createHeatmapData = function() {
   let ret = {
@@ -368,11 +377,15 @@ let createHeatmapData = function() {
       ret.limit_x = student.data_x
     }
     return {
+      name: student.info.name,
       studentId: student._id,
+      class: '',
       student: student,
       data_x: student.data_x,
       data_y: student.data_y,
       count: 0,
+      show_count: true,
+      sort_first: false,
     }
   });
 
@@ -393,6 +406,74 @@ let createHeatmapData = function() {
       }
     }
   });
+
+
+  let highest_count = ret.contributions_dataset.reduce((acc, student) => student.count > acc ? student.count : acc, 1);
+  // let highest_count = ret.contributions_dataset.map(student => student.count).reduce((acc, student) => student > acc ? student : acc, 0)
+  console.log('highest_count', highest_count);
+  console.table(ret.contributions_dataset);
+  ret.contributions_dataset = ret.contributions_dataset.map(function(datum) {
+    datum.quintile = Math.ceil(datum.count * 4 / highest_count);
+    return datum
+  });
+  console.table(ret.contributions_dataset);
+
+
+  // if (heatmapReportSortType.get() === 'quintiles') {
+  //   let sortQuintiles = function(a, b) {
+  //     return a.quintile - b.quintile;
+  //   }
+  //   ret.contributions_dataset.sort(sortQuintiles)
+  // }
+  // else
+  if (heatmapReportSortType.get() === 'buckets') {
+    let selectedDemo = heatmapReportSortDemoChosen.get();
+    console.log('asd', getDemographics().filter(d => d.name === selectedDemo));
+    let selected_demo_options = getDemographics().filter(d => d.name === selectedDemo)[0];
+    let opts;
+    if (selected_demo_options) {
+      opts = selected_demo_options.options.split(',').map(function(opt) {return {name: opt.trim()}});
+    }
+    else {
+      opts = [];
+    }
+    console.log('opts', opts);
+    ret.contributions_dataset = ret.contributions_dataset.map(datum => {datum.selected_demo_value = datum.student.info.demographics[selectedDemo]; return datum})
+
+    opts.map(opt => ret.contributions_dataset.push({
+      name: opt.name,
+      studentId: opt.name + '-label',
+      selected_demo_value: opt.name,
+      class: opt.name + '-label demo-label',
+      student: {},
+      data_x: 0,
+      data_y: 0,
+      count: 0,
+      show_count: false,
+      sort_first: true,
+    }));
+
+
+
+    let sortDemo = function(a, b) {
+      let a_demo = a.selected_demo_value;
+      let b_demo = b.selected_demo_value;
+      if (a_demo > b_demo) {
+        return 1
+      }
+      else if (a_demo === b_demo) {
+        return b.sort_first - a.sort_first;
+      }
+      else {
+        return -1
+      }
+    };
+    ret.contributions_dataset = ret.contributions_dataset.sort(sortDemo);
+  }
+
+
+  console.log('sorted');
+  console.table(ret.contributions_dataset);
 
   return ret
 };
@@ -430,8 +511,32 @@ let updateGraph = function() {
     initHeatmapGraph(data, heatmap_selector)
   }
   else {
+    $('#heatmap-d3-wrapper').html('');
     updateHeatmapGraph(data, heatmap_selector)
   }
+  updateFilteredStudents()
+}
+
+let updateFilteredStudents = function() {
+  let selected_filters = currentDemoFilters.get();
+  let student_boxes = $('.student-box');
+  student_boxes.each(function(student_key) {
+    let $student = $(student_boxes[student_key]);
+    let student_data = students.get().find(student => student._id === $student.attr('id'))
+
+    let allowed = selected_filters.map(function(filter) {
+      if (filter.selected.length === 0) {
+        return true;
+      }
+
+      return (filter.selected.indexOf(student_data.info.demographics[filter.name]) >= 0)
+    }).reduce((a,b) => a && b);
+
+    $student.removeClass('disabled-student');
+    if (!allowed) {
+      $student.addClass('disabled-student');
+    }
+  });
 }
 
 let updateTotalContribs = function(data) {
@@ -456,12 +561,12 @@ let updateTotalContribs = function(data) {
       if (filter.selected.length === 0) {
         return true;
       }
-      return (filter.selected.indexOf(student_data.info[filter.name]) >= 0)
+      return (filter.selected.indexOf(student_data.info.demographics[filter.name]) >= 0)
     }).reduce((a,b) => a && b);
 
-    $student.removeClass('disabled-student');
+    // $student.removeClass('disabled-student');
     if (!allowed) {
-      $student.addClass('disabled-student');
+      // $student.addClass('disabled-student');
     }
     else {
       allowed_students.push($student.attr('id'))
@@ -486,16 +591,31 @@ let initHeatmapGraph = function(full_data, containerSelector) {
   let boxes = g.selectAll(".student-box")
     .data(data);
 
-  boxes.enter()
+  let new_boxes = boxes.enter()
     .append('div')
     .attr('id', d => d.studentId)
     .attr('data-x', d => d.student.data_x)
     .attr('data-y', d => d.student.data_y)
+    .attr('data-quintile', d => d.quintile)
     .attr('data-contrib-count', d => d.count)
-    .attr('class', 'dragger student-box c--observation__student-box-container')
-    .html(d => '<p class="c--observation__student-box">' + d.student.info.name + ' (' + d.count + ')</p>')
-    .style('transform', function(d) { return "translate(" + d.student.data_x + "px, " + d.student.data_y + "px)" })
-    .style('background-color', d => count_scale(d.count))
+    .attr('class', d => 'dragger student-box c--observation__student-box-container' + d.class)
+    .html(function(d) {
+      let count = d.show_count ? ' (' + d.count + ')' : '';
+      return '<p class="c--observation__student-box">' + d.name + count +'</p>'
+    });
+
+  $('#heatmap-d3-wrapper').removeClass('subjects--fixed-height');
+  if (heatmapReportSortType.get() === 'classroom') {
+    new_boxes.style('transform', function(d) { return "translate(" + d.student.data_x + "px, " + d.student.data_y + "px)" })
+    new_boxes.style('position', "absolute");
+    $('#heatmap-d3-wrapper').addClass('subjects--fixed-height');
+  }
+  else {
+    new_boxes.style('transform', "");
+    new_boxes.style('position', "");
+  }
+
+  new_boxes.style('background-color', d => count_scale(d.count))
     .on('click', function() {
       selectStudentForModal($(this).attr('id'));
     });
@@ -515,7 +635,7 @@ let updateHeatmapGraph = function(full_data, containerSelector) {
   // initHeatmapGraph(full_data, containerSelector)
 
   let count_scale = d3.scaleSequential(d3Interpolate.interpolateRgb('#bbbbbb', '#cc0000'))
-    .domain([0, d3.max(data, d => d.count) * 1.2]);
+    .domain([0, d3.max(data, d => d.count)]);
 
   updateHeatmapKey('.heatmap-report__graph-key', count_scale);
 
@@ -524,16 +644,31 @@ let updateHeatmapGraph = function(full_data, containerSelector) {
   let boxes = g.selectAll(".student-box")
     .data(data);
 
-  boxes.enter()
+  let new_boxes = boxes.enter()
     .append('div')
     .attr('id', d => d.studentId)
     .attr('data-x', d => d.student.data_x)
     .attr('data-y', d => d.student.data_y)
-    .attr('class', 'dragger student-box c--observation__student-box-container')
-    // .html(d => '<p class="c--observation__student-box">' + d.student.info.name + ' (' + d.count + ')</p>')
-    .style('transform', function(d) { return "translate(" + d.student.data_x + "px, " + d.student.data_y + "px)" })
+    .attr('data-quintile', d => d.quintile)
+    .attr('class', d => 'dragger student-box c--observation__student-box-container' + d.class)
+    .html(function(d) {
+      let count = d.show_count ? ' (' + d.count + ')' : '';
+      return '<p class="c--observation__student-box">' + d.name + count +'</p>'
+    })
     .merge(boxes)
-    .html(d => '<p class="c--observation__student-box">' + d.student.info.name + ' (' + d.count + ')</p>')
+
+  $('#heatmap-d3-wrapper').removeClass('subjects--fixed-height');
+  if (heatmapReportSortType.get() === 'classroom') {
+    new_boxes.style('transform', function(d) { return "translate(" + d.student.data_x + "px, " + d.student.data_y + "px)" })
+    new_boxes.style('position', "absolute");
+    $('#heatmap-d3-wrapper').addClass('subjects--fixed-height');
+  }
+  else {
+    new_boxes.style('transform', "");
+    new_boxes.style('position', "");
+  }
+
+  new_boxes
     .transition()
     .duration(500)
     .attr('data-contrib-count', d => d.count)

@@ -90,12 +90,44 @@ Template.spotlightDiscourseSelect.rendered = function() {
 }
 
 Template.heatmapReportSort.rendered = function() {
-  $('.students-sort')
+  console.log('rendered run');
+  $('.students-select-sort')
+    .trigger('change')
     .filter(':not(.chosen--processed)').addClass('chosen--processed')
     .chosen({disable_search_threshold: 10, width: "250px"});
 }
 
+Template.heatmapReportSortDemo.rendered = function() {
+  $('.students-select-buckets-demo')
+    .trigger('change')
+    .filter(':not(.chosen--processed)').addClass('chosen--processed')
+    .chosen({disable_search_threshold: 10, width: "250px"});
+}
 
+const showDemoSelect = new ReactiveVar(false);
+const heatmapReportSortType = new ReactiveVar(false);
+const heatmapReportSortDemoChosen = new ReactiveVar(false);
+Template.heatmapReportSort.helpers({
+  showDemoSelect: function() {
+    return showDemoSelect.get()
+  }
+})
+
+Template.heatmapReportSort.events({
+  'change #students-sort': function(e) {
+    let selected = $('option:selected', e.target);
+    showDemoSelect.set(selected.val() === 'buckets');
+    heatmapReportSortType.set(selected.val());
+    $(window).trigger('heatmap_student_sort_updated', selected.val())
+  }
+})
+Template.heatmapReportSortDemo.events({
+  'change #students-buckets-demo': function(e) {
+    let selected = $('option:selected', e.target);
+    heatmapReportSortDemoChosen.set(selected.val());
+    $(window).trigger('heatmap_student_sort_demo_updated', selected.val())
+  }
+})
 //
 // let getObsOptions = function(envId) {
 //   if (!!envId) {
@@ -106,3 +138,5 @@ Template.heatmapReportSort.rendered = function() {
 //     return false;
 //   }
 // }
+
+export {heatmapReportSortDemoChosen, heatmapReportSortType}

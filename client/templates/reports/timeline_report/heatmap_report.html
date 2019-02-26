@@ -41,7 +41,7 @@
                     </div>
                     <div class="heatmap-report__sort">
                         {{#if showFilters}}
-                            {{>heatmapReportSort }}
+                            {{>heatmapReportSort demoParams=demographic_filters }}
                         {{/if}}
                     </div>
                     <div class="heatmap-report__student-spotlight {{#if selectedStudent}} student-spotlight--active {{/if}}">

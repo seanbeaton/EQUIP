@@ -64,10 +64,27 @@
 </template>
 
 <template name="heatmapReportSort">
-    <label for="students-sort">View</label>
-    <select id="students-sort chosen">
-        <option selected value="classroom">Classroom</option>
-        <option value="quintiles">Buckets</option>
-        <option value="buckets">Buckets</option>
+    <div class="heatmap-sort-select-wrapper">
+        <label for="students-sort">Sort display</label>
+        <select id="students-sort" class="students-select-sort">
+            <option selected value="classroom">Classroom</option>
+            <!--<option value="quintiles">Contribution Count</option>-->
+            <option value="buckets">Demographic Buckets</option>
+        </select>
+    </div>
+    {{#if showDemoSelect }}
+        <!-- wrapper required to this all is removed reactively -->
+        <div class="heatmap-demo-select-wrapper">
+        {{> heatmapReportSortDemo demoParams=demoParams}}
+        </div>
+    {{/if}}
+</template>
+
+<template name="heatmapReportSortDemo">
+    <label for="students-buckets-demo">By demographic</label>
+    <select id="students-buckets-demo" class="students-select-buckets-demo">
+        {{#each demoParams }}
+            <option {{default}} value="{{name}}">{{name}}</option>
+        {{/each}}
     </select>
 </template>
