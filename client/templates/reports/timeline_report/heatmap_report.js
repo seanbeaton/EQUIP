@@ -415,14 +415,10 @@ let createHeatmapData = function() {
 
   let highest_count = ret.contributions_dataset.reduce((acc, student) => student.count > acc ? student.count : acc, 1);
   // let highest_count = ret.contributions_dataset.map(student => student.count).reduce((acc, student) => student > acc ? student : acc, 0)
-  console.log('highest_count', highest_count);
-  console.table(ret.contributions_dataset);
   ret.contributions_dataset = ret.contributions_dataset.map(function(datum) {
     datum.quintile = Math.ceil(datum.count * 4 / highest_count);
     return datum
   });
-  console.table(ret.contributions_dataset);
-
 
   // if (heatmapReportSortType.get() === 'quintiles') {
   //   let sortQuintiles = function(a, b) {
@@ -475,10 +471,6 @@ let createHeatmapData = function() {
     };
     ret.contributions_dataset = ret.contributions_dataset.sort(sortDemo);
   }
-
-
-  console.log('sorted');
-  console.table(ret.contributions_dataset);
 
   return ret
 };
@@ -860,12 +852,17 @@ let createStudentContribData = function() {
   let dimension = selectedSpotlightDimension.get();
   let disc_opts = getDiscourseOptionsForDimension(dimension);
   // let demo_opts = getDemographicOptions();
+
   ret = disc_opts.map(function(opt) {
     return {
       name: opt.name,
       count: 0,
+      all_students: students.get().map(stud => ({id: stud._id, count: 0})),
+      class_total: 0,
     }
   });
+
+  let all_students = students.get().map(stud => ({id: stud._id, count: 0}));
 
   for (let obsId_k in obsIds) {
     if (!obsIds.hasOwnProperty(obsId_k)) continue;
@@ -875,28 +872,69 @@ let createStudentContribData = function() {
       if (!sequences.hasOwnProperty(sequence_k)) continue;
       let sequence = sequences[sequence_k];
       disc_opts.map(function(opt) {
-        if (sequence.info.parameters[dimension] === opt.name &&
-          sequence.info.student.studentId === student._id) {
+        if (sequence.info.parameters[dimension] === opt.name) {
           let ds_index = ret.findIndex(datapoint => datapoint.name === opt.name);
-          ret[ds_index].count += 1;
-          // total += 1;
+          ret[ds_index].class_total += 1;
+          ret[ds_index].all_students.filter(stud => stud.id === sequence.info.student.studentId)[0].count += 1;
+          all_students.filter(stud => stud.id === sequence.info.student.studentId)[0].count += 1;
+          if (sequence.info.student.studentId === student._id) {
+            ret[ds_index].count += 1;
+            // total += 1;
+          }
         }
       });
     }
   }
 
-  let total = 0;
+
+  let total = ret.map(d => d.count).reduce((a, b) => a + b);
+
+  let class_total = ret.map(d => d.class_total).reduce((a, b) => a + b);
+
+  let num_students = students.get().length;
   ret.forEach(function(opt) {
-    total += opt.count;
+    let all_counts = opt.all_students.map(d => d.count);
+    opt.median = get_median(all_counts);
+    opt.average = get_average(all_counts);
   });
 
   ret.push({
     name: 'Total',
     count: total,
+    class_total: class_total,
+    average: class_total / num_students,
+    median: get_median(all_students.map(d => d.count)),
   });
+
+  console.log('ret');
+  console.table(ret);
 
   return ret
 };
+
+function get_median(values) {
+  if (values.length === 0) {
+    return 0;
+  }
+
+  values.sort((a, b) => a - b);
+
+  let mid_point = Math.floor(values.length / 2);
+
+  if (values.length % 2) {
+    return values[mid_point]
+  }
+  else {
+    return (values[mid_point] + values[mid_point - 1]) / 2.;
+  }
+}
+function get_average(values) {
+  if (values.length === 0) {
+    return 0;
+  }
+
+  return values.reduce((a, b) => a + b) / values.length
+}
 
 let studentContribGraph = function(data, selector) {
   svg = $('<svg width="718" height="400">' +
@@ -927,10 +965,16 @@ let studentContribGraph = function(data, selector) {
   x.domain(data.map(d => d.name))
   y.domain([0, d3.max(data, d => d.count)]);
 
+  let key_colors = getLabelColors(data.map(d => d.name));
+  console.log('key_colors', key_colors);
+  key_colors['Total'] = "#555555ff";
+  let z = d3.scaleOrdinal()
+    .range(Object.values(key_colors));
+
   g.selectAll("bar")
     .data(data)
     .enter().append("rect")
-    .style("fill", "steelblue")
+    .style("fill", d => z(d.name))
     .attr("x", function(d) { return x(d.name); })
     .attr("width", x.bandwidth())
     .attr("y", function(d) { return y(d.count); })
@@ -1040,7 +1084,6 @@ let createStudentTimeData = function() {
     obs.max = obs._total;
   });
 
-  console.table(ret.contributions_dataset);
   return ret.contributions_dataset
 
 }
