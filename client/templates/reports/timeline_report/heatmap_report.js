@@ -956,34 +956,64 @@ let studentContribGraph = function(data, selector) {
     g = container.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
   let x = d3.scaleBand() // inside each group
-    .range([0, width])
+    // .range([0, width])
     .padding(0.10);
 
   let y = d3.scaleLinear()
     .rangeRound([height, 0]);
 
-  x.domain(data.map(d => d.name))
+  let x_group = d3.scaleBand() // each group
+    .rangeRound([0, width])
+    .paddingInner(0.1);
+
+  x_group.domain(data.map(d => d.name));
+  x.domain(['value', 'median']).rangeRound([0, x_group.bandwidth()]);
   y.domain([0, d3.max(data, d => d.count)]);
 
+  let median_color = '#999999ff';
+  let total_color = '#555555ff';
+
   let key_colors = getLabelColors(data.map(d => d.name));
-  console.log('key_colors', key_colors);
-  key_colors['Total'] = "#555555ff";
+  key_colors.Total = total_color;
+  key_colors.Median = median_color;
   let z = d3.scaleOrdinal()
     .range(Object.values(key_colors));
+  updateStudentContribKey('.student-contributions-graph__graph-key', Object.keys(key_colors), z)
 
-  g.selectAll("bar")
+  let groups = g.append("g")
+    .selectAll("bar")
     .data(data)
-    .enter().append("rect")
+    .enter().append('g')
+    .attr("transform", function(d) {
+      console.log('d', d);
+      return "translate(" + x_group(d.name) + ",0)"
+    })
+    .attr("class", 'bar-group')
+    .selectAll('rect')
+    .data(function(d) {
+      console.log('rect data', d);
+      return data.filter(i => i.name === d.name)
+    })
+    .enter();
+
+  groups.append("rect")
     .style("fill", d => z(d.name))
-    .attr("x", function(d) { return x(d.name); })
+    .attr("x", x("value"))
     .attr("width", x.bandwidth())
     .attr("y", function(d) { return y(d.count); })
     .attr("height", function(d) { return height - y(d.count); });
 
+  groups.append("rect")
+    .style("fill", z('Median'))
+    .attr("x", x("median"))
+    .attr("width", x.bandwidth())
+    .attr("y", function(d) { return y(d.median); })
+    .attr("height", function(d) { return height - y(d.median); });
+
   g.append('g')
     // .attr("class", "axis axis--x")
     .attr("transform", "translate(0," + height + ")")
-    .call(d3.axisBottom(x));
+    .call(d3.axisBottom(x_group));
 
   g.append("g")
     // .attr("class", "axis axis--y")
@@ -995,6 +1025,15 @@ let studentContribGraph = function(data, selector) {
       })
     )
 };
+
+let updateStudentContribKey = function(key_wrapper, y_values, color_axis) {
+  let key_chunks = y_values.map(function(label) {
+    return `<span class="key--label"><span class="key--color" style="background-color: ${color_axis(label)}"></span><span class="key--text">${label}</span></span>`
+  })
+
+  let html = `${key_chunks.join('')}`;
+  $(key_wrapper).html(html)
+}
 
 let updateStudentTimeGraph = function () {
   let selector = '.student-participation-time__graph';
@@ -1151,7 +1190,7 @@ let studentTimeGraph = function(data, selector) {
   let z = d3.scaleOrdinal()
     .range(Object.values(key_colors));
 
-  updateStudentTimeKey('.student-participation-time__graph_key', discdims, z)
+  updateStudentTimeKey('.student-participation-time__graph-key', discdims, z)
 
   lines.forEach(function(line) {
 
