@@ -51,7 +51,18 @@ div {
     pointer-events: none;
     display: block;
     font-size: 18px;
-    padding: 4px 8px;
+    min-height: 104px;
+    padding: 24px 8px;
+
+  }
+  .option__example-image {
+    background-color: var(--light-gray);
+    display: block;
+    padding: 8px;
+    img {
+      max-width: 100%;
+      display: block;
+    }
   }
   &.report-select__option--spacer {
     cursor: default;
@@ -93,12 +104,6 @@ div {
   > .report-select__options {
     padding-left: 8px;
     padding-right: 8px;
-  }
-}
-
-.option--report-type {
-  .option__text {
-    padding: 32px 8px;
   }
 }
 
