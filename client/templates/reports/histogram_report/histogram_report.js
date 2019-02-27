@@ -339,19 +339,32 @@ let initHistogram = function(data, selector) {
   if (key_options.length > 0) {
     let key_colors = getLabelColors(key_options);
     let color_scale = d3.scaleOrdinal()
-      .range(Object.values(key_colors));
+      .range(Object.values(key_colors))
+
+    updateHistogramDemoKey('.histogram-report__graph-key', key_options, color_scale);
+
     let all_students = students.get();
     let demo = selectedDemographic.get();
-    $('.student-box').each(function(box) {
-      let $box = $(box);
+    let student_boxes = $('.student-box');
+    student_boxes.each(function(box_index) {
+      let $box = $($('.student-box')[box_index]);
       console.log('box', $box);
       console.log('getting students');
-      let student = all_students.filter(stud => stud.studentId === $box.attr('id'))[0]
+      let student = all_students.filter(stud => stud._id === $box.attr('id'))[0]
       console.log('student', student);
-
-      console.log('color', color_scale(student.info.demographics[demo]))
+      $box.css('background-color', color_scale(student.info.demographics[demo]));
     })
   }
+
+}
+
+let updateHistogramDemoKey = function(key_wrapper, y_values, color_axis) {
+  let key_chunks = y_values.map(function(label) {
+    return `<span class="key--label"><span class="key--color" style="background-color: ${color_axis(label)}"></span><span class="key--text">${label}</span></span>`
+  })
+
+  let html = `${key_chunks.join('')}`;
+  $(key_wrapper).html(html)
 }
 
 let updateHistogram = function(data, selector) {
