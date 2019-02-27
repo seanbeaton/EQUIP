@@ -868,8 +868,8 @@ let getLabelColors = function(labels) {
   return label_colors
 }
 
-
 let setupVis = function() {
+  // Intentionally duplicated to allow for easier customization on a per-report-type basis.
   let observations = obsOptions.get();
   // //console.log('observations', observations);
   let obs = observations.map(function(obs) {

@@ -2,43 +2,9 @@ import {setupSequenceParameters, setupSubjectParameters} from "../../../helpers/
 import {getSequences} from "../../../helpers/sequences";
 import {getStudent, getStudents} from "../../../helpers/students";
 import {Sidebar} from '../../../helpers/graph_sidebar';
+import vis from "vis";
 
-
-// import {getSequence, getSequences} from "../../../helpers/sequences";
-// import {getStudent, getStudents} from "../../../helpers/students";
-// import {setupSubjectParameters, setupSequenceParameters} from "../../../helpers/parameters";
-
-//
-// Template.interactiveReport.rendered = function() {
-//     // show different report options
-//     // 'environments':
-//   console.log('rendered interactiveReport');
-//   $(".chosen-select").trigger("chosen:updated");   // update chosen to take the updated values into account
-// }
-//
-// Template.interactiveReport.rendered = function() {
-//   Meteor.defer(function () {
-//     // fixes the persistent dropdown selection
-//     let chosenElements = $(".chosen-select");
-//     let correctVal = chosenElements.eq(lastRemovedId).children().first().text();
-//     chosenElements.eq(lastRemovedId).val(correctVal);
-//
-//     // update chosen
-//     chosenElements.trigger("chosen:updated");
-//   });
-// }
-
-// Template.interactiveReport.destroyed(function() {
-//   // run in async after the rest of the tasks have been executed
-//   Meteor.defer(function () {
-//     // fixes the persistent dropdown selection
-//     let chosenElements =
-//     let correctVal = chosenElements.eq(lastRemovedId).children().first().text();
-//     chosenElements.eq(lastRemovedId).val(correctVal);
-//
-//     // update chosen
-//   });
-// });
+let timeline;
 
 const obsOptions = new ReactiveVar([]);
 const selectedEnvironment = new ReactiveVar(false);
@@ -47,44 +13,8 @@ const selectedXParameter = new ReactiveVar(false);
 const selectedYParameter = new ReactiveVar(false);
 const selectedDatasetType = new ReactiveVar('equity');
 
-const possibleSlides = {
-  env: {
-    show: 'env',
-    pos: 1,
-  },
-  obs: {
-    show: 'obs',
-    pos: 2,
-  },
-  params: { // This is also the graph
-    show: 'params',
-    pos: 3,
-  }
-};
-
-const lastSlide = new ReactiveVar('env');
-
-
-let calculateSlidePosition = function(section) {
-  //console.log('calculateSlidePosition, going to slide', section);
-  lastSlide.set(section);
-  let slideSettings = possibleSlides[lastSlide.get()];
-  let prevSlides = Object.keys(possibleSlides).filter(item => possibleSlides[item].pos < slideSettings.pos);
-  //console.log('prevsliders', prevSlides);
-
-  let heights = prevSlides.map(prevSlide => $('.report-section[data-slide-id="' + prevSlide +'"]').height() + 40); // 40px margin
-  let aboveItemsHeight = heights.reduce((a, b) => a + b, 0);  // sum
-  let topMargin = `${aboveItemsHeight * -1}px`;
-
-  $('.report-section-wrapper__slide').css('marginTop', topMargin)
-}
-
-
 
 Template.interactiveReport.helpers({
-    // environments: function() {
-    //     return Environments.find();
-    // },
   environments: function() {
     let envs = Environments.find().fetch();
     // let default_set = false;
@@ -110,21 +40,9 @@ Template.interactiveReport.helpers({
     environmentChosen: function() {
         return !!(selectedEnvironment.get());
     },
-    // observationsExist: function() {
-    //     //console.log('checked if observations exist');
-    //     return obsOptions.get().length !== 0
-    // },
     observations: function() {
         // //console.log('obsOptions', obsOptions);
         return obsOptions.get()
-    },
-    possibleSlides: function() {
-        // //console.log('obsOptions', obsOptions);
-        return possibleSlides;
-    },
-    lastSlide: function() {
-        // //console.log('obsOptions', obsOptions);
-        return lastSlide.get()
     },
     observationChosen: function() {
         // //console.log('observationChosen', obsOptions.get(), !!(obsOptions.get()));
@@ -190,43 +108,6 @@ var clearParameters = function() {
 };
 
 Template.interactiveReport.events({
-  'click .report-section-wrapper__fade': function(e) {
-    lastSlide.get();
-    let lastSlidePos = possibleSlides[lastSlide.get()].pos;
-
-    //console.log('lastslidepos', lastSlidePos);
-
-    let prevSlide = Object.keys(possibleSlides).filter(item => possibleSlides[item].pos === lastSlidePos - 1);
-
-    //console.log('prev slide', prevSlide);
-
-    if (typeof prevSlide[0] === 'undefined') {
-      return
-    }
-
-    calculateSlidePosition(possibleSlides[prevSlide[0]].show);
-  },
-    // 'click .option--environment': function(e) {
-    //   let $target = $(e.target);
-    //     if (!$target.hasClass('selected')) {
-    //         $('.option--environment').removeClass('selected');
-    //         $target.addClass('selected');
-    //     }
-    //     else {
-    //       return;
-    //     }
-    //   calculateSlidePosition('obs');
-    //
-    //   clearObservations();
-    //     envSet.set(false);
-    //     envSet.set(true);
-    //     selectedEnvironment.set(getCurrentEnvId());
-    //     obsOptions.set([]);
-    //     obsOptions.set(getObsOptions());
-    //     // //console.log('obs options get', obsOptions.get());
-    //     envSet.set(!!getCurrentEnvId());
-    //
-    // },
   'change #env-select': function(e) {
 
     let selected = $('option:selected', e.target);
@@ -235,56 +116,54 @@ Template.interactiveReport.events({
     clearGraph();
     clearObservations();
     obsOptions.set(getObsOptions());
+    setTimeout(setupVis, 50);
 
     $('#disc-select').val('');
     $('#demo-select').val('');
     $('#disc-opt-select').val('');
   },
-    'click .option--all-observations': function(e) {
-      selectedObservations.set([])
-      $('.option--observation').removeClass('selected').click()
-
-    },
-    'click .option--observation': function(e) {
-      calculateSlidePosition('obs');
-      // clearParameters();
-      let $target = $(e.target);
-      if (!$target.hasClass('selected')) {
-        // $('.option--observation').removeClass('selected');
-        $target.addClass('selected');
-      }
-      else {
-        $target.removeClass('selected');
-      }
-
-      let clickedObservationId = $(e.target).attr('data-obs-id');
-
-      let currentObsIds = selectedObservations.get();
-
-      if (currentObsIds.find(id => id === clickedObservationId)) {
-        currentObsIds.splice(currentObsIds.indexOf(clickedObservationId), 1);
-      }
-      else {
-        currentObsIds.push(clickedObservationId);
-      }
-
-      selectedObservations.set(currentObsIds);
-      updateReport();
-      // setTimeout(function(){$(window).trigger('updated-filters')}, 100) // We're also forcing a graph update when you select new observations, not just changing params
-    },
+    // 'click .option--all-observations': function(e) {
+    //   selectedObservations.set([])
+    //   $('.option--observation').removeClass('selected').click()
+    //
+    // },
+    // 'click .option--observation': function(e) {
+    //   // clearParameters();
+    //   let $target = $(e.target);
+    //   if (!$target.hasClass('selected')) {
+    //     // $('.option--observation').removeClass('selected');
+    //     $target.addClass('selected');
+    //   }
+    //   else {
+    //     $target.removeClass('selected');
+    //   }
+    //
+    //   let clickedObservationId = $(e.target).attr('data-obs-id');
+    //
+    //   let currentObsIds = selectedObservations.get();
+    //
+    //   if (currentObsIds.find(id => id === clickedObservationId)) {
+    //     currentObsIds.splice(currentObsIds.indexOf(clickedObservationId), 1);
+    //   }
+    //   else {
+    //     currentObsIds.push(clickedObservationId);
+    //   }
+    //
+    //   selectedObservations.set(currentObsIds);
+    //   updateReport();
+    //   // setTimeout(function(){$(window).trigger('updated-filters')}, 100) // We're also forcing a graph update when you select new observations, not just changing params
+    // },
   'change #dataset-type-select': function(e) {
     let selected = $('option:selected', e.target);
     selectedDatasetType.set(selected.val());
     $(window).trigger('updated-filters') // We're also forcing a graph update when you select new observations, not just changing params
   },
   'change .select__wrapper select': function(e) {
-    calculateSlidePosition('params');
     selectedXParameter.set(getXAxisSelection());
     selectedYParameter.set(getYAxisSelection());
     $(window).trigger('updated-filters')
   },
   'click .swappable__button': function(e) {
-    calculateSlidePosition('params');
     let $target = $(e.target);
     if (!$target.hasClass('.swappable__button')) {
       $target = $target.parents('.swappable__button');
@@ -1129,3 +1008,45 @@ let getLabelColors = function(labels) {
 //   report_wrapper.append(report_structure);
 //   //console.log('created report structure');
 // }
+
+
+
+let setupVis = function() {
+  // Intentionally duplicated to allow for easier customization on a per-report-type basis.
+  let observations = obsOptions.get();
+  // //console.log('observations', observations);
+  let obs = observations.map(function(obs) {
+    // console.log('obse', obs);
+    return {
+      id: obs._id,
+      // content: obs.name + '<br/>(' + obs.observationDate + ')',
+      content: obs.name + ' (' + obs.observationDate + ')',
+      compare_date: new Date(obs.observationDate),
+      start: obs.observationDate,
+      className: getSequences(obs._id, obs.envId).length < 1 ? 'disabled' : ''
+    }
+  })
+  let items = new vis.DataSet(obs);
+  let container = document.getElementById('vis-container');
+  $(container).html('');
+  let options = {
+    multiselect: true,
+    zoomable: false,
+  }
+  timeline = new vis.Timeline(container, items, options)
+  timeline.on('select', function(props) {
+    selectedObservations.set(props.items);
+    console.log('selectedObservations', selectedObservations.get());
+
+    $(window).trigger('updated-filters');
+    // updateGraph();
+  });
+
+  let recent_obs = obs.sort(function(a, b) {return a.compare_date - b.compare_date}).slice(Math.max(obs.length - 8, 1));
+  // console.log('recent_obs', recent_obs)
+  let recent_obs_ids = recent_obs.map(obs => obs.id);
+  // console.log('recent_obs_ids', recent_obs_ids)
+  timeline.focus(recent_obs_ids);
+
+  return timeline
+}

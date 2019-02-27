@@ -4,6 +4,7 @@ let d3 = require('d3');
 let d3ScaleChromatic = require("d3-scale-chromatic");
 let d3Interpolate = require("d3-interpolate");
 let chosen = require("chosen-js");
+import vis from "vis";
 
 import {getSequences} from "../../../helpers/sequences";
 import {getStudents, getStudent} from "../../../helpers/students";
@@ -23,17 +24,11 @@ const totalContributions = new ReactiveVar(0);
 
 const currentDemoFilters = new ReactiveVar(false);
 
-// const selectedDemographic = new ReactiveVar(false);
-// const selectedDiscourseDimension = new ReactiveVar(false);
-// const selectedDiscourseOption = new ReactiveVar(false);
-// let timeline;
+let timeline;
 
 Template.heatmapReport.helpers({
   environments: function() {
-    // //console.log('envs', Environments.find());
     let envs = Environments.find().fetch();
-    //console.log('envs', envs);
-    // let default_set = false;
     envs = envs.map(function(env) {
       let obsOpts = getObsOptions(env._id);
       //console.log('obs_opts', obsOpts);
@@ -103,8 +98,6 @@ Template.heatmapReport.helpers({
       return demo_opt;
     });
 
-    console.log('demo_options', demo_options);
-
     if (typeof demo_options[0] !== 'undefined') {
       demo_options[0].default = 'default'
     }
@@ -134,36 +127,12 @@ Template.heatmapReport.helpers({
   },
   dataset_types: function() {
     return [
-      // {
-      //   id: 'equity',
-      //   name: 'Equity Ratio',
-      //   default: 'default'
-      // },
       {
         id: 'contributions',
         name: 'Contributions',
         default: 'default'
       }
     ]
-  },
-  tourData: function() {
-    let a = {
-      id: 'heatmap-tour',
-      steps: [
-        // {
-        //   content: 'Tour.',
-        // },
-        {
-          class: 'environment-select',
-          content: 'First, select a classroom with the dropdown.',
-        },
-        // {
-        //   class: 'environment-select',
-        //   content: 'First, select a classroom with the dropdown.',
-        // },
-      ]
-    };
-    return {};
   },
   students: function() {
     return students.get();
@@ -195,7 +164,6 @@ Template.heatmapReport.helpers({
   }
 });
 
-
 let getDemographics = function() {
   let envId = selectedEnvironment.get();
   if (!envId) {
@@ -203,38 +171,6 @@ let getDemographics = function() {
   }
   return setupSubjectParameters(envId);
 };
-//
-// let getDiscourseDimensions = function() {
-//   let envId = selectedEnvironment.get();
-//   if (!envId) {
-//     return []
-//   }
-//   return setupSequenceParameters(envId);
-// };
-//
-// let getDiscourseOptions = function() {
-//   let options = getDiscourseDimensions();
-//   let selected_disc_dim = selectedDiscourseDimension.get();
-//   if (selected_disc_dim === false) {
-//     return [];
-//   }
-//   // console.log('options', options, 'selected_disc_dim', selected_disc_dim);
-//   let opt = options.find(opt => opt.name === selected_disc_dim);
-//   // console.log('opt', opt);
-//   return opt
-//     .options.split(',').map(function(opt) {return {name: opt.trim()}})
-// };
-
-//
-// let getDemographicOptions = function() {
-//   let options = getDemographics();
-//   let selected_demo = selectedDemographic.get();
-//   let opt =  options.find(opt => opt.name === selected_demo);
-//   //console.log('opt', opt);
-//   return opt
-//     .options.split(',').map(function(opt) {return {name: opt.trim()}})
-// };
-//
 
 let getEnvironment = function() {
   let envId = selectedEnvironment.get();
@@ -243,24 +179,20 @@ let getEnvironment = function() {
 
 let getSelectedObservations = function() {
   let obsIds = selectedObservations.get();
-  // console.log('getSelectedObservations', obsIds);
   return Observations.find({_id: {$in: obsIds}}).fetch();
 }
-
 
 Template.heatmapReport.events({
   'change #env-select': function(e) {
 
     let selected = $('option:selected', e.target);
-    //console.log('env-select,', selected.val());
     clearGraph();
 
     selectedEnvironment.set(selected.val());
-    // selectedDiscourseOption.set(false);
     clearObservations();
     obsOptions.set(getObsOptions());
     students.set(getStudents(selectedEnvironment.get()));
-    // setTimeout(setupVis, 50);
+    setTimeout(setupVis, 50);
 
     $('#disc-select').val('');
     $('#demo-select').val('');
@@ -287,43 +219,43 @@ Template.heatmapReport.events({
     updateStudentContribGraph();
     updateStudentTimeGraph();
   },
-  'click .option--all-observations': function(e) {
-    selectedObservations.set([]);
-    $('.option--observation').removeClass('selected').click()
-
-  },
-  'click .option--observation': function(e) {
-    let $target = $(e.target);
-    if (!$target.hasClass('selected')) {
-      $target.addClass('selected');
-    }
-    else {
-      $target.removeClass('selected');
-    }
-
-    let clickedObservationId = $(e.target).attr('data-obs-id');
-    let currentObsIds = selectedObservations.get();
-
-    if (currentObsIds.find(id => id === clickedObservationId)) {
-      currentObsIds.splice(currentObsIds.indexOf(clickedObservationId), 1);
-    }
-    else {
-      currentObsIds.push(clickedObservationId);
-    }
-
-    selectedObservations.set(currentObsIds);
-
-    if (currentObsIds.length === 0) {
-      selectedStudent.set(false);
-      // students.set([]);
-    }
-
-    updateGraph();
-
-    updateStudentContribGraph();
-    updateStudentTimeGraph();
-    // setTimeout(function(){$(window).trigger('updated-filters')}, 100) // We're also forcing a graph update when you select new observations, not just changing params
-  },
+  // 'click .option--all-observations': function(e) {
+  //   selectedObservations.set([]);
+  //   $('.option--observation').removeClass('selected').click()
+  //
+  // },
+  // 'click .option--observation': function(e) {
+  //   let $target = $(e.target);
+  //   if (!$target.hasClass('selected')) {
+  //     $target.addClass('selected');
+  //   }
+  //   else {
+  //     $target.removeClass('selected');
+  //   }
+  //
+  //   let clickedObservationId = $(e.target).attr('data-obs-id');
+  //   let currentObsIds = selectedObservations.get();
+  //
+  //   if (currentObsIds.find(id => id === clickedObservationId)) {
+  //     currentObsIds.splice(currentObsIds.indexOf(clickedObservationId), 1);
+  //   }
+  //   else {
+  //     currentObsIds.push(clickedObservationId);
+  //   }
+  //
+  //   selectedObservations.set(currentObsIds);
+  //
+  //   if (currentObsIds.length === 0) {
+  //     selectedStudent.set(false);
+  //     // students.set([]);
+  //   }
+  //
+  //   updateGraph();
+  //
+  //   updateStudentContribGraph();
+  //   updateStudentTimeGraph();
+  //   // setTimeout(function(){$(window).trigger('updated-filters')}, 100) // We're also forcing a graph update when you select new observations, not just changing params
+  // },
   'click .student-spotlight__close': function() {
     selectedStudent.set(false);
   },
@@ -344,9 +276,6 @@ Template.heatmapReport.events({
     $('.students').html('');
     updateGraph()
   },
-  'heatmap_student_sort_demo_updated window': function() {
-    console.log('testing if event works heatmap_student_sort_demo_updated');
-  }
 })
 
 $(window).on('heatmap_student_sort_updated', function(e, sort_type) {
@@ -429,7 +358,6 @@ let createHeatmapData = function() {
   // else
   if (heatmapReportSortType.get() === 'buckets') {
     let selectedDemo = heatmapReportSortDemoChosen.get();
-    console.log('asd', getDemographics().filter(d => d.name === selectedDemo));
     let selected_demo_options = getDemographics().filter(d => d.name === selectedDemo)[0];
     let opts;
     if (selected_demo_options) {
@@ -438,7 +366,6 @@ let createHeatmapData = function() {
     else {
       opts = [];
     }
-    console.log('opts', opts);
     ret.contributions_dataset = ret.contributions_dataset.map(datum => {datum.selected_demo_value = datum.student.info.demographics[selectedDemo]; return datum})
 
     opts.map(opt => ret.contributions_dataset.push({
@@ -824,8 +751,49 @@ let getDiscourseOptionsForDimension = function(dimension) {
 };
 
 
+
+let setupVis = function() {
+  // Intentionally duplicated to allow for easier customization on a per-report-type basis.
+  let observations = obsOptions.get();
+  // //console.log('observations', observations);
+  let obs = observations.map(function(obs) {
+    // console.log('obse', obs);
+    return {
+      id: obs._id,
+      // content: obs.name + '<br/>(' + obs.observationDate + ')',
+      content: obs.name + ' (' + obs.observationDate + ')',
+      compare_date: new Date(obs.observationDate),
+      start: obs.observationDate,
+      className: getSequences(obs._id, obs.envId).length < 1 ? 'disabled' : ''
+    }
+  })
+  let items = new vis.DataSet(obs);
+  let container = document.getElementById('vis-container');
+  $(container).html('');
+  let options = {
+    multiselect: true,
+    zoomable: false,
+  }
+  timeline = new vis.Timeline(container, items, options);
+  timeline.on('select', function(props) {
+    selectedObservations.set(props.items);
+    updateStudentContribGraph();
+    updateStudentTimeGraph();
+    if (props.items.length === 0) {
+      selectedStudent.set(false);
+    }
+    setTimeout(updateGraph, 200);
+  });
+
+  let recent_obs = obs.sort(function(a, b) {return a.compare_date - b.compare_date}).slice(Math.max(obs.length - 8, 1));
+  let recent_obs_ids = recent_obs.map(obs => obs.id);
+  timeline.focus(recent_obs_ids);
+
+  return timeline
+}
+
+
 let updateStudentContribGraph = function() {
-  console.log('updateStudentContribGraph');
   let selector = '.student-contributions-graph__graph';
 
   let dimension = selectedSpotlightDimension.get();
@@ -906,9 +874,6 @@ let createStudentContribData = function() {
     median: get_median(all_students.map(d => d.count)),
   });
 
-  console.log('ret');
-  console.table(ret);
-
   return ret
 };
 
@@ -985,13 +950,11 @@ let studentContribGraph = function(data, selector) {
     .data(data)
     .enter().append('g')
     .attr("transform", function(d) {
-      console.log('d', d);
       return "translate(" + x_group(d.name) + ",0)"
     })
     .attr("class", 'bar-group')
     .selectAll('rect')
     .data(function(d) {
-      console.log('rect data', d);
       return data.filter(i => i.name === d.name)
     })
     .enter();

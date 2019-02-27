@@ -17,9 +17,14 @@
         <h3>
             Graph type: {{> inlineDataTypeSelect dataset_types=dataset_types}}
         </h3>
+
         {{#if environmentChosen }}
-        <h4>Choose one or more observations.</h4>
-            {{>observationsButtonSelect observations=observations}}
+            <h4>Choose one or more observations.</h4>
+            <p>You can select multiple observations by holding down the control key (command on mac) and clicking more observations.</p>
+            <p>Drag the graph to see earlier or later observations.</p>
+            <div class="report-select__options report-select__options--observations">
+                <div id="vis-container"></div>
+            </div>
         {{/if}}
 
         <div class="interactive-report-wrapper">

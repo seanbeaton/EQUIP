@@ -2,8 +2,6 @@
 <template name="heatmapReport">
     {{> reportBackButton }}
 
-    {{> tour tourData=tourData }}
-
     <div class="report-section-wrapper">
         <!--<div class="report-section-wrapper__slide-track">-->
             <!--<div class="report-section-wrapper__slide">-->
@@ -12,10 +10,17 @@
             <h3>
                 Classroom: {{>environmentSelect environments=environments}}
             </h3>
+
             {{#if environmentChosen }}
                 <h2>Choose one or more observations.</h2>
-                {{>observationsButtonSelect observations=observationsOptions}}
+                <p>You can select multiple observations by holding down the control key (command on mac) and clicking more observations.</p>
+                <p>Drag the graph to see earlier or later observations.</p>
+                <div class="report-select__options report-select__options--observations">
+                    <div id="vis-container"></div>
+                </div>
             {{/if}}
+
+
             {{#if observationNames}} <h3>Observations: {{ observationNames }}</h3> {{/if }}
 
             <div class="heatmap-report-wrapper">
