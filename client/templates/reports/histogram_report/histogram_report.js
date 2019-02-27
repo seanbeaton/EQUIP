@@ -81,9 +81,17 @@ Template.histogramReport.events({
   },
   'change #histogram-demographic': function(e) {
     let selected = $('option:selected', e.target);
+    selectedDemographic.set(selected.val());
+    updateGraph();
+  },
+  'change #student-spotlight__discourse-select': function(e) {
+    let selected = $('option:selected', e.target);
     selectedSpotlightDimension.set(selected.val());
     updateStudentContribGraph();
     updateStudentTimeGraph();
+  },
+  'click .student-spotlight__close': function() {
+    selectedStudent.set(false);
   },
 });
 
@@ -324,10 +332,30 @@ let initHistogram = function(data, selector) {
   $('.student-box').on('click', function() {
     selectStudentForModal($(this).attr('id'));
   });
+
+  // let dim = selectedDemographic.get();
+  let key_options = getDemographicOptions().map(demo_opt => demo_opt.name);
+
+  if (key_options.length > 0) {
+    let key_colors = getLabelColors(key_options);
+    let color_scale = d3.scaleOrdinal()
+      .range(Object.values(key_colors));
+    let all_students = students.get();
+    let demo = selectedDemographic.get();
+    $('.student-box').each(function(box) {
+      let $box = $(box);
+      console.log('box', $box);
+      console.log('getting students');
+      let student = all_students.filter(stud => stud.studentId === $box.attr('id'))[0]
+      console.log('student', student);
+
+      console.log('color', color_scale(student.info.demographics[demo]))
+    })
+  }
 }
 
 let updateHistogram = function(data, selector) {
-
+  initHistogram(data, selector);
 }
 
 let getObservations = function() {
@@ -342,6 +370,17 @@ let getDemographics = function() {
     return []
   }
   return setupSubjectParameters(envId);
+};
+
+let getDemographicOptions = function() {
+  let options = getDemographics();
+  let selected_demo = selectedDemographic.get();
+  if (!selected_demo) {
+    return [];
+  }
+  let opt = options.find(opt => opt.name === selected_demo);
+  return opt
+    .options.split(',').map(function(opt) {return {name: opt.trim()}})
 };
 
 let getDiscourseDimensions = function() {
