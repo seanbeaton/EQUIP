@@ -104,6 +104,13 @@ Template.heatmapReportSortDemo.rendered = function() {
     .chosen({disable_search_threshold: 10, width: "250px"});
 }
 
+Template.histogramDemoSelect.rendered = function() {
+  $('.histogram-demographic-chosen')
+    .trigger('change')
+    .filter(':not(.chosen--processed)').addClass('chosen--processed')
+    .chosen({disable_search_threshold: 10, width: "250px"});
+}
+
 const showDemoSelect = new ReactiveVar(false);
 const heatmapReportSortType = new ReactiveVar(false);
 const heatmapReportSortDemoChosen = new ReactiveVar(false);

@@ -1,0 +1,147 @@
+.histogram-report {
+  display: grid;
+  margin: 20px 0 0;
+  div {
+    margin: 0;
+  }
+
+  .student-box {
+    position: relative;
+    cursor: pointer;
+    float: left;
+    margin: 5px;
+    @include nt($prop: opacity);
+    &:hover {
+      opacity: 0.8;
+    }
+    &.demo-label {
+      clear: both;
+      &,
+      &[style] {
+        background: 0 !important;
+      }
+      p {
+        color: #333;
+        background: 0;
+      }
+      + .student-box {
+        clear: left;
+      }
+    }
+  }
+  .subjects {
+    padding: 7px 20px;
+    display: block;
+    flex-flow: row wrap;
+    min-height: auto;
+    height: auto;
+    &.subjects--fixed-height {
+      min-height: 1200px;
+      height: 1200px;
+    }
+  }
+  grid-template-columns: 50% 50%;
+  grid-template-rows: auto auto;
+}
+
+.histogram-report {
+  font-family: Roboto, sans-serif;
+}
+
+// Grid placements
+
+.histogram-report__graph-key {
+  grid-column-start: 1;
+  grid-column-end: 2;
+  grid-row-start: 1;
+  grid-row-end: 2;
+  min-height: 50px;
+}
+
+.histogram-report__graph {
+  grid-column-start: 1;
+  grid-column-end: 3;
+  grid-row-start: 2;
+  grid-row-end: 3;
+}
+
+.histogram-report__student-spotlight {
+  grid-column-start: 1;
+  grid-column-end: 3;
+  grid-row-start: 1;
+  grid-row-end: 3;
+}
+
+
+$grid-color: #333;
+$light-grid-color: #ddd;
+
+// Grid lines
+.histogram-report__graph-key {
+  //border-bottom: 1px solid $grid-color;
+  height: 100%;
+}
+
+
+.histogram-report__filters {
+  .filters__wrapper  {
+    display: flex;
+    flex-flow: row wrap;
+  }
+  .select__wrapper {
+    margin-right: 10px;
+    margin-bottom: 10px;
+  }
+}
+
+//.student-spotlight {
+//  position: relative;
+//  padding: 20px;
+//}
+//
+//.student-spotlight__close {
+//  position: absolute;
+//  top: 20px;
+//  right: 20px;
+//  padding: 10px;
+//}
+//
+//.student-spotlight__demographics {
+//  .demo-label {
+//    font-weight: 600;
+//  }
+//  li {
+//    margin: 0;
+//  }
+//}
+
+#histogram-d3-wrapper {
+  overflow-x: scroll;
+  position: relative;
+}
+
+//
+//.disabled-student {
+//  pointer-events: none;
+//  opacity: 0.3;
+//}
+
+#histogram-d3-wrapper {
+  display: flex;
+  flex-flow: row nowrap;
+
+  .student-group {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: flex-end;
+    padding: 0 20px 0 0;
+  }
+  .student-group__title {
+    font-weight: bold;
+    margin: 0 10px
+  }
+
+  .student-group__students {
+    min-width: 230px;
+  }
+}

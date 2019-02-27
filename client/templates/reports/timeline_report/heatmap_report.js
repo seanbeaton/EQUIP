@@ -189,7 +189,6 @@ Template.heatmapReport.events({
     clearGraph();
 
     selectedEnvironment.set(selected.val());
-    clearObservations();
     obsOptions.set(getObsOptions());
     students.set(getStudents(selectedEnvironment.get()));
     setTimeout(setupVis, 50);
@@ -522,7 +521,7 @@ let initHeatmapGraph = function(full_data, containerSelector) {
     .attr('data-y', d => d.student.data_y)
     .attr('data-quintile', d => d.quintile)
     .attr('data-contrib-count', d => d.count)
-    .attr('class', d => 'dragger student-box c--observation__student-box-container' + d.class)
+    .attr('class', d => 'dragger student-box c--observation__student-box-container ' + d.class)
     .html(function(d) {
       let count = d.show_count ? ' (' + d.count + ')' : '';
       return '<p class="c--observation__student-box">' + d.name + count +'</p>'
@@ -574,7 +573,7 @@ let updateHeatmapGraph = function(full_data, containerSelector) {
     .attr('data-x', d => d.student.data_x)
     .attr('data-y', d => d.student.data_y)
     .attr('data-quintile', d => d.quintile)
-    .attr('class', d => 'dragger student-box c--observation__student-box-container' + d.class)
+    .attr('class', d => 'dragger student-box c--observation__student-box-container ' + d.class)
     .html(function(d) {
       let count = d.show_count ? ' (' + d.count + ')' : '';
       return '<p class="c--observation__student-box">' + d.name + count +'</p>'
@@ -702,26 +701,12 @@ let getObsOptions = function(envId) {
     envId = selectedEnvironment.get();
   }
   if (!!envId) {
-    let obs = Observations.find({envId: envId}).fetch();
-    return obs;
+    return Observations.find({envId: envId}).fetch();
   }
   else {
     return false;
   }
 }
-
-let clearObservations = function() {
-  //console.log('TODO: CLEAN OBSERVATIONS');
-  clearParameters();
-  selectedObservations.set([]);
-  $('.option--observation').removeClass('selected');
-
-};
-
-let clearParameters = function() {
-  //console.log('TODO: CLEAN PARAMS')
-};
-
 
 let getObservations = function() {
   let obsIds = selectedObservations.get();
@@ -792,6 +777,11 @@ let setupVis = function() {
   return timeline
 }
 
+//
+// Below this we have only the spotlight code
+// This could be refactored by somehow attaching all the fields
+// (students, selected student, env, observations) to the spotlight somehow.
+//
 
 let updateStudentContribGraph = function() {
   let selector = '.student-contributions-graph__graph';
@@ -855,9 +845,9 @@ let createStudentContribData = function() {
   }
 
 
-  let total = ret.map(d => d.count).reduce((a, b) => a + b);
+  let total = ret.map(d => d.count).reduce((a, b) => a + b, 0);
 
-  let class_total = ret.map(d => d.class_total).reduce((a, b) => a + b);
+  let class_total = ret.map(d => d.class_total).reduce((a, b) => a + b, 0);
 
   let num_students = students.get().length;
   ret.forEach(function(opt) {
@@ -898,7 +888,7 @@ function get_average(values) {
     return 0;
   }
 
-  return values.reduce((a, b) => a + b) / values.length
+  return values.reduce((a, b) => a + b, 0) / values.length
 }
 
 let studentContribGraph = function(data, selector) {

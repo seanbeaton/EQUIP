@@ -1,5 +1,48 @@
 <template name="histogramReport">
-    <div>
-        Histogram report.
+    {{> reportBackButton }}
+
+    <div class="report-section-wrapper">
+        <!--<div class="report-section-wrapper__slide-track">-->
+        <!--<div class="report-section-wrapper__slide">-->
+
+        <section class="report-section report-section--main">
+            <h3>
+                Classroom: {{>environmentSelect environments=environments}}
+            </h3>
+            {{#if environmentChosen }}
+                <h2>Choose one or more observations.</h2>
+                <p>You can select multiple observations by holding down the control key (command on mac) and clicking more observations.</p>
+                <p>Drag the graph to see earlier or later observations.</p>
+                <div class="report-select__options report-select__options--observations">
+                    <div id="vis-container"></div>
+                </div>
+            {{/if}}
+            {{#if observationNames}} <h3>Observations: {{ observationNames }}</h3> {{/if }}
+            {{#if observationChosen }}
+            {{> histogramDemoSelect demographics=demographics }}
+            {{/if }}
+            <div class="histogram-report-wrapper">
+                <div class="histogram-report">
+                    <div class="histogram-report__graph">
+                        {{#if students }}
+                            {{#if histogramDemoOptionSelected }}
+                                <h3>Click on a student to see more details.</h3>
+                            {{else}}
+                                <h3>Choose a demographic above to highlight the students below.</h3>
+                            {{/if}}
+                            <div class="subjects" id="histogram-d3-wrapper">
+
+                            </div>
+                        {{/if}}
+                    </div>
+                    <div class="histogram-report__graph-key"></div>
+                    <div class="histogram-report__student-spotlight spotlight-wrapper {{#if selectedStudent}} student-spotlight--active {{/if}}">
+                        {{> studentSpotlight selectedStudent=selectedStudent discourseparams=discourseparams multipleObservationsChosen=multipleObservationsChosen}}
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!--</div>-->
+        <!--</div>-->
     </div>
 </template>

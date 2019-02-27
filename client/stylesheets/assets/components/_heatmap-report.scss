@@ -111,8 +111,20 @@ $light-grid-color: #ddd;
     margin-top: auto;
   }
 }
+//
+//.heatmap-report__student-spotlight {
+//  background-color: white;
+//  opacity: 0;
+//  z-index: 1;
+//  pointer-events: none;
+//  @include nt($prop: opacity);
+//  &.student-spotlight--active {
+//    opacity: 1;
+//    pointer-events: auto;
+//  }
+//}
 
-.heatmap-report__student-spotlight {
+.spotlight-wrapper {
   background-color: white;
   opacity: 0;
   z-index: 1;
