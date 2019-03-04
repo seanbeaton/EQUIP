@@ -1034,13 +1034,32 @@ let setupVis = function() {
     zoomable: false,
   }
   timeline = new vis.Timeline(container, items, options)
+
   timeline.on('select', function(props) {
-    selectedObservations.set(props.items);
-    console.log('selectedObservations', selectedObservations.get());
+    if (props.event.firstTarget.classList.contains('vis-group')) {
+      timeline.setSelection(selectedObservations.get());
+      return;
+    }
+    if (props.items.length > 1) {
+      selectedObservations.set(props.items);
+    } else {
+      let currentObs = selectedObservations.get();
+      let obsIndex = currentObs.indexOf(props.items[0])
+      if (obsIndex === -1) {
+        currentObs.push(props.items[0])
+      }
+      else {
+        currentObs.splice(obsIndex, 1)
+      }
+      selectedObservations.set(currentObs);
+      timeline.setSelection(currentObs);
+    }
 
     $(window).trigger('updated-filters');
-    // updateGraph();
   });
+
+
+
 
   let recent_obs = obs.sort(function(a, b) {return a.compare_date - b.compare_date}).slice(Math.max(obs.length - 8, 1));
   // console.log('recent_obs', recent_obs)

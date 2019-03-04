@@ -892,7 +892,25 @@ let setupVis = function() {
   }
   timeline = new vis.Timeline(container, items, options)
   timeline.on('select', function(props) {
-    selectedObservations.set(props.items);
+    console.log('items', props);
+    if (props.event.firstTarget.classList.contains('vis-group')) {
+      timeline.setSelection(selectedObservations.get());
+      return;
+    }
+    if (props.items.length > 1) {
+      selectedObservations.set(props.items);
+    } else {
+      let currentObs = selectedObservations.get();
+      let obsIndex = currentObs.indexOf(props.items[0])
+      if (obsIndex === -1) {
+        currentObs.push(props.items[0])
+      }
+      else {
+        currentObs.splice(obsIndex, 1)
+      }
+      selectedObservations.set(currentObs);
+      timeline.setSelection(currentObs);
+    }
     updateGraph();
   });
 

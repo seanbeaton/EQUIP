@@ -48,13 +48,31 @@ let setupVis = function() {
   }
   timeline = new vis.Timeline(container, items, options);
   timeline.on('select', function(props) {
-    selectedObservations.set(props.items);
+    if (props.event.firstTarget.classList.contains('vis-group')) {
+      timeline.setSelection(selectedObservations.get());
+      return;
+    }
+    if (props.items.length > 1) {
+      selectedObservations.set(props.items);
+    } else {
+      let currentObs = selectedObservations.get();
+      let obsIndex = currentObs.indexOf(props.items[0])
+      if (obsIndex === -1) {
+        currentObs.push(props.items[0])
+      }
+      else {
+        currentObs.splice(obsIndex, 1)
+      }
+      selectedObservations.set(currentObs);
+      timeline.setSelection(currentObs);
+    }
+    if (selectedObservations.get().length === 0) {
+      selectedStudent.set(false);
+    }
+
     updateStudentContribGraph();
     updateStudentTimeGraph();
     setTimeout(updateGraph, 200);
-    if (props.items.length === 0) {
-      selectedStudent.set(false);
-    }
   });
 
   let recent_obs = obs.sort(function(a, b) {return a.compare_date - b.compare_date}).slice(Math.max(obs.length - 8, 1));
