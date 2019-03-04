@@ -132,16 +132,23 @@ $light-grid-color: #ddd;
 
   .student-group {
     display: flex;
-    flex-flow: row nowrap;
-    align-items: flex-end;
+    flex-flow: column-reverse nowrap;
+    align-items: flex-start;
     padding: 0 20px 0 0;
   }
   .student-group__title {
     font-weight: bold;
-    margin: 0 10px
+    border-top: 2px solid #333;
+    display: block;
+    width: 100%;
+    width: calc(100% - 10px);
+    margin: 0px 5px;
   }
 
   .student-group__students {
     min-width: 230px;
+    //max-height: 500px;
+    //display: flex;
+    //flex-flow: column-reverse wrap;
   }
 }
