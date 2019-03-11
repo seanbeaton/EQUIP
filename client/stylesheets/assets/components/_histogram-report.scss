@@ -129,12 +129,15 @@ $light-grid-color: #ddd;
 #histogram-d3-wrapper {
   display: flex;
   flex-flow: row nowrap;
+  .student-group:last-child {
+    margin-right: auto;
+  }
 
   .student-group {
     display: flex;
     flex-flow: column-reverse nowrap;
     align-items: flex-start;
-    padding: 0 20px 0 0;
+    padding: 0 15px 0 0;
   }
   .student-group__title {
     font-weight: bold;
@@ -146,9 +149,12 @@ $light-grid-color: #ddd;
   }
 
   .student-group__students {
-    min-width: 230px;
+    min-width: 170px;
     //max-height: 500px;
     //display: flex;
     //flex-flow: column-reverse wrap;
+  }
+  .student-box {
+    width: 175px;
   }
 }
