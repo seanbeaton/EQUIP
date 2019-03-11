@@ -266,7 +266,7 @@ let createHistogramData = function() {
   ret.quartiles.forEach(function(quartile) {
     quartile.students = ret.students.filter(function(student) {
       return quartile.min_exclusive < student.count && student.count <= quartile.max_inclusive
-    }).sort((a, b) => a.count - b.count)
+    }).sort((a, b) => b.count - a.count)
   })
 
   console.table(ret.students);
