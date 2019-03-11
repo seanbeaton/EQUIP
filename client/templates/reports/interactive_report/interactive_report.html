@@ -36,17 +36,6 @@
                 <div class="interactive-report__y-scale"></div>
                 <div class="interactive-report__title">
                     <div class="x-axis-label param-selector-wrapper swappable">
-
-                        <div class="select__wrapper select__wrapper--demo"><span
-                                class="explanation-text">Demographic</span>
-                            <select id="demo-select" {{demo_available}} class="param-select-form-item demographic chosen-select" name="demographic-select" data-param-type="demographics">
-                                <option disabled selected value="">- Select -</option>
-                                {{#each demographics}}
-                                    <option value="{{name}}">{{name}}</option>
-                                {{/each}}
-                            </select>
-                        </div>
-                        <span class="center_text"><span class="swappable__button"><i class="fas fa-exchange-alt"></i></span></span>
                         <div class="select__wrapper select__wrapper--disc"><span
                                 class="explanation-text">Discourse Dimension</span>
                             <select id="disc-select" {{disc_available}} class="param-select-form-item discourse chosen-select" name="parameter-select" data-param-type="discourse">
@@ -56,7 +45,16 @@
                                 {{/each}}
                             </select>
                         </div>
-
+                        <span class="center_text"><span class="swappable__button"><i class="fas fa-exchange-alt"></i></span></span>
+                        <div class="select__wrapper select__wrapper--demo"><span
+                                class="explanation-text">Demographic</span>
+                            <select id="demo-select" {{demo_available}} class="param-select-form-item demographic chosen-select" name="demographic-select" data-param-type="demographics">
+                                <option disabled selected value="">- Select -</option>
+                                {{#each demographics}}
+                                    <option value="{{name}}">{{name}}</option>
+                                {{/each}}
+                            </select>
+                        </div>
                     </div>
                     </div>
                 <div class="interactive-report__graph" data-graph-type="{{selectedDatasetType}}"></div>
