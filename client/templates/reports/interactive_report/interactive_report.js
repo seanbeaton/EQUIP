@@ -482,7 +482,7 @@ let createGraph = function(contribData, containerSelector, dataset) {
       buildBarTooltipSlide(group, group_type, bar, bar_type, contribData)
     })
     .on('mouseout', function() {
-        sidebar.setCurrentPanel('start', 250)
+        // sidebar.setCurrentPanel('start', 250)
       // hover out
 
     })
