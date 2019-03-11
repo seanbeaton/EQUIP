@@ -413,7 +413,8 @@ let updateGraph = function() {
 let initTimelineGraph = function(full_data, containerSelector) {
   let data;
 
-  if (selectedDatasetType.get() === 'contributions') {
+  let dataset = selectedDatasetType.get();
+  if (dataset === 'contributions') {
     data = full_data.contributions_dataset;
   }
   else {
@@ -445,7 +446,7 @@ let initTimelineGraph = function(full_data, containerSelector) {
     .range([0, width]);
 
   let y = d3.scaleLinear()
-    .domain([0, d3.max(data, d => d.max)])
+    .domain([0, d3.max(data, d => d.max)]).nice()
     .range([height, 0]);
 
 
@@ -551,10 +552,43 @@ let initTimelineGraph = function(full_data, containerSelector) {
     .call(d3.axisBottom(x)
       .tickValues(ticks));
 
-  // Add the Y Axis
-  g.append("g")
-    .attr('class', 'axis--y')
-    .call(d3.axisLeft(y));
+  // // Add the Y Axis
+  // g.append("g")
+  //   .attr('class', 'axis--y')
+  //   .call(d3.axisLeft(y));
+
+  let y_a;
+  if (dataset === 'contributions') {
+    y_a =
+      g.append("g")
+        .attr("class", "axis--y")
+        .call(d3.axisLeft(y).tickFormat(function(e){
+            if(Math.floor(e) !== e) {
+              return;
+            }
+            return e;
+          })
+        )
+  }
+  else {
+    y_a = g.append("g")
+      .attr("class", "axis--y")
+      .call(d3.axisLeft(y).ticks(null, "s")
+      )
+  }
+
+  // y_a.append("text")
+  //   .attr("x", 2)
+  //   .attr("y", y(y.ticks().pop()) + 0.5)
+  //   .attr("dy", "-2.4em")
+  //   .attr("dx", height / -2)
+  //   .attr("fill", "#000")
+  //   .attr("font-weight", "bold")
+  //   .attr("text-anchor", "middle" +
+  //     "")
+  //   .attr("transform", "rotate(-90)")
+
+
 
 
   let toggleTickDirection = function(tick) {
