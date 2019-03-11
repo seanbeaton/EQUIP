@@ -80,7 +80,7 @@ Template.interactiveReport.rendered = function(){
 Template.demographicHeatmapFilter.rendered = function() {
   $('.filter.chosen-select')
     .filter(':not(.chosen--processed)').addClass('chosen--processed')
-    .chosen({disable_search_threshold: 10, width: "250px"});
+    .chosen({disable_search_threshold: 10, width: "240px", placeholder_text_multiple: "Choose Multiple Options"});
 }
 
 Template.spotlightDiscourseSelect.rendered = function() {
@@ -94,21 +94,21 @@ Template.heatmapReportSort.rendered = function() {
   $('.students-select-sort')
     .trigger('change')
     .filter(':not(.chosen--processed)').addClass('chosen--processed')
-    .chosen({disable_search_threshold: 10, width: "250px"});
+    .chosen({disable_search_threshold: 10, width: "240px", placeholder_text_multiple: "Choose Multiple Options"});
 }
 
 Template.heatmapReportSortDemo.rendered = function() {
   $('.students-select-buckets-demo')
     .trigger('change')
     .filter(':not(.chosen--processed)').addClass('chosen--processed')
-    .chosen({disable_search_threshold: 10, width: "250px"});
+    .chosen({disable_search_threshold: 10, width: "240px", placeholder_text_multiple: 'Choose Multiple Options'});
 }
 
 Template.histogramDemoSelect.rendered = function() {
   $('.histogram-demographic-chosen')
     .trigger('change')
     .filter(':not(.chosen--processed)').addClass('chosen--processed')
-    .chosen({disable_search_threshold: 10, width: "250px"});
+    .chosen({disable_search_threshold: 10, width: "240px", placeholder_text_multiple: 'Choose Multiple Options'});
 }
 
 const showDemoSelect = new ReactiveVar(false);
