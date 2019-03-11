@@ -602,7 +602,7 @@ let createGraph = function(contribData, containerSelector, dataset) {
 
   if (selectedDatasetType.get() === 'equity') {
     let center_line = $('.axis--y g').filter((idx, item) => parseFloat($('text', item).text()) === 1.);
-    toggleTickDirection($('line', center_line[0]));
+    // toggleTickDirection($('line', center_line[0]));
     $(center_line[0]).on('click', function(tick) {
       toggleTickDirection($('line', center_line[0]));
     });
