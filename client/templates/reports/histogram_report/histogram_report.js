@@ -373,6 +373,9 @@ let initHistogram = function(data, selector) {
       $box.css('background-color', color_scale(student.info.demographics[demo]));
     })
   }
+  else {
+    $('.histogram-report__graph-key').html('');
+  }
 
 }
 
