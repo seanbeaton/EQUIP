@@ -648,7 +648,7 @@ let buildBarTooltipSlide = function(group, group_type, bar, bar_type, contribDat
   let max_contribs_contributing = Math.max(...contributing_students.map(student => student.relevant_contributions.length));
   let contributing_students_html = contributing_students.sort((a, b) => b.relevant_contributions.length - a.relevant_contributions.length).map(function(student) {
     let max_contribs_percent = (student.relevant_contributions.length / max_contribs_contributing) * 100 + '%';
-    return `<span class="student-bar student-bar--contributor" style="background: linear-gradient(to right, rgba(15,129,204,0.15) 0%, rgba(15,129,204,0.15) ${max_contribs_percent}, rgba(15,129,204,0.05) ${max_contribs_percent}, rgba(15,129,204,0.05) 100%)">
+    return `<span class="student-bar student-bar--contributor" style="background: linear-gradient(to right, rgba(15,129,204,0.15) 0%, rgba(15,129,204,0.15) ${max_contribs_percent}, rgba(15,129,204,0.02) ${max_contribs_percent}, rgba(15,129,204,0.02) 100%)">
     ${student.info.name} (${student.relevant_contributions.length})
     </span>`
   }).join('');
