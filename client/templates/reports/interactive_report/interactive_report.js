@@ -446,7 +446,16 @@ let createGraph = function(contribData, containerSelector, dataset) {
   // var keys = data.column_keys.slice(1);
   var keys = contribData.column_keys;
 
-  let key_colors = getLabelColors(keys);
+
+  let color_function;
+  console.log('contribData', contribData);
+  if (contribData.y_axis_param_type === 'demographics') {
+    color_function = d3.interpolateViridis
+  }
+  else {
+    color_function = d3.interpolatePlasma
+  }
+  let key_colors = getLabelColors(keys, color_function);
   var z = d3.scaleOrdinal()
     .range(Object.values(key_colors));
 
@@ -908,7 +917,14 @@ let increaseValueForStudent = function(data, y, x, student) {
 
 let updateKey = function(key_wrapper) {
   let y_axis = getYAxisSelection();
-  let label_colors = getLabelColors(y_axis.selected_option.option_list);
+  let color_function;
+  if (y_axis.param_type === 'demographics') {
+    color_function = d3.interpolateViridis
+  }
+  else {
+    color_function = d3.interpolatePlasma
+  }
+  let label_colors = getLabelColors(y_axis.selected_option.option_list, color_function);
   let key_chunks = Object.keys(label_colors).map(function(label) {
     let color = label_colors[label]
     return `<span class="key--label"><span class="key--color" style="background-color: ${color}"></span><span class="key--text">${label}</span></span>`
@@ -947,23 +963,36 @@ let avail_colors_viridis = [
   "#cbe02dff", "#d6e22bff", "#e1e329ff", "#eae428ff", "#f5e626ff", "#fde725ff",
 ];
 
+// let getLabelColors = function(labels) {
+//   let local_colors = avail_colors_viridis.slice();
+//
+//   let spacing = Math.max(Math.floor(avail_colors_viridis.length / labels.length), 1);
+//
+//   let label_colors = {};
+//   let _ = labels.map(function(label) {
+//     if (typeof label_colors[label] === 'undefined') {
+//       let new_color = local_colors[0];
+//       local_colors.push(new_color);
+//       label_colors[label] = new_color;
+//       shiftArrayToLeft(local_colors, spacing);
+//     }
+//     else {
+//
+//     }
+//   });
+//   return label_colors
+// }
+let getLabelColors = function(labels, color_function) {
+  if (typeof color_function === 'undefined') {
+    color_function = d3.interpolateViridis;
+  }
 
-function shiftArrayToLeft(arr, places) {
-  arr.push.apply(arr, arr.splice(0,places));
-}
-
-let getLabelColors = function(labels) {
-  let local_colors = avail_colors_viridis.slice();
-
-  let spacing = Math.max(Math.floor(avail_colors_viridis.length / labels.length), 1);
+  let spacing = 1 / labels.length;
 
   let label_colors = {};
-  let _ = labels.map(function(label) {
+  let _ = labels.map(function(label, index) {
     if (typeof label_colors[label] === 'undefined') {
-      let new_color = local_colors[0];
-      local_colors.push(new_color);
-      label_colors[label] = new_color;
-      shiftArrayToLeft(local_colors, spacing);
+      label_colors[label] = color_function(index * spacing);
     }
     else {
 
