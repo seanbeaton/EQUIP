@@ -442,6 +442,13 @@ let updateGraph = function() {
 
 let updateFilteredStudents = function() {
   let selected_filters = currentDemoFilters.get();
+  let active_filters = !!selected_filters.map(filter => filter.selected.length).reduce((a, b) => a + b);
+  if (active_filters) {
+    $('.heatmap-report-wrapper').addClass('filters-active');
+  }
+  else {
+    $('.heatmap-report-wrapper').removeClass('filters-active');
+  }
   let student_boxes = $('.student-box');
   student_boxes.each(function(student_key) {
     let $student = $(student_boxes[student_key]);
