@@ -832,19 +832,24 @@ let studentTimeGraph = function(data, selector) {
   // let valLine = d3.line()
   //   .x(function(d) {return x(d.date)})
   //   .y(function(d) {return y(d.value)})
+  let total_color = '#555555ff';
 
 
   g.append('path')
     .data([data])
     .attr('class', 'line line--total')
     .style("stroke-width", 2)
+    .style('stroke', total_color)
     .attr('d', total_line);
 
   let key_colors = getLabelColors(getDiscourseOptionsForDimension(dim).map(demo_opt => demo_opt.name));
+
+  key_colors.Total = total_color;
+
   let z = d3.scaleOrdinal()
     .range(Object.values(key_colors));
 
-  updateStudentTimeKey('.student-participation-time__graph-key', discdims, z)
+  updateStudentTimeKey('.student-participation-time__graph-key', Object.keys(key_colors), z)
 
   lines.forEach(function(line) {
 
@@ -885,8 +890,8 @@ let studentTimeGraph = function(data, selector) {
 
 let updateStudentTimeKey = function(key_wrapper, y_values, color_axis) {
   let key_chunks = y_values.map(function(label) {
-    let color = color_axis(label.name)
-    return `<span class="key--label"><span class="key--color" style="background-color: ${color}"></span><span class="key--text">${label.name}</span></span>`
+    let color = color_axis(label)
+    return `<span class="key--label"><span class="key--color" style="background-color: ${color}"></span><span class="key--text">${label}</span></span>`
   })
 
   let html = `${key_chunks.join('')}`;
