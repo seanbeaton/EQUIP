@@ -389,7 +389,16 @@ let createHeatmapData = function() {
         return 1
       }
       else if (a_demo === b_demo) {
-        return b.sort_first - a.sort_first;
+        // return b.sort_first - a.sort_first;
+        if (a.sort_first) {
+          return -1;
+        }
+        else if (b.sort_first) {
+          return 1
+        }
+        else {
+          return b.count - a.count;
+        }
       }
       else {
         return -1
@@ -427,7 +436,7 @@ let updateGraph = function() {
 
   let data = createHeatmapData();
   updateTotalContribs(data.contributions_dataset);
-
+  $('.heatmap-report-wrapper').removeClass('filters-active');
   if (!heatmap_wrapper.hasClass('heatmap-created')) {
     heatmap_wrapper.addClass('heatmap-created');
 
@@ -443,6 +452,7 @@ let updateGraph = function() {
 let updateFilteredStudents = function() {
   let selected_filters = currentDemoFilters.get();
   let active_filters = !!selected_filters.map(filter => filter.selected.length).reduce((a, b) => a + b);
+  console.log('active filteres', active_filters)
   if (active_filters) {
     $('.heatmap-report-wrapper').addClass('filters-active');
   }
@@ -453,12 +463,14 @@ let updateFilteredStudents = function() {
   student_boxes.each(function(student_key) {
     let $student = $(student_boxes[student_key]);
     let student_data = students.get().find(student => student._id === $student.attr('id'))
-
     let allowed = selected_filters.map(function(filter) {
       if (filter.selected.length === 0) {
         return true;
       }
-
+      console.log('student_data', student_data);
+      if (!student_data) {
+        return false;
+      }
       return (filter.selected.indexOf(student_data.info.demographics[filter.name]) >= 0)
     }).reduce((a,b) => a && b);
 
@@ -485,7 +497,9 @@ let updateTotalContribs = function(data) {
   student_boxes.each(function(student_key) {
     let $student = $(student_boxes[student_key]);
     let student_data = students.get().find(student => student._id === $student.attr('id'))
-
+    if (!student_data) {
+      return false;
+    }
     // creates an array of boolean values for if the student matches each filter, then reduces it.
     let allowed = filters.map(function(filter) {
       if (filter.selected.length === 0) {
