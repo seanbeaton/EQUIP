@@ -11,7 +11,7 @@ const selectedEnvironment = new ReactiveVar(false);
 const selectedObservations = new ReactiveVar([]);
 const selectedXParameter = new ReactiveVar(false);
 const selectedYParameter = new ReactiveVar(false);
-const selectedDatasetType = new ReactiveVar('equity');
+const selectedDatasetType = new ReactiveVar('contributions');
 
 
 Template.interactiveReport.helpers({
@@ -67,15 +67,15 @@ Template.interactiveReport.helpers({
   dataset_types: function() {
     return [
       {
-        id: 'equity',
-        name: 'Equity Ratio',
-        default: 'default'
-      },
-      {
         id: 'contributions',
         name: 'Contributions',
-        default: ''
-      }
+        selected: 'selected'
+      },
+      {
+        id: 'equity',
+        name: 'Equity Ratio',
+        selected: ''
+      },
     ]
   },
   selectedDatasetType: function() {

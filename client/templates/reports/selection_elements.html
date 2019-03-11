@@ -19,7 +19,7 @@
 <template name="dataTypeSelect">
     <select id="dataset-type-select" class="dataset chosen-select">
     {{#each dataset_types}}
-        <option {{default}} value="{{id}}">{{name}}</option>
+        <option {{selected}} value="{{id}}">{{name}}</option>
     {{/each}}
     </select>
 </template>
