@@ -10,6 +10,7 @@
             <h3>
                 Classroom: <span class="env-select {{#if selectedStudent}} env-select--disabled {{/if}}">{{>environmentSelect environments=environments}}</span>
             </h3>
+            <h3 class="heatmap-report__sort">{{>heatmapReportSort demoParams=demographic_filters }}</h3>
 
             {{#if environmentChosen }}
                 <h2>Choose one or more observations.</h2>
@@ -37,13 +38,12 @@
                     </div>
                     <div class="heatmap-report__graph-key"></div>
                     <div class="heatmap-report__graph-stat">{{#if totalContributions}}<h4>Total contributions: {{totalContributions}}</h4>{{/if}}</div>
-                    <div class="heatmap-report__sort">
-                        {{#if showFilters}}
-                            {{>heatmapReportSort demoParams=demographic_filters }}
-                        {{/if}}
-                    </div>
+                    <!--<div class="heatmap-report__sort">-->
+               <!---->
+                    <!--</div>-->
                     <div class="heatmap-report__filters">
                         {{#if showFilters}}
+                            <h4>Additional filters</h4>
                             <div class="filters__wrapper">
                             {{#each filter in demographic_filters }}
                                 {{> demographicHeatmapFilter filter=filter }}
