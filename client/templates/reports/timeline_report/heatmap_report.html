@@ -37,6 +37,11 @@
                     </div>
                     <div class="heatmap-report__graph-key"></div>
                     <div class="heatmap-report__graph-stat">{{#if totalContributions}}<h4>Total contributions: {{totalContributions}}</h4>{{/if}}</div>
+                    <div class="heatmap-report__sort">
+                        {{#if showFilters}}
+                            {{>heatmapReportSort demoParams=demographic_filters }}
+                        {{/if}}
+                    </div>
                     <div class="heatmap-report__filters">
                         {{#if showFilters}}
                             <div class="filters__wrapper">
@@ -44,11 +49,6 @@
                                 {{> demographicHeatmapFilter filter=filter }}
                             {{/each}}
                             </div>
-                        {{/if}}
-                    </div>
-                    <div class="heatmap-report__sort">
-                        {{#if showFilters}}
-                            {{>heatmapReportSort demoParams=demographic_filters }}
                         {{/if}}
                     </div>
                     <div class="heatmap-report__student-spotlight spotlight-wrapper {{#if selectedStudent}} student-spotlight--active {{/if}}">
