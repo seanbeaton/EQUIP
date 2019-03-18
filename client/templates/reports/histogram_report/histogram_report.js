@@ -699,7 +699,7 @@ let studentContribGraph = function(data, selector) {
     .attr("height", function(d) { return height - y(d.count); });
 
   groups.append("rect")
-    .style("fill", z('Median'))
+    .style("fill", z('Median (Class)'))
     .attr("x", x("median"))
     .attr("width", x.bandwidth())
     .attr("y", function(d) { return y(d.median); })
