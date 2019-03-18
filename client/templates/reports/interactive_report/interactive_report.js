@@ -521,7 +521,12 @@ let createGraph = function(contribData, containerSelector, dataset) {
 
   let xAxis = d3.axisBottom(x0)
     .tickFormat(function(d, i) {
-      return `${d}(n = ${contribData.x_axis_n_values[d].n})`
+      if (contribData.y_axis_param_type === 'demographics') {
+        return `${d}(n = ${contribData.x_axis_n_values[d].n})`
+      }
+      else {
+        return `${d}`
+      }
     })
     // .attr('n', function(d) {return contribData.x_axis_n_values[d].n});
 
@@ -539,9 +544,11 @@ let createGraph = function(contribData, containerSelector, dataset) {
         let text = tick_text.text();
         let rows = /(^.+)(\(n = \d+\)$)/.exec(text);
 
-        tick_text.text(null)
-        tick_text.append('tspan').attr('x', 0).attr('y', y).attr('dy', dy + 'em').text(rows[1]);
-        tick_text.append('tspan').attr('x', 0).attr('y', y).attr('dy', dy + 1.1 + 'em').text(rows[2]);
+        if (rows) {
+          tick_text.text(null)
+          tick_text.append('tspan').attr('x', 0).attr('y', y).attr('dy', dy + 'em').text(rows[1]);
+          tick_text.append('tspan').attr('x', 0).attr('y', y).attr('dy', dy + 1.1 + 'em').text(rows[2]).attr('class', 'n-value');
+        }
       });
       text.each(function() {
         let $this = $(this);
