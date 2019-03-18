@@ -7,7 +7,7 @@
 
         <section class="report-section report-section--main">
             <h3>
-                Classroom: {{>environmentSelect environments=environments}}
+                Classroom: <span class="env-select {{#if selectedStudent}} env-select--disabled {{/if}}">{{>environmentSelect environments=environments}}</span>
             </h3>
             {{#if environmentChosen }}
                 <h2>Choose one or more observations.</h2>

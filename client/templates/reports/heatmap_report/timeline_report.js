@@ -16,7 +16,7 @@ const selectedObservations = new ReactiveVar([]);
 const selectedDemographic = new ReactiveVar(false);
 const selectedDiscourseDimension = new ReactiveVar(false);
 const selectedDiscourseOption = new ReactiveVar(false);
-const selectedDatasetType = new ReactiveVar('equity');
+const selectedDatasetType = new ReactiveVar('contributions');
 let timeline;
 
 
@@ -110,14 +110,14 @@ Template.timelineReport.helpers({
   dataset_types: function() {
     return [
       {
-        id: 'equity',
-        name: 'Equity Ratio',
-        default: 'default'
-      },
-      {
         id: 'contributions',
         name: 'Contributions',
-        default: ''
+        selected: 'selected'
+      },
+      {
+        id: 'equity',
+        name: 'Equity Ratio',
+        selected: ''
       }
     ]
   }

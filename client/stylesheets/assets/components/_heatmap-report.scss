@@ -191,3 +191,11 @@ $light-grid-color: #ddd;
 .heatmap-report .heatmap-demo-select-wrapper {
   margin-left: 20px;
 }
+
+.env-select--disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  > div {
+    pointer-events: none;
+  }
+}
