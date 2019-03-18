@@ -94,7 +94,7 @@ Template.heatmapReportSort.rendered = function() {
   $('.students-select-sort')
     .trigger('change')
     .filter(':not(.chosen--processed)').addClass('chosen--processed')
-    .chosen({disable_search_threshold: 10, width: "240px", placeholder_text_multiple: "Choose Multiple Options"});
+    .chosen({disable_search_threshold: 10, width: "300px", placeholder_text_multiple: "Choose Multiple Options"});
 }
 
 Template.heatmapReportSortDemo.rendered = function() {
