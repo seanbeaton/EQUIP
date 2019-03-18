@@ -1,9 +1,13 @@
 /*
-* JS file for view_data.js
+* JS file for static_report.js
 */
+import {getStudent, getStudents, updateStudent, updateStudents} from "/client/helpers/students";
+import {setupSequenceParameters, setupSubjectParameters} from "/client/helpers/parameters";
+import {updateSequences, getSequences} from "/client/helpers/sequences";
+
 var d3 = require('d3');
 //Generate classroom buttons immediately
-Template.viewData.rendered = function() {
+Template.staticReport.rendered = function() {
   var envs = Environments.find({}).fetch();
   if ($.isEmptyObject(envs)) {
     $('.env-selection').append('<h2 class="subtitle is-2" style="color: red;">You must create classroom data before doing an analysis is possible.</h2>')
@@ -34,19 +38,19 @@ Template.viewData.rendered = function() {
   }
 }
 
-Template.viewData.helpers({
+Template.staticReport.helpers({
    environment: function() {
       return Environments.find({}, {sort: {submitted: -1}});
    },
 });
 
-Template.viewData.helpers({
+Template.staticReport.helpers({
    sequences: function() {
       return Sequences.find();
    },
 });
 
-Template.viewData.helpers({
+Template.staticReport.helpers({
    subjects: function() {
       return Subjects.find();
    },
@@ -54,7 +58,7 @@ Template.viewData.helpers({
 
 
 
-Template.viewData.events({
+Template.staticReport.events({
 
   'click .reset-button': function (e) {
     location.reload()
@@ -100,13 +104,13 @@ Template.viewData.events({
         return;
     }
     // Start generating graphs
-    let demData = makeDemGraphs(envId, dParams);
-    let groupCData = makeContributionGraphs(obsIds, dParams, sParams);
+    let demData = makeDemGraphs(envId, dParams, envId);
+    let groupCData = makeContributionGraphs(obsIds, dParams, sParams, envId);
 
     reportSummary(chosenClassroomName, obsNames, sParams, dParams, totalCont);
     classStats(envId, sParams, obsIds);
     makeRatioGraphs(envId, groupCData, demData);
-    makeIndividualGraphs(obsIds);
+    makeIndividualGraphs(obsIds, envId);
 
     gtag('event', 'view', {'event_category': 'analytics', 'event_label': JSON.stringify({
       'classroom_name': chosenClassroomName,
@@ -434,14 +438,18 @@ function classStats(envId, sParams, obsId) {
   }).appendTo(bullets)
 }
 
-function makeDemGraphs(env, dparams) {
-  var subs = Subjects.find({"envId": env}).fetch();
-  var data = {}
+function makeDemGraphs(envId, dparams) {
+  let subs = getStudents(envId);
+  var data = {};
+
   for (p in dparams) {
     data[dparams[p]] = {}
     for (s in subs) {
-      var val = subs[s]['info'][dparams[p]]
-      if (val && val in data[dparams[p]]) {
+        console.log('subs[s][\'info\']', subs[s]['info']);
+      var val = subs[s]['info']['demographics'][dparams[p]]
+        console.log('VAL HEREval=', val)
+
+        if (val && val in data[dparams[p]]) {
         data[dparams[p]][val] += 1;
       } else if (val) {
         data[dparams[p]][val] = 1;
@@ -450,6 +458,7 @@ function makeDemGraphs(env, dparams) {
   }
 
   for (key in data){
+      console.log('making dev graphs with data', data)
     makePieChart(d3.entries(data[key]), key);
   }
 
@@ -458,32 +467,42 @@ function makeDemGraphs(env, dparams) {
 
 }
 
-function makeContributionGraphs(obsIds, dp, sp) {
+function makeContributionGraphs(obsIds, dp, sp, envId) {
   data = {};
   for (d in dp) {
     data[dp[d]] = {};
   }
 
   for (id in obsIds) {
-    var seqs = Sequences.find({"obsId" : obsIds[id]}).fetch();
+    let seqs = getSequences(obsIds[id], envId);
+
+    // console.log('obser', seqs);
     for (seq in seqs) {
-      var studId = seqs[seq]['info']['studentId'];
-      var student = Subjects.findOne({"_id": studId});
+      var studId = seqs[seq]['info']['student']['studentId'];
+      let student = getStudent(studId, envId);
+
       for (s in sp) {
         var param = sp[s];
-        var value = seqs[seq]['info'][param];
-        if (!value) {continue; }
+
+
+        var value = seqs[seq]['info']['parameters'][param];
+        if (!value) { continue; }
         for (d in dp) {
           var dem = dp[d];
-          var demVal = student['info'][dem]
+          var demVal = student['info']['demographics'][dem];
+          // console.log('looking for demVal', demVal);
           if (!demVal) {continue; }
+
           if (!(param in data[dp[d]])) { data[dem][param] = {}; }
           if (!(value in data[dem][param])) { data[dem][param][value] = {}; }
+
+
           if (demVal in data[dem][param][value]) {
             data[dem][param][value][demVal] += 1;
           } else {
             data[dem][param][value][demVal] = 1;
           }
+          // console.log('data', data);
         }
 
       }
@@ -504,9 +523,11 @@ function makeContributionGraphs(obsIds, dp, sp) {
 }
 
 function makeRatioGraphs(envId, cData, dData) {
+  console.log('makeRatioGraphs');
   var statData = {};
   var total = d3.sum(d3.values(dData[d3.keys(dData)[0]]))
-  var allParams = SubjectParameters.findOne({"children.envId": envId});
+  // var allParams = SubjectParameters.findOne({"children.envId": envId});
+  let allParams = setupSubjectParameters(envId);
 
   for (key in dData) {
     statData[key] = dData[key];
@@ -526,37 +547,51 @@ function makeRatioGraphs(envId, cData, dData) {
     }
   }
 
-  for (demp in ratioData) {
-    for (param in ratioData[demp]) {
+  console.log('ratioData', ratioData);
+  for (let demp in ratioData) {
+    console.log('demp', demp);
+
+    for (let param in ratioData[demp]) {
+      console.log('param', param);
+
       var label = param + " by " + demp;
       var dataSlice = d3.entries(data[demp][param]);
       //new
-        for (obj in dataSlice) {
-          for (var x=0; x < allParams['children']['parameterPairs']; x++) {
-            if (allParams['children']['label'+x] == demp) {
-              selection = allParams['children']['parameter'+x];
-              listedParams = selection.split(',').map((str) => { return str.trim() });
-              for (p in listedParams) {
-                if (listedParams[p] in dataSlice[obj].value) {
-                  continue;
-                } else {
-                  dataSlice[obj]['value'][listedParams[p]] = 0.0;
-                }
+        for (let obj in dataSlice) {
+          console.log('allParams', allParams);
+
+          for (let param_k in allParams) {
+            console.log('param_k',  param_k);
+
+            if (!allParams.hasOwnProperty(param_k)) continue;
+            let param = allParams[param_k];
+            // consol
+            if (param.name !== demp) continue;  // todo: this really needs to be refactored.
+
+            let listedParams = param.options.split(',').map((str) => { return str.trim() });
+            for (p in listedParams) {
+              if (listedParams[p] in dataSlice[obj].value) {
+                // continue;
+              } else {
+                dataSlice[obj]['value'][listedParams[p]] = 0.0;
               }
             }
           }
         }
-
+        console.log('tello');
         var sortedData = [];
 
-        function getKeyByValue(object, value) {
-            return Object.keys(object).find(key => object[key] === value);
+        let sequenceParameters = setupSequenceParameters(envId);
+
+        function getParamInfoByName(object, value) {
+          return object.find(function(item) {return item.name === value});
         }
-        var sequenceParameters = SequenceParameters.find({'children.envId':envId}).fetch()[0];
-        var paramkey = getKeyByValue(sequenceParameters.children, param);
-        var position = paramkey.split("").pop();
-        var paramPosition = `parameter${position}`;
-        var barParams = sequenceParameters.children[paramPosition].split(",").map((str) => { return str.trim() });
+
+        var param_item = getParamInfoByName(sequenceParameters, param);
+        // console.log('paramitem', param_item);
+        var barParams = param_item.options.split(",").map((str) => { return str.trim() });
+        // console.log('barparams', barParams);
+
         for (var i = 0; i < barParams.length; i++) {
             for (var j = 0; j < dataSlice.length; j++) {
                 if (barParams[i] === dataSlice[j].key) {
@@ -564,6 +599,9 @@ function makeRatioGraphs(envId, cData, dData) {
                 }
             }
         }
+
+        console.log('sortedData', sortedData);
+
         let wrapper_class = "ratio-plot--" + label.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
         $(".ratio-plots").append('<div class="ratio-plot ' + wrapper_class + '"></div>');
         makeStackedBar(sortedData, label, "." + wrapper_class, "Equity Ratio");
@@ -571,21 +609,24 @@ function makeRatioGraphs(envId, cData, dData) {
   }
 }
 
-function makeIndividualGraphs(oIds) {
-  var subjects = Subjects.find({"envId":envId}).fetch();
+function makeIndividualGraphs(oIds, envId) {
+  let subjects = getStudents(envId);
+
   var contribs = {};
   var filteredNamesObj = {};
   var names = [];
 
   for (id in oIds) {
-    var nc = Sequences.find({"obsId": oIds[id]}).fetch();
+    let nc = getSequences(oIds[id], envId);
+
     for (c in nc) {
-      if (contribs[nc[c]['info']["Name"]]) {
-        contribs[nc[c]['info']["Name"]] += 1;
+      console.log(nc[c]);
+      if (contribs[nc[c]['info']['student']["studentName"]]) {
+        contribs[nc[c]['info']['student']["studentName"]] += 1;
 
       } else {
-        contribs[nc[c]['info']["Name"]] = 1;
-        names.push(nc[c]['info']["Name"]);
+        contribs[nc[c]['info']['student']["studentName"]] = 1;
+        names.push(nc[c]['info']['student']["studentName"]);
       }
     }
   }
@@ -721,9 +762,10 @@ function makePieChart(data, label) {
   var color = d3.scaleOrdinal()
     .range(["#F15854", "#DECF3F", "#B276B2", "#B2912F", "#F17CB0", "#60BD68", "#FAA43A"]);
 
+  console.log('pie chart data', data);
   var pie = d3.pie()
     .sort(null)
-    .value(function(d) { return d.value; });
+    .value(function(d) { console.log('d', d); return d.value; });
 
   var path = d3.arc()
     .outerRadius(radius - 10)

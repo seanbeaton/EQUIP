@@ -109,11 +109,6 @@ Template.editSequenceParameters.events({
       }
     });
   },
-
- 'click .back-to-class': function(e) {
-   e.preventDefault();
-   Router.go('observationList', {_envId:Router.current().params._envId});
- },
 'click .demo-param-button': function(e) {
    e.preventDefault();
    Router.go('editSubjectParameters', {_envId:Router.current().params._envId});

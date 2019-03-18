@@ -2,6 +2,7 @@
 * JS file for environment_list.html
 */
 
+
 Template.environmentList.rendered = function() {
   if (document.querySelector(".toggle-accordion")) {
       document.querySelectorAll('.toggle-accordion')[0].click(); // main
@@ -9,10 +10,11 @@ Template.environmentList.rendered = function() {
   }
 
   var urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.has("onboarding")) {
-        $('#onboarding-modal').removeClass("is-active");
-        $('#env-create-modal').addClass("is-active");
-    }
+  if (urlParams.has("onboarding")) {
+      $('#onboarding-modal').removeClass("is-active");
+      $('#env-create-modal').addClass("is-active");
+  }
+  processDatepickers()
 }
 
 Template.environmentList.helpers({
@@ -27,6 +29,30 @@ Template.environmentList.helpers({
 
     return results;
   },
+  currentUTCDate: function() {
+    let date = new Date();
+    function pad(number) {
+      if (number < 10) {
+        return '0' + number;
+      }
+      return number;
+    }
+    return date.getFullYear() +
+    '-' + pad(date.getMonth() + 1) +
+    '-' + pad(date.getDate())
+  },
+  currentUSDate: function() {
+    let date = new Date();
+    function pad(number) {
+      if (number < 10) {
+        return '0' + number;
+      }
+      return number;
+    }
+    return pad(date.getMonth() + 1) +
+    '/' + pad(date.getDate()) +
+    '/' + date.getFullYear();
+  },
   needsEnvironment: function() {
     var obj = Environments.find({}).fetch();
 
@@ -38,7 +64,7 @@ Template.environmentList.events({
   'click #analyze-button': function (e){
     e.preventDefault();
     e.stopPropagation();
-    Router.go('viewData');
+    Router.go('staticReport');
   },
   'click .help-button': function (e) {
     $('#help-env-modal').addClass("is-active");
@@ -73,12 +99,23 @@ Template.environmentList.events({
 
     var observation = {
       name: $('#observationName').val(),
+      observationDate: $('#altObservationDate').val(),
       envId: id,
       timer: 0
     };
 
-    if ($('#observationName').val() == "") {
+    if (!observation.name) {
       alert("Observation name required.");
+      return;
+    }
+
+    if (!observation.observationDate) {
+      alert("Observation date required.");
+      return;
+    }
+
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(observation.observationDate)) {
+      alert('Please input a valid date in YYYY-MM-DD format');
       return;
     }
 
@@ -89,26 +126,18 @@ Template.environmentList.events({
 
     if (observations.length === 0 ) {
         var confirmation = getConfirmation();
-        if (confirmation) {
-            Meteor.call('observationInsert', observation, function(error, result) {
-              return 0;
-            });
-            $('#observationName').val('');
-            $('#obs-close-modal').click();
-            if (!$(obsAccordion).next().hasClass("show")) {
-                $(obsAccordion).click();
-            }
+        if (!confirmation) {
+          return;
         }
-    } else {
-        Meteor.call('observationInsert', observation, function(error, result) {
-          return 0;
-        });
-        $('#observationName').val('');
-        $('#obs-close-modal').click();
+    }
+    Meteor.call('observationInsert', observation, function(error, result) {
+      return 0;
+    });
+    $('#observationName').val('');
+    $('#obs-close-modal').click();
 
-        if (!$(obsAccordion).next().hasClass("show")) {
-            $(obsAccordion).click();
-        }
+    if (!$(obsAccordion).next().hasClass("show")) {
+      $(obsAccordion).click();
     }
 
     function getConfirmation() {
@@ -160,3 +189,12 @@ Template.environmentList.events({
     $('#environmentName').val('');
   }
 });
+
+
+function processDatepickers() {
+  $('.datepicker:not(.datepicker--processed)').addClass('datepicker--processed').datepicker({
+    dateFormat: 'mm/dd/yy',
+    altField: '#altObservationDate',
+    altFormat: 'yy-mm-dd'
+  })
+}

@@ -1,0 +1,289 @@
+.interactive-report {
+  display: grid;
+  margin: 0;
+  div {
+    margin: 0;
+  }
+
+  grid-template-columns: 50px auto 250px;
+  grid-template-rows: 40px 500px;
+}
+
+.interactive-report {
+  font-family: Roboto, sans-serif;
+}
+
+// Grid placements
+.interactive-report__top-left {
+  grid-column-start: 1;
+  grid-column-end: 2;
+  grid-row-start: 1;
+  grid-row-end: 2;
+}
+
+.interactive-report__y-scale {
+  grid-column-start: 1;
+  grid-column-end: 2;
+  grid-row-start: 2;
+  grid-row-end: 3;
+}
+
+.interactive-report__title {
+  grid-column-start: 2;
+  grid-column-end: 4;
+  grid-row-start: 1;
+  grid-row-end: 2;
+}
+
+.interactive-report__graph-key {
+  grid-column-start: 2;
+  grid-column-end: 3;
+  grid-row-start: 2;
+  grid-row-end: 3;
+}
+
+.interactive-report__graph {
+  grid-column-start: 1;
+  grid-column-end: 3;
+  grid-row-start: 2;
+  grid-row-end: 3;
+}
+
+.interactive-report__sidebar {
+  grid-column-start: 3;
+  grid-column-end: 4;
+  grid-row-start: 2;
+  grid-row-end: 3;
+}
+
+$grid-color: #333;
+$light-grid-color: #ddd;
+
+// Grid lines
+.interactive-report__top-left {
+  border-bottom: 1px solid $grid-color;
+  border-right: 1px solid $grid-color;
+  height: 100%;
+}
+
+.interactive-report__title {
+  border-bottom: 1px solid $grid-color;
+  height: 100%;
+}
+
+.interactive-report__y-scale {
+  border-right: 1px solid $grid-color;
+  height: 100%;
+}
+
+
+.interactive-report__sidebar {
+  border-left: 1px solid $light-grid-color;
+  height: 100%;
+}
+
+// Sidebar Key
+
+
+.key--label {
+  display: inline-flex;
+  padding: 4px 4px;
+}
+
+.key--color {
+  height: 16px;
+  width: 16px;
+  display: inline-block;
+  margin-right: 3px;
+}
+
+.key--text {
+  display: inline-block;
+  line-height: 1;
+}
+
+.interactive-report__sidebar {
+  //padding: 8px;
+  overflow: hidden;
+}
+
+.panels-flex {
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-flow: row nowrap;
+  overflow: hidden;
+  @include nt($prop: margin);
+}
+
+.sidebar-panel {
+  padding: 8px;
+  margin: 0;
+  height: 100%;
+  width: 100%;
+  box-shadow: -1px 2px 4px rgba(0,0,0,0.1);
+  background: white;
+}
+
+.toggle--graph-type {
+  cursor: pointer;
+}
+
+.change-graph-type-link {
+  color: var(--orange);
+  border-bottom: 1px solid;
+}
+.clickable-tick {
+  padding: 3px;
+  text {
+    padding: 3px;
+    border: 1px solid black;
+    font-weight: bold;
+  }
+}
+
+.interactive-report__title {
+  display: flex;
+  flex-flow: row nowrap;
+}
+.axis {
+  font-size: 1rem;
+}
+
+.axis--y {
+  .tick {
+    opacity: 0.6;
+  }
+  .tick.clickable-tick {
+    opacity: 0.75;
+    &:hover {
+      opacity: 1;
+    }
+    text {
+      cursor: pointer;
+    }
+  }
+}
+
+.stat-group-name {
+  color: var(--teal);
+}
+
+.graph-type-toggle-wrapper {
+  //display: block;
+  //line-height: 1;
+  //padding-top: 4px;
+}
+
+.report-section-wrapper {
+  margin: 40px 20px;
+  position: relative;
+}
+
+.report-section-wrapper {
+  min-height: 1150px;
+  height: 100%;
+}
+.report-section-wrapper__slide-track {
+  z-index: 2;
+  top: 0;
+  position: absolute;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+}
+
+.report-section-wrapper__fade {
+  top: 0;
+  width: 100%;
+  z-index: 3;
+  box-sizing: border-box;
+  height: 100px;
+  margin: 0;
+  position: absolute;
+  background: linear-gradient(to bottom, var(--background-color), transparent);
+
+  opacity: 1;
+}
+
+.report-section-wrapper__slide {
+  padding-top: 80px;
+  width: 100%;
+  @include nt($prop: margin)
+}
+
+.report-section-wrapper--active {
+  .report-section-wrapper__fade {
+    //opacity: 1;
+  }
+}
+
+.panel__title {
+  line-height: 1.2;
+  margin: 0 0 0.2em;
+}
+
+
+.y-axis-label,
+.x-axis-label {
+  align-items: center;
+  select {
+    display: inline-block;
+    height: 29px;
+    font-size: 17px;
+    background: transparent;
+    border: none;
+  }
+  span {
+    padding: 0 4px;
+  }
+}
+
+.y-axis-label {
+  display: flex;
+  flex-flow: row nowrap;
+}
+
+.x-y-separator {
+  padding: 0 8px;
+  font-size: 20px;
+}
+
+.student-bar {
+  display: block;
+  margin: 0;
+  width: 100%;
+  padding: 4px 8px;
+}
+
+.stat--barchart {
+  padding: 0 0 10px;
+}
+.student-bar--non-contributor {
+  background-color: rgba(204,11,99,0.05)
+}
+
+.student-bar--contributor {
+  background-color: rgba(15,129,204,0.05)
+}
+
+$demo-color: #332091;
+$disc-color: #921370;
+
+.demographics-color {
+  color: $demo-color;
+}
+.discourse-color {
+  color: $disc-color;
+}
+
+.toggle--graph-type {
+  font-weight: bold;
+}
+
+.center_text {
+  height: 100%;
+  justify-items: center;
+}

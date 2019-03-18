@@ -7,6 +7,8 @@ var timer = new Stopwatch();
 var lastChoices = {};
 
 import * as observation_helpers from '/client/helpers/observations.js'
+import {updateStudent, updateStudents} from '/client/helpers/students.js'
+
 
 Template.observatory.created = function() {
   Session.set('envId', Router.current().params._envId);
@@ -80,6 +82,7 @@ Template.observatory.rendered = function() {
       $('#seq-data-modal').removeClass('is-active');
     }
   });
+  processDatepickers();
 }
 
 function createToggle(params, label) {
@@ -118,6 +121,18 @@ Template.observatory.helpers({
   },
   subject: function() {
     return Subjects.find({envId: this.envId});
+  },
+  convertISODateToUS: function(isoDate) {
+    let date = new Date(Date.parse(isoDate));
+    function pad(number) {
+      if (number < 10) {
+        return '0' + number;
+      }
+      return number;
+    }
+    return pad(date.getMonth() + 1) +
+      '/' + pad(date.getDate()) +
+      '/' + date.getFullYear();
   }
 });
 
@@ -166,52 +181,98 @@ Template.observatory.events({
   'click .edit-observation-name': function(e) {
     editObservationName(this._id);
   },
+  'click .edit-observation-date': function(e) {
+    editObservationDate(this._id);
+  },
   'click #delete-observation': function(e) {
     deleteObservation(this._id);
   },
+  'click #randomize-selected': function(e) {
+    $('.c--modal-student-options-container').each(function() {
+      let param_opts = $('.subj-box-params', $(this))
+      param_opts.removeClass('chosen');
+      let index = Math.floor(param_opts.length * Math.random());
+      console.log('index ', index)
+      param_opts[index].click()
+
+    });
+  },
   'click #save-seq-params': function(e) {
-    var info = {};
-    info['studentId'] = $('.js-modal-header').attr('data_id');
-    info['Name'] = $('.js-modal-header').attr('data_name');
-    envId = Router.current().params._envId;
-    obsId = Router.current().params._obsId;
+    // var info = {};
+    // info['studentId'] = $('.js-modal-header').attr('data-id');
+    // info['Name'] = $('.js-modal-header').attr('data_name');
+    // envId = Router.current().params._envId;
+    // obsId = Router.current().params._obsId;
 
-    var obsRaw = Observations.find({_id: obsId}).fetch()[0];
-    var choices = [];
-    var labels = [];
+    // var choices = [];
+    // var labels = [];
 
-    $('.toggle-item').each(function () {
-      if ($(this).attr('data_label') == "Contribution Defaults") {
-        return;
-      }
-      labels.push($(this).attr('data_label'));
-      choices.push($(this).val());
-    });
+    let info = {
+      student: {
+        studentId:$('.js-modal-header').attr('data-id'),
+        studentName: $('.js-modal-header').attr('data-name'),
+      },
+    };
 
-    $('.js-subject-labels').each(function () {
-      var chosenElement = false;
-      var chosenElements = this.nextElementSibling.querySelectorAll('.subj-box-params');
+    let form_incomplete = false;
 
-      labels.push(this.textContent);
-      chosenElements.forEach(function(ele) {
-        if ($(ele).hasClass('chosen')) {
-            choices.push(ele.textContent.replace(/\n/ig, '').trim());
-            chosenElement = true;
-        }
-      })
+    info.parameters = {};
 
-      if (chosenElement === false) {
-          choices.push(undefined);
+    // todo this should cycle through known fields, not those that are in html
+    $('.c--modal-student-options-container').each(function() {
+      let parameter_name = this.getAttribute('data-parameter-name');
+      let parameter_choice = $('.chosen', $(this)).text().replace(/\n/ig, '').trim();
+      if (parameter_choice.length === 0) {
+        alert(`No selection made for ${parameter_name}`);
+        form_incomplete = true;
+      } else {
+        info.parameters[parameter_name] = parameter_choice
       }
     });
 
-    for (label in labels) {
-      info[labels[label]] = choices[label];
+    console.log('info (params', info.parameters);
+
+    if (form_incomplete) {
+      return;
     }
 
-    lastChoices = info;
+    //
+    // $('.toggle-item').each(function () {
+    //   if ($(this).attr('data_label') == "Contribution Defaults") {
+    //     return;
+    //   }
+    //   labels.push($(this).attr('data_label'));
+    //   choices.push($(this).val());
+    // });
+    //
+    // $('.js-subject-labels').each(function () {
+    //   var chosenElement = false;
+    //   var chosenElements = this.nextElementSibling.querySelectorAll('.subj-box-params');
+    //
+    //   labels.push(this.textContent);
+    //   chosenElements.forEach(function(ele) {
+    //     if ($(ele).hasClass('chosen')) {
+    //         choices.push(ele.textContent.replace(/\n/ig, '').trim());
+    //         chosenElement = true;
+    //     }
+    //   })
+    //
+    //   if (chosenElement === false) {
+    //       choices.push(undefined);
+    //   }
+    // });
+    //
+    // for (label in labels) {
+    //   info[labels[label]] = choices[label];
+    // }
+    //
+    // lastChoices = info;
 
-    var sequence = {
+    const obsId = Router.current().params._obsId;
+    const envId = Router.current().params._envId;
+    let obsRaw = Observations.find({_id: obsId}).fetch()[0];
+
+    let sequence = {
       envId: envId,
       time: timer.value,
       info: info,
@@ -252,65 +313,75 @@ Template.observatory.events({
     $('#seq-data-modal').addClass('is-active');
   },
   'click #edit-seq-params': function(e) {
-    let seqId = $(e.target).attr('data_seq');
 
-    var info = {};
-      info['studentId'] = $('.js-modal-header').attr('data_id');
-      info['Name'] = $('.js-modal-header').attr('data_name');
-      let envId = Router.current().params._envId;
-      let obsId = Router.current().params._obsId;
-      var choices = [];
-      var labels = [];
-      $('.toggle-item').each(function () {
-        if ($(this).attr('data_label') === "Contribution Defaults") {
-          return;
-        }
-        labels.push($(this).attr('data_label'));
-        choices.push($(this).val());
-      });
-
-
-    $('.js-subject-labels').each(function () {
-      var chosenElement = false;
-      var chosenElements = this.nextElementSibling.querySelectorAll('.subj-box-params');
-      labels.push(this.textContent);
-      chosenElements.forEach(function(ele) {
-        if ($(ele).hasClass('chosen')) {
-            choices.push(ele.textContent.replace(/\n/ig, '').trim());
-            chosenElement = true;
-        }
-      })
-
-      if (chosenElement === false) {
-          choices.push(undefined);
-      }
-    });
-
-
-      for (label in labels) {
-        info[labels[label]] = choices[label];
-      }
-
-      var sequence = {
-        info: info,
-        seqId: seqId
-      };
-
-      Meteor.call('sequenceUpdate', sequence, function(error, result) {
-       if (error) {
-         alert(error.reason);
-       } else {
-         gtag('event',  'edit_success', {'event_category': 'sequences'});
-         $('#seq-param-modal').removeClass('is-active');
-       }
-     });
-
+    editSequence(e);
     //This should happen at the end...
     $('#seq-param-modal').removeClass('is-active');
     observation_helpers.createTableOfContributions(this._id);
     $('#seq-data-modal').addClass('is-active');
   }
 });
+
+function editSequence(e) {
+
+  seqId = $(e.target).attr('data-seq');
+
+  var info = {};
+  info['studentId'] = $('.js-modal-header').attr('data-id');
+  info['Name'] = $('.js-modal-header').attr('data-name');
+  envId = Router.current().params._envId;
+  obsId = Router.current().params._obsId;
+  var choices = [];
+  var labels = [];
+  $('.toggle-item').each(function () {
+    if ($(this).attr('data_label') == "Contribution Defaults") {
+      return;
+    }
+    labels.push($(this).attr('data_label'));
+    choices.push($(this).val());
+  });
+
+
+  $('.js-subject-labels').each(function () {
+    var chosenElement = false;
+    var chosenElements = this.nextElementSibling.querySelectorAll('.subj-box-params');
+    labels.push(this.textContent);
+    chosenElements.forEach(function(ele) {
+      if ($(ele).hasClass('chosen')) {
+        choices.push(ele.textContent.replace(/\n/ig, '').trim());
+        chosenElement = true;
+      }
+    })
+
+    if (chosenElement === false) {
+      choices.push(undefined);
+    }
+  });
+
+
+  for (label in labels) {
+    info[labels[label]] = choices[label];
+  }
+
+  var sequence = {
+    info: info,
+    seqId: seqId
+  };
+
+
+
+  Meteor.call('sequenceUpdate', sequence, function(error, result) {
+    if (error) {
+      alert(error.reason);
+    } else {
+      $('#seq-param-modal').removeClass('is-active');
+    }
+  });
+}
+
+function editSeqParamBoxes(seqId) {
+
+}
 
 Template.registerHelper( 'math', function () {
   return {
@@ -327,31 +398,24 @@ function editObservationName(obsId) {
 
   var obs_name = $('.observation-name', context);
   var obs_name_wrapper = $('.observation-name-wrapper', context);
-  var currently_editing = !!(obs_name.hasClass('editing'));
-  var save_button = $('.edit-observation-name.button', context);
+  var save_button = $('.save-observation-name', context);
 
   save_button.addClass('is-loading');
 
-  if (!currently_editing) {
-    obs_name_wrapper.prepend($('<input>', {
-      class: 'edit-obs-name inherit-font-size',
-      value: obs_name.html()
-    }));
-
-    obs_name.addClass('editing');
-    obs_name.hide();
-    save_button.show();
-
-    $(context, '.edit-obs-name').on('keyup', function(e) {
-      if (e.keyCode === 13) {
-        save_button.click()
-      }
-    })
+  if (obs_name.hasClass('editing')) {
+    $('.edit-obs-name', context).remove();
+    save_button.hide();
+    obs_name.removeClass('editing');
+    obs_name.show();
   }
 
-  else {
+  save_button
+    .filter(':not(.save-observation-name--processed)')
+    .addClass('save-observation-name--processed')
+    .on('click', function() {
     var new_obs_name = $('.edit-obs-name', context);
     var new_name = new_obs_name.val();
+    console.log('new name', new_name);
 
     var args = {
       'obsId': obsId,
@@ -383,11 +447,123 @@ function editObservationName(obsId) {
       return 0;
     });
 
-    save_button.show();
+    save_button.hide();
     new_obs_name.remove();
     obs_name.removeClass('editing');
     obs_name.show();
+  })
+
+  obs_name_wrapper.prepend($('<input>', {
+    class: 'edit-obs-name inherit-font-size',
+    value: obs_name.html()
+  }));
+
+  obs_name.addClass('editing');
+  obs_name.hide();
+  save_button.show();
+
+  $('.edit-obs-name:not(.edit-obs-name--processed)', context).addClass('edit-obs-name--processed').on('keyup', function(e) {
+    if (e.keyCode === 13) {
+      save_button.click()
+    }
+  })
+
+  save_button.removeClass('is-loading');
+}
+
+function editObservationDate(obsId) {
+  let context = $('.observation[data-obs-id="' + obsId + '"]');
+
+  var obs_date = $('.observation-date--iso', context);
+  var obs_date_display = $('.observation-date--display', context);
+  var obs_wrapper = $('.observation-date-wrapper', context);
+  var save_button = $('.save-observation-date', context);
+
+  if (obs_date.hasClass('editing')) {
+    $('.edit-obs-date', context).remove();
+    $('.edit-obs-date--iso', context).remove();
+    save_button.hide();
+    obs_date.removeClass('editing');
+    obs_date_display.show();
   }
+
+  save_button.addClass('is-loading');
+
+  save_button
+    .filter(':not(.save-observation-date--processed)')
+    .addClass('save-observation-date--processed')
+    .on('click', function() {
+    var new_obs_date_iso = $('.edit-obs-date--iso', context);
+    var new_obs_date = $('.edit-obs-date', context);
+    var new_date = new_obs_date_iso.val();
+    console.log('new date', new_date);
+
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(new_date)) {
+      alert('Please input a valid date');
+      return;
+    }
+
+    var args = {
+      'obsId': obsId,
+      'observationDate': new_date,
+    };
+
+    Meteor.call('observationUpdateDate', args, function(error, result) {
+      var message;
+      if (error) {
+        alert('error on date update, error')
+      }
+      if (result) {
+        message = $('<span/>', {
+          class: 'name-save-result tag is-success inline-block success-message',
+          text: 'Saved'
+        });
+        obs_date.html(new_date);
+        gtag('event', 'updateDate', {'event_category': 'observations'});
+      }
+      else {
+        message = $('<span/>', {
+          class: 'name-save-result tag is-warning inline-block error-message',
+          text: 'Failed to save. Try again later'
+        })
+      }
+      obs_wrapper.append(message);
+
+      setTimeout(function() {
+        message.remove();
+      }, 3000);
+
+      return 0;
+    });
+
+    save_button.hide();
+    new_obs_date_iso.remove();
+    new_obs_date.remove();
+    obs_date.removeClass('editing');
+    obs_date_display.show();
+  })
+
+  obs_wrapper.prepend($('<input>', {
+    class: 'edit-obs-date datepicker inherit-font-size',
+    value: obs_date_display.html()
+  }));
+  obs_wrapper.prepend($('<input>', {
+    class: 'edit-obs-date--iso',
+    id: 'altObservationDate',
+    type: 'hidden',
+    value: obs_date.html()
+  }));
+  processDatepickers();
+
+  obs_date.addClass('editing');
+  obs_date_display.hide();
+  save_button.show();
+
+  $('.edit-obs-date:not(.edit-obs-date--processed)', context).addClass('edit-obs-date--processed').on('keyup', function(e) {
+    if (e.keyCode === 13) {
+      save_button.click()
+    }
+  })
 
   save_button.removeClass('is-loading');
 }
@@ -402,4 +578,12 @@ function deleteObservation(obsId) {
       }
     })
   }
+}
+
+function processDatepickers() {
+  $('.datepicker:not(.datepicker--processed)').addClass('datepicker--processed').datepicker({
+    dateFormat: 'mm/dd/yy',
+    altField: '#altObservationDate',
+    altFormat: 'yy-mm-dd'
+  })
 }

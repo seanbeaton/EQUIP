@@ -36,7 +36,12 @@
         <section class="modal-card-body">
           <label class="label">Observation Name</label>
             <p class="control">
-              <input class="input" type="text" placeholder="E.g., 1/14/2017" id="observationName">
+              <input class="input" type="text" placeholder="E.g., Evening class, 01/01/2019" id="observationName">
+            </p>
+          <label class="label">Observation Date</label>
+            <p class="control">
+                <input class="input datepicker" type="text" value="{{currentUSDate}}" placeholder="01/01/2019" id="observationDate">
+                <input type="hidden" value="{{currentUTCDate}}" id="altObservationDate">
             </p>
         </section>
         <footer class="modal-card-foot">

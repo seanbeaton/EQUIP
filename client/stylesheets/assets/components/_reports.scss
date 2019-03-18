@@ -1,0 +1,190 @@
+$container-size: 1000px;
+$padding: 16px;
+
+.report-section {
+  max-width: $container-size;
+  padding: $padding;
+  margin: 20px auto;
+  background: white;
+}
+
+.report-section:first-child {
+  margin: 100px auto 20px;
+}
+
+.report-section-wrapper__slide-track {
+  .report-section:first-child {
+    margin: 20px auto;
+  }
+
+}
+.report-select__options {
+  display: flex;
+  flex-flow: row wrap;
+  margin: -8px;
+  width: 100%;
+  padding: 16px 0 16px;
+}
+.report-select__option {
+  display: block;
+  margin: 4px;
+  flex: 1 0 150px;
+  padding: 0;
+  cursor: pointer;
+  font-size: 24px;
+  font-family: 'Roboto Condensed', sans-serif;
+  word-wrap: break-word;
+  text-align: center;
+  overflow: hidden;
+  color: var(--orange);
+  //margin-right: 8px;
+
+  .option__text {
+    background-color: var(--light-gray);
+    pointer-events: none;
+    display: block;
+    font-size: 18px;
+    padding: 4px 8px;
+  }
+  &.report-select__option--spacer {
+    cursor: default;
+  }
+}
+
+
+.selected .option__text {
+  background: rgba(52, 196, 196, 0.2);
+  color: #34C4C4;
+}
+
+.report-select__option--spacer {
+
+}
+
+
+.interactive-report__title {
+  font-size: 20px;
+  line-height: 1;
+  padding: 2px 16px;
+  .deemphasize {
+    opacity: 0.6;
+  }
+}
+
+//.param-select {
+//  margin: 0 0 8px;
+//}
+
+.param-select__label {
+  margin: 0 16px 0 0;
+  flex: 0 0 auto;
+}
+
+.param-select--labelled {
+  display: flex;
+  align-items: center;
+  > .report-select__options {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+}
+
+.option--report-type {
+  .option__text {
+    padding: 32px 8px;
+  }
+}
+
+@mixin fa-button($size: 40px) {
+  font-size: $size;
+  padding: 5px;
+  border-radius: $size + 5;
+  line-height: $size;
+  width: $size;
+  box-sizing: content-box;
+  text-align: center;
+  background: white;
+  box-shadow: 0px 1px 4px 2px rgba(0, 0, 0, 0.1);
+  z-index: 200;
+  cursor: pointer;
+  display: inline-block;
+}
+
+.back-button {
+  position: fixed;
+  left: 20px;
+  bottom: 20px;
+  @include fa-button;
+}
+
+.back-button--reports {
+
+}
+
+.inactive {
+  display: none;
+}
+
+
+.swappable {
+  display: flex;
+  flex-flow: row nowrap;
+  &.swapped {
+    flex-flow: row-reverse nowrap;
+  }
+  .swappable__button {
+    @include fa-button($size: 20px);
+    font-size: 16px;
+    //margin: -26px 0;
+  }
+}
+
+.center_text {
+  display: flex;
+  flex-flow: column nowrap;
+}
+
+.explanation-text {
+  font-size: 14px;
+}
+
+.select__wrapper {
+  text-align: center;
+  display: flex;
+  flex-flow: column nowrap;
+}
+
+.swappable {
+  &:not(.swapped) {
+    .select__wrapper:first-child {
+      .explanation-text__bar {
+        display: none;
+      }
+    }
+    .select__wrapper:last-child {
+      .explanation-text__group {
+        display: none;
+      }
+    }
+  }
+  &.swapped {
+    .select__wrapper:first-child {
+      .explanation-text__group {
+        display: none;
+      }
+    }
+    .select__wrapper:last-child {
+      .explanation-text__bar {
+        display: none;
+      }
+    }
+  }
+}
+
+
+.report-section-wrapper__prev-section-button {
+  @include fa-button;
+  position: absolute;
+  right: 20px;
+  top: 20px;
+}

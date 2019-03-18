@@ -27,8 +27,8 @@
     <div class="c--student-body__container subjects">
         <div class="drag-bounding-box">
         {{#each subject}}
-            <div id="{{_id}}" style='transform:translate({{data_x}}px, {{data_y}}px);' data-x="{{data_x}}" data-y="{{data_y}}" class="draggable student c--student-body__container-drag-area o--box-item">
-                <p class="c--student-body__container-drag-label">{{info.name}}</p>
+            <div id="{{_id}}" style='transform:translate({{data_x}}px, {{data_y}}px);' data-id="{{_id}}" data-x="{{data_x}}" data-y="{{data_y}}" class="draggable student c--student-body__container-drag-area o--box-item">
+                <p class="c--student-body__container-drag-label">{{info.name}}</p><span class="student-edit-button edit-stud" data-id="{{_id}}"><i class="fa fa-edit"></i></span>
             </div>
         {{/each}}
         </div>

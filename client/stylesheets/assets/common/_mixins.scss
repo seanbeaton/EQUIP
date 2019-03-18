@@ -1,0 +1,32 @@
+
+@mixin transition($transition...) {
+  transition: $transition;
+}
+
+@mixin transition-property($property...) {
+  transition-property: $property;
+}
+
+@mixin transition-duration($duration...) {
+  transition-duration: $duration;
+}
+
+@mixin transition-timing-function($timing...) {
+  transition-timing-function: $timing;
+}
+
+@mixin transition-delay($delay...) {
+  transition-delay: $delay;
+}
+
+@mixin nt($prop: all, $time: .15s, $anim: ease-in-out) {
+  // These are seperated to allow for multiple attribute selection with unquote('item, item2') syntax.
+  // @include nt($attr: unquote('width, opacity'));
+  // You may also use single attributes.
+  // @include nt($attr: width);
+  // Or none at all
+  // @include nt;
+  @include transition-property($prop);
+  @include transition-duration($time);
+  @include transition-timing-function($anim);
+}

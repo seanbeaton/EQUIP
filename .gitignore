@@ -4,3 +4,4 @@ settings.json
 sample_data.txt
 .idea/
 node_modules
+db
