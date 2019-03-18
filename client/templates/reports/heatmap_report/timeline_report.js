@@ -190,6 +190,9 @@ Template.timelineReport.events({
     $('#disc-select').val('');
     $('#demo-select').val('');
     $('#disc-opt-select').val('');
+    if (typeof sidebar !== 'undefined') {
+      sidebar.setCurrentPanel('start');
+    }
   },
   'change #disc-select': function(e) {
     let selected = $('option:selected', e.target);
@@ -399,7 +402,6 @@ let updateGraph = function() {
     };
     sidebar = new Sidebar('.timeline-report__sidebar', sidebarLevels);
     sidebar.setSlide('start', 'Hover a point (or tap on mobile) to see more information', '')
-
     initTimelineGraph(data, timeline_selector)
   }
   else {
