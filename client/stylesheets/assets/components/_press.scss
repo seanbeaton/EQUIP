@@ -1,0 +1,65 @@
+.press {
+  background: #fff;
+  padding: 0.5rem;
+  margin: 1rem auto;
+  //display: block;
+  //box-shadow: 0 0 3px 1px rgba(0,0,0,0.1);
+  //a {
+  //  margin-top: 4px;
+  //  display: inline-block;
+  //}
+  display: flex;
+  flex-flow: row nowrap;
+  > div {
+    padding: 0.5rem;
+  }
+}
+
+.press__logo {
+  flex: 0 1 200px;
+  align-self: center;
+  img {
+    display: block;
+    margin: 0 auto;
+    width: 100%;
+    height: auto;
+  }
+}
+
+.press__info {
+  flex: 1 1 400px;
+}
+
+.press__title {
+  font-size: 18px;
+  line-height: 1.5;
+}
+.press__tag {
+  font-size: 16px;
+  line-height: 1.2;
+  padding: 0.25rem;
+  display: inline-block;
+  background-color: #ddd;
+  border-radius: 0 4px;
+  color: #444;
+}
+
+.research__authors {
+  color: #666;
+}
+
+.research__content {
+  margin: 0.5rem 0;
+}
+
+.research__read {
+  margin: 0.5rem 0 0;
+  display: inline-block;
+}
+
+.page__heading {
+  padding: 3rem 2.5rem 0;
+  + .page__section {
+    padding-top: 1rem;
+  }
+}

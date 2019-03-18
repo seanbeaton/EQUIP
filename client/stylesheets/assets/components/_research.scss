@@ -1,0 +1,36 @@
+.research {
+  background: #fff;
+  padding: 1rem;
+  margin: 1rem auto;
+  display: block;
+  //box-shadow: 0 0 3px 1px rgba(0,0,0,0.1);
+  //a {
+  //  margin-top: 4px;
+  //  display: inline-block;
+  //}
+}
+
+.research__title {
+  font-size: 18px;
+  line-height: 1.5;
+}
+
+.research__authors {
+  color: #666;
+}
+
+.research__content {
+  margin: 0.5rem 0;
+}
+
+.research__read {
+  margin: 0.5rem 0 0;
+  display: inline-block;
+}
+
+.page__heading {
+  padding: 3rem 2.5rem 0;
+  + .page__section {
+    padding-top: 1rem;
+  }
+}
