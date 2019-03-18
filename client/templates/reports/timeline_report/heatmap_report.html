@@ -10,7 +10,9 @@
             <h3>
                 Classroom: <span class="env-select {{#if selectedStudent}} env-select--disabled {{/if}}">{{>environmentSelect environments=environments}}</span>
             </h3>
+            {{#if environmentChosen }}
             <h3 class="heatmap-report__sort">{{>heatmapReportSort demoParams=demographic_filters }}</h3>
+            {{/if}}
 
             {{#if environmentChosen }}
                 <h2>Choose one or more observations.</h2>
