@@ -899,7 +899,7 @@ let createStudentContribData = function() {
   });
 
   ret.push({
-    name: 'Total',
+    name: 'Total (Student)',
     count: total,
     class_total: class_total,
     average: class_total / num_students,
@@ -972,6 +972,7 @@ let studentContribGraph = function(data, selector) {
 
   let key_colors = getLabelColors(data.map(d => d.name));
   key_colors["__BREAK__"] = '#ffffffff';
+  delete key_colors["Total (Student)"];
   key_colors["Total (Student)"] = total_color;
   key_colors["Median (Class)"] = median_color;
   let z = d3.scaleOrdinal()
