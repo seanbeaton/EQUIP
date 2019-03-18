@@ -699,3 +699,22 @@ li {
     max-width: 900px;
     padding: 2rem;
 }
+
+.stats-container td, .stats-container th {
+    padding: 0.25rem 0.5rem;
+    border: 0;
+}
+.stats-container tbody tr:nth-child(odd) {
+    background-color: #eeeeee;
+}
+.stats-container th:first-child,
+.stats-container thead {
+    border-bottom: 2px #666;
+}
+.stats-container td {
+    border: 0;
+}
+
+.number-td {
+    text-align: right;
+}
