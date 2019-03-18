@@ -257,7 +257,7 @@ let createHistogramData = function() {
   let all_counts = ret.students.map(d => d.count);
   ret.median = get_median(all_counts);
   ret.average = (all_counts);
-  ret.quartiles = get_ntiles(all_counts, 4, true, 'quartile'); //quartiles
+  ret.quartiles = get_n_groups(all_counts, 4, true, 'Group'); //quartiles
   ret.students.forEach(function(student) {
     student.median = get_median(all_counts);
     student.average = get_average(all_counts);
@@ -288,7 +288,7 @@ let get_ntiles = function(values, n, zero_separate, ntile_name) {
     })
   }
 
-  let max_value = Math.max(values);
+  let max_value = Math.max(...values);
   if (n > max_value) {
     n = max_value;
   }
@@ -307,6 +307,46 @@ let get_ntiles = function(values, n, zero_separate, ntile_name) {
     });
     min = max;
   }
+  return ret;
+}
+
+let get_n_groups = function(values, n, zero_separate, group_name) {
+  if (typeof group_name === 'undefined') {
+    group_name = n + ' group';
+  }
+  let ret = []
+  if (zero_separate) {
+    ret.push({
+      name: '0',
+      min_exclusive: -1,
+      max_inclusive: 0,
+    })
+  }
+
+  if (n > Math.max(...values)) {
+    n = Math.max(...values);
+  }
+
+  let step = Math.max(...values) / n;
+
+  let min = 0;
+  let max;
+  console.log('values, ', values)
+  console.log('step, ', step)
+  for (let i = 1; i <= n; i++) {
+    console.log('i', i);
+    max = Math.ceil(step * i);
+    console.log('min and max', min, max);
+
+    ret.push({
+      name: get_ordinal_suffix(i) + '&nbsp;' + group_name + "&nbsp;(" + (min + 1) + "&nbsp;-&nbsp;" + max + ")",
+      min_exclusive: min,
+      max_inclusive: max
+    });
+    min = max;
+  }
+
+  console.log('rett', ret);
   return ret;
 }
 
