@@ -1,0 +1,28 @@
+<!-- HTML for the edit subjects page -->
+
+<template name="siteStatsTime">
+    <div class="basic-container">
+        <h2>Site stats</h2>
+        <div class="stats-container">
+            <ul>
+            {{#each stats}}
+                <li>
+                    <strong>{{group_label}}:</strong>
+                    <table>
+                    <thead><tr><th>Month</th><th>Count</th></tr></thead>
+                        <tbody>
+                        {{#each months}}
+                            <tr><td>{{label}}</td><td class="number-td">{{value}}</td></tr>
+                        {{ else }}
+                            <tr><td colspan="2">No stats available for this month</td></tr>
+                        {{/each}}
+                        </tbody>
+                    </table>
+                </li>
+            {{ else }}
+                <li>No stats available</li>
+            {{/each}}
+            </ul>
+        </div>
+    </div>
+</template>

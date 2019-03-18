@@ -700,3 +700,25 @@ li {
     max-width: 900px;
     padding: 2rem;
 }
+
+.stats-container {
+  table {
+    td, th {
+      padding: 0.25rem 0.5rem;
+      border: 0;
+    }
+    tbody tr:nth-child(odd) {
+      background-color: #eeeeee;
+    }
+    th:first-child,
+    thead {
+      border-bottom: 2px #666;
+      td {
+        border: 0;
+      }
+    }
+  }
+  .number-td {
+    text-align: right;
+  }
+}
