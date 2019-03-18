@@ -8,7 +8,7 @@
 
         <section data-slide-id="params" class="report-section report-section--select">
             <h3>
-                Classroom: {{>environmentSelect environments=environments}}
+                Classroom: <span class="env-select {{#if selectedStudent}} env-select--disabled {{/if}}">{{>environmentSelect environments=environments}}</span>
             </h3>
 
             {{#if environmentChosen }}

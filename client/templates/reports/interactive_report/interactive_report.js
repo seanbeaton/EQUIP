@@ -377,6 +377,7 @@ let updateReport = function() {
     sidebar.setSlide('start', 'Hover a bar (or tap on mobile) to see more information', '')
   }
   // updateReportTitle()
+  sidebar.setCurrentPanel('start');
   updateKey('.interactive-report__graph-key');
   updateGraph();
 

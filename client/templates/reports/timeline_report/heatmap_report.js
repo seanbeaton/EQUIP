@@ -967,12 +967,13 @@ let studentContribGraph = function(data, selector) {
   x.domain(['value', 'median']).rangeRound([0, x_group.bandwidth()]);
   y.domain([0, d3.max(data, d => d.count)]);
 
-  let median_color = '#999999ff';
+  let median_color = '#c8c8c8ff';
   let total_color = '#555555ff';
 
   let key_colors = getLabelColors(data.map(d => d.name));
-  key_colors.Total = total_color;
-  key_colors.Median = median_color;
+  key_colors["__BREAK__"] = '#ffffffff';
+  key_colors["Total (Student)"] = total_color;
+  key_colors["Median (Class)"] = median_color;
   let z = d3.scaleOrdinal()
     .range(Object.values(key_colors));
   updateStudentContribKey('.student-contributions-graph__graph-key', Object.keys(key_colors), z)
@@ -1023,6 +1024,11 @@ let studentContribGraph = function(data, selector) {
 
 let updateStudentContribKey = function(key_wrapper, y_values, color_axis) {
   let key_chunks = y_values.map(function(label) {
+    if (label === '__BREAK__') {
+      // it looks like even if the axis value isn't used, it applies it to the next item if you don't call this function.
+      let _ = color_axis(label);
+      return `<br />`;
+    }
     return `<span class="key--label"><span class="key--color" style="background-color: ${color_axis(label)}"></span><span class="key--text">${label}</span></span>`
   })
 
