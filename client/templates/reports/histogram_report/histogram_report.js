@@ -282,7 +282,7 @@ let get_ntiles = function(values, n, zero_separate, ntile_name) {
   let ret = []
   if (zero_separate) {
     ret.push({
-      name: '0',
+      name: 'No contributions',
       min_exclusive: -1,
       max_inclusive: 0,
     })
@@ -317,7 +317,7 @@ let get_n_groups = function(values, n, zero_separate, group_name) {
   let ret = []
   if (zero_separate) {
     ret.push({
-      name: '0',
+      name: 'No contributions',
       min_exclusive: -1,
       max_inclusive: 0,
     })
@@ -337,9 +337,15 @@ let get_n_groups = function(values, n, zero_separate, group_name) {
     console.log('i', i);
     max = Math.ceil(step * i);
     console.log('min and max', min, max);
-
+    let name = get_ordinal_suffix(i) + '&nbsp;' + group_name + "&nbsp;(n&nbsp;=&nbsp;";
+    if ((min + 1) !== max) {
+      name += (min + 1) + "&nbsp;to&nbsp;" + max + ")";
+    }
+    else {
+      name += max + ")"
+    }
     ret.push({
-      name: get_ordinal_suffix(i) + '&nbsp;' + group_name + "&nbsp;(" + (min + 1) + "&nbsp;-&nbsp;" + max + ")",
+      name: name,
       min_exclusive: min,
       max_inclusive: max
     });
