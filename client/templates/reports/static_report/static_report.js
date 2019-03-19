@@ -379,37 +379,28 @@ function classStats(envId, sParams, obsId) {
     text: "Classroom Summary"
   }).appendTo(classRoomSummary);
 
-
   sParams.forEach(function(param, idx) {
-    var newObject = {};
-    var paramWithData = [];
-    for (con in filteredResults) {
-      var next = filteredResults[con]['info'];
-      studTrack.add(next['studentId']);
-      if (next[param]) {
-        if (next[param] in newObject) {
-          newObject[next[param]] += 1;
-        } else {
-          paramWithData.push(next[param]);
-          newObject[next[param]] = 1;
-        }
+    let sequence_params = setupSequenceParameters(envId);
+    console.log('sequence_params', sequence_params);
+    let seq_options = sequence_params.find(seq_param_opt => seq_param_opt.name === param).options.split(",").map((str) => { return str.trim() });
+
+    //
+    let sequence_opt_count = {};
+    seq_options.forEach(opt => sequence_opt_count[opt] = 0);
+
+    for (let con in filteredResults) {
+      let next = filteredResults[con]['info'];
+      console.log('next', next);
+      studTrack.add(next['student']['studentId']);
+      if (next['parameters'][param]) {
+        sequence_opt_count[next['parameters'][param]] += 1;
       }
     }
+    console.log('newObject', sequence_opt_count);
 
-    function getKeyByValue(object, value) {
-        return Object.keys(object).find(key => object[key] === value);
-    }
+    let total = studTrack.size;
 
-    var sequenceParameters = SequenceParameters.find({'children.envId':envId}).fetch()[0];
-    var paramkey = getKeyByValue(sequenceParameters.children, param);
-    var position = paramkey.split("").pop();
-    var paramPosition = `parameter${position}`;
-    var parameters = sequenceParameters.children[paramPosition].split(",").map((str)=> { return str.trim()})
-    parameters.filter((obj) => { return paramWithData.indexOf(obj) == -1;}).forEach((item) => { newObject[item] = 0; })
-
-    var total = studTrack.size;
-
-    renderStats(stats, newObject, param, total);
+    renderStats(stats, sequence_opt_count, param, total);
   });
 
   var bullets = $('<ul/>', {
