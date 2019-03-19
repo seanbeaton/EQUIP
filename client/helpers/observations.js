@@ -65,7 +65,6 @@
 // }
 
 // import {setupSubjectParameters} from "./parameters";
-
 import {setupSequenceParameters} from './parameters.js'
 import {getStudent, getStudents} from "./students.js";
 import {getSequence, getSequences} from "./sequences.js";
