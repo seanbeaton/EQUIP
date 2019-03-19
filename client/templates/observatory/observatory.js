@@ -286,8 +286,8 @@ Template.observatory.events({
     gtag('event', 'edit', {'event_category': 'sequences'});
     $('#seq-data-modal').removeClass('is-active');
 
-    let seqId = $(e.target).attr('data_id');
-    let subjId = $(e.target).attr('data_studentid');
+    let seqId = $(e.target).attr('data-id');
+    let subjId = $(e.target).attr('data-studentid');
 
     console.log('editing student id',  subjId, 'seq id', seqId);
 
