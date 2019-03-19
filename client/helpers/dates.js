@@ -6,9 +6,9 @@ let convertISODateToUS = function(isoDate) {
     }
     return number;
   }
-  return pad(date.getMonth() + 1) +
-    '/' + pad(date.getDate()) +
-    '/' + date.getFullYear();
+  return pad(date.getUTCMonth() + 1) +
+    '/' + pad(date.getUTCDate()) +
+    '/' + date.getUTCFullYear();
 };
 
 export {convertISODateToUS}
