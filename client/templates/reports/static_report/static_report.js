@@ -381,25 +381,19 @@ function classStats(envId, sParams, obsId) {
 
   sParams.forEach(function(param, idx) {
     let sequence_params = setupSequenceParameters(envId);
-    console.log('sequence_params', sequence_params);
     let seq_options = sequence_params.find(seq_param_opt => seq_param_opt.name === param).options.split(",").map((str) => { return str.trim() });
-
-    //
     let sequence_opt_count = {};
     seq_options.forEach(opt => sequence_opt_count[opt] = 0);
 
     for (let con in filteredResults) {
       let next = filteredResults[con]['info'];
-      console.log('next', next);
       studTrack.add(next['student']['studentId']);
       if (next['parameters'][param]) {
         sequence_opt_count[next['parameters'][param]] += 1;
       }
     }
-    console.log('newObject', sequence_opt_count);
 
     let total = studTrack.size;
-
     renderStats(stats, sequence_opt_count, param, total);
   });
 
