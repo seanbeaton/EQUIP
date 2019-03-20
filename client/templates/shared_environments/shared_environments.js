@@ -33,7 +33,6 @@ Template.sharedEnv.helpers({
         'parameter': sharedEnv.sequenceParameters.children[`parameter${i}`]
       })
     }
-    console.log('aprams', params);
     return params;
   },
   subjectParams: function() {
@@ -45,8 +44,11 @@ Template.sharedEnv.helpers({
         'parameter': sharedEnv.subjectParameters.children[`parameter${i}`]
       })
     }
-    console.log('aprams', params);
     return params;
+  },
+  students: function() {
+    let sharedEnv = SharedEnvironments.findOne({_id:Router.current().params._shareId});
+    return sharedEnv.students;
   }
 });
 

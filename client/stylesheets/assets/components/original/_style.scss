@@ -722,3 +722,17 @@ li {
     text-align: right;
   }
 }
+
+.shared-environment .params li {
+  margin: 0.3rem 0;
+}
+
+.params--students {
+  margin-bottom: 2rem;
+}
+
+.importable-student:not(:last-child) {
+  &:after {
+    content: ",";
+  }
+}

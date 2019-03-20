@@ -37,9 +37,15 @@ Template.environmentItem.events({
             }
             else {
               let share_link = `${window.location.origin}/share/env/${result._id}`;
+              let share_link_students = `${window.location.origin}/share/env/${result._id_with_students}`;
               let share_button = $(e.target).parents('.share-tab-wrapper');
               let platform_modifier_key = (window.navigator.userAgent.indexOf("Mac") !== -1) ? '⌘' : 'ctrl';
-              share_button.append(`<div class="shared-env-dialog"><span>Press ${platform_modifier_key}+c to copy the share link, or <a href="mailto:?subject=Try%20this%20classroom%20setup%20on%20EQUIP&body=${encodeURIComponent(share_link)}">share by email</a></span><input class="share-link-field" readonly value="${share_link}"></div>`);
+              share_button
+                .append(`<div class="shared-env-dialog">
+                <span>Press ${platform_modifier_key}+c to copy the share link, or <a href="mailto:?subject=Try%20this%20classroom%20setup%20on%20EQUIP&body=${encodeURIComponent(share_link)}">share by email</a></span>
+                <input class="share-link-field" readonly value="${share_link}">
+                <span>Or, share this link to include the students</span>
+                <input class="share-link-field-with-students" readonly value="${share_link_students}"></div>`);
               let share_link_field = $('.share-link-field', share_button);
               share_link_field.select();
               //

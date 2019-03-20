@@ -17,6 +17,16 @@
                 {{/each}}
             </ul>
         </div>
+        {{#if students}}
+        <div class="params params--students">
+            <h4>Students</h4>
+            <div>
+                {{#each student in students}}
+                    <span class="importable-student">{{student.info.name}}</span>
+                {{/each}}
+            </div>
+        </div>
+        {{/if}}
         <div class="button-wrapper">
             <a class="save-shared-env" data-shared-env-id="{{_id}}" href="#">Save to my classrooms</a>
         </div>
