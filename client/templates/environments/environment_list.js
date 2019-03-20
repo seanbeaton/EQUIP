@@ -29,7 +29,7 @@ Template.environmentList.helpers({
 
     return results;
   },
-  currentUTCDate: function() {
+  currentISODate: function() {
     let date = new Date();
     function pad(number) {
       if (number < 10) {
