@@ -4,11 +4,11 @@ let d3 = require('d3');
 let d3ScaleChromatic = require("d3-scale-chromatic");
 let d3Interpolate = require("d3-interpolate");
 let chosen = require("chosen-js");
-import vis from "vis";
 
 import {getSequences} from "../../../helpers/sequences";
 import {getStudents, getStudent} from "../../../helpers/students";
 import {heatmapReportSortDemoChosen, heatmapReportSortType} from "../selection_elements";
+import {setupVis} from '../../../helpers/timeline';
 import {clone_object} from "../../../helpers/objects";
 
 // const envSet = new ReactiveVar(false);
@@ -23,8 +23,6 @@ const selectedSpotlightDimension = new ReactiveVar(false);
 const totalContributions = new ReactiveVar(0);
 
 const currentDemoFilters = new ReactiveVar(false);
-
-let timeline;
 
 Template.heatmapReport.helpers({
   environments: function() {
@@ -191,7 +189,17 @@ Template.heatmapReport.events({
     selectedEnvironment.set(selected.val());
     obsOptions.set(getObsOptions());
     students.set(getStudents(selectedEnvironment.get()));
-    setTimeout(setupVis, 50);
+    setTimeout(function() {
+      setupVis('vis-container', function() {
+        if (selectedObservations.get().length === 0) {
+          selectedStudent.set(false);
+        }
+        updateStudentContribGraph();
+        updateStudentTimeGraph();
+        setTimeout(updateGraph, 200);
+      }, obsOptions, selectedObservations);
+    }, 50);
+
 
     $('#disc-select').val('');
     $('#demo-select').val('');
@@ -755,63 +763,6 @@ let getDiscourseOptionsForDimension = function(dimension) {
   return opt
     .options.split(',').map(function(opt) {return {name: opt.trim()}})
 };
-
-
-
-let setupVis = function() {
-  // Intentionally duplicated to allow for easier customization on a per-report-type basis.
-  let observations = obsOptions.get();
-  let obs = observations.map(function(obs) {
-    return {
-      id: obs._id,
-      content: obs.name + ' (' + obs.observationDate + ')',
-      compare_date: new Date(obs.observationDate),
-      start: obs.observationDate,
-      className: getSequences(obs._id, obs.envId).length < 1 ? 'disabled' : ''
-    }
-  })
-  let items = new vis.DataSet(obs);
-  let container = document.getElementById('vis-container');
-  $(container).html('');
-  let options = {
-    multiselect: true,
-    zoomable: false,
-  }
-  timeline = new vis.Timeline(container, items, options);
-  timeline.on('select', function(props) {
-    if (props.event.firstTarget.classList.contains('vis-group')) {
-      timeline.setSelection(selectedObservations.get());
-      return;
-    }
-    if (props.items.length > 1) {
-      selectedObservations.set(props.items);
-    } else {
-      let currentObs = selectedObservations.get();
-      let obsIndex = currentObs.indexOf(props.items[0])
-      if (obsIndex === -1) {
-        currentObs.push(props.items[0])
-      }
-      else {
-        currentObs.splice(obsIndex, 1)
-      }
-      selectedObservations.set(currentObs);
-      timeline.setSelection(currentObs);
-    }
-    if (selectedObservations.get().length === 0) {
-      selectedStudent.set(false);
-    }
-
-    updateStudentContribGraph();
-    updateStudentTimeGraph();
-    setTimeout(updateGraph, 200);
-  });
-
-  let recent_obs = obs.sort(function(a, b) {return a.compare_date - b.compare_date}).slice(-8);
-  let recent_obs_ids = recent_obs.map(obs => obs.id);
-  timeline.focus(recent_obs_ids);
-
-  return timeline
-}
 
 //
 // Below this we have only the spotlight code

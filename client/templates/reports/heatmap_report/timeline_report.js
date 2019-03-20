@@ -17,8 +17,6 @@ const selectedDemographic = new ReactiveVar(false);
 const selectedDiscourseDimension = new ReactiveVar(false);
 const selectedDiscourseOption = new ReactiveVar(false);
 const selectedDatasetType = new ReactiveVar('contributions');
-let timeline;
-
 
 Template.timelineReport.rendered = function(){
   $('.timeline-param-select.chosen-select')
@@ -185,7 +183,12 @@ Template.timelineReport.events({
     selectedDiscourseOption.set(false);
     clearObservations();
     obsOptions.set(getObsOptions());
-    setTimeout(setupVis, 50);
+    setTimeout(function() {
+      setupVis('vis-container', function() {
+        updateGraph();
+      }, obsOptions, selectedObservations);
+    }, 50);
+
 
     $('#disc-select').val('');
     $('#demo-select').val('');
@@ -902,56 +905,6 @@ let getLabelColors = function(labels) {
     }
   });
   return label_colors
-}
-
-let setupVis = function() {
-  // Intentionally duplicated to allow for easier customization on a per-report-type basis.
-  let observations = obsOptions.get();
-  let obs = observations.map(function(obs) {
-    return {
-      id: obs._id,
-      content: obs.name + ' (' + obs.observationDate + ')',
-      compare_date: new Date(obs.observationDate),
-      start: obs.observationDate,
-      className: getSequences(obs._id, obs.envId).length < 1 ? 'disabled' : ''
-    }
-  })
-  let items = new vis.DataSet(obs);
-  let container = document.getElementById('vis-container');
-  $(container).html('');
-  let options = {
-    multiselect: true,
-    zoomable: false,
-  }
-  timeline = new vis.Timeline(container, items, options)
-  timeline.on('select', function(props) {
-    console.log('items', props);
-    if (props.event.firstTarget.classList.contains('vis-group')) {
-      timeline.setSelection(selectedObservations.get());
-      return;
-    }
-    if (props.items.length > 1) {
-      selectedObservations.set(props.items);
-    } else {
-      let currentObs = selectedObservations.get();
-      let obsIndex = currentObs.indexOf(props.items[0])
-      if (obsIndex === -1) {
-        currentObs.push(props.items[0])
-      }
-      else {
-        currentObs.splice(obsIndex, 1)
-      }
-      selectedObservations.set(currentObs);
-      timeline.setSelection(currentObs);
-    }
-    updateGraph();
-  });
-
-  let recent_obs = obs.sort(function(a, b) {return a.compare_date - b.compare_date}).slice(-8);
-  let recent_obs_ids = recent_obs.map(obs => obs.id);
-  timeline.focus(recent_obs_ids);
-
-  return timeline
 }
 
 let getObsOptions = function(envId) {
