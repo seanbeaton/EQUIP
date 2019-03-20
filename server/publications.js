@@ -56,9 +56,9 @@ Meteor.publish('sequence_parameters', function() {
    return SequenceParameters.find({userId: this.userId});
 });
 
-Meteor.publish('shared_environments', function() {
+Meteor.publish('shared_environments', function(shareId) {
    // these are public
-   return SharedEnvironments.find();
+   return SharedEnvironments.find({_id: shareId});
 });
 
 
