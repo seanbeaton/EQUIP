@@ -27,12 +27,9 @@ let timeline;
 let setupVis = function() {
   // Intentionally duplicated to allow for easier customization on a per-report-type basis.
   let observations = obsOptions.get();
-  // //console.log('observations', observations);
   let obs = observations.map(function(obs) {
-    // console.log('obse', obs);
     return {
       id: obs._id,
-      // content: obs.name + '<br/>(' + obs.observationDate + ')',
       content: obs.name + ' (' + obs.observationDate + ')',
       compare_date: new Date(obs.observationDate),
       start: obs.observationDate,
