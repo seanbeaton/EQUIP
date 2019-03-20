@@ -907,12 +907,9 @@ let getLabelColors = function(labels) {
 let setupVis = function() {
   // Intentionally duplicated to allow for easier customization on a per-report-type basis.
   let observations = obsOptions.get();
-  // //console.log('observations', observations);
   let obs = observations.map(function(obs) {
-    // console.log('obse', obs);
     return {
       id: obs._id,
-      // content: obs.name + '<br/>(' + obs.observationDate + ')',
       content: obs.name + ' (' + obs.observationDate + ')',
       compare_date: new Date(obs.observationDate),
       start: obs.observationDate,
@@ -950,10 +947,8 @@ let setupVis = function() {
     updateGraph();
   });
 
-  let recent_obs = obs.sort(function(a, b) {return a.compare_date - b.compare_date}).slice(Math.max(obs.length - 8, 1));
-  // console.log('recent_obs', recent_obs)
+  let recent_obs = obs.sort(function(a, b) {return a.compare_date - b.compare_date}).slice(-8);
   let recent_obs_ids = recent_obs.map(obs => obs.id);
-  // console.log('recent_obs_ids', recent_obs_ids)
   timeline.focus(recent_obs_ids);
 
   return timeline

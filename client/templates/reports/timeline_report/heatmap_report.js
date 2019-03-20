@@ -812,7 +812,8 @@ let setupVis = function() {
 
 
 
-  let recent_obs = obs.sort(function(a, b) {return a.compare_date - b.compare_date}).slice(Math.max(obs.length - 8, 1));
+  let recent_obs = obs.sort(function(a, b) {return a.compare_date - b.compare_date}).slice(-8);
+
   let recent_obs_ids = recent_obs.map(obs => obs.id);
   timeline.focus(recent_obs_ids);
 
