@@ -44,7 +44,7 @@ Template.environmentItem.events({
                 .append(`<div class="shared-env-dialog">
                 <span>Press ${platform_modifier_key}+c to copy the share link, or <a href="mailto:?subject=Try%20this%20classroom%20setup%20on%20EQUIP&body=${encodeURIComponent(share_link)}">share by email</a></span>
                 <input class="share-link-field" readonly value="${share_link}">
-                <span>Or, share this link to include the students</span>
+                <span>Copy this link to include the students, or <a href="mailto:?subject=Try%20this%20classroom%20setup%20on%20EQUIP&body=${encodeURIComponent(share_link_students)}">share by email</a></span>
                 <input class="share-link-field-with-students" readonly value="${share_link_students}"></div>`);
               let share_link_field = $('.share-link-field', share_button);
               share_link_field.select();
