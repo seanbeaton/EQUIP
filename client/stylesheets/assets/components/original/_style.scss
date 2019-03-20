@@ -728,11 +728,15 @@ li {
 }
 
 .params--students {
-  margin-bottom: 2rem;
+  //margin-bottom: 2rem;
 }
 
 .importable-student:not(:last-child) {
   &:after {
     content: ",";
   }
+}
+
+.shared-environment .button-wrapper {
+  margin-top: 2rem;
 }
