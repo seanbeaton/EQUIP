@@ -8,6 +8,7 @@ import {getSequences} from "../../../helpers/sequences";
 import {getStudents} from "../../../helpers/students";
 import {convertISODateToUS} from "../../../helpers/dates";
 import {clone_object} from "../../../helpers/objects";
+import {setupVis} from "../../../helpers/timeline";
 
 // const envSet = new ReactiveVar(false);
 const obsOptions = new ReactiveVar([]);
