@@ -24,8 +24,7 @@ function updateStudents(students, allParams) {
 }
 
 function updateStudent(student, allParams) {
-  // console.log('updateStudent', student, allParams);
-  if (student.info['demographics'] === undefined || !student.info['demographics']) {
+  if (student.info['demographics'] === undefined || Object.keys(student.info['demographics']).length === 0) {
     student.info.demographics = {};
     for (let param_k in allParams) {
       if (!allParams.hasOwnProperty(param_k)) continue;
