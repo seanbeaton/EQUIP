@@ -357,36 +357,42 @@ function renderStats(stats, data, name, total) {
   }
 }
 
-function classStats(envId, sParams, obsId) {
-  var studs = Subjects.find({"envId": envId}).fetch();
-  var conts = Sequences.find({'envId': envId}).fetch();
-  var totalStuds = studs.length;
-  var studTrack = new Set();
-  var totalCont = conts.filter(function (contribution) {
-    return obsId.includes(contribution.obsId);
-  }).length;
-  var stats = $('.class-stats');
+function classStats(envId, sParams, obsIds) {
+  let studs = getStudents(envId);
+  let sequencesIncludedObservations = [];
 
-  var filteredResults = conts.filter(function(result) {
-      return obsId.includes(result.obsId);
+  obsIds.forEach(function(obsId) {
+    let seqs = getSequences(obsId, envId);
+    sequencesIncludedObservations = sequencesIncludedObservations.concat(seqs);
   });
 
-  var classRoomSummary = $('<div/>', {
+  let totalStuds = studs.length;
+  let studTrack = new Set();
+  let stats = $('.class-stats');
+
+  let totalCont = sequencesIncludedObservations.length;
+
+  let classRoomSummary = $('<div/>', {
       class: "category-summary",
   }).appendTo(stats);
-  var fh = $('<h3/>', {
+  let fh = $('<h3/>', {
     class: "stat-head title is-5",
     text: "Classroom Summary"
   }).appendTo(classRoomSummary);
 
+  let sequence_params = setupSequenceParameters(envId);
+  console.log('sParams', sParams);
+
   sParams.forEach(function(param, idx) {
-    let sequence_params = setupSequenceParameters(envId);
     let seq_options = sequence_params.find(seq_param_opt => seq_param_opt.name === param).options.split(",").map((str) => { return str.trim() });
     let sequence_opt_count = {};
     seq_options.forEach(opt => sequence_opt_count[opt] = 0);
 
-    for (let con in filteredResults) {
-      let next = filteredResults[con]['info'];
+    console.log('seq_options', seq_options);
+    console.log('sequencesIncludedObservations', sequencesIncludedObservations);
+    for (let con in sequencesIncludedObservations) {
+      let next = sequencesIncludedObservations[con]['info'];
+      console.log('next', next, sequencesIncludedObservations['con'])
       studTrack.add(next['student']['studentId']);
       if (next['parameters'][param]) {
         sequence_opt_count[next['parameters'][param]] += 1;
