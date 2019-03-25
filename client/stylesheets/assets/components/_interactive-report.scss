@@ -101,6 +101,13 @@ $light-grid-color: #ddd;
   margin-right: 3px;
 }
 
+.stats-container--graphs {
+  .key--label {
+    display: inline;
+    padding: 0;
+  }
+}
+
 .key--text {
   display: inline-block;
   line-height: 1;

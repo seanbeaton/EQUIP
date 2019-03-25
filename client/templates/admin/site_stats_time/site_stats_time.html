@@ -3,26 +3,16 @@
 <template name="siteStatsTime">
     <div class="basic-container">
         <h2>Site stats</h2>
-        <div class="stats-container">
-            <ul>
-            {{#each stats}}
-                <li>
-                    <strong>{{group_label}}:</strong>
-                    <table>
-                    <thead><tr><th>Month</th><th>Count</th></tr></thead>
-                        <tbody>
-                        {{#each months}}
-                            <tr><td>{{label}}</td><td class="number-td">{{value}}</td></tr>
-                        {{ else }}
-                            <tr><td colspan="2">No stats available for this month</td></tr>
-                        {{/each}}
-                        </tbody>
-                    </table>
-                </li>
-            {{ else }}
-                <li>No stats available</li>
-            {{/each}}
-            </ul>
+        <div class="stat-loader__wrapper" style="{{#if statsLoaded }}display: none;{{/if}}">
+            <div class="stat-loader">Data loaded. Processing <span class="num-stats-loaded">0</span> of {{totalNumStats}} statistics...</div>
+            <div class="stat-loader">Data loaded. Processing statistics. This may take up to 30-60 seconds.</div>
         </div>
+        <div class="stats-container stats-container--graphs">
+
+        </div>
+        <div class="stats-container stats-container--text">
+
+        </div>
+
     </div>
 </template>

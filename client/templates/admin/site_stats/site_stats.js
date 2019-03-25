@@ -6,10 +6,11 @@ Template.siteStats.helpers({
   stats: function() {
     let stats = [];
     stats.push({label: 'Number of users', value: Meteor.users.find().count()});
-    stats.push({label: 'Number of classrooms', value: Environments.find().count()});
-    stats.push({label: 'Number of students', value: Subjects.find().count()});
-    stats.push({label: 'Number of observations', value: Observations.find().count()});
-    stats.push({label: 'Number of sequences', value: Sequences.find().count()});
+    stats.push({label: 'Number of classrooms', value: Environments.find({isExample: null, envName: {$ne: "Example Classroom"}}).count()});
+    stats.push({label: 'Number of example classrooms', value: Environments.find({$or: [{isExample: true}, {envName: "Example Classroom"}]}).count()});
+    stats.push({label: 'Number of students', value: Subjects.find({origStudId: null}).count()});
+    stats.push({label: 'Number of observations', value: Observations.find({origObsId: null}).count()});
+    stats.push({label: 'Number of sequences', value: Sequences.find({origObsId: null}).count()});
 
     console.log('stats', stats);
     return stats;
