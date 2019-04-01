@@ -5,6 +5,8 @@ let d3 = require('d3');
 
 const stats = new ReactiveVar([]);
 const statsLoaded = new ReactiveVar(false);
+const total_color = new ReactiveVar('#F25F3D');
+const month_color = new ReactiveVar('#999999');
 // const numStatsLoaded = new ReactiveVar('0');
 
 Template.siteStatsTime.helpers({
@@ -56,7 +58,7 @@ let get_stats = function() {
 }
 
 let new_total_guide = function() {
-  return `<span class="key--label"><span class="key--color" style="background-color: #333333"></span><span class="key--text">Total</span></span>/<span class="key--label"><span class="key--color" style="background-color: #999999"></span><span class="key--text">New</span></span>&nbsp;`
+  return `<span class="key--label"><span class="key--color" style="background-color: ${total_color.get()}"></span><span class="key--text">Total</span></span>/<span class="key--label"><span class="key--color" style="background-color: ${month_color.get()}"></span><span class="key--text">New</span></span>&nbsp;`
 }
 
 Template.siteStatsTime.rendered = function() {
@@ -106,7 +108,7 @@ let create_graph = function(stats, selector) {
   g.append('path')
     .data([data])
     .attr('class', 'line line--stat')
-    .style("stroke", '#333333')
+    .style("stroke", total_color.get())
     .style("stroke-width", 2)
     .attr('d', d3.line()
       .x(d => x(d.d3date))
@@ -115,7 +117,7 @@ let create_graph = function(stats, selector) {
   g.append('path')
     .data([data])
     .attr('class', 'line line--stat')
-    .style("stroke", '#999999')
+    .style("stroke", month_color.get())
     .style("stroke-width", 2)
     .attr('d', d3.line()
       .x(d => x(d.d3date))
