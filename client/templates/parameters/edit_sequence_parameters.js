@@ -249,10 +249,6 @@ const EditSequence = () => {
     function loadParamTemplate() {
         const defaultSequenceData = [
             {
-                name: "Discourse Type",
-                input: "Logistics,Content"
-            },
-            {
                 name: "Teacher Solicitation",
                 input: "How,What,Why,Other,None"
             },
@@ -271,10 +267,6 @@ const EditSequence = () => {
             {
                 name: "Student Talk",
                 input: "How,What,Why,Other"
-            },
-            {
-                name: "Explicit Evaluation",
-                input: "Yes,No"
             }
         ]
 
