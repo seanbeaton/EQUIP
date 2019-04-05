@@ -7,7 +7,13 @@ function getSequence(seqId, envId) {
   return updateSequence(sequence, allParams);
 }
 function getSequences(obsId, envId) {
-  let sequences = Sequences.find({obsId:obsId}).fetch();
+  let sequences;
+  if (obsId === null) {
+    sequences = Sequences.find({envId:envId}).fetch();
+  }
+  else {
+    sequences = Sequences.find({obsId:obsId}).fetch();
+  }
   let allParams = setupSequenceParameters(envId);
   return updateSequences(sequences, allParams);
 }

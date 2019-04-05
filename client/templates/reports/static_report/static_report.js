@@ -276,10 +276,12 @@ Template.staticReport.events({
      {
         var environment = Environments.findOne({"_id":envId});
         var envName = environment['envName'];
-        var sequences=Sequences.find({"envId":envId}).fetch();
+        // var sequences=Sequences.find({"envId":envId}).fetch();
+        var sequences = getSequences(null, envId);
+
         var literalArray = []
         for (i=0;i<sequences.length;i++) {
-          new_seq = sequences[i]['info'];
+          new_seq = sequences[i]['info'].parameters;
           new_seq['time'] = sequences[i]['time'];
           new_seq['obsName'] = sequences[i]['obsName'];
           new_seq['envName'] = envName;
