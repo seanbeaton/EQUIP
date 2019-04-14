@@ -268,46 +268,6 @@ Template.staticReport.events({
         alert("Please select a classroom to export!")
       }
   },
-  'click .export-data-button': function(e) {
-
-     var envId = $('.env-selection .chosen').attr('data_id');
-
-     if(envId)
-     {
-        var environment = Environments.findOne({"_id":envId});
-        var envName = environment['envName'];
-        // var sequences=Sequences.find({"envId":envId}).fetch();
-        var sequences = getSequences(null, envId);
-
-        var literalArray = []
-        for (i=0;i<sequences.length;i++) {
-          new_seq = sequences[i]['info'].parameters;
-          new_seq['time'] = sequences[i]['time'];
-          new_seq['obsName'] = sequences[i]['obsName'];
-          new_seq['envName'] = envName;
-          literalArray.push(new_seq);
-        }
-        var csv = Papa.unparse({
-          data: literalArray,
-        });
-        var csvData = new Blob([csv], {type: 'text/csv;charset=utf-8;'});
-        var csvURL =  null;
-        //IE download API for saving files client side
-        if (navigator.msSaveBlob) {
-            csvURL = navigator.msSaveBlob(csvData, 'download.csv');
-        } else {
-        //Everything else
-            csvURL = window.URL.createObjectURL(csvData);
-        }
-        var tempLink = document.createElement('a');
-        tempLink.href = csvURL;
-        tempLink.setAttribute('download', envName+'_sequence_export.csv');
-        tempLink.click();
-      } else {
-        alert("Please select a classroom to export!")
-      }
-
-    }
 });
 
 
