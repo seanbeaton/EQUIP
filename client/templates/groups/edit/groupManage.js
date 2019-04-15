@@ -30,7 +30,10 @@ Template.memberPermissionCheckbox.helpers({
   getGroupMembershipCheckDisabled: function(user, role) {
     let roles = getUserRoles(user.userId, this.group);
     let own_roles = currentUserRoles(this.group);
-    if (role === 'manage' && (roles.admin === true || !own_roles.admin)) {
+    if (!own_roles.admin && !own_roles.manage) {
+      return 'disabled'
+    }
+    else if (role === 'manage' && (roles.admin === true || !own_roles.admin)) {
       return 'disabled';
     }
     else if (role === 'edit' && roles.manage === true) {
