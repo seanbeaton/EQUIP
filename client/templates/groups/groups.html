@@ -1,7 +1,8 @@
 <template name="groupsList">
-    <h3>Groups listing page</h3>
-    <table>
-        <thead>
+    <div class="page--group">
+        <h3>Groups listing page</h3>
+        <table>
+            <thead>
             <tr>
                 <td>Group name</td>
                 <td>Your role</td>
@@ -10,26 +11,27 @@
                 <td>Actions</td>
             </tr>
 
-        </thead>
-        <tbody>
-        {{#each group in groups}}
-            <tr>
-                <td>{{group.groupName}}</td>
-                <td>{{myRole group}}</td>
-                <td>{{group.members.length}}</td>
-                <td>{{group.environments.length}}</td>
-                <td>{{> groupViewLink group=group}} {{> groupEditLink group=group}}</td>
-            </tr>
-        {{/each}}
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+            {{#each group in groups}}
+                <tr>
+                    <td><a href="{{pathFor route='groupView' _groupId=group._id}}">{{group.groupName}}</a></td>
+                    <td>{{myRole group}}</td>
+                    <td>{{group.members.length}}</td>
+                    <td>{{group.environments.length}}</td>
+                    <td>{{> groupViewLink group=group}} {{> groupManageLink group=group}}</td>
+                </tr>
+            {{/each}}
+            </tbody>
+        </table>
+    </div>
 </template>
 
 
 <template name="groupViewLink">
-    <a href="/groups/{{ group._id }}/view">View</a>
+    <a href="{{pathFor route='groupView' _groupId=group._id}}">View</a>
 </template>
 
-<template name="groupEditLink">
-    <a href="/groups/{{ group._id }}/edit">Edit</a>
+<template name="groupManageLink">
+    <a href="{{pathFor route='groupManage' _groupId=group._id}}">Manage</a>
 </template>

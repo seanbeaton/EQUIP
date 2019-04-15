@@ -1,5 +1,5 @@
 
-Template.groupEdit.helpers({
+Template.groupManage.helpers({
   group: function() {
     return this
   },

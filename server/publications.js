@@ -144,13 +144,10 @@ Meteor.publish('allSubjectsAndParams', function() {
 
 
 Meteor.publish("autocompleteUsers", function(selector, options) {
-  console.log('selector here, selector', selector);
-
   let results = Meteor.users.find({_id: ''}, options);
 
   let min_search_string_length = 6;
   if (selector && typeof selector['$or'] !== 'undefined' && selector['$or'][0].username.toString().length >= min_search_string_length) {
-    console.log('passes')
     results = Meteor.users.find(selector, options);
   }
 

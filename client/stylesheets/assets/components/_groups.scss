@@ -1,0 +1,31 @@
+.page--group {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 80px 20px;
+
+  table {
+    td {
+      padding: 2px 4px;
+    }
+  }
+  thead {
+    td {
+      border: 0;
+      border-right: 1px solid #666;
+      &:first-child {
+        border-left: 1px solid #666;
+      }
+    }
+    tr:first-child td {
+      text-align: center;
+    }
+    td {
+      min-width: 120px;
+    }
+    border-bottom: 3px solid #666;
+  }
+}
+
+.member-add-form {
+  margin: 20px 0;
+}
