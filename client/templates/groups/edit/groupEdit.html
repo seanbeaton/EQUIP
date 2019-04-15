@@ -1,0 +1,64 @@
+<template name="groupEdit">
+    <h3>Group {{group.groupName}} settings</h3>
+    {{> memberAddForm group=group}}
+    <table>
+        <thead>
+        <tr>
+            <td rowspan="2">Name</td>
+            <td colspan="3">Roles</td>
+            <td rowspan="2">Actions</td>
+        </tr>
+        <tr>
+            <td>Manage group</td>
+            <td>Edit all</td>
+            <td>View only</td>
+        </tr>
+
+        </thead>
+        <tbody>
+        {{#each member in members}}
+            <tr>
+                <td>{{getUserName member}}</td>
+                <td>{{> memberPermissionCheckbox member=member group=group checkboxtype='manage'}}</td>
+                <td>{{> memberPermissionCheckbox member=member group=group checkboxtype='edit'}}</td>
+                <td>{{> memberPermissionCheckbox member=member group=group checkboxtype='view'}}</td>
+                <td>
+                    {{#if memberRemovalAllowed member group}}
+                        {{> memberRemoveButton group=group member=member}}
+                    {{/if}}
+                </td>
+            </tr>
+        {{/each}}
+        </tbody>
+    </table>
+</template>
+
+<template name="memberPermissionCheckbox">
+    <input type="checkbox" class="permission-checkbox" id="{{member.userId}}__{{checkboxtype}}" data-user-id="{{member.userId}}" data-role="manage" {{getGroupMembershipChecked member checkboxtype}} {{getGroupMembershipCheckDisabled member checkboxtype}}>
+</template>
+
+<template name="userAutocompleteOption">
+    <span class="label" data-user-id="{{_id}}">{{username}}</span>
+</template>
+
+<template name="noAutocompleteAvailable">
+    {{#if searchTextLengthCheck getText }}
+        No matches
+    {{else}}
+        Min. 3 characters to search
+    {{/if}}
+</template>
+
+<template name="memberRemoveButton">
+    <button class="member-remove-button" data-member-id="{{member.userId}}">Remove</button>
+</template>
+
+<template name="memberAddForm">
+    <div class="member-add-form">
+        <label for="member-add-form">Add user</label>
+        {{> inputAutocomplete settings=settings id="member-add-form" class="member-add-form__input" placeholder="Type a name..."}}
+        <!--<input class="member-add-form__input" id="member-add-form">-->
+        <button class="member-add-form__submit">Add</button>
+    </div>
+</template>
+

@@ -5,6 +5,28 @@
 * Subscriptions are handled in ../lib/router.js
 */
 
+Meteor.publish('groups', function(groupId) {
+  if (!this.userId) {
+    return this.ready();
+  }
+
+  if (typeof groupId === 'undefined') {
+    return Groups.find(
+      {
+        "members.userId": this.userId
+      }
+    )
+  }
+  else {
+    return Groups.find(
+      {
+        "members.userId": this.userId,
+        _id: groupId
+      }
+    )
+  }
+});
+
 Meteor.publish('environments', function() {
     if (!this.userId) {
         return this.ready();
@@ -121,18 +143,46 @@ Meteor.publish('allSubjectsAndParams', function() {
 });
 
 
+Meteor.publish("autocompleteUsers", function(selector, options) {
+  console.log('selector here, selector', selector);
+
+  let results = Meteor.users.find({_id: ''}, options);
+
+  let min_search_string_length = 6;
+  if (selector && typeof selector['$or'] !== 'undefined' && selector['$or'][0].username.toString().length >= min_search_string_length) {
+    console.log('passes')
+    results = Meteor.users.find(selector, options);
+  }
+
+  Autocomplete.publishCursor(results, this);
+  this.ready();
+});
+
 
 Meteor.publish('users', function () {
   if (Roles.userIsInRole(this.userId, ['admin'], 'site')) {
     return Meteor.users.find();
   }
   else {
-    // return [];
-    this.ready()
+    return this.ready()
+  }
+});
+
+Meteor.publish('allUsers', function () {
+  if (!this.userId) {
+    return this.ready();
   }
 
-  // this.stop();
-  return;
+  return Meteor.users.find({}, {
+
+    // todo: in the future, should this only publish relevant users to the group
+    // you're part of, and a search for users requires some sort of input?
+    fields: {
+      username: 1,
+      _id: 1
+    }
+
+  });
 });
 
 //

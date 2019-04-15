@@ -1,3 +1,3 @@
-Template.admin.events({
-
-});
+// Template.admin.events({
+//
+// });
