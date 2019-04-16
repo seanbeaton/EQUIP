@@ -2,9 +2,9 @@
 * JS file for edit_subjects.html
 */
 
-import {updateStudent, updateStudents, getStudents} from '/client/helpers/students.js'
-import {setupSubjectParameters} from '/client/helpers/parameters.js'
-import {getStudent} from "/client/helpers/students.js";
+import {updateStudent, updateStudents, getStudents} from '/helpers/students.js'
+import {setupSubjectParameters} from '/helpers/parameters.js'
+import {getStudent} from "/helpers/students.js";
 
 Template.editSubjects.helpers({
     subject: function() {

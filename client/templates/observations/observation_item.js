@@ -2,7 +2,7 @@
 * JS file for observation_environment_item.html
 */
 
-import * as observation_helpers from '/client/helpers/observations.js'
+import * as observation_helpers from '/helpers/observations.js'
 
 Template.observationItem.events({
    'click #enter-class': function(e) {

@@ -1,9 +1,9 @@
 /*
 * JS file for static_report.js
 */
-import {getStudent, getStudents, updateStudent, updateStudents} from "/client/helpers/students";
-import {setupSequenceParameters, setupSubjectParameters} from "/client/helpers/parameters";
-import {updateSequences, getSequences} from "/client/helpers/sequences";
+import {getStudent, getStudents, updateStudent, updateStudents} from "/helpers/students";
+import {setupSequenceParameters, setupSubjectParameters} from "/helpers/parameters";
+import {updateSequences, getSequences} from "/helpers/sequences";
 
 var d3 = require('d3');
 //Generate classroom buttons immediately

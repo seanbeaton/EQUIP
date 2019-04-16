@@ -1,14 +1,14 @@
 import vis from 'vis';
-import {Sidebar} from '../../../helpers/graph_sidebar';
+import {Sidebar} from '../../../../helpers/graph_sidebar';
 let d3 = require('d3');
 
 import '/node_modules/vis/dist/vis.min.css';
-import {setupSequenceParameters, setupSubjectParameters} from "../../../helpers/parameters";
-import {getSequences} from "../../../helpers/sequences";
-import {getStudents} from "../../../helpers/students";
-import {convertISODateToUS} from "../../../helpers/dates";
-import {clone_object} from "../../../helpers/objects";
-import {setupVis} from "../../../helpers/timeline";
+import {setupSequenceParameters, setupSubjectParameters} from "../../../../helpers/parameters";
+import {getSequences} from "../../../../helpers/sequences";
+import {getStudents} from "../../../../helpers/students";
+import {convertISODateToUS} from "../../../../helpers/dates";
+import {clone_object} from "../../../../helpers/objects";
+import {setupVis} from "../../../../helpers/timeline";
 
 // const envSet = new ReactiveVar(false);
 const obsOptions = new ReactiveVar([]);

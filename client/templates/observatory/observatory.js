@@ -6,9 +6,9 @@ var timer = new Stopwatch();
 //var timerUpdate;
 var lastChoices = {};
 
-import * as observation_helpers from '/client/helpers/observations.js'
-import {updateStudent, updateStudents} from '/client/helpers/students.js'
-import {convertISODateToUS} from '/client/helpers/dates.js'
+import * as observation_helpers from '/helpers/observations.js'
+import {updateStudent, updateStudents} from '/helpers/students.js'
+import {convertISODateToUS} from '/helpers/dates.js'
 
 
 Template.observatory.created = function() {

@@ -1,4 +1,4 @@
-import {setupSequenceParameters, setupSubjectParameters} from "../../../helpers/parameters";
+import {setupSequenceParameters, setupSubjectParameters} from "../../../../helpers/parameters";
 
 let d3 = require('d3');
 let d3ScaleChromatic = require("d3-scale-chromatic");
@@ -7,9 +7,9 @@ let chosen = require("chosen-js");
 import vis from "vis";
 
 
-import {getSequences} from "../../../helpers/sequences";
-import {getStudents, getStudent} from "../../../helpers/students";
-import {setupVis} from "../../../helpers/timeline";
+import {getSequences} from "../../../../helpers/sequences";
+import {getStudents, getStudent} from "../../../../helpers/students";
+import {setupVis} from "../../../../helpers/timeline";
 
 // const envSet = new ReactiveVar(false);
 const obsOptions = new ReactiveVar([]);

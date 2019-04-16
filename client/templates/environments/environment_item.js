@@ -2,8 +2,8 @@
 * JS file for environment_item.html
 */
 
-import { createModal } from '/client/helpers/modals.js'
-import {getSequences} from "../../helpers/sequences";
+import { createModal } from '/helpers/modals.js'
+import {getSequences} from "../../../helpers/sequences";
 
 let share_window_timeout;
 

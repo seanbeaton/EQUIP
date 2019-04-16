@@ -1,8 +1,8 @@
-import {setupSequenceParameters, setupSubjectParameters} from "../../../helpers/parameters";
-import {getSequences} from "../../../helpers/sequences";
-import {getStudent, getStudents} from "../../../helpers/students";
-import {Sidebar} from '../../../helpers/graph_sidebar';
-import {setupVis} from '../../../helpers/timeline';
+import {setupSequenceParameters, setupSubjectParameters} from "../../../../helpers/parameters";
+import {getSequences} from "../../../../helpers/sequences";
+import {getStudent, getStudents} from "../../../../helpers/students";
+import {Sidebar} from '../../../../helpers/graph_sidebar';
+import {setupVis} from '../../../../helpers/timeline';
 
 const obsOptions = new ReactiveVar([]);
 const selectedEnvironment = new ReactiveVar(false);
