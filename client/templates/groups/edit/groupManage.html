@@ -2,6 +2,13 @@
     <div class="page--group">
         <h3>Group {{group.groupName}} settings</h3>
         {{> memberAddForm group=group}}
+        <span>
+            Role explanation:
+            <br/><strong>Admin:</strong> Can add new group members, change permissions of all members.
+            <br/><strong>Manage:</strong> Can add new group members, change permissions of all members without the manage or admin roles. Can remove users from the group, as long as they don't have the admin or manage roles. Can remove any classroom from the group.
+            <br/><strong>Edit:</strong> Can edit any classroom shared with the group, as long as the classroom was shared with the edit permissions.
+            <br/><strong>View:</strong> Can view any classroom shared with the group. Can share their own classrooms with the group, and un-share them.
+        </span>
         <table>
             <thead>
             <tr>
@@ -56,7 +63,7 @@
 </template>
 
 <template name="memberAddForm">
-    <div class="member-add-form">
+    <div class="member-add-form autocomplete-form">
         <label for="member-add-form">Add user</label>
         {{> inputAutocomplete settings=settings id="member-add-form" class="member-add-form__input" placeholder="Type a name..."}}
         <!--<input class="member-add-form__input" id="member-add-form">-->

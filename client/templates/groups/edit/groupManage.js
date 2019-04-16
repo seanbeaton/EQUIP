@@ -28,6 +28,7 @@ Template.memberPermissionCheckbox.helpers({
     return getUserRoles(user.userId, this.group)[role] === true ? 'checked' : '';
   },
   getGroupMembershipCheckDisabled: function(user, role) {
+    // todo: possible future improvement, use the same permissions check function here and on the backend.
     let roles = getUserRoles(user.userId, this.group);
     let own_roles = currentUserRoles(this.group);
     if (!own_roles.admin && !own_roles.manage) {
@@ -108,15 +109,15 @@ Template.memberAddForm.helpers({
           field: 'username',
           template: Template.userAutocompleteOption,
           noMatchTemplate: Template.noAutocompleteAvailable,
-          selector: function(match) {
-            let regex = new RegExp(match, 'i');
-            return {
-              $or: [ {
-                  'username': regex
-                }
-              ]
-            };
-          },
+          // selector: function(match) {
+          //   let regex = new RegExp(match, 'i');
+          //   return {
+          //     $or: [ {
+          //         'username': regex
+          //       }
+          //     ]
+          //   };
+          // },
         }
       ]
     }

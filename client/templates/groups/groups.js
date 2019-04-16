@@ -14,5 +14,8 @@ Template.groupsList.rendered = function() {
 };
 
 Template.groupsList.events = {
+  'click .group-create': function() {
+    Meteor.call('groupInsert', {})
+  }
 
 }

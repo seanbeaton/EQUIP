@@ -26,6 +26,23 @@
   }
 }
 
-.member-add-form {
+.autocomplete-form {
   margin: 20px 0;
+  input[type='text'] {
+    width: 220px;
+    padding: 6px 5px;
+  }
+  input[type="radio"] {
+    margin: 4px 8px;
+  }
+  li {
+    margin: 0;
+    font-size: 16px;
+  }
+  div {
+    font-size: 16px;
+  }
+  .-autocomplete-container {
+    margin-top: 6px;
+  }
 }

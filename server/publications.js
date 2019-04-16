@@ -155,6 +155,23 @@ Meteor.publish("autocompleteUsers", function(selector, options) {
   this.ready();
 });
 
+Meteor.publish("autocompleteEnvironments", function(selector, options) {
+  console.log('selecto bfeore', selector)
+  if (selector && typeof selector['$or'] !== 'undefined') {
+    selector['userId'] = this.userId;
+  }
+  else {
+    selector = {userId: this.userId};
+  }
+
+  console.log('selecto after', selector)
+
+  let results = Environments.find(selector, options);
+
+  Autocomplete.publishCursor(results, this);
+  this.ready();
+});
+
 
 Meteor.publish('users', function () {
   if (Roles.userIsInRole(this.userId, ['admin'], 'site')) {
@@ -180,6 +197,42 @@ Meteor.publish('allUsers', function () {
     }
 
   });
+});
+
+Meteor.publish('groupUsers', function(groupId) {
+  if (!this.userId) {
+    return this.ready();
+  }
+
+  let group = Groups.findOne({_id: groupId});
+
+  if (!group) {
+    return this.ready();
+  }
+  let userIds = group.members.map(mem => mem.userId);
+
+  return Meteor.users.find({_id: {$in: userIds}}, {
+    fields: {
+      username: 1,
+      _id: 1
+    }
+
+  });
+});
+
+Meteor.publish('groupEnvs', function(groupId) {
+  if (!this.userId) {
+    return this.ready();
+  }
+
+  let group = Groups.findOne({_id: groupId});
+
+  if (!group) {
+    return this.ready();
+  }
+  let envIds = group.environments.map(env => env.envId);
+
+  return Environments.find({_id: {$in: envIds}});
 });
 
 //

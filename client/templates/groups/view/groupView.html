@@ -1,5 +1,71 @@
 <template name="groupView">
     <div class="page--group">
         <h3>Viewing group {{group.groupName}}</h3>
+        <details>
+            <summary>Share a classroom</summary>
+            {{>envAddForm}}
+        </details>
+        <div>
+            <table>
+                <thead>
+                    <tr>
+                        <td>Classroom</td>
+                        <td>Owner</td>
+                        <td>Share type</td>
+                        <td>Actions</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#each env in group.environments }}
+                        <tr>
+                            <td>{{getEnvName env.envId}}</td>
+                            <td>{{getEnvOwner env.envId}}</td>
+                            <td>
+                                {{#if isEnvOwner env.envId }}
+                                    {{> envShareTypeChanger env=env}}
+                                {{else}}
+                                    {{getHumanEnvPermission env.share_type}}
+                                {{/if}}
+                            </td>
+                            <td>
+                                {{#if hasRemovePermission env}}
+                                    {{> removeEnvButton env=env}}
+                                {{/if}}
+                                <a href="#">View (does not work)</a>
+                            </td>
+                        </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</template>
+
+<template name="removeEnvButton">
+    <button class="remove-env-from-group">Remove from group</button>
+</template>
+
+<template name="envAutocompleteOption">
+    <span class="label" data-env-id="{{_id}}">{{envName}}</span>
+</template>
+
+<template name="envAddForm">
+    <div class="environment-add-form autocomplete-form">
+        <div class="env-share-type">
+            <span>How do you want to share the classroom? (this can be changed later)</span>
+            <div>
+                <span><input type="radio" name='env-share-type' id="share-type--view" data-share-type="view" checked><label for="share-type--view">{{getHumanEnvPermission 'view'}}</label></span>
+                <span><input type="radio" name='env-share-type' id="share-type--edit" data-share-type="edit"><label for="share-type--edit">{{getHumanEnvPermission 'edit'}}</label></span>
+            </div>
+           </div>
+        <label for="environment-add-form">Add classroom</label>
+        {{> inputAutocomplete settings=autocompleteSettings id="environment-add-form" class="environment-add-form__input" placeholder="Type a classroom name..."}}
+    </div>
+</template>
+
+<template name="envShareTypeChanger">
+    <div>
+        <span><input type="radio" name='{{env.envId}}--env-share-type' id="{{env.envId}}--share-type--view" data-share-type="view" {{viewChecked}}><label for="share-type--view">{{getHumanEnvPermission 'view'}}</label></span>
+        <span><input type="radio" name='{{env.envId}}--env-share-type' id="{{env.envId}}--share-type--edit" data-share-type="edit" {{editChecked}}><label for="share-type--edit">{{getHumanEnvPermission 'edit'}}</label></span>
     </div>
 </template>
