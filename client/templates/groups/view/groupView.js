@@ -22,7 +22,8 @@ Template.groupView.helpers({
     return getHumanEnvPermission(perm)
   },
   hasRemovePermission(env) {
-    return hasRemovePermission(env, this.group);
+    console.log('env', env);
+    return hasRemovePermission(env.envId, this.group);
   }
 });
 
@@ -91,6 +92,6 @@ Template.groupView.events = {
 Template.removeEnvButton.events = {
   'click .remove-env-from-group': function(e, template, doc) {
     console.log('temp, doc', template, doc);
-    Meteor.call('removeEnvFromGroup', doc._id, template.data.group._id)
+    Meteor.call('removeEnvFromGroup', template.data.env.envId, template.data.group._id)
   }
 }

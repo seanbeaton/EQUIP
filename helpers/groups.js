@@ -1,5 +1,5 @@
 let hasRemovePermission = function (envId, group) {
-  let full_env = Environments.findOne({_id: env.envId});
+  let full_env = Environments.findOne({_id: envId});
   if (full_env.userId === Meteor.userId()) {
     return true;
   }
