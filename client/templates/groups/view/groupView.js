@@ -1,4 +1,4 @@
-import {getHumanEnvPermission, hasRemovePermission} from "../../../../helpers/groups";
+import {userIsGroupMember, getHumanEnvPermission, hasRemovePermission, userIsEnvOwner} from "../../../../helpers/groups";
 
 Template.groupView.helpers({
   group: function() {
@@ -15,17 +15,18 @@ Template.groupView.helpers({
     console.log('getEnvName', envId);
     return Environments.findOne({_id: envId}).envName
   },
-  isEnvOwner: function(env) {
-    return true;
+  isEnvOwner: function(envId) {
+    return userIsEnvOwner(envId);
   },
   getHumanEnvPermission(perm) {
-    return getHumanEnvPermission(perm)
+    return getHumanEnvPermission(perm);
   },
   hasRemovePermission(env) {
     console.log('env', env);
     return hasRemovePermission(env.envId, this.group);
   }
 });
+
 
 Template.groupView.onCreated(function() {
   console.log('this before', this.data);
@@ -47,6 +48,11 @@ Template.envShareTypeChanger.helpers({
   },
 })
 
+Template.envShareTypeChanger.events = {
+  'click input[type="radio"]': function(e, template) {
+    Meteor.call('changeGroupEnvPermission', this.group._id, this.env.envId, $(e.target).attr('data-share-type'))
+  }
+}
 
 Template.envAddForm.helpers({
   autocompleteSettings: function() {

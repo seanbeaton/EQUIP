@@ -22,7 +22,7 @@
                             <td>{{getEnvOwner env.envId}}</td>
                             <td>
                                 {{#if isEnvOwner env.envId }}
-                                    {{> envShareTypeChanger env=env}}
+                                    {{> envShareTypeChanger env=env group=group}}
                                 {{else}}
                                     {{getHumanEnvPermission env.share_type}}
                                 {{/if}}

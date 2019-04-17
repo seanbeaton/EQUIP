@@ -32,5 +32,20 @@ let getHumanEnvPermission = function (perm) {
   }
 }
 
+let userIsEnvOwner = function (envId, uid) {
+  if (typeof uid === 'undefined') {
+    uid = Meteor.userId();
+  }
+  let full_env = Environments.findOne({_id: envId});
+  return full_env.userId === uid;
+}
 
-export {getHumanEnvPermission, userIsGroupManager, hasRemovePermission}
+let userIsGroupMember = function (gid, uid) {
+  if (typeof uid === 'undefined') {
+    uid = Meteor.userId();
+  }
+  let group = Groups.findOne({_id: gid});
+  return !!group.members.find(m => m.userId === uid)
+}
+
+export {userIsGroupMember, getHumanEnvPermission, userIsGroupManager, hasRemovePermission, userIsEnvOwner}
