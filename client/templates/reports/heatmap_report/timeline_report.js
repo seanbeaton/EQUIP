@@ -429,7 +429,7 @@ let initTimelineGraph = function(full_data, containerSelector) {
 
   data = data.sort(function(a, b) {return a.d3date - b.d3date});
 
-  svg = $('<svg width="718" height="500">' +
+  let svg_tag = $('<svg width="718" height="500">' +
     '<defs>\n' +
     '  <style type="text/css">\n' +
     '    @font-face {\n' +
@@ -439,7 +439,7 @@ let initTimelineGraph = function(full_data, containerSelector) {
     '  </style>\n' +
     '</defs>' +
     '</svg>');
-  $(containerSelector).html(svg);
+  $(containerSelector).html(svg_tag);
 
   let svg = d3.select(containerSelector + " svg"),
     margin = {top: 30, right: 20, bottom: 40, left: 50},

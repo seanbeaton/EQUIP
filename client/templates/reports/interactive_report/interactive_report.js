@@ -418,7 +418,7 @@ let createGraph = function(contribData, containerSelector, dataset) {
     y_label = "Equity Ratio";
   }
 
-  svg = $('<svg width="718" height="580">' +
+  let svg_tag = $('<svg width="718" height="580">' +
     '<defs>\n' +
     '  <style type="text/css">\n' +
     '    @font-face {\n' +
@@ -428,7 +428,7 @@ let createGraph = function(contribData, containerSelector, dataset) {
     '  </style>\n' +
     '</defs>' +
     '</svg>');
-  $(containerSelector).html(svg);
+  $(containerSelector).html(svg_tag);
 
   var svg = d3.select(containerSelector + " svg"),
     margin = {top: 30, right: 20, bottom: 80, left: 50},

@@ -284,7 +284,7 @@ Template.editSubjectParameters.rendered = function() {
 }
 
 
-const EditDemographics = () => {
+const EditDemographics = function() {
     function hideRemoveButtons() {
         var obsMade = document.getElementById('obsMade');
 

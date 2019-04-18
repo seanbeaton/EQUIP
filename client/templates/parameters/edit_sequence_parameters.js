@@ -199,7 +199,7 @@ Template.editSequenceParameters.rendered = function() {
     editSequence.hideRemoveButtons();
 }
 
-const EditSequence = () => {
+const EditSequence = function() {
     function hideRemoveButtons() {
         var obsMade = document.getElementById('obsMade');
 

@@ -237,36 +237,40 @@ Template.staticReport.events({
   'click .export-class-button': function(e){
 
     var envId = $('.env-selection .chosen').attr('data_id');
-    if(envId)
-     {
-        var environment = Environments.findOne({"_id":envId});
-        var envName = environment['envName'];
-        var subjects=Subjects.find({"envId":envId}).fetch();
-        var literalArray = []
-        for (i=0;i<subjects.length;i++) {
-          new_sub = subjects[i]['info'];
-          new_sub['envName'] = envName;
-          literalArray.push(new_sub);
-        }
-        var csv = Papa.unparse({
-          data: literalArray,
-        });
-        var csvData = new Blob([csv], {type: 'text/csv;charset=utf-8;'});
-        var csvURL =  null;
-        //IE download API for saving files client side
-        if (navigator.msSaveBlob) {
-            csvURL = navigator.msSaveBlob(csvData, 'download.csv');
-        } else {
-        //Everything else
-            csvURL = window.URL.createObjectURL(csvData);
-        }
-        var tempLink = document.createElement('a');
-        tempLink.href = csvURL;
-        tempLink.setAttribute('download', envName+'_classroom_export.csv');
-        tempLink.click();
+    if (envId) {
+      var environment = Environments.findOne({"_id": envId});
+      var envName = environment['envName'];
+      var subjects = Subjects.find({"envId": envId}).fetch();
+      var literalArray = []
+      console.log('subjects all', subjects);
+      console.log('new way', getStudents(envId));
+      let students = getStudents(envId);
+      students.forEach(function (student) {
+        let new_sub = student['info']['demographics'];
+        new_sub['Name'] = student.info.name;
+        new_sub['envName'] = envName;
+        literalArray.push(new_sub);
+      });
+
+      var csv = Papa.unparse({
+        data: literalArray,
+      });
+      var csvData = new Blob([csv], {type: 'text/csv;charset=utf-8;'});
+      var csvURL = null;
+      //IE download API for saving files client side
+      if (navigator.msSaveBlob) {
+        csvURL = navigator.msSaveBlob(csvData, 'download.csv');
       } else {
-        alert("Please select a classroom to export!")
+        //Everything else
+        csvURL = window.URL.createObjectURL(csvData);
       }
+      var tempLink = document.createElement('a');
+      tempLink.href = csvURL;
+      tempLink.setAttribute('download', envName + '_classroom_export.csv');
+      tempLink.click();
+    } else {
+      alert("Please select a classroom to export!")
+    }
   },
 });
 

@@ -879,7 +879,7 @@ function get_average(values) {
 }
 
 let studentContribGraph = function(data, selector) {
-  svg = $('<svg width="718" height="400">' +
+  let svg_tag = $('<svg width="718" height="400">' +
     '<defs>\n' +
     '  <style type="text/css">\n' +
     '    @font-face {\n' +
@@ -889,12 +889,12 @@ let studentContribGraph = function(data, selector) {
     '  </style>\n' +
     '</defs>' +
     '</svg>');
-  $(selector).html(svg);
+  $(selector).html(svg_tag);
 
   let container = d3.select(selector + ' svg'),
     margin = {top: 30, right: 20, bottom: 80, left: 50},
-    width = +svg.attr("width") - margin.left - margin.right,
-    height = +svg.attr("height") - margin.top - margin.bottom,
+    width = +container.attr("width") - margin.left - margin.right,
+    height = +container.attr("height") - margin.top - margin.bottom,
     g = container.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
   let x = d3.scaleBand() // inside each group
@@ -1077,7 +1077,7 @@ let studentTimeGraph = function(data, selector) {
 
   data = data.sort(function(a, b) {return a.d3date - b.d3date});
 
-  svg = $('<svg width="718" height="500">' +
+  let svg_tag = $('<svg width="718" height="500">' +
     '<defs>\n' +
     '  <style type="text/css">\n' +
     '    @font-face {\n' +
@@ -1087,7 +1087,7 @@ let studentTimeGraph = function(data, selector) {
     '  </style>\n' +
     '</defs>' +
     '</svg>');
-  $(selector).html(svg);
+  $(selector).html(svg_tag);
 
   let svg = d3.select(selector + " svg"),
     margin = {top: 30, right: 20, bottom: 40, left: 50},
