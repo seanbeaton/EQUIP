@@ -82,8 +82,8 @@ Template.siteStatsTime.rendered = function() {
 let create_graph = function(stats, selector) {
   let data = stats.months;
 
-  svg = $('<svg width="718" height="500"></svg>');
-  $(selector).html(svg);
+  let svg_tag = $('<svg width="718" height="500"></svg>');
+  $(selector).html(svg_tag);
 
   let svg = d3.select(selector + " svg"),
     margin = {top: 30, right: 50, bottom: 40, left: 50},
