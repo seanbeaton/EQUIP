@@ -193,6 +193,7 @@ Template.environmentItem.events({
       var literalArray = []
       for (i = 0; i < sequences.length; i++) {
         new_seq = sequences[i]['info'].parameters;
+        new_seq['name'] = sequences[i].info.student.studentName;
         new_seq['time'] = sequences[i]['time'];
         new_seq['obsName'] = sequences[i]['obsName'];
         new_seq['envName'] = envName;
