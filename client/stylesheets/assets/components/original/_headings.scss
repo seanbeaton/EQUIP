@@ -566,7 +566,7 @@ input:-webkit-autofill {
 
 @media screen and (max-width: 550px) {
     .dropdown-wrapper.dropdown-wrapper--open .drop-menu {
-        max-height: 320px;
+        max-height: 400px;
         opacity: 1;
         pointer-events: auto;
     }
@@ -574,7 +574,7 @@ input:-webkit-autofill {
 
 @media screen and (min-width: 551px) {
     .dropdown-wrapper:hover .drop-menu {
-        max-height: 320px;
+        max-height: 400px;
         opacity: 1;
         pointer-events: auto;
     }
