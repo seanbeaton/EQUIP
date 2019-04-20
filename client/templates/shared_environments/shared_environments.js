@@ -54,8 +54,7 @@ Template.sharedEnv.helpers({
 
 
 function copySharedClassroom(shareId) {
-  let share = SharedEnvironments.findOne({_id:Router.current().params._shareId});
-  Meteor.call('environmentImportShared', share, function(error, result) {
+  Meteor.call('environmentImportShared', shareId, function(error, result) {
     if (error) {
       alert(error)
     }
