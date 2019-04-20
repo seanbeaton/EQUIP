@@ -415,6 +415,7 @@ Meteor.publish("autocompleteEnvironments", function(selector, options) {
     selector = {userId: this.userId};
   }
 
+
   let results = Environments.find(selector, options);
 
   Autocomplete.publishCursor(results, this);

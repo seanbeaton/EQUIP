@@ -94,6 +94,7 @@ Template.memberAddForm.events = {
   'autocompleteselect .member-add-form__input': function(e, template, doc) {
     Meteor.call('addUserToGroup', doc._id, template.data.group._id)
     $('.member-add-form__input').val('');
+    Meteor.subscribe('groupUsers', template.data.group._id);
   }
 }
 
@@ -109,15 +110,15 @@ Template.memberAddForm.helpers({
           field: 'username',
           template: Template.userAutocompleteOption,
           noMatchTemplate: Template.noAutocompleteAvailable,
-          // selector: function(match) {
-          //   let regex = new RegExp(match, 'i');
-          //   return {
-          //     $or: [ {
-          //         'username': regex
-          //       }
-          //     ]
-          //   };
-          // },
+          selector: function(match) {
+            let regex = new RegExp(match, 'i');
+            return {
+              $or: [ {
+                  'username': regex
+                }
+              ]
+            };
+          },
         }
       ]
     }
