@@ -52,7 +52,9 @@ function clockSet() {
 
 //Create Timer and Toggle Options
 Template.observatory.rendered = function() {
-  var obs = Observations.find({_id: Router.current().params._obsId}).fetch()[0];
+  console.log(this);
+  var obs = this.data.observation;
+  console.log('students', Subjects.find().fetch());
   var seqParams = SequenceParameters.find({'children.envId': Router.current().params._envId}).fetch()[0];
   var timerVal = obs.timer;
   timer.value = timerVal;
@@ -121,7 +123,7 @@ Template.observatory.helpers({
     return obs;
   },
   subject: function() {
-    return Subjects.find({envId: this.envId});
+    return Subjects.find({envId: this.observation.envId});
   },
   convertISODateToUS: function(isoDate) {
     return convertISODateToUS(isoDate);
@@ -171,13 +173,13 @@ Template.observatory.events({
     $('#seq-data-modal').removeClass('is-active');
   },
   'click .edit-observation-name': function(e) {
-    editObservationName(this._id);
+    editObservationName(this.observation._id);
   },
   'click .edit-observation-date': function(e) {
-    editObservationDate(this._id);
+    editObservationDate(this.observation._id);
   },
   'click #delete-observation': function(e) {
-    deleteObservation(this._id);
+    deleteObservation(this.observation._id);
   },
   'click #randomize-selected': function(e) {
     $('.c--modal-student-options-container').each(function() {
@@ -300,7 +302,7 @@ Template.observatory.events({
     observation_helpers.deleteContribution(e);
   },
   'click #show-all-observations':function (e){
-    observation_helpers.createTableOfContributions(this._id);
+    observation_helpers.createTableOfContributions(this.observation._id);
     gtag('event', 'view_sequence_list', {'event_category': 'observations'});
     $('#seq-data-modal').addClass('is-active');
   },
@@ -309,7 +311,7 @@ Template.observatory.events({
     editSequence(e);
     //This should happen at the end...
     $('#seq-param-modal').removeClass('is-active');
-    observation_helpers.createTableOfContributions(this._id);
+    observation_helpers.createTableOfContributions(this.observation._id);
     $('#seq-data-modal').addClass('is-active');
   }
 });

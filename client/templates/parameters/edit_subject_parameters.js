@@ -213,6 +213,9 @@ Template.editSubjectParameters.events({
     envId: Router.current().params._envId,
     parameterPairs: parameterPairs
   });
+
+  // todo: clean this up, it looks like sequence params are being used for some reason?
+  // pretty sure this entire if can be removed, both branches are the same.
   var existingObj = SequenceParameters.find({'children.envId':clean_obj.envId}).fetch();
   gtag('event',  'save', {'event_category': 'seq_params', 'event_label': JSON.stringify(clean_obj)});
   if ($.isEmptyObject(existingObj) == true) {

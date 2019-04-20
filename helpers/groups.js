@@ -48,4 +48,18 @@ let userIsGroupMember = function (gid, uid) {
   return !!group.members.find(m => m.userId === uid)
 }
 
-export {userIsGroupMember, getHumanEnvPermission, userIsGroupManager, hasRemovePermission, userIsEnvOwner}
+let getUserGroupEnvs = function (userId) {
+  let groups = Groups.find({
+    "members.userId": userId
+  }).fetch();
+
+  let env_ids = new Set();
+  groups.forEach(function (group) {
+    group.environments.forEach(function (env) {
+      env_ids.add(env.envId)
+    })
+  });
+  return env_ids
+}
+
+export {getUserGroupEnvs, userIsGroupMember, getHumanEnvPermission, userIsGroupManager, hasRemovePermission, userIsEnvOwner}

@@ -5,6 +5,8 @@
 * Subscriptions are handled in ../lib/router.js
 */
 
+import {getUserGroupEnvs} from "../helpers/groups";
+
 Meteor.publish('groups', function(groupId) {
   if (!this.userId) {
     return this.ready();
@@ -28,13 +30,86 @@ Meteor.publish('groups', function(groupId) {
 });
 
 Meteor.publish('environments', function() {
-    if (!this.userId) {
-        return this.ready();
-    }
-    
+  if (!this.userId) {
+    return this.ready();
+  }
+
+  return Environments.find({userId: this.userId});
+});
+
+Meteor.publish('environment', function(envId) {
+  if (!this.userId) {
+    return this.ready();
+  }
+
+  return Environments.find({userId: this.userId, _id: envId});
+});
+
+Meteor.publish('groupEnvironments', function() {
+  if (!this.userId) {
+      return this.ready();
+  }
+
+  let env_ids = getUserGroupEnvs(this.userId);
+
+  if (env_ids.length === 0) {
+    this.ready()
+  }
+
+  return Environments.find(
+    {_id: {$in: [...env_ids]}}
+  );
+});
+
+Meteor.publish('groupEnvironment', function(envId) {
+  if (!this.userId) {
+      return this.ready();
+  }
+
+  let env_ids = getUserGroupEnvs(this.userId);
+
+  if (env_ids.length === 0) {
+    this.ready()
+  }
+
+  if (env_ids.has(envId)) {
     return Environments.find(
-    {userId: this.userId}
+      {_id: envId}
     );
+  }
+  this.ready()
+});
+
+Meteor.publish('groupObservations', function() {
+  if (!this.userId) {
+      return this.ready();
+  }
+
+  let env_ids = getUserGroupEnvs(this.userId);
+
+  if (env_ids.length === 0) {
+    this.ready()
+  }
+
+  return Observations.find(
+    {envId: {$in: [...env_ids]}}
+  );
+});
+
+Meteor.publish('groupObservation', function(obsId) {
+  if (!this.userId) {
+      return this.ready();
+  }
+
+  let env_ids = getUserGroupEnvs(this.userId);
+
+  if (env_ids.length === 0) {
+    this.ready()
+  }
+
+  return Observations.find(
+    {envId: {$in: [...env_ids]}, _id: obsId}
+  );
 });
 
 
@@ -46,6 +121,18 @@ Meteor.publish('observations', function() {
   return Observations.find({userId: this.userId});
 });
 
+Meteor.publish('observation', function(obsId) {
+  if (!this.userId) {
+    return this.ready();
+  }
+
+  if (typeof obsId === 'undefined') {
+    this.ready();
+  }
+
+  return Observations.find({userId: this.userId, _id: obsId});
+});
+
 Meteor.publish('subjects', function() {
     if (!this.userId) {
         return this.ready();
@@ -54,15 +141,101 @@ Meteor.publish('subjects', function() {
   return Subjects.find({userId: this.userId});
 });
 
-Meteor.publish('sequences', function() {
-    if (!this.userId) {
-        return this.ready();
-    }
+Meteor.publish('groupSubjects', function() {
+  if (!this.userId) {
+    return this.ready();
+  }
 
-   return Sequences.find({userId: this.userId});
+  let env_ids = getUserGroupEnvs(this.userId);
+
+  if (env_ids.length === 0) {
+    this.ready();
+  }
+
+  return Subjects.find(
+    {envId: {$in: [...env_ids]}}
+  );
 });
 
-Meteor.publish('subject_parameters', function() {
+
+Meteor.publish('envSubjects', function(envId) {
+  if (!this.userId) {
+    return this.ready();
+  }
+
+  if (typeof envId === 'undefined') {
+    this.ready();
+  }
+  console.log('envSubjects', 'envid', Subjects.find({userId: this.userId}).fetch());
+  return Subjects.find({
+    userId: this.userId,
+    envId: envId
+  });
+});
+
+Meteor.publish('groupEnvSubjects', function(envId) {
+  if (!this.userId) {
+    return this.ready();
+  }
+  if (typeof envId === 'undefined') {
+    this.ready()
+  }
+
+  let env_ids = getUserGroupEnvs(this.userId);
+
+  if (env_ids.has(envId)) {
+    return Subjects.find(
+      {envId: envId}
+    );
+  }
+  this.ready()
+});
+
+Meteor.publish('sequences', function() {
+  if (!this.userId) {
+    return this.ready();
+  }
+
+  return Sequences.find({userId: this.userId});
+});
+
+Meteor.publish('obsSequences', function(obsId) {
+  if (!this.userId) {
+    return this.ready();
+  }
+
+  return Sequences.find({userId: this.userId, obsId: obsId});
+});
+
+Meteor.publish('groupObsSequences', function(obsId) {
+  if (!this.userId) {
+    return this.ready();
+  }
+
+  let env_ids = getUserGroupEnvs(this.userId);
+
+  if (env_ids.length === 0) {
+    this.ready()
+  }
+
+  return Sequences.find({obsId: obsId, envId: {$in: [...env_ids]}});
+});
+
+Meteor.publish('groupSequences', function() {
+  if (!this.userId) {
+    return this.ready();
+  }
+
+  let env_ids = getUserGroupEnvs(this.userId);
+
+  if (env_ids.length === 0) {
+    this.ready()
+  }
+
+  return Sequences.find({envId: {$in: [...env_ids]}});
+});
+
+Meteor.publish('subjectParameters', function() {
     if (!this.userId) {
         return this.ready();
     }
@@ -70,12 +243,91 @@ Meteor.publish('subject_parameters', function() {
    return SubjectParameters.find({userId: this.userId});
 });
 
-Meteor.publish('sequence_parameters', function() {
+Meteor.publish('envSubjectParameters', function(envId) {
+  if (!this.userId) {
+    return this.ready();
+  }
+  return SubjectParameters.find({userId: this.userId, 'children.envId': envId});
+});
+
+Meteor.publish('groupEnvSubjectParameters', function(envId) {
+  if (!this.userId) {
+    return this.ready();
+  }
+
+  let env_ids = getUserGroupEnvs(this.userId);
+
+  if (env_ids.length === 0) {
+    this.ready()
+  }
+
+  if (env_ids.has(envId)) {
+    return SubjectParameters.find({'children.envId': envId});
+  }
+  this.ready()
+});
+
+
+Meteor.publish('groupSubjectParameters', function() {
+  if (!this.userId) {
+    return this.ready();
+  }
+
+  let env_ids = getUserGroupEnvs(this.userId);
+
+  if (env_ids.length === 0) {
+    this.ready()
+  }
+
+  return SubjectParameters.find({'children.envId': {$in: [...env_ids]}});
+});
+
+
+Meteor.publish('sequenceParameters', function() {
     if (!this.userId) {
         return this.ready();
     }
     
    return SequenceParameters.find({userId: this.userId});
+});
+
+Meteor.publish('envSequenceParameters', function(envId) {
+  if (!this.userId) {
+    return this.ready();
+  }
+
+  return SequenceParameters.find({userId: this.userId, 'children.envId': envId});
+});
+
+Meteor.publish('groupEnvSequenceParameters', function(envId) {
+  if (!this.userId) {
+    return this.ready();
+  }
+
+  let env_ids = getUserGroupEnvs(this.userId);
+
+  if (env_ids.length === 0) {
+    this.ready()
+  }
+
+  if (env_ids.has(envId)) {
+    return SequenceParameters.find({'children.envId': envId});
+  }
+  this.ready()
+});
+
+Meteor.publish('groupSequenceParameters', function() {
+  if (!this.userId) {
+    return this.ready();
+  }
+
+  let env_ids = getUserGroupEnvs(this.userId);
+
+  if (env_ids.length === 0) {
+    this.ready()
+  }
+
+  return SequenceParameters.find({'children.envId': {$in: [...env_ids]}});
 });
 
 Meteor.publish('shared_environments', function(shareId) {
@@ -156,15 +408,12 @@ Meteor.publish("autocompleteUsers", function(selector, options) {
 });
 
 Meteor.publish("autocompleteEnvironments", function(selector, options) {
-  console.log('selecto bfeore', selector)
   if (selector && typeof selector['$or'] !== 'undefined') {
     selector['userId'] = this.userId;
   }
   else {
     selector = {userId: this.userId};
   }
-
-  console.log('selecto after', selector)
 
   let results = Environments.find(selector, options);
 
