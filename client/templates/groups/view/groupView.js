@@ -89,7 +89,7 @@ Template.groupView.events = {
     let share_type = $('input[name="env-share-type"]:checked').attr('data-share-type')
     Meteor.call('addEnvToGroup', doc._id, template.data.group._id, share_type)
     $('.classroom-add-form__input').val('');
-    Meteor.subscribe('groupEnvironments', template.data.group._id);
+    // Meteor.subscribe('groupEnvironments', template.data.group._id);
   }
 }
 

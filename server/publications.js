@@ -448,42 +448,87 @@ Meteor.publish('allUsers', function () {
 
   });
 });
+//
+// Meteor.publish('groupUsers', function(groupId) {
+//   if (!this.userId) {
+//     return this.ready();
+//   }
+//
+//   let group = Groups.findOne({_id: groupId});
+//
+//   if (!group) {
+//     return this.ready();
+//   }
+//   let userIds = group.members.map(mem => mem.userId);
+//
+//   return Meteor.users.find({_id: {$in: userIds}}, {
+//     fields: {
+//       username: 1,
+//       _id: 1
+//     }
+//
+//   });
+// });
 
-Meteor.publish('groupUsers', function(groupId) {
+Meteor.publishComposite('groupUsers', function(groupId) {
   if (!this.userId) {
     return this.ready();
   }
 
-  let group = Groups.findOne({_id: groupId});
+  return {
+    find() {
+      return Groups.find({_id: groupId}, {fields: {members: 1}});
+    },
+    children: [{
+      find(group) {
+        let userIds = group.members.map(mem => mem.userId);
 
-  if (!group) {
-    return this.ready();
+        return Meteor.users.find({_id: {$in: userIds}}, {
+          fields: {
+            username: 1,
+            _id: 1
+          }
+        });
+      }
+    }]
   }
-  let userIds = group.members.map(mem => mem.userId);
+})
 
-  return Meteor.users.find({_id: {$in: userIds}}, {
-    fields: {
-      username: 1,
-      _id: 1
-    }
+//
+// Meteor.publish('groupEnvs', function(groupId) {
+//   if (!this.userId) {
+//     return this.ready();
+//   }
+//
+//   let group = Groups.findOne({_id: groupId});
+//
+//   if (!group) {
+//     return this.ready();
+//   }
+//
+//   return Environments.find({_id: {$in: envIds}});
+// });
 
-  });
-});
-
-Meteor.publish('groupEnvs', function(groupId) {
+Meteor.publishComposite('groupEnvs', function(groupId) {
   if (!this.userId) {
     return this.ready();
   }
 
-  let group = Groups.findOne({_id: groupId});
+  return {
+    find() {
+      return Groups.find({_id: groupId}, {fields: {environments: 1}});
+    },
+    children: [{
+      find(group) {
+        let envIds = group.environments.map(env => env.envId);
 
-  if (!group) {
-    return this.ready();
+        return Environments.find({_id: {$in: envIds}});
+        // todo: only publish necessary fields here
+      }
+    }]
   }
-  let envIds = group.environments.map(env => env.envId);
+})
 
-  return Environments.find({_id: {$in: envIds}});
-});
 
 //
 // Meteor.publish('Meteor.users', function() {

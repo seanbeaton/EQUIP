@@ -94,7 +94,7 @@ Template.memberAddForm.events = {
   'autocompleteselect .member-add-form__input': function(e, template, doc) {
     Meteor.call('addUserToGroup', doc._id, template.data.group._id)
     $('.member-add-form__input').val('');
-    Meteor.subscribe('groupUsers', template.data.group._id);
+    // Meteor.subscribe('groupUsers', template.data.group._id);
   }
 }
 
