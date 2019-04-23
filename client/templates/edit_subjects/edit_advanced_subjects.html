@@ -7,10 +7,14 @@
             <button class="undelete-all-students">Un-remove all students</button>
         </div>
         <div class="page-section--body">
+            <div class="students-table-explanation">
+                <p>Add new students by filling in the fields. New lines will be added automatically for you. Pasting in data copied from a spreadsheet will fill in the correct fields, but only if you copy the header as well. The header fields must match the headers shown here exactly.</p>
+            </div>
             <div class="subjects-table">
                 <table>
                     <thead>
                         <tr>
+                            <td class="text-content"></td>
                             <td class="text-content">Status</td>
                             <td class="text-content">Name</td>
                             {{#each param in subject_parameters}}
@@ -21,11 +25,11 @@
                     <tbody>
                         {{#each row in student_rows}}
                             <tr data-student-id="{{row.id}}" data-row-status="{{row.status}}">
+                                <td class="text-content"><button data-remove-id="{{column.id}}" class="remove-student">-</button></td>
                                 <td class="text-content">{{row.status}}</td>
                                 {{#each column in row.columns}}
                                     <td><input class="student-data-input" type="text" id="{{column.id}}" data-student-type="{{column.data_student_type}}" data-field-type="{{column.data_field_type}}" data-field="{{column.data_field}}" data-student-id="{{column.data_student_id}}" value="{{column.value}}"></td>
                                 {{/each}}
-                                <td class="text-content"><button data-remove-id="{{column.id}}" class="remove-student">-</button></td>
                             </tr>
                         {{/each}}
                     </tbody>

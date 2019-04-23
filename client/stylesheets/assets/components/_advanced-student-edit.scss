@@ -2,6 +2,10 @@
   background-color: rgba(204, 11, 99, 0.24);
 }
 
+.subjects-table {
+  overflow-y: scroll;
+}
+
 tr.deleted-student {
   background-color: #ddd;
   input[type="text"] {
