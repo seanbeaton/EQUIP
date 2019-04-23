@@ -289,7 +289,10 @@ let saveStudentsTable = function(envId, params) {
       };
       Meteor.call('subjectInsert', new_student);
     }
-  })
+  });
+
+  // todo: force rerender some other way.
+  setTimeout(function() {document.location.reload()}, 2000);
 }
 
 let addNewRow = function(params, values) {
