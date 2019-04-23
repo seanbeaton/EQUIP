@@ -1,9 +1,13 @@
 import {setupSubjectParameters} from "../../helpers/parameters";
 import {getStudents} from "../../helpers/students";
-
+import {find_open_position} from "./edit_subjects";
 const partial_rows = new ReactiveVar([]);
+const showStudentRows = new ReactiveVar(true);
 
 Template.editSubjectsAdvanced.helpers({
+  showStudentRows: function() {
+    return showStudentRows.get()
+  },
   envId: function() {
     return this.environment._id;
   },
@@ -47,6 +51,8 @@ Template.editSubjectsAdvanced.helpers({
       student_rows.push({
         id: student._id,
         status: 'existing',
+        data_x: student.data_x,
+        data_y: student.data_y,
         columns: columns,
       })
     })
@@ -233,8 +239,6 @@ let saveStudentsTable = function(envId, params) {
   let students_info = []
   $('tr.student-row').each(function(idx) {
     let $row = $(this);
-    console.log('row', $row);
-
     // Don't save completely empty rows.
     let row_empty = true;
     $row.find('input').each(function(){
@@ -254,37 +258,40 @@ let saveStudentsTable = function(envId, params) {
 
 
     students_info.push({
-      id: $row.attr('data-student-id'),
+      _id: $row.attr('data-student-id'),
       status: $row.attr('data-row-status'),
       deleted: !!$row.attr('data-deleted'),
-      data_x: '0',
+      data_x:  $row.attr('data-x'),
+      data_y: $row.attr('data-y'),
       envId: envId,
-      data_y: '0',
       info: {
         name: $row.find('input[data-field="name"][data-field-type="base"]').val(),
         demographics: demos
       }
     })
-  })
-
-  console.log('saving student info:', students_info);
+  });
 
   students_info.forEach(function(student) {
     if (student.deleted) {
-      Meteor.call('subjectDelete', student.id);
+      Meteor.call('subjectDelete', student._id);
     }
     else if (student.status === 'existing') {
       let update_student = {
-        id: student.id,
+        id: student._id,
         info: student.info
       };
       Meteor.call('subjectUpdate', update_student);
     }
     else if (student.status === 'new') {
+      let new_pos = find_open_position(students_info);
+      // setting on the student obj so the next
+      // new student will see it when looking for a spot.
+      student.data_x = new_pos.x;
+      student.data_y = new_pos.y;
       let new_student = {
         envId: student.envId,
-        data_x: student.data_x,
-        data_y: student.data_y,
+        data_x: String(student.data_x),
+        data_y: String(student.data_y),
         info: student.info
       };
       Meteor.call('subjectInsert', new_student);
@@ -292,7 +299,9 @@ let saveStudentsTable = function(envId, params) {
   });
 
   // todo: force rerender some other way.
-  setTimeout(function() {document.location.reload()}, 2000);
+  refreshTableContent();
+  partial_rows.set([]);
+  // setTimeout(function() {document.location.reload()}, 2000);
 }
 
 let addNewRow = function(params, values) {
@@ -330,6 +339,8 @@ let addNewRow = function(params, values) {
   rows.push({
     new_row_number: new_row_id,
     id: 'new-row--' + new_row_id,
+    data_x: '0',
+    data_y: '0',
     status: 'new',
     columns: new_row_columns,
   });
@@ -399,3 +410,8 @@ let checkTableValues = function(parameters) {
 //   }
 //   return student;
 // })
+
+let refreshTableContent = function() {
+  showStudentRows.set(false);
+  showStudentRows.set(true);
+}

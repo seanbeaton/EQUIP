@@ -31,8 +31,9 @@
                         </tr>
                     </thead>
                     <tbody>
+                        {{#if showStudentRows }}
                         {{#each row in student_rows}}
-                            <tr class="student-row" data-student-id="{{row.id}}" data-row-status="{{row.status}}">
+                            <tr class="student-row" data-student-id="{{row.id}}" data-row-status="{{row.status}}" data-x="{{row.data_x}}" data-y="{{row.data_y}}">
                                 <td class="text-content student-action"><button data-remove-id="{{column.id}}" class="simple-button simple-button--mini remove-student">-</button></td>
                                 <td class="text-content">{{row.status}}</td>
                                 {{#each column in row.columns}}
@@ -40,6 +41,7 @@
                                 {{/each}}
                             </tr>
                         {{/each}}
+                        {{/if}}
                     </tbody>
                 </table>
             </div>

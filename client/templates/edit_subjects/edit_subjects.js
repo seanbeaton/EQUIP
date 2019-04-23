@@ -79,7 +79,7 @@ Template.editSubjects.created = function () {
         if (!new_pos.x || !new_pos.y) {
           new_pos = find_open_position(students)
         }
-        moveStudent(document.getElementById(occupying_student._id), new_pos.x, new_pos.y)
+        moveStudent(occupying_student._id, new_pos.x, new_pos.y)
       }
       target.classList.remove('dragging');
       target.removeAttribute('data-orig-x');
@@ -103,7 +103,7 @@ Template.editSubjects.created = function () {
     x = Math.round(x / parseFloat(grid_size.x)) * parseFloat(grid_size.x);
     y = Math.round(y / parseFloat(grid_size.y)) * parseFloat(grid_size.y);
 
-    moveStudent(target, x, y);
+    moveStudent(target.getAttribute('data-id'), x, y);
   }
 };
 
@@ -175,12 +175,12 @@ Template.editSubjects.events({
   },
   'click #align-students': function(e) {
     const students = Subjects.find({envId: Router.current().params._envId}).fetch();
-    align_all_students(students);
+    align_all_students(students, false, moveStudent);
     saveStudentLocations()
   },
   'click #align-students-alpha': function(e) {
     const students = Subjects.find({envId: Router.current().params._envId}).fetch();
-    align_all_students(students, true);
+    align_all_students(students, true, moveStudent);
     saveStudentLocations();
   },
   'click #save-locations': function(e) {
@@ -261,12 +261,11 @@ function editStudent(e) {
   });
 }
 
-function find_open_position(students) {
+export let find_open_position = function(students) {
   let x = 0,
       y = 0;
   let complete = false;
   while (!complete) {
-
     let element_in_location = findStudentAtLocation(students, x, y)
     if (!element_in_location) {
       complete = true;
@@ -285,7 +284,8 @@ function find_open_position(students) {
   return {x: x, y: y};
 }
 
-function align_all_students(students, alphabetically) {
+export let align_all_students = function(students, alphabetically, callback) {
+  console.log('students', students);
   if (typeof alphabetically === 'undefined') {
     alphabetically = false;
   }
@@ -321,15 +321,19 @@ function align_all_students(students, alphabetically) {
   });
   for (let s_key in students) {
     if (!students.hasOwnProperty(s_key)) continue;
+
     let open_pos = find_open_position(students);
-    moveStudent(document.getElementById(students[s_key]._id), open_pos.x, open_pos.y);
+    if (typeof callback === 'function') {
+      callback(students[s_key]._id, open_pos.x, open_pos.y);
+    }
     students[s_key].ignoreLocation = false;
     students[s_key].data_x = open_pos.x;
     students[s_key].data_y = open_pos.y;
   }
 }
 
-function moveStudent(student, x, y) {
+function moveStudent(subId, x, y) {
+  let student = document.getElementById(subId)
   // if (typeof permanent === 'undefined') {
   //   permanent = 'true'
   // }
