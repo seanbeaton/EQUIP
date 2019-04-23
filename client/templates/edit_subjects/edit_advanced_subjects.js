@@ -383,3 +383,19 @@ let checkTableValues = function(parameters) {
   });
   return table_passes;
 }
+//
+//
+// students_list.map(function(student) {
+//   let demos = {};
+//   Object.keys(student.info).forEach(function(param) {
+//     if (param === 'name') {
+//       return;
+//     }
+//     demos[param] = student.info[param];
+//   })
+//   student.info = {
+//     name: student.info.name,
+//     demographics: demos
+//   }
+//   return student;
+// })
