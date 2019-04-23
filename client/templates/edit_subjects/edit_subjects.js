@@ -28,10 +28,7 @@ const grid_size = {
 };
 
 //Used to set up interactJS and get labels for students
-// (and a session for some reason???)
 Template.editSubjects.created = function () {
-  Session.set('envId', Router.current().params._envId);
-
   // target elements with the "draggable" class
   interact('.draggable')
     .draggable({
@@ -105,18 +102,12 @@ Template.editSubjects.created = function () {
 
     moveStudent(target, x, y);
   }
-
-
-  // this is used later in the resizing and gesture demos
-  // window.dragMoveListener = dragMoveListener;
-  /* INTERACTJS END */
-
 };
 
 // On rendering, get students and layout classroom with student boxes
 Template.editSubjects.rendered = function() {
   $(document).keyup(function(e) {
-     if (e.keyCode == 27) {
+     if (e.keyCode === 27) {
       $('#stud-param-modal').removeClass('is-active');
       $('#stud-data-modal').removeClass('is-active');
     }
@@ -127,9 +118,6 @@ Template.editSubjects.rendered = function() {
 // Click events
 //
 Template.editSubjects.events({
-  'click .back-head-params': function(e) {
-    Router.go('observationList', {_envId:Router.current().params._envId});
-  },
   //Stuff for student parameters modal
   'click .modal-close': function(e){
     $('#stud-param-modal').removeClass('is-active');
@@ -230,8 +218,6 @@ Template.editSubjects.events({
 function editStudent(e) {
   var subjId = $(e.target).attr('data-id');
 
-  var envId = Router.current().params._envId;
-
   //Do this always in the case of editing from obs list
 
   let form_incomplete = false;
@@ -241,11 +227,12 @@ function editStudent(e) {
 
   info.demographics = {};
 
+  let incomplete_parameters = [];
   $('.c--modal-student-options-container').each(function() {
     let parameter_name = this.getAttribute('data-parameter-name');
     let parameter_choice = $('.chosen', $(this)).text().replace(/\n/ig, '').trim();
     if (parameter_choice.length === 0) {
-      alert(`No selection made for ${parameter_name}`);
+      incomplete_parameters.push(parameter_name);
       form_incomplete = true;
     } else {
       info.demographics[parameter_name] = parameter_choice
@@ -253,6 +240,7 @@ function editStudent(e) {
   });
 
   if (form_incomplete) {
+    alert(`No selection made for ${incomplete_parameters.join(', ')}`);
     return;
   }
 
@@ -446,11 +434,12 @@ function saveNewSubject(env) {
 
   info.demographics = {};
 
+  let incomplete_parameters = [];
   $('.c--modal-student-options-container').each(function() {
     let parameter_name = this.getAttribute('data-parameter-name');
     let parameter_choice = $('.chosen', $(this)).text().replace(/\n/ig, '').trim();
     if (parameter_choice.length === 0) {
-      alert(`No selection made for ${parameter_name}`);
+      incomplete_parameters.push(parameter_name);
       form_incomplete = true;
     } else {
       info.demographics[parameter_name] = parameter_choice
@@ -458,6 +447,7 @@ function saveNewSubject(env) {
   });
 
   if (form_incomplete) {
+    alert(`No selection made for ${incomplete_parameters.join(', ')}`);
     return;
   }
 
