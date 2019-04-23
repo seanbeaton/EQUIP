@@ -71,7 +71,7 @@ let examinePartialRows = function(envId) {
 };
 
 Template.editSubjectsAdvanced.events({
-  'click .remove-student': function(e) {
+  'click .remove-student': function(e, template) {
     let target = $(e.target);
     let row = target.parents('tr')
     if (row.attr('data-row-status') === 'new') {
@@ -79,7 +79,9 @@ Template.editSubjectsAdvanced.events({
       let row_to_remove = new_rows.findIndex(r => r.id === row.attr('data-student-id'))
       new_rows.splice(row_to_remove, 1);
       partial_rows.set(new_rows);
-      // handle new row numbering once some have been deleted
+      setTimeout(function() {
+        checkTableValues(setupSubjectParameters(template.data.environment._id))
+      }, 500)
     }
     else {
       target.removeClass('remove-student').addClass('undo-remove-student');
@@ -88,6 +90,7 @@ Template.editSubjectsAdvanced.events({
       row.addClass('deleted-student');
       row.attr('data-deleted', 'true');
     }
+
   },
   'click .undo-remove-student': function(e) {
     let target = $(e.target);
@@ -253,6 +256,10 @@ let saveStudentsTable = function(envId, params) {
     students_info.push({
       id: $row.attr('data-student-id'),
       status: $row.attr('data-row-status'),
+      deleted: !!$row.attr('data-deleted'),
+      data_x: '0',
+      envId: envId,
+      data_y: '0',
       info: {
         name: $row.find('input[data-field="name"][data-field-type="base"]').val(),
         demographics: demos
@@ -261,6 +268,28 @@ let saveStudentsTable = function(envId, params) {
   })
 
   console.log('saving student info:', students_info);
+
+  students_info.forEach(function(student) {
+    if (student.deleted) {
+      Meteor.call('subjectDelete', student.id);
+    }
+    else if (student.status === 'existing') {
+      let update_student = {
+        id: student.id,
+        info: student.info
+      };
+      Meteor.call('subjectUpdate', update_student);
+    }
+    else if (student.status === 'new') {
+      let new_student = {
+        envId: student.envId,
+        data_x: student.data_x,
+        data_y: student.data_y,
+        info: student.info
+      };
+      Meteor.call('subjectInsert', new_student);
+    }
+  })
 }
 
 let addNewRow = function(params, values) {
@@ -342,7 +371,9 @@ let checkTableValues = function(parameters) {
         $input.removeClass('invalid-param-value')
       }
       else {
-        table_passes = false;
+        if (!$row.attr('data-deleted')) {
+          table_passes = false;
+        }
         $input.addClass('invalid-param-value')
       }
     })

@@ -10,3 +10,19 @@ $padding: 16px;
     font-size: 16px;
   }
 }
+
+.simple-button {
+  background-color: #F25F3D;
+  color: white;
+  font-size: 16px;
+  line-height: 1.2em;
+  padding: 8px 12px;
+  border: 0;
+  margin: 3px;
+}
+
+.simple-button--mini {
+  padding: 1px 6px;
+  line-height: 1em;
+  margin: 0;
+}

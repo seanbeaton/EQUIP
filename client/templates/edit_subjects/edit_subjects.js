@@ -249,7 +249,7 @@ function editStudent(e) {
 
   let subject = {
     info: info,
-    subId: subjId
+    id: subjId
   };
 
   Meteor.call('subjectUpdate', subject, function(error, result) {
