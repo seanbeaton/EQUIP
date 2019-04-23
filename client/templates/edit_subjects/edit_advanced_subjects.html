@@ -1,0 +1,36 @@
+<template name="editSubjectsAdvanced">
+    <div class="page-section">
+        <h3 class="page-section--header">Advanced Student Editing</h3>
+        <div class="page-section--nav">
+            <a href="{{pathFor route="editSubjects" _envId=envId}}">Back to simple student editing</a>
+            <button class="delete-all-students">Remove all students</button>
+            <button class="undelete-all-students">Un-remove all students</button>
+        </div>
+        <div class="page-section--body">
+            <div class="subjects-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <td class="text-content">Status</td>
+                            <td class="text-content">Name</td>
+                            {{#each param in subject_parameters}}
+                                <td class="student__header student__header--{{className param.name}} text-content">{{param.name}}</td>
+                            {{/each}}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{#each row in student_rows}}
+                            <tr data-student-id="{{row.id}}" data-row-status="{{row.status}}">
+                                <td class="text-content">{{row.status}}</td>
+                                {{#each column in row.columns}}
+                                    <td><input class="student-data-input" type="text" id="{{column.id}}" data-student-type="{{column.data_student_type}}" data-field-type="{{column.data_field_type}}" data-field="{{column.data_field}}" data-student-id="{{column.data_student_id}}" value="{{column.value}}"></td>
+                                {{/each}}
+                                <td class="text-content"><button data-remove-id="{{column.id}}" class="remove-student">-</button></td>
+                            </tr>
+                        {{/each}}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</template>

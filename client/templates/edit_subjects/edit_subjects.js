@@ -13,6 +13,9 @@ Template.editSubjects.helpers({
     },
     classRoomName: function() {
         return this.envName;
+    },
+    envId: function() {
+      return this._id;
     }
 });
 
