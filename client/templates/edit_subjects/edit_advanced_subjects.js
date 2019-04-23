@@ -66,7 +66,6 @@ let examinePartialRows = function(envId) {
 
   if (rows.length === 0 ||
     !(rows[rows.length - 1].columns.map(field => field.value).every(value => !value || value.length === 0))) {
-    console.log('adding a new row');
     addNewRow(subj_params);
   }
 };
@@ -78,7 +77,6 @@ Template.editSubjectsAdvanced.events({
     if (row.attr('data-row-status') === 'new') {
       let new_rows = partial_rows.get();
       let row_to_remove = new_rows.findIndex(r => r.id === row.attr('data-student-id'))
-      console.log('new row id', row_to_remove);
       new_rows.splice(row_to_remove, 1);
       partial_rows.set(new_rows);
       // handle new row numbering once some have been deleted
@@ -97,11 +95,9 @@ Template.editSubjectsAdvanced.events({
     target.text(target.attr('data-original-text'));
     let row = target.parents('tr');
     row.removeClass('deleted-student');
-    row.attr('data-deleted', '');
+    row.removeAttr('data-deleted');
   },
   'focusout input[data-student-type="new"]': function(e, template) {
-    console.log('testing e', e, template);
-
     let target = $(e.target);
     let rows = partial_rows.get();
     let row = rows.find(row => row.id === target.attr('data-student-id'));
@@ -121,7 +117,6 @@ Template.editSubjectsAdvanced.events({
   'keyup .student-data-input': function(e, template) {
     if (e.keyCode === 13) {
       let target = $(e.target);
-      console.log(e);
       let new_target;
       if (e.shiftKey) {
         new_target = target.parents('tr').prev().find('input[data-field="' + target.attr('data-field') + '"][data-field-type="' + target.attr('data-field-type') + '"]')
@@ -140,16 +135,12 @@ Template.editSubjectsAdvanced.events({
   },
   'paste .student-data-input': function(e, template) {
     let target = $(e.target);
-    console.log('paste e', e);
-    console.log(e.originalEvent.clipboardData.getData('text'));
     let data = e.originalEvent.clipboardData.getData('text');
     if (!data.match(/\t.*\n/g)) {
       console.log('no tabular data found on paste');
       return;
     }
     let rows = data.split(/\n/g);
-    console.log('rows', rows);
-
     let params = setupSubjectParameters(template.data.environment._id);
     let param_names = params.map(param => param.name);
     param_names.push('name');
@@ -159,21 +150,20 @@ Template.editSubjectsAdvanced.events({
       if (!rows[0].split(/\t/g).every(header => !!param_names.find(name => name.toLowerCase() === header.toLowerCase()))) {
         alert("Some of the data you pasted was able to match to existing columns, but not all. The following headers did not match: " +
           rows[0].split(/\t/g).filter(col => !param_names.find(name => name.toLowerCase() === col.toLowerCase())).join(', ')
-        + '.\n The data in those columns were not imported.')
+        + '.\nThe data in those columns were not imported.')
       }
       let header_row_items = rows[0].split(/\t/g)
       header_row_items.forEach(function(header_item, index) {
         if (!!param_names.find(name => name.toLowerCase() === header_item.toLowerCase())) {
-          console.log('found ', header_item, 'at index', index)
           headers[index] = header_item;
         }
         else {
-          console.log("fdidn't find", header_item);
+          console.log("didn't find any headers in item", header_item);
         }
       })
     }
     else {
-      console.log('none match')
+      console.log('No headers found.')
     }
 
     let structured_data = rows.map(function(row) {
@@ -183,6 +173,11 @@ Template.editSubjectsAdvanced.events({
 
     if (Object.keys(headers).length > 0) {
       structured_data = structured_data.slice(1, structured_data.length);
+    }
+
+    if (Object.keys(headers).length === 0) {
+      alert('Pasting tabular data without headers not supported');
+      return;
     }
 
     structured_data.forEach(function(row) {
@@ -195,18 +190,78 @@ Template.editSubjectsAdvanced.events({
         addNewRow(params, new_row_data);
       }
       else {
-        alert('pasting tabular data without headers not supported');
+        // later, we can add support for just pasting tabular data.
       }
-    })
+    });
 
     e.preventDefault();
     if (target.attr('data-student-type') === 'new') {
       target.parents('tr').find('.remove-student').click();
     }
-
-
+    setTimeout(function() {
+      if (!checkTableValues(params)) {
+        alert('Errors found in pasted data. Please review your input for any highlighted issues.');
+      }
+    }, 500)
+  },
+  'click .save-all-students': function(e, template) {
+    let params = setupSubjectParameters(template.data.environment._id);
+    if (!checkTableValues(params)) {
+      alert('Errors found, not saving. Please review your input for any highlighted issues.');
+      return;
+    }
+    saveStudentsTable(template.data.environment._id, params)
+  },
+  'click .check-all-students': function(e, template) {
+    let params = setupSubjectParameters(template.data.environment._id);
+    checkTableValues(params);
+    if (!checkTableValues(params)) {
+      alert('Errors found. Please review your input for any highlighted issues.');
+    }
+    else {
+      alert('All good!')
+    }
   }
 });
+
+
+let saveStudentsTable = function(envId, params) {
+
+  let students_info = []
+  $('tr.student-row').each(function(idx) {
+    let $row = $(this);
+    console.log('row', $row);
+
+    // Don't save completely empty rows.
+    let row_empty = true;
+    $row.find('input').each(function(){
+      if ($(this).val()) {
+        row_empty = false;
+      }
+    })
+    if (row_empty) {
+      return;
+    }
+
+    // create demos obj.
+    let demos = {};
+    params.forEach(function(param) {
+      demos[param.name] = $row.find('input[data-field="' + param.name + '"][data-field-type="param"]').val();
+    })
+
+
+    students_info.push({
+      id: $row.attr('data-student-id'),
+      status: $row.attr('data-row-status'),
+      info: {
+        name: $row.find('input[data-field="name"][data-field-type="base"]').val(),
+        demographics: demos
+      }
+    })
+  })
+
+  console.log('saving student info:', students_info);
+}
 
 let addNewRow = function(params, values) {
   if (typeof values === 'undefined') {
@@ -266,6 +321,31 @@ let checkCellValue = function(cell, parameters) {
 // run this on each paste
 // also check for duplicate names? do we allow dupe names right now?
 // todo: also need to do validation of this input on the server side when we save.
-let checkTableValues = function(cell, parameters) {
-
+let checkTableValues = function(parameters) {
+  let table_passes = true;
+  $('tr.student-row').each(function(idx) {
+    let $row = $(this);
+    // Don't check completely empty rows, they won't be saved anyway.
+    let row_empty = true;
+    $row.find('input').each(function(){
+      if ($(this).val()) {
+        row_empty = false;
+      }
+    });
+    if (row_empty) {
+      $row.find('input').removeClass('invalid-param-value');
+      return;
+    }
+    $row.find('input').each(function() {
+      let $input = $(this);
+      if (checkCellValue($input, parameters)) {
+        $input.removeClass('invalid-param-value')
+      }
+      else {
+        table_passes = false;
+        $input.addClass('invalid-param-value')
+      }
+    })
+  });
+  return table_passes;
 }

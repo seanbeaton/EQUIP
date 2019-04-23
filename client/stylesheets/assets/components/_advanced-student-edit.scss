@@ -1,7 +1,3 @@
-.invalid-param-value {
-  background-color: rgba(204, 11, 99, 0.24);
-}
-
 .subjects-table {
   overflow-y: scroll;
 }
@@ -34,4 +30,13 @@ tr[data-row-status="new"] {
     padding: 5px 8px 3px;
     line-height: 1em;
   }
+}
+
+td.student-action {
+  min-width: 41px;
+  text-align: center;
+}
+
+.invalid-param-value {
+  background-color: rgba(204, 11, 99, 0.24);
 }
