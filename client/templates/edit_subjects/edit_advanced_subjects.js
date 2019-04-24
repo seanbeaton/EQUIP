@@ -163,6 +163,10 @@ Template.editSubjectsAdvanced.events({
   'paste .student-data-input': function(e, template) {
     let target = $(e.target);
     let data = e.originalEvent.clipboardData.getData('text');
+    console.log('e.clipboardData.types', e.originalEvent.clipboardData.types);
+    e.originalEvent.clipboardData.types.forEach(function(type) {
+      console.log('version', type, e.originalEvent.clipboardData.getData(type));
+    });
     if (!data.match(/\t.*[\n\r]/g)) {
       console.log('no tabular data found on paste');
       return;
