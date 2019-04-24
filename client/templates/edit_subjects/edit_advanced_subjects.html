@@ -33,8 +33,8 @@
                     <tbody>
                         {{#if showStudentRows }}
                         {{#each row in student_rows}}
-                            <tr class="student-row" data-student-id="{{row.id}}" data-row-status="{{row.status}}" data-x="{{row.data_x}}" data-y="{{row.data_y}}">
-                                <td class="text-content student-action"><button data-remove-id="{{column.id}}" class="simple-button simple-button--mini remove-student">-</button></td>
+                            <tr class="student-row {{deletedClass row.id}}" data-deleted="{{isDeletedText row.id}}" data-student-id="{{row.id}}" data-row-status="{{row.status}}" data-x="{{row.data_x}}" data-y="{{row.data_y}}">
+                                <td class="text-content student-action"><button data-remove-id="{{column.id}}" class="simple-button simple-button--mini {{deleteButtonClass row.id}}">{{deleteButtonText row.id}}</button></td>
                                 <td class="text-content">{{row.status}}</td>
                                 {{#each column in row.columns}}
                                     <td><input class="student-data-input" type="text" id="{{column.id}}" data-student-type="{{column.data_student_type}}" data-field-type="{{column.data_field_type}}" data-field="{{column.data_field}}" data-student-id="{{column.data_student_id}}" value="{{column.value}}"></td>

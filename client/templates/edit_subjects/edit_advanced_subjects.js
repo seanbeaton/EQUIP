@@ -3,8 +3,29 @@ import {getStudents} from "../../helpers/students";
 import {find_open_position} from "./edit_subjects";
 const partial_rows = new ReactiveVar([]);
 const showStudentRows = new ReactiveVar(true);
+const deletedRows = new ReactiveVar({});
 
 Template.editSubjectsAdvanced.helpers({
+  deletedClass: function(id) {
+    let rows = deletedRows.get();
+    return (typeof rows[id] !== 'undefined' && rows[id] === true) ? ' deleted-student' : '';
+  },
+  isDeleted: function(id) {
+    let rows = deletedRows.get();
+    return (typeof rows[id] !== 'undefined' && rows[id] === true)
+  },
+  isDeletedText: function(id) {
+    let rows = deletedRows.get();
+    return (typeof rows[id] !== 'undefined' && rows[id] === true) ? 'true' : 'false'
+  },
+  deleteButtonClass: function(id) {
+    let rows = deletedRows.get();
+    return (typeof rows[id] !== 'undefined' && rows[id] === true) ? 'undo-remove-student' : 'remove-student'
+  },
+  deleteButtonText: function(id) {
+    let rows = deletedRows.get();
+    return (typeof rows[id] !== 'undefined' && rows[id] === true) ? '+' : '-'
+  },
   showStudentRows: function() {
     return showStudentRows.get()
   },
@@ -52,6 +73,7 @@ Template.editSubjectsAdvanced.helpers({
         id: student._id,
         status: 'existing',
         data_x: student.data_x,
+        deleted: false,
         data_y: student.data_y,
         columns: columns,
       })
@@ -79,7 +101,7 @@ let examinePartialRows = function(envId) {
 Template.editSubjectsAdvanced.events({
   'click .remove-student': function(e, template) {
     let target = $(e.target);
-    let row = target.parents('tr')
+    let row = target.parents('tr');
     if (row.attr('data-row-status') === 'new') {
       let new_rows = partial_rows.get();
       let row_to_remove = new_rows.findIndex(r => r.id === row.attr('data-student-id'))
@@ -90,21 +112,17 @@ Template.editSubjectsAdvanced.events({
       }, 500)
     }
     else {
-      target.removeClass('remove-student').addClass('undo-remove-student');
-      target.attr('data-original-text', target.text());
-      target.text('+');
-      row.addClass('deleted-student');
-      row.attr('data-deleted', 'true');
+      let del_rows = deletedRows.get();
+      del_rows[row.attr('data-student-id')] = true;
+      deletedRows.set(del_rows);
     }
 
   },
   'click .undo-remove-student': function(e) {
-    let target = $(e.target);
-    target.removeClass('undo-remove-student').addClass('remove-student')
-    target.text(target.attr('data-original-text'));
-    let row = target.parents('tr');
-    row.removeClass('deleted-student');
-    row.removeAttr('data-deleted');
+    let row = $(e.target).parents('tr');
+    let del_rows = deletedRows.get();
+    del_rows[row.attr('data-student-id')] = false;
+    deletedRows.set(del_rows);
   },
   'focusout input[data-student-type="new"]': function(e, template) {
     let target = $(e.target);
@@ -260,7 +278,7 @@ let saveStudentsTable = function(envId, params) {
     students_info.push({
       _id: $row.attr('data-student-id'),
       status: $row.attr('data-row-status'),
-      deleted: !!$row.attr('data-deleted'),
+      deleted: ($row.attr('data-deleted') === 'true'),
       data_x:  $row.attr('data-x'),
       data_y: $row.attr('data-y'),
       envId: envId,
@@ -341,6 +359,7 @@ let addNewRow = function(params, values) {
     id: 'new-row--' + new_row_id,
     data_x: '0',
     data_y: '0',
+    deleted: false,
     status: 'new',
     columns: new_row_columns,
   });
@@ -385,7 +404,7 @@ let checkTableValues = function(parameters) {
         $input.removeClass('invalid-param-value')
       }
       else {
-        if (!$row.attr('data-deleted')) {
+        if (!($row.attr('data-deleted') === 'true')) {
           table_passes = false;
         }
         $input.addClass('invalid-param-value')
