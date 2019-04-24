@@ -171,7 +171,7 @@ Template.editSubjectsAdvanced.events({
       console.log('no tabular data found on paste');
       return;
     }
-    let rows = data.split(/[\n\r]/g);
+    let rows = data.split(/(\r\n|[\n\r])/g);
     let params = setupSubjectParameters(template.data.environment._id);
     let param_names = params.map(param => param.name);
     param_names.push('name');
