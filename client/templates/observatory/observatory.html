@@ -20,6 +20,10 @@
               To add a contribution, click on the student's name. To edit or delete
               a contribution, click on the contribution log.
           </p>
+          <p>
+              Observation type: <strong>{{classTypeHuman observation.observationType}}</strong>
+          </p>
+          <br/>
       </div>
       <div class="columns c--observation-header__container">
         <h2 class="column c--observation-header__title">
@@ -49,7 +53,7 @@
         <h3 class="column c--observation-toggle__title">Toggles</h3>
       </div>
       <div class="subjects">
-        {{#each subject}}
+        {{#each subjects}}
           <div id="{{_id}}" style='transform:translate({{data_x}}px, {{data_y}}px);' data-x="{{data_x}}" data-y="{{data_y}}" class="dragger c--observation__student-box-container">
             <p class="c--observation__student-box">{{info.name}}</p>
           </div>

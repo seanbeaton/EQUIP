@@ -120,11 +120,33 @@ Template.observatory.helpers({
     var obs = Observations.find({_id: Router.current().params._obsId}).fetch()[0];
     return obs;
   },
-  subject: function() {
-    return Subjects.find({envId: this.envId});
+  subjects: function() {
+    console.log('this', this);
+    if (this.observationType === 'small_group') {
+      return Subjects.find({
+        envId: this.envId,
+        _id: {
+          $in: this.small_group
+        }
+      });
+    }
+    else {
+      return Subjects.find({envId: this.envId});
+    }
   },
   convertISODateToUS: function(isoDate) {
     return convertISODateToUS(isoDate);
+  },
+  classTypeHuman: function(obsType) {
+    if (obsType === 'small_group') {
+      return "Small group";
+    }
+    else if (obsType === 'whole_class') {
+      return "Whole class";
+    }
+    else {
+      return "No type";
+    }
   }
 });
 
