@@ -117,7 +117,7 @@ Template.interactiveReport.events({
     setTimeout(function() {
       setupVis('vis-container', function() {
         $(window).trigger('updated-filters');
-      }, obsOptions, selectedObservations);
+      }, obsOptions, selectedObservations, 'whole_class');
     }, 50);
 
     $('#disc-select').val('');

@@ -187,7 +187,7 @@ Template.timelineReport.events({
     setTimeout(function() {
       setupVis('vis-container', function() {
         updateGraph();
-      }, obsOptions, selectedObservations);
+      }, obsOptions, selectedObservations, 'whole_class');
     }, 50);
 
 

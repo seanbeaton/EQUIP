@@ -13,15 +13,27 @@
 import {getSequences} from "./sequences";
 import vis from "vis";
 
-let setupVis = function(visContainerId, selectionCallback, obsOptions, selectedObservations) {
+let setupVis = function(visContainerId, selectionCallback, obsOptions, selectedObservations, class_type) {
   let observations = obsOptions.get();
+  let disabled_class = function(obs) {
+    if (getSequences(obs._id, obs.envId).length < 1) {
+      return 'disabled';
+    }
+    if (class_type === 'all') {
+      return '';
+    }
+    if (class_type === obs.observationType) {
+      return ''
+    }
+    return 'disabled';
+  }
   let obs = observations.map(function(obs) {
     return {
       id: obs._id,
-      content: obs.name + ' (' + obs.observationDate + ')',
+      content: obs.name + ' (' + obs.observationDate + ' - ' + obsTypeAbbrev(obs.observationType) + ')',
       compare_date: new Date(obs.observationDate),
       start: obs.observationDate,
-      className: getSequences(obs._id, obs.envId).length < 1 ? 'disabled' : ''
+      className: disabled_class(obs)
     }
   })
   let items = new vis.DataSet(obs);
@@ -61,6 +73,15 @@ let setupVis = function(visContainerId, selectionCallback, obsOptions, selectedO
   timeline.focus(recent_obs_ids);
 
   return timeline
+}
+
+let obsTypeAbbrev = function(type) {
+  if (type === 'whole_class') {
+    return 'WC';
+  }
+  else if (type === 'small_group') {
+    return "SG";
+  }
 }
 
 export {setupVis}
