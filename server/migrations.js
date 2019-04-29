@@ -30,3 +30,11 @@ Migrations.add({
     })
   },
 });
+
+Migrations.add({
+  version: 2,
+  name: 'Adds observation type field to all observations',
+  up: function () {
+    Observations.update({}, {$set: {"observationType": 'whole_class'}}, {multi:true});
+  },
+});

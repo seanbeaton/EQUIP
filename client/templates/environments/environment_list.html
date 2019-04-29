@@ -30,7 +30,9 @@
         </a>
     </section>
 
-    <div id="obs-create-modal" class="modal">
+    {{#if obsCreateModal}}
+    <h1>Student!</h1>
+    <div id="obs-create-modal" class="modal is-active" data-id="{{activeEnvId}}">
       <div class="modal-background"></div>
       <div class="modal-card">
         <header class="modal-card-head">
@@ -47,6 +49,13 @@
                 <input class="input datepicker" type="text" value="{{currentUSDate}}" placeholder="01/01/2019" id="observationDate">
                 <input type="hidden" value="{{currentISODate}}" id="altObservationDate">
             </p>
+          <label class="label">Observation Type</label>
+            <p class="control">
+                <input name="classroom-type" type="radio" data-classroom-type="whole_class" id="type--whole-class" checked>
+                <label for="type--whole-class">Whole Class</label>
+                <input name="classroom-type" type="radio" data-classroom-type="small_group" id="type--small-group">
+                <label for="type--small-group">Small Group</label>
+            </p>
         </section>
         <footer class="modal-card-foot">
           <a id="save-obs-name" class="o--standard-button" style="margin-right: 10px;">Save changes</a>
@@ -54,7 +63,35 @@
         </footer>
       </div>
     </div>
+    {{/if}}
 
+    {{#if smallGroupStudentSelectActive}}
+        <div id="obs-small-group-modal" class="modal is-active">
+            <div class="modal-background"></div>
+            <div class="modal-card">
+                <header class="modal-card-head">
+                    <p class="modal-card-title">Students select </p>
+                    <button id="obs-close-modal" class="delete"></button>
+                </header>
+                <section class="modal-card-body">
+                    <div>Choose the students you want to include in this small group observation.</div>
+                    <div class="subjects">
+                        <div class="subjects-scroller">
+                            {{#each subjects}}
+                                <div id="{{_id}}" style='transform:translate({{transformStudentPosition data_x}}px, {{transformStudentPosition data_y}}px);' data-x="{{data_x}}" data-y="{{data_y}}" class="small-group-student c--observation__student-box-container">
+                                    <p class="c--observation__student-box">{{info.name}}</p>
+                                </div>
+                            {{/each}}
+                        </div>
+                    </div>
+                </section>
+                <footer class="modal-card-foot">
+                    <a id="save-small-group" class="o--standard-button" style="margin-right: 10px;">Save changes</a>
+                    <a id="small-group-close-modal" class="o--standard-button">Cancel</a>
+                </footer>
+            </div>
+        </div>
+    {{/if}}
 
     <!-- CREATE NEW CLASSROOM MODAL -->
     <div id="env-create-modal" class="modal">
