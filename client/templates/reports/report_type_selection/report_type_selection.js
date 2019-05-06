@@ -20,6 +20,9 @@ Template.reportsSelection.events({
     'click .option--student-histogram': function() {
         Router.go('histogramReport')
     },
+    'click .option--group-work': function() {
+        Router.go('groupWorkReport')
+    },
 })
 
 Template.reportBackButton.events({

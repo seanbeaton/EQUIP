@@ -16,3 +16,87 @@
     }
   }
 }
+
+.student-box--scaling {
+  width: 150px;
+  height: 50px;
+  margin: 5px;
+  cursor: pointer;
+  text-align: center;
+  .student-box__inner {
+    color: white;
+  }
+}
+
+.student-box__wrapper {
+  background-color: #898989;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  height: 100%;
+  box-sizing: content-box;
+}
+
+#group-work-d3-wrapper {
+  display: flex;
+  flex-flow: row wrap;
+
+  .student-group {
+    flex: 1 1 400px;
+    padding: 8px;
+  }
+  .student-group__students {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: center;
+  }
+  .student-group__title {
+    text-align: center;
+  }
+}
+
+.group-work-report {
+  display: grid;
+  grid-template-columns: 50% 50%;
+  grid-template-rows: auto auto auto;
+  font-family: Roboto, sans-serif;
+}
+
+// Grid placements
+.group-work-report__graph-demo-select {
+  grid-column-start: 1;
+  grid-column-end: 2;
+  grid-row-start: 1;
+  grid-row-end: 2;
+  padding: 0 0 16px;
+}
+.group-work-report__graph-disc-select {
+  grid-column-start: 2;
+  grid-column-end: 3;
+  grid-row-start: 1;
+  grid-row-end: 2;
+  padding: 0 0 16px;
+}
+
+.group-work-report__graph-key {
+  grid-column-start: 1;
+  grid-column-end: 2;
+  grid-row-start: 2;
+  grid-row-end: 3;
+  min-height: 50px;
+}
+
+.group-work-report__graph {
+  grid-column-start: 1;
+  grid-column-end: 3;
+  grid-row-start: 3;
+  grid-row-end: 4;
+}
+
+.group-work-report__student-spotlight {
+  grid-column-start: 1;
+  grid-column-end: 3;
+  grid-row-start: 1;
+  grid-row-end: 4;
+}
+
