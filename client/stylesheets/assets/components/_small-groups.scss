@@ -1,9 +1,11 @@
+#obs-absent-modal,
 #obs-small-group-modal {
   .subjects-scroller {
     //overflow: scroll;
     position: relative;
     height: 1200px;
   }
+  .class-absent-student,
   .small-group-student {
     width: 132px;
     height: 30px;

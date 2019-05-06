@@ -71,7 +71,7 @@
             <div class="modal-card">
                 <header class="modal-card-head">
                     <p class="modal-card-title">Students select </p>
-                    <button id="obs-close-modal" class="delete"></button>
+                    <!--<button id="obs-close-modal" class="delete"></button>-->
                 </header>
                 <section class="modal-card-body">
                     <div>Choose the students you want to include in this small group observation.</div>
@@ -88,6 +88,34 @@
                 <footer class="modal-card-foot">
                     <a id="save-small-group" class="o--standard-button" style="margin-right: 10px;">Save changes</a>
                     <a id="small-group-close-modal" class="o--standard-button">Cancel</a>
+                </footer>
+            </div>
+        </div>
+    {{/if}}
+
+    {{#if absentStudentSelectActive}}
+        <div id="obs-absent-modal" class="modal is-active">
+            <div class="modal-background"></div>
+            <div class="modal-card">
+                <header class="modal-card-head">
+                    <p class="modal-card-title">Absent students select</p>
+                    <!--<button id="obs-close-modal" class="delete"></button>-->
+                </header>
+                <section class="modal-card-body">
+                    <div>Choose the students you want to mark as absent.</div>
+                    <div class="subjects">
+                        <div class="subjects-scroller">
+                            {{#each subjects}}
+                                <div id="{{_id}}" style='transform:translate({{transformStudentPosition data_x}}px, {{transformStudentPosition data_y}}px);' data-x="{{data_x}}" data-y="{{data_y}}" class="class-absent-student c--observation__student-box-container">
+                                    <p class="c--observation__student-box">{{info.name}}</p>
+                                </div>
+                            {{/each}}
+                        </div>
+                    </div>
+                </section>
+                <footer class="modal-card-foot">
+                    <a id="save-absent-students" class="o--standard-button" style="margin-right: 10px;">Save</a>
+                    <a id="absent-close-modal" class="o--standard-button">Cancel</a>
                 </footer>
             </div>
         </div>

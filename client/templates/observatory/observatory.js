@@ -130,6 +130,14 @@ Template.observatory.helpers({
         }
       });
     }
+    if (this.observationType === 'whole_class') {
+      return Subjects.find({
+        envId: this.envId,
+        _id: {
+          $nin: this.absent
+        }
+      });
+    }
     else {
       return Subjects.find({envId: this.envId});
     }

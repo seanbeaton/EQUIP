@@ -5,9 +5,10 @@
 import {getStudents} from "../../helpers/students";
 
 const smallGroupStudentSelectActive = new ReactiveVar(false);
+const absentStudentSelectActive = new ReactiveVar(false);
 const obsCreateModal = new ReactiveVar(false);
 const activeEnvId = new ReactiveVar(false);
-const currentNewObservations = new ReactiveVar(false);
+const currentNewObservation = new ReactiveVar(false);
 
 Template.environmentList.rendered = function() {
   // if (document.querySelector(".toggle-accordion")) {
@@ -29,6 +30,9 @@ Template.environmentList.helpers({
   },
   smallGroupStudentSelectActive: function() {
     return smallGroupStudentSelectActive.get();
+  },
+  absentStudentSelectActive: function() {
+    return absentStudentSelectActive.get();
   },
   obsCreateModal: function() {
     return obsCreateModal.get()
@@ -111,7 +115,7 @@ Template.environmentList.events({
   },
   'click #save-small-group': function(e) {
     e.preventDefault();
-    let observation = currentNewObservations.get();
+    let observation = currentNewObservation.get();
     observation.small_group = getSmallGroupStudents();
     if (observation.small_group.length <= 1) {
       alert('You need to select at least two students');
@@ -122,11 +126,21 @@ Template.environmentList.events({
       return 0
     });
     smallGroupStudentSelectActive.set(false);
-    currentNewObservations.set(false)
+    currentNewObservation.set(false)
+  },
+  'click #save-absent-students': function(e) {
+    e.preventDefault();
+    let observation = currentNewObservation.get();
+    observation.absent = getAbsentStudents();
+    console.log('about to save observation:', observation)
+    Meteor.call('observationInsert', observation, function(error, result) {
+      return 0
+    });
+    absentStudentSelectActive.set(false);
+    currentNewObservation.set(false)
   },
   'click #obs-close-modal': function(e) {
     obsCreateModal.set(false);
-    // $('#obs-create-modal').removeClass("is-active");
   },
   'click #save-obs-name': function(e) {
     var id = $('#obs-create-modal').attr("data-id");
@@ -188,8 +202,12 @@ Template.environmentList.events({
     if (observation.observationType === 'small_group') {
       smallGroupStudentSelectActive.set(true);
       closeObsModal();
-      console.log('small group found');
-      currentNewObservations.set(observation);
+      currentNewObservation.set(observation);
+    }
+    else if (observation.observationType === 'whole_class') {
+      absentStudentSelectActive.set(true);
+      closeObsModal();
+      currentNewObservation.set(observation);
     }
     else {
       Meteor.call('observationInsert', observation, function(error, result) {
@@ -208,9 +226,12 @@ Template.environmentList.events({
         }
     }
 },
-'#small-group-close-modal click': function() {
-    smallGroupStudentSelectActive.set(false);
-},
+  'click #small-group-close-modal': function() {
+      smallGroupStudentSelectActive.set(false);
+  },
+  'click #absent-close-modal': function() {
+    absentStudentSelectActive.set(false);
+  },
 'click .enter-class': function(e) {
   // var obj1 = SubjectParameters.find({'children.envId': this._id}).fetch();
   // var obj2 = SequenceParameters.find({'children.envId': this._id}).fetch();
@@ -262,6 +283,15 @@ Template.environmentList.events({
     else {
       target.parents('.small-group-student').toggleClass('selected');
     }
+  },
+  'click .class-absent-student': function(e) {
+    let target = $(e.target);
+    if (target.hasClass('class-absent-student')) {
+      target.toggleClass('selected');
+    }
+    else {
+      target.parents('.class-absent-student').toggleClass('selected');
+    }
   }
 });
 
@@ -270,7 +300,16 @@ let getSmallGroupStudents = function() {
   $('.small-group-student.selected').each(function() {
     ret.push($(this).attr('id'))
   })
-  console.log('ret', ret);
+  // console.log('ret', ret);
+  return ret;
+};
+
+let getAbsentStudents = function() {
+  let ret = [];
+  $('.class-absent-student.selected').each(function() {
+    ret.push($(this).attr('id'))
+  })
+  // console.log('ret', ret);
   return ret;
 };
 
