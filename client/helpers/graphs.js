@@ -307,7 +307,7 @@ let studentContribGraph = function(data, selector) {
 
   x_group.domain(data.map(d => d.name));
   x.domain(['value', 'median']).rangeRound([0, x_group.bandwidth()]);
-  y.domain([0, d3.max(data, d => d.count)]);
+  y.domain([0, d3.max(data, d => Math.max(d.count, d.median))]);
 
   let median_color = '#c8c8c8ff';
   let total_color = '#555555ff';
@@ -349,6 +349,43 @@ let studentContribGraph = function(data, selector) {
     .attr("y", function(d) { return y(d.median); })
     .attr("height", function(d) { return height - y(d.median); });
 
+  // 0s on 0 values for the counts
+  groups.append('text')
+    .text(function(d) {
+      if (d.count === 0) {
+        return '0';
+      }
+    })
+    .attr("text-anchor", "middle")
+    .attr("x", function(d) {
+      return x('value') + x.bandwidth() / 2;
+    })
+    .attr("y", function(d) {
+      return y(d.count) - 6;
+    })
+    .attr("font-family", "sans-serif")
+    .attr("font-size", "16px")
+    .attr("fill", "black");
+
+  // 0s on 0 values for the medians
+  groups.append('text')
+    .text(function(d) {
+      if (d.median === 0) {
+        return '0';
+      }
+    })
+    .attr("text-anchor", "middle")
+    .attr("x", function(d) {
+      return x('median') + x.bandwidth() / 2;
+    })
+    .attr("y", function(d) {
+      return y(d.median) - 6;
+    })
+    .attr("font-family", "sans-serif")
+    .attr("font-size", "16px")
+    .attr("fill", "black");
+
+
   g.append('g')
   // .attr("class", "axis axis--x")
     .attr("transform", "translate(0," + height + ")")
@@ -378,8 +415,6 @@ let updateStudentContribKey = function(key_wrapper, y_values, color_axis) {
   let html = `${key_chunks.join('')}`;
   $(key_wrapper).html(html)
 }
-
-
 
 let getObservations = function(obsIds) {
   return Observations.find({_id: {$in: obsIds}}).fetch();
