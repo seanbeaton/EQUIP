@@ -8,6 +8,7 @@
     }
   }
   &.observatory--edit {
+    animation: students-pulse 1.5s infinite;
     .student-box {
       cursor: pointer;
     }
@@ -19,5 +20,17 @@
     &:not(.enabled) {
       opacity: 0.3;
     }
+  }
+}
+
+@keyframes students-pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 1;
   }
 }

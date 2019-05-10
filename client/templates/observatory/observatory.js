@@ -218,7 +218,7 @@ Template.observatory.events({
     console.log('tsds', {
       obsId: this._id,
       studentId: target_id,
-      action: $('#' + target_id).hasClass('enabled') ? 'add' : 'remove',
+      action: $('#' + target_id).hasClass('enabled') ? 'mark' : 'unmark',
     })
 
     Meteor.call('observationModifyAbsentStudent', {
