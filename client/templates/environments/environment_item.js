@@ -190,17 +190,29 @@ Template.environmentItem.events({
       // var sequences=Sequences.find({"envId":envId}).fetch();
       var sequences = getSequences(null, envId);
 
-      var literalArray = []
-      for (i = 0; i < sequences.length; i++) {
-        new_seq = sequences[i]['info'].parameters;
-        new_seq['name'] = sequences[i].info.student.studentName;
-        new_seq['time'] = sequences[i]['time'];
-        new_seq['obsName'] = sequences[i]['obsName'];
-        new_seq['envName'] = envName;
-        literalArray.push(new_seq);
-      }
+      var export_data = []
+      sequences.sort(function(a, b) {
+        let a_name = a.obsName.toLowerCase();
+        let b_name = b.obsName.toLowerCase();
+        if (a_name < b_name) {
+          return -1;
+        }
+        if (a_name > b_name) {
+          return 1
+        }
+        return 0;
+      }).forEach(function(sequence) {
+        let new_seq = {};
+        new_seq['name'] = sequence.info.student.studentName;
+        Object.keys(sequence['info'].parameters).forEach(function(param_key) {
+          new_seq[param_key] = sequence['info'].parameters[param_key]
+        });
+        new_seq['obsName'] = sequence['obsName'];
+        export_data.push(new_seq);
+      });
+
       var csv = Papa.unparse({
-        data: literalArray,
+        data: export_data,
       });
       var csvData = new Blob([csv], {type: 'text/csv;charset=utf-8;'});
       var csvURL = null;
