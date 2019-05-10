@@ -169,8 +169,9 @@ let getStudentPadding = function(count, max) {
 
 let getStudentTotalContribs = function(student) {
   let disc_option_active = selectedDiscourseOption.get();
-  if (disc_option_active === false) {
-    return student.total_contributions
+  // false is not set, '' is "- All -"
+  if (disc_option_active === false || disc_option_active === '') {
+      return student.total_contributions
   }
   else {
     console.log('student', student);
@@ -182,6 +183,22 @@ let getStudentTotalContribs = function(student) {
       .count;
   }
 };
+let getGroupTotalContribs = function(group) {
+  let disc_option_active = selectedDiscourseOption.get();
+  // false is not set, '' is "- All -"
+  if (disc_option_active === false || disc_option_active === '') {
+    return group.sequences.length
+  }
+  else {
+    console.log('group.seqs, selected dim', group.sequences, selectedDiscourseDimension.get(), disc_option_active)
+    return group.sequences
+      .filter(c => c.info.parameters[selectedDiscourseDimension.get()] === disc_option_active)
+      .length
+      // .option_counts
+      // .find(o => o.option === disc_option_active)
+      // .count;
+  }
+};
 
 let initGroups = function(data, selector) {
   let container = $(selector + '');
@@ -190,7 +207,7 @@ let initGroups = function(data, selector) {
   let markup = data.groups.map(function(group) {
     let highest_contribs = Math.max(...group.students.map(stud => getStudentTotalContribs(stud)));
     let markup = "<div class='student-group'>" +
-      "<div class='student-group__title'><strong>" + group.name + "</strong> - " + group.observationDate + " (n = " + group.sequences.length + ")</div>" +
+      "<div class='student-group__title'><strong>" + group.name + "</strong> - " + group.observationDate + " (n = " + getGroupTotalContribs(group) + ")</div>" +
       "<div class='student-group__students'>" +
       group.students.map(function(student) {
         console.log('student', student);
