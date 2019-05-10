@@ -35,18 +35,17 @@ Template.interactiveReport.helpers({
     });
     return envs;
   },
-    environmentChosen: function() {
-        return !!(selectedEnvironment.get());
-    },
-    observations: function() {
-        // //console.log('obsOptions', obsOptions);
-        return obsOptions.get()
-    },
-    observationChosen: function() {
-        // //console.log('observationChosen', obsOptions.get(), !!(obsOptions.get()));
+  environmentChosen: function() {
+    return !!(selectedEnvironment.get());
+  },
+  observations: function() {
+    return getSelectedObservations();
+  },
+  observationChosen: function() {
+    // //console.log('observationChosen', obsOptions.get(), !!(obsOptions.get()));
 
-        return !!(selectedObservations.get().length)
-    },
+    return !!(selectedObservations.get().length)
+  },
   demographics: function() {
     //console.log('getDemographics', getDemographics());
     return getDemographics();

@@ -25,7 +25,9 @@
                         </div>
                     {{/if}}
                     {{#if observationNames}} <h3>Observations: {{ observationNames }}</h3> {{/if }}
-
+                    {{#if observationChosen}}
+                        {{>absentStudents observations=observations}}
+                    {{/if}}
                 </section>
                 <section class="report-section report-section__graph">
                     <div class="timeline-report-wrapper">

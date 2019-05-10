@@ -1,0 +1,23 @@
+<template name="absentStudents">
+    <div class="absent-students-list">
+        {{#if anyAbsentStudents observations}}
+            <details>
+                <summary>
+                    Absent Students (click to view)
+                </summary>
+                <ul>
+                    {{#each obs in observations}}
+                        <li>
+                            <span class="absent-students-list__observation-name">{{obs.name}}</span><br/>
+                            <span class="absent-students-list__students-label">Absent: </span>
+                            <span class="absent-students-list__students-list">{{getAbsentStudents obs._id}}</span>
+                        </li>
+                    {{/each}}
+                </ul>
+            </details>
+        {{else}}
+            <p>There were no absent students marked in the selected observations.</p>
+        {{/if}}
+
+    </div>
+</template>

@@ -897,3 +897,9 @@ let updateStudentTimeKey = function(key_wrapper, y_values, color_axis) {
   let html = `${key_chunks.join('')}`;
   $(key_wrapper).html(html)
 }
+
+
+let getSelectedObservations = function() {
+  let obsIds = selectedObservations.get();
+  return Observations.find({_id: {$in: obsIds}}).fetch();
+}
