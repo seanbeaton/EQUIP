@@ -43,7 +43,7 @@ Migrations.add({
   version: 3,
   name: 'Adds either the absent or small_group arrays to observations',
   up: function () {
-    Observations.update({observationType: 'whole_class'}, {$set: {"absent": []}}, {multi:true});
-    Observations.update({observationType: 'small_group'}, {$set: {"small_group": []}}, {multi:true});
+    Observations.update({observationType: 'whole_class', absent: {$exists: false}}, {$set: {"absent": []}}, {multi:true});
+    Observations.update({observationType: 'small_group', small_group: {$exists: false}}, {$set: {"small_group": []}}, {multi:true});
   },
 });

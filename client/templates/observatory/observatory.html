@@ -1,14 +1,14 @@
 <!-- HTML for the observatory -->
 
 <template name="observatory">
-  <section class="c--discourse-header__container">
-      <h1 class="c--discourse-header__title">Live Observation</h1>
-      <div class="c--discourse-header__links-container">
-          <p class="u--header-links" id="show-all-observations">Contribution Log</p>
-      </div>
-  </section>
+    <section class="c--discourse-header__container">
+        <h1 class="c--discourse-header__title">Live Observation</h1>
+        <div class="c--discourse-header__links-container">
+            <p class="u--header-links" id="show-all-observations">Contribution Log</p>
+        </div>
+    </section>
 
-  <section class="c--observation-body__container observation" data-obs-id="{{observation._id}}">
+    <section class="c--observation-body__container observation" data-obs-id="{{observation._id}}">
       <div>
           <ul class="c--discourse-body__container-list-container">
               <a href="{{pathFor 'environmentList'}}">
@@ -42,6 +42,16 @@
           <div class="toggle-sub">
               <p class="o--toggle-links edit-observation-date">Change Date</p>
               <p class="o--toggle-links edit-observation-name">Rename</p>
+              {{#if wholeClass}}
+                  <p class="o--toggle-links edit-included-students {{#if classroomInEditMode}} toggle-link--active{{/if}}">
+
+                      {{#if classroomInEditMode}}
+                          Back to obs.
+                      {{else}}
+                          Absent Students
+                      {{/if}}
+                  </p>
+              {{/if}}
               <p class="o--toggle-links" id="delete-observation">Delete</p>
           </div>
       </div>
@@ -52,10 +62,10 @@
       <div class="columns c--observation-toggle__container toggle-dash" style="display: none;">
         <h3 class="column c--observation-toggle__title">Toggles</h3>
       </div>
-      <div class="subjects">
-        {{#each subjects}}
-          <div id="{{_id}}" style='transform:translate({{data_x}}px, {{data_y}}px);' data-x="{{data_x}}" data-y="{{data_y}}" class="dragger c--observation__student-box-container">
-            <p class="c--observation__student-box">{{info.name}}</p>
+      <div class="subjects observatory {{classroomMode}}">
+        {{#each subject in subjects}}
+          <div id="{{subject._id}}" style='transform:translate({{subject.data_x}}px, {{subject.data_y}}px);' data-x="{{subject.data_x}}" data-y="{{subject.data_y}}" class="student-box dragger c--observation__student-box-container {{#if studentActive subject}} enabled{{/if}}">
+            <p class="c--observation__student-box">{{subject.info.name}}</p>
           </div>
         {{/each}}
       </div>

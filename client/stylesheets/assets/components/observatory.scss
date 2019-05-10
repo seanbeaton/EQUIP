@@ -1,0 +1,23 @@
+
+.observatory {
+  &.observatory--code {
+    .student-box {
+      &:not(.enabled) {
+        pointer-events: none;
+      }
+    }
+  }
+  &.observatory--edit {
+    .student-box {
+      cursor: pointer;
+    }
+  }
+  .student-box {
+    &.enabled {
+      cursor: pointer;
+    }
+    &:not(.enabled) {
+      opacity: 0.3;
+    }
+  }
+}
