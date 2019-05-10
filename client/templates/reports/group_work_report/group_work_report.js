@@ -287,7 +287,8 @@ let getLabelColors = function(labels) {
 }
 
 let selectStudentForModal = function(studentId) {
-  selectedStudent.set(getStudent(studentId, selectedEnvironment.get()));
+  // Disabling the modal for now.
+  // selectedStudent.set(getStudent(studentId, selectedEnvironment.get()));
 }
 
 let updateGroups = function(data, selector) {
