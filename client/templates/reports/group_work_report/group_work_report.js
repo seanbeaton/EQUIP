@@ -8,7 +8,7 @@ let chosen = require("chosen-js");
 import {getSequences} from "../../../helpers/sequences";
 import {getStudents, getStudent} from "../../../helpers/students";
 import {setupVis} from "../../../helpers/timeline";
-
+import {getDiscourseOptionsForDimension, getObservations} from "../../../helpers/graphs";
 
 const obsOptions = new ReactiveVar([]);
 const selectedEnvironment = new ReactiveVar(false);
@@ -97,7 +97,7 @@ Template.groupWorkReport.helpers({
     return !!selectedDiscourseDimension.get() && !!selectedEnvironment.get() && !!(selectedObservations.get().length >= 1) ? '' : 'disabled'
   },
   selected_discourse_options: function() {
-    return getDiscourseOptions();
+    return getDiscourseOptionsForDimension(selectedEnvironment.get(), selectedDiscourseDimension.get());
   },
   environmentChosen: function() {
     return !!(selectedEnvironment.get());
@@ -318,7 +318,7 @@ let createData = function() {
   };
 
   let envId = selectedEnvironment.get();
-  let observations = getObservations();
+  let observations = getObservations(selectedObservations.get());
   let obsIds = selectedObservations.get();
   let allStudents = getStudents(envId);
 
@@ -408,13 +408,6 @@ let createData = function() {
   // return ret
 }
 
-
-let getObservations = function() {
-  let obsIds = selectedObservations.get();
-  return Observations.find({_id: {$in: obsIds}}).fetch();
-}
-
-
 let getDemographics = function() {
   let envId = selectedEnvironment.get();
   if (!envId) {
@@ -469,7 +462,6 @@ let updateStudentContribGraph = function() {
   studentContribGraph(data, selector)
 };
 
-
 let createStudentContribData = function() {
   return {};
 };
@@ -477,7 +469,6 @@ let createStudentContribData = function() {
 let studentContribGraph = function(data, selector) {
 
 };
-
 
 let getObsOptions = function(envId) {
   if (typeof envId === 'undefined') {
@@ -489,18 +480,4 @@ let getObsOptions = function(envId) {
   else {
     return false;
   }
-};
-
-
-let getDiscourseOptions = function() {
-  let options = getDiscourseDimensions();
-  let selected_disc_dim = selectedDiscourseDimension.get();
-  if (selected_disc_dim === false) {
-    return [];
-  }
-  // console.log('options', options, 'selected_disc_dim', selected_disc_dim);
-  let opt = options.find(opt => opt.name === selected_disc_dim);
-  // console.log('opt', opt);
-  return opt
-    .options.split(',').map(function(opt) {return {name: opt.trim()}})
 };
