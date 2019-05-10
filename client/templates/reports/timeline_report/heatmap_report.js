@@ -10,6 +10,12 @@ import {getStudents, getStudent} from "../../../helpers/students";
 import {heatmapReportSortDemoChosen, heatmapReportSortType} from "../selection_elements";
 import {setupVis} from '../../../helpers/timeline';
 import {clone_object} from "../../../helpers/objects";
+import {
+  createStudentTimeData,
+  getDiscourseDimensions,
+  getDiscourseOptionsForDimension,
+  getObservations
+} from "../../../helpers/graphs";
 
 // const envSet = new ReactiveVar(false);
 const obsOptions = new ReactiveVar([]);
@@ -66,13 +72,13 @@ Template.heatmapReport.helpers({
     return getEnvironment();
   },
   observations: function() {
-    return getSelectedObservations();
+    return getObservations(selectedObservations.get());
   },
   observationsOptions: function() {
     return obsOptions.get();
   },
   observationNames: function() {
-    let observations = getSelectedObservations();
+    let observations = getObservations(selectedObservations.get());;
     let obsNames = observations.map(obs => obs.name);
 
     if (obsNames.length >= 3) {
@@ -103,7 +109,7 @@ Template.heatmapReport.helpers({
     return demo_options;
   },
   discourseparams: function() {
-    return getDiscourseDimensions();
+    return getDiscourseDimensions(selectedEnvironment.get());
   },
   showFilters: function() {
     return (students.get().length > 0) && (selectedObservations.get().length > 0);
@@ -173,11 +179,6 @@ let getDemographics = function() {
 let getEnvironment = function() {
   let envId = selectedEnvironment.get();
   return Environments.findOne({_id: envId})
-}
-
-let getSelectedObservations = function() {
-  let obsIds = selectedObservations.get();
-  return Observations.find({_id: {$in: obsIds}}).fetch();
 }
 
 Template.heatmapReport.events({
@@ -737,33 +738,6 @@ let getObsOptions = function(envId) {
   }
 }
 
-let getObservations = function() {
-  let obsIds = selectedObservations.get();
-  return Observations.find({_id: {$in: obsIds}}).fetch();
-}
-
-
-let getDiscourseDimensions = function() {
-  let envId = selectedEnvironment.get();
-  if (!envId) {
-    return []
-  }
-  return setupSequenceParameters(envId);
-};
-
-let getDiscourseOptionsForDimension = function(dimension) {
-  let options = getDiscourseDimensions();
-  if (dimension === false) {
-    return [];
-  }
-  let opt = options.find(opt => opt.name === dimension);
-  if (typeof opt === 'undefined') {
-    return [];
-  }
-  return opt
-    .options.split(',').map(function(opt) {return {name: opt.trim()}})
-};
-
 //
 // Below this we have only the spotlight code
 // This could be refactored by somehow attaching all the fields
@@ -795,7 +769,7 @@ let createStudentContribData = function() {
   let student = selectedStudent.get();
 
   let dimension = selectedSpotlightDimension.get();
-  let disc_opts = getDiscourseOptionsForDimension(dimension);
+  let disc_opts = getDiscourseOptionsForDimension(envId, dimension);
   // let demo_opts = getDemographicOptions();
 
   ret = disc_opts.map(function(opt) {
@@ -1002,77 +976,19 @@ let updateStudentTimeGraph = function () {
     return;
   }
 
-  let data = createStudentTimeData();
+  let data = createStudentTimeData(
+    selectedEnvironment.get(),
+    selectedObservations.get(),
+    selectedStudent.get(),
+    dimension,
+    getDiscourseOptionsForDimension(selectedEnvironment.get(), dimension)
+  );
+
 
   studentTimeGraph(data, selector)
 }
 
-let createStudentTimeData = function() {
 
-  let ret = {
-    contributions_dataset: []
-  };
-
-  let student = selectedStudent.get();
-
-  let dimension = selectedSpotlightDimension.get();
-  let disc_opts = getDiscourseOptionsForDimension(dimension);
-
-  let envId = selectedEnvironment.get();
-  let obsIds = selectedObservations.get();
-
-
-  for (let obsId_k in obsIds) {
-
-    if (!obsIds.hasOwnProperty(obsId_k)) continue;
-    let obsId = obsIds[obsId_k];
-
-    let sequences = getSequences(obsId, envId);
-    for (let sequence_k in sequences) {
-      if (!sequences.hasOwnProperty(sequence_k)) continue;
-      let sequence = sequences[sequence_k];
-
-      if (!ret.contributions_dataset.find(datapoint => datapoint.obsId === obsId)) {
-        // If it wasn't there:
-        let obsers = getObservations();
-
-        let obs = obsers.find(obs => obs._id === obsId);
-        let parseTime = d3.timeParse('%Y-%m-%d');
-        let datapoint = {
-          obsId: obsId,
-          d3date: parseTime(obs.observationDate),
-          obsName: obs.name,
-          date: obs.observationDate,
-          _total: 0,
-        };
-
-        disc_opts.forEach(function (opt) {
-          datapoint[opt.name] = 0
-        });
-
-        ret.contributions_dataset.push(datapoint)
-      }
-
-      if (sequence.info.student.studentId !== student._id) {
-        continue;
-      }
-
-      let seq_disc_opt = sequence.info.parameters[dimension];
-      let ds_index = ret.contributions_dataset.findIndex(datapoint => datapoint.obsId === obsId);
-
-      ret.contributions_dataset[ds_index]._total += 1;
-      ret.contributions_dataset[ds_index][seq_disc_opt] += 1;
-
-    }
-  }
-
-  ret.contributions_dataset.forEach(function(obs) {
-    obs.max = obs._total;
-  });
-
-  return ret.contributions_dataset
-
-}
 let studentTimeGraph = function(data, selector) {
 
   data = data.sort(function(a, b) {return a.d3date - b.d3date});
@@ -1106,7 +1022,7 @@ let studentTimeGraph = function(data, selector) {
 
   // let lines = [];
   let dim = selectedSpotlightDimension.get();
-  let discdims = getDiscourseOptionsForDimension(dim);
+  let discdims = getDiscourseOptionsForDimension(selectedEnvironment.get(), dim);
 
   let total_line = d3.line()
     .x(function(d) { return x(d.d3date)})
@@ -1135,7 +1051,7 @@ let studentTimeGraph = function(data, selector) {
     .style('stroke', total_color)
     .attr('d', total_line);
 
-  let key_colors = getLabelColors(getDiscourseOptionsForDimension(dim).map(demo_opt => demo_opt.name));
+  let key_colors = getLabelColors(discdims.map(demo_opt => demo_opt.name));
 
   key_colors.Total = total_color;
   let z = d3.scaleOrdinal()
