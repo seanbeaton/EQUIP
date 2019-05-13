@@ -30,3 +30,20 @@ Migrations.add({
     })
   },
 });
+
+Migrations.add({
+  version: 2,
+  name: 'Adds observation type field to all observations',
+  up: function () {
+    Observations.update({observationType: {$exists: false}}, {$set: {"observationType": 'whole_class'}}, {multi:true});
+  },
+});
+
+Migrations.add({
+  version: 3,
+  name: 'Adds either the absent or small_group arrays to observations',
+  up: function () {
+    Observations.update({observationType: 'whole_class', absent: {$exists: false}}, {$set: {"absent": []}}, {multi:true});
+    Observations.update({observationType: 'small_group', small_group: {$exists: false}}, {$set: {"small_group": []}}, {multi:true});
+  },
+});

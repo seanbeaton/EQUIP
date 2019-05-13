@@ -45,7 +45,7 @@ Template.histogramReport.events({
         updateStudentContribGraph();
         updateStudentTimeGraph();
         setTimeout(updateGraph, 200);
-      }, obsOptions, selectedObservations);
+      }, obsOptions, selectedObservations, 'whole_class');
     }, 50);
 
 
@@ -512,3 +512,4 @@ let updateStudentTimeGraph = function () {
 
   studentTimeGraph(data, selector, selectedEnvironment.get(), dimension)
 }
+

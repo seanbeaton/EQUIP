@@ -10,6 +10,7 @@ import * as observation_helpers from '/helpers/observations.js'
 import {updateStudent, updateStudents} from '/helpers/students.js'
 import {convertISODateToUS} from '/helpers/dates.js'
 
+const classroomMode = new ReactiveVar('code');
 
 Template.observatory.created = function() {
   Session.set('envId', Router.current().params._envId);
@@ -114,6 +115,12 @@ function createToggle(params, label) {
 }
 
 Template.observatory.helpers({
+  smallGroup: function() {
+    return this.observationType === 'small_group';
+  },
+  wholeClass: function() {
+    return this.observationType === 'whole_class';
+  },
   environment: function() {
     var env = Environments.find({_id: Router.current().params._envId}).fetch()[0];
     return env;
@@ -122,11 +129,60 @@ Template.observatory.helpers({
     var obs = Observations.find({_id: Router.current().params._obsId}).fetch()[0];
     return obs;
   },
-  subject: function() {
-    return Subjects.find({envId: this.observation.envId});
+  subjects: function() {
+    return Subjects.find({
+      envId: this.envId,
+    })
+    // if (this.observationType === 'small_group') {
+    //   return Subjects.find({
+    //     envId: this.envId,
+    //     _id: {
+    //       $in: this.small_group
+    //     }
+    //   });
+    // }
+    // if (this.observationType === 'whole_class') {
+    //   return Subjects.find({
+    //     envId: this.envId,
+    //     _id: {
+    //       $nin: this.absent
+    //     }
+    //   });
+    // }
+    // else {
+    //   return Subjects.find({envId: this.envId});
+    // }
+  },
+  studentActive: function(student) {
+    if (this.observationType === 'small_group') {
+      console.log('this', this);
+      return !!this.small_group.find(id => id === student._id)
+    }
+    if (this.observationType === 'whole_class') {
+      console.log('whole class, ', student._id, this.absent);
+      console.log('whole class, ', student, this.absent);
+      return !this.absent.find(id => id === student._id)
+    }
   },
   convertISODateToUS: function(isoDate) {
     return convertISODateToUS(isoDate);
+  },
+  classTypeHuman: function(obsType) {
+    if (obsType === 'small_group') {
+      return "Small group";
+    }
+    else if (obsType === 'whole_class') {
+      return "Whole class";
+    }
+    else {
+      return "No type";
+    }
+  },
+  classroomMode: function() {
+    return 'observatory--' + classroomMode.get();
+  },
+  classroomInEditMode: function() {
+    return classroomMode.get() === 'edit';
   }
 });
 
@@ -140,7 +196,7 @@ Template.observatory.events({
     Meteor.call('timerUpdate', update);
     Router.go('observationList', {_envId:Router.current().params._envId});
   },
-  'click .dragger': function(e) {
+  'click .observatory.observatory--code .student-box.enabled': function(e) {
     //Create Sequence
     gtag('event', 'add', {'event_category': 'sequences'});
 
@@ -153,6 +209,25 @@ Template.observatory.events({
 
     observation_helpers.populateParamBoxes(myId);
     $('#seq-param-modal').addClass('is-active');
+  },
+  'click .observatory.observatory--edit .student-box': function(e) {
+    let target_id;
+    if ($(e.target).is('.student-box')) {
+      target_id = $(e.target).attr('id');
+    } else {
+      target_id = $(e.target).parents('.student-box').attr('id')
+    }
+    console.log('tsds', {
+      obsId: this._id,
+      studentId: target_id,
+      action: $('#' + target_id).hasClass('enabled') ? 'mark' : 'unmark',
+    })
+
+    Meteor.call('observationModifyAbsentStudent', {
+      obsId: this._id,
+      studentId: target_id,
+      action: $('#' + target_id).hasClass('enabled') ? 'mark' : 'unmark',
+    });
   },
   'click .help-button': function (e) {
     $('#help-env-modal').addClass("is-active");
@@ -313,6 +388,14 @@ Template.observatory.events({
     $('#seq-param-modal').removeClass('is-active');
     observation_helpers.createTableOfContributions(this.observation._id);
     $('#seq-data-modal').addClass('is-active');
+  },
+  'click .edit-included-students': function() {
+    if (classroomMode.get() === 'code') {
+      classroomMode.set('edit');
+    }
+    else {
+      classroomMode.set('code');
+    }
   }
 });
 

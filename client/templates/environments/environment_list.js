@@ -2,12 +2,19 @@
 * JS file for environment_list.html
 */
 
+import {getStudents} from "../../helpers/students";
+
+const smallGroupStudentSelectActive = new ReactiveVar(false);
+const absentStudentSelectActive = new ReactiveVar(false);
+const obsCreateModal = new ReactiveVar(false);
+const activeEnvId = new ReactiveVar(false);
+const currentNewObservation = new ReactiveVar(false);
 
 Template.environmentList.rendered = function() {
-  if (document.querySelector(".toggle-accordion")) {
-      document.querySelectorAll('.toggle-accordion')[0].click(); // main
-      document.querySelectorAll('.toggle-accordion')[1].click(); // observations
-  }
+  // if (document.querySelector(".toggle-accordion")) {
+  //     document.querySelectorAll('.toggle-accordion')[0].click(); // main
+  //     document.querySelectorAll('.toggle-accordion')[1].click(); // observations
+  // }
 
   var urlParams = new URLSearchParams(window.location.search);
   if (urlParams.has("onboarding")) {
@@ -18,6 +25,24 @@ Template.environmentList.rendered = function() {
 }
 
 Template.environmentList.helpers({
+  transformStudentPosition: function(pos) {
+    return parseInt(pos) * 0.6;
+  },
+  smallGroupStudentSelectActive: function() {
+    return smallGroupStudentSelectActive.get();
+  },
+  absentStudentSelectActive: function() {
+    return absentStudentSelectActive.get();
+  },
+  obsCreateModal: function() {
+    return obsCreateModal.get()
+  },
+  activeEnvId: function() {
+    return activeEnvId.get();
+  },
+  subjects: function() {
+    return getStudents(activeEnvId.get());
+  },
   environment: function() {
     var envs = Environments.find({}, {sort: {submitted: -1}}).fetch();
     var obs;
@@ -83,12 +108,39 @@ Template.environmentList.events({
     $('#help-env-modal').removeClass("is-active");
   },
   'click #obs-create-button': function(e) {
+    console.log('starting');
     var id = e.target.getAttribute('data-id');
-    $('#obs-create-modal').addClass("is-active");
-    $('#obs-create-modal').attr("data-id", id);
+    obsCreateModal.set(true);
+    activeEnvId.set(id);
+  },
+  'click #save-small-group': function(e) {
+    e.preventDefault();
+    let observation = currentNewObservation.get();
+    observation.small_group = getSmallGroupStudents();
+    if (observation.small_group.length <= 1) {
+      alert('You need to select at least two students');
+      return;
+    }
+    console.log('observations small group', observation.small_group);
+    Meteor.call('observationInsert', observation, function(error, result) {
+      return 0
+    });
+    smallGroupStudentSelectActive.set(false);
+    currentNewObservation.set(false)
+  },
+  'click #save-absent-students': function(e) {
+    e.preventDefault();
+    let observation = currentNewObservation.get();
+    observation.absent = getAbsentStudents();
+    console.log('about to save observation:', observation)
+    Meteor.call('observationInsert', observation, function(error, result) {
+      return 0
+    });
+    absentStudentSelectActive.set(false);
+    currentNewObservation.set(false)
   },
   'click #obs-close-modal': function(e) {
-    $('#obs-create-modal').removeClass("is-active");
+    obsCreateModal.set(false);
   },
   'click #save-obs-name': function(e) {
     var id = $('#obs-create-modal').attr("data-id");
@@ -100,6 +152,7 @@ Template.environmentList.events({
     var observation = {
       name: $('#observationName').val(),
       observationDate: $('#altObservationDate').val(),
+      observationType: $('input[name="classroom-type"]:checked').attr('data-classroom-type'),
       envId: id,
       timer: 0
     };
@@ -114,12 +167,18 @@ Template.environmentList.events({
       return;
     }
 
+    if (!observation.observationType) {
+      alert("Observation type required.");
+      return;
+    }
+
     if (!/^\d{4}-\d{2}-\d{2}$/.test(observation.observationDate)) {
       alert('Please input a valid date in YYYY-MM-DD format');
       return;
     }
 
     if (sequenceParams === undefined || demographicParams === undefined) {
+      console.log('sequence ', sequenceParams, demographicParams);
         alert("You must add students and parameters to the environment to continue to do the observation.")
         return;
     }
@@ -130,14 +189,31 @@ Template.environmentList.events({
           return;
         }
     }
-    Meteor.call('observationInsert', observation, function(error, result) {
-      return 0;
-    });
-    $('#observationName').val('');
-    $('#obs-close-modal').click();
 
-    if (!$(obsAccordion).next().hasClass("show")) {
-      $(obsAccordion).click();
+    let closeObsModal = function() {
+      $('#observationName').val('');
+      $('#obs-close-modal').click();
+
+      if (!$(obsAccordion).next().hasClass("show")) {
+        $(obsAccordion).click();
+      }
+    }
+
+    if (observation.observationType === 'small_group') {
+      smallGroupStudentSelectActive.set(true);
+      closeObsModal();
+      currentNewObservation.set(observation);
+    }
+    else if (observation.observationType === 'whole_class') {
+      absentStudentSelectActive.set(true);
+      closeObsModal();
+      currentNewObservation.set(observation);
+    }
+    else {
+      Meteor.call('observationInsert', observation, function(error, result) {
+        return 0;
+      });
+      closeObsModal()
     }
 
     function getConfirmation() {
@@ -150,7 +226,13 @@ Template.environmentList.events({
         }
     }
 },
-'click #enter-class': function(e) {
+  'click #small-group-close-modal': function() {
+      smallGroupStudentSelectActive.set(false);
+  },
+  'click #absent-close-modal': function() {
+    absentStudentSelectActive.set(false);
+  },
+'click .enter-class': function(e) {
   // var obj1 = SubjectParameters.find({'children.envId': this._id}).fetch();
   // var obj2 = SequenceParameters.find({'children.envId': this._id}).fetch();
   // if ($.isEmptyObject(obj1) || $.isEmptyObject(obj2) || $.isEmptyObject(obj3)) {
@@ -192,9 +274,44 @@ Template.environmentList.events({
     Meteor.call('environmentInsertExample', null, function(error, result) {
       return 0;
     });
+  },
+  'click .small-group-student': function(e) {
+    let target = $(e.target);
+    if (target.hasClass('small-group-student')) {
+      target.toggleClass('selected');
+    }
+    else {
+      target.parents('.small-group-student').toggleClass('selected');
+    }
+  },
+  'click .class-absent-student': function(e) {
+    let target = $(e.target);
+    if (target.hasClass('class-absent-student')) {
+      target.toggleClass('selected');
+    }
+    else {
+      target.parents('.class-absent-student').toggleClass('selected');
+    }
   }
 });
 
+let getSmallGroupStudents = function() {
+  let ret = [];
+  $('.small-group-student.selected').each(function() {
+    ret.push($(this).attr('id'))
+  })
+  // console.log('ret', ret);
+  return ret;
+};
+
+let getAbsentStudents = function() {
+  let ret = [];
+  $('.class-absent-student.selected').each(function() {
+    ret.push($(this).attr('id'))
+  })
+  // console.log('ret', ret);
+  return ret;
+};
 
 function processDatepickers() {
   $('.datepicker:not(.datepicker--processed)').addClass('datepicker--processed').datepicker({

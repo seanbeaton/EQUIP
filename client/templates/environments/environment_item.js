@@ -8,7 +8,7 @@ import {getSequences} from "../../../helpers/sequences";
 let share_window_timeout;
 
 Template.environmentItem.events({
-  'click #enter-class': function(e) {
+  'click .enter-class': function(e) {
      e.preventDefault();
      var obsId = $(e.target).attr("data-id");
      Router.go('observatory', {_envId:this._id, _obsId: obsId});
@@ -248,6 +248,14 @@ Template.environmentItem.events({
 
 
 Template.environmentItem.helpers({
+    getClassTypeAbbreviation: function(class_name) {
+        if (class_name === 'whole_class') {
+          return 'WC';
+        }
+        else if (class_name === 'small_group') {
+          return "SG";
+        }
+    },
     incrementIndex: function(index) {
         return index + 1;
     },

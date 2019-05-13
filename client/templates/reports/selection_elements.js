@@ -76,6 +76,12 @@ Template.interactiveReport.rendered = function(){
   // $(".param-select-form-item.chosen-select").trigger("chosen:updated");   // update chosen to take the updated values into account
 };
 
+Template.groupWorkDiscSelect.rendered = function() {
+  $('.group-work-report__graph-disc-select .chosen-select')
+    .filter(':not(.chosen--processed)').addClass('chosen--processed')
+    .chosen({disable_search_threshold: 10, width: "300px"});
+  // $(".param-select-form-item.chosen-select").trigger("chosen:updated");   // update chosen to take the updated values into account
+}
 
 Template.demographicHeatmapFilter.rendered = function() {
   $('.filter.chosen-select')
@@ -105,7 +111,7 @@ Template.heatmapReportSortDemo.rendered = function() {
 }
 
 Template.histogramDemoSelect.rendered = function() {
-  $('.histogram-demographic-chosen')
+  $('.' + this.data.class_prefix + '-demographic-chosen')
     .trigger('change')
     .filter(':not(.chosen--processed)').addClass('chosen--processed')
     .chosen({disable_search_threshold: 10, width: "240px", placeholder_text_multiple: 'Choose Multiple Options'});

@@ -5,7 +5,7 @@
 import * as observation_helpers from '/helpers/observations.js'
 
 Template.observationItem.events({
-   'click #enter-class': function(e) {
+   'click .enter-class': function(e) {
      var obj1 = SubjectParameters.find({'children.envId': Router.current().params._envId}).fetch();
      var obj2 = SequenceParameters.find({'children.envId': Router.current().params._envId}).fetch();
      var obj3 = Subjects.find({envId: Router.current().params._envId}).fetch();

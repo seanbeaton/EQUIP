@@ -1,0 +1,72 @@
+<template name="groupWorkReport">
+    {{> reportBackButton }}
+
+    <div class="report-section-wrapper">
+        <section class="report-section report-section--main">
+            <h3>
+                Classroom: <span class="env-select {{#if selectedStudent}} env-select--disabled {{/if}}">{{>environmentSelect environments=environments}}</span>
+            </h3>
+            {{#if environmentChosen }}
+                <h2>Choose one or more group work observations.</h2>
+                <p>Click observations on the timeline to select them.</p>
+                <p>Drag the graph to see earlier or later observations.</p>
+                <div class="report-select__options report-select__options--observations">
+                    <div id="vis-container"></div>
+                </div>
+            {{/if}}
+            {{#if observationNames}} <h3>Observations: {{ observationNames }}</h3> {{/if }}
+        </section>
+        <section class="report-section report-section__graph">
+            <div class="group-work-report-wrapper">
+                <div class="group-work-report">
+                    <div class="group-work-report__graph">
+                        {{#if students }}
+                            {{#if histogramDemoOptionSelected }}
+                                <h3>Click on a student to see more details.</h3>
+                            {{else}}
+                                <h3>Choose a demographic above to highlight the students below.</h3>
+                            {{/if}}
+                            <div id="group-work-d3-wrapper">
+
+                            </div>
+                        {{/if}}
+                    </div>
+                    <div class="group-work-report__graph-demo-select">
+                        {{#if observationChosen }}
+                            {{> histogramDemoSelect demographics=demographics class_prefix="group-work"}}
+                        {{/if }}
+                    </div>
+                    <div class="group-work-report__graph-disc-select">
+                        {{#if observationChosen }}
+                            {{> groupWorkDiscSelect selected_discourse_options=selected_discourse_options discourseparams=discourseparams disc_options_available=disc_options_available disc_available=disc_available}}
+                        {{/if }}
+                    </div>
+                    <div class="group-work-report__graph-key"></div>
+                </div>
+            </div>
+        </section>
+        <!--</div>-->
+        <!--</div>-->
+    </div>
+</template>
+
+<template name="groupWorkDiscSelect">
+    <div class="discourse-select">
+        <label for="disc-select">Discourse dimension</label>
+        <select id="disc-select" {{disc_available}} class="group-work-disc-param-select discourse chosen-select">
+            <option disabled selected value="">- Select -</option>
+            {{#each discourseparams}}
+                <option data-options="{{options}}" value="{{name}}">{{name}}</option>
+            {{/each}}
+        </select>
+    </div>
+    <div class="discourse-option-select">
+        <label for="disc-opt-select">Option</label>
+        <select id="disc-opt-select" {{disc_options_available}} class="group-work-disc-opt-param-select discourse-option chosen-select">
+            <option selected value="">- All -</option>
+            {{#each selected_discourse_options }}
+                <option value="{{name}}">{{name}}</option>
+            {{/each }}
+        </select>
+    </div>
+</template>

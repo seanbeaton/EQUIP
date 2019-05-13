@@ -26,6 +26,9 @@
                 <div id="vis-container"></div>
             </div>
         {{/if}}
+        {{#if observationChosen}}
+            {{>absentStudents observations=observations}}
+        {{/if}}
 
     </section>
     <section class="report-section report-section__graph">
