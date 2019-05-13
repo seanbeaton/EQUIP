@@ -116,22 +116,21 @@ function createToggle(params, label) {
 
 Template.observatory.helpers({
   smallGroup: function() {
-    return this.observationType === 'small_group';
+    return this.observation.observationType === 'small_group';
   },
   wholeClass: function() {
-    return this.observationType === 'whole_class';
+    console.log('whole class', this);
+    return this.observation.observationType === 'whole_class';
   },
   environment: function() {
-    var env = Environments.find({_id: Router.current().params._envId}).fetch()[0];
-    return env;
+    return this.environment;
   },
   observation: function () {
-    var obs = Observations.find({_id: Router.current().params._obsId}).fetch()[0];
-    return obs;
+    return this.observation;
   },
   subjects: function() {
     return Subjects.find({
-      envId: this.envId,
+      envId: this.observation.envId,
     })
     // if (this.observationType === 'small_group') {
     //   return Subjects.find({
@@ -154,14 +153,13 @@ Template.observatory.helpers({
     // }
   },
   studentActive: function(student) {
-    if (this.observationType === 'small_group') {
-      console.log('this', this);
-      return !!this.small_group.find(id => id === student._id)
+    if (this.observation.observationType === 'small_group') {
+      return !!this.observation.small_group.find(id => id === student._id)
     }
-    if (this.observationType === 'whole_class') {
-      console.log('whole class, ', student._id, this.absent);
-      console.log('whole class, ', student, this.absent);
-      return !this.absent.find(id => id === student._id)
+    if (this.observation.observationType === 'whole_class') {
+      console.log('whole class, ', student._id, this.observation.absent);
+      console.log('whole class, ', student, this.observation.absent);
+      return !this.observation.absent.find(id => id === student._id)
     }
   },
   convertISODateToUS: function(isoDate) {
