@@ -1,14 +1,14 @@
-import {setupSequenceParameters, setupSubjectParameters} from "../../../helpers/parameters";
+import {setupSequenceParameters, setupSubjectParameters} from "/helpers/parameters";
 
 let d3 = require('d3');
 let d3ScaleChromatic = require("d3-scale-chromatic");
 let d3Interpolate = require("d3-interpolate");
 let chosen = require("chosen-js");
 
-import {getSequences} from "../../../helpers/sequences";
-import {getStudents, getStudent} from "../../../helpers/students";
-import {setupVis} from "../../../helpers/timeline";
-import {getDiscourseOptionsForDimension, getObservations} from "../../../helpers/graphs";
+import {getSequences} from "/helpers/sequences";
+import {getStudents, getStudent} from "/helpers/students";
+import {setupVis} from "/helpers/timeline";
+import {getDiscourseOptionsForDimension, getObservations} from "/helpers/graphs";
 
 const obsOptions = new ReactiveVar([]);
 const selectedEnvironment = new ReactiveVar(false);

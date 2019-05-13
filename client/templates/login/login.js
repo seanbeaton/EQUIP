@@ -29,7 +29,7 @@ AccountsTemplates.configure({
   termsUrl: '/terms-of-use',
 
   // Redirects
-  homeRoutePath: '/environmentList',
+  homeRoutePath: '/dashboard',
   redirectTimeout: 4000,
   //
   // // Hooks
@@ -83,7 +83,7 @@ AccountsTemplates.configureRoute('signIn', {
   path: '/login',
   template: 'login',
   layoutTemplate: 'layout',
-  redirect: '/environmentList',
+  redirect: '/dashboard',
 });
 
 AccountsTemplates.configureRoute('signUp', {
@@ -91,7 +91,7 @@ AccountsTemplates.configureRoute('signUp', {
   path: '/sign-up',
   template: 'login',
   layoutTemplate: 'layout',
-  redirect: '/environmentList',
+  redirect: '/dashboard',
 });
 
 AccountsTemplates.configureRoute('resetPwd', {
@@ -99,7 +99,7 @@ AccountsTemplates.configureRoute('resetPwd', {
   path: '/reset-password',
   template: 'login',
   layoutTemplate: 'layout',
-  redirect: '/environmentList',
+  redirect: '/dashboard',
 });
 
 AccountsTemplates.configureRoute('changePwd', {
@@ -107,7 +107,7 @@ AccountsTemplates.configureRoute('changePwd', {
   path: '/change-password',
   template: 'login',
   layoutTemplate: 'layout',
-  redirect: '/environmentList',
+  redirect: '/dashboard',
 });
 
 var pwd = AccountsTemplates.removeField('password');

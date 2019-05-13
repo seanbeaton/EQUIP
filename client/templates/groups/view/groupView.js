@@ -1,4 +1,4 @@
-import {userIsGroupMember, getHumanEnvPermission, hasRemovePermission, userIsEnvOwner} from "../../../../helpers/groups";
+import {userIsGroupMember, getHumanEnvPermission, hasRemovePermission, userIsEnvOwner} from "/helpers/groups";
 
 Template.groupView.helpers({
   group: function() {

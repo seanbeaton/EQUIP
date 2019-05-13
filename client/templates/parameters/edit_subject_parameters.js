@@ -243,7 +243,7 @@ Template.editSubjectParameters.events({
         Command: toastr["success"]("NOTE: After the first observation is created, you will not be able to edit discourse dimensions or demographics.","Save Successful","Demographic Parameters");
       }
       setTimeout(() => {
-          window.location.href = "/environmentList"
+          Router.go('environmentList')
       },1000)
     });
   } else {
@@ -273,7 +273,7 @@ Template.editSubjectParameters.events({
     });
 
     setTimeout(() => {
-        window.location.href = "/environmentList"
+      Router.go('environmentList')
     },1000)
   }
 }
