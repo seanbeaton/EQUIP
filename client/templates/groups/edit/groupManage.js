@@ -88,13 +88,20 @@ Template.memberAddForm.events = {
   'click .member-add-form__submit': function(e) {
     let user = $('.member-add-form__input');
     let userId = user.val();
-    Meteor.call('addUserToGroup', userId, this._id)
+    Meteor.call('addUserToGroup', userId, this._id, addUserHandler)
     $('.member-add-form__input').val('');
   },
   'autocompleteselect .member-add-form__input': function(e, template, doc) {
-    Meteor.call('addUserToGroup', doc._id, template.data.group._id)
+    Meteor.call('addUserToGroup', doc._id, template.data.group._id, addUserHandler)
     $('.member-add-form__input').val('');
     // Meteor.subscribe('groupUsers', template.data.group._id);
+  }
+}
+
+let addUserHandler = function(error, result) {
+  if (error) {
+    console.log('Error: ', error);
+    alert(error);
   }
 }
 

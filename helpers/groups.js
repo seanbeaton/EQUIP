@@ -1,6 +1,7 @@
+import {checkAccess} from "./access";
+
 let hasRemovePermission = function (envId, group) {
-  let full_env = Environments.findOne({_id: envId});
-  if (full_env.userId === Meteor.userId()) {
+  if (userIsEnvOwner(envId)) {
     return true;
   }
   else if (userIsGroupManager(Meteor.userId(), group)) {
@@ -13,11 +14,12 @@ let userIsGroupManager = function (uid, group) {
   if (typeof group === 'string') {
     group = Groups.findOne({_id: group});
   }
-  if (group.members.find(mem => mem.userId === uid)
-    .roles.some(r => ['manage', 'admin'].includes(r))) {
-    return true;
+  try {
+    checkAccess(group._id, 'group', 'manage')
+  } catch (error) {
+    return false;
   }
-  return false;
+  return true;
 }
 
 let getHumanEnvPermission = function (perm) {
@@ -62,4 +64,39 @@ let getUserGroupEnvs = function (userId) {
   return env_ids
 }
 
-export {getUserGroupEnvs, userIsGroupMember, getHumanEnvPermission, userIsGroupManager, hasRemovePermission, userIsEnvOwner}
+let userCanGroupViewEnv = function (uid, envId) {
+  if (typeof uid === 'undefined') {
+    uid = Meteor.userId();
+  }
+  let envs = getUserGroupEnvs(uid);
+  if (envs.length === 0) {
+    return false
+  }
+  return envs.has(envId);
+}
+
+let userCanGroupEditEnv = function (uid, envId) {
+  if (typeof uid === 'undefined') {
+    uid = Meteor.userId();
+  }
+
+  let groups = Groups.find({
+    "members.userId": uid
+  }).fetch();
+
+  let allow = false;
+  console.log('checkibng fir uid', uid, 'and envID', envId, 'groups', groups)
+  groups.forEach(function (group) {
+    console.log(group.environments.find(env => env.envId === envId), group.members.find(m => m.userId === Meteor.userId())
+      .roles.some(r => ['edit', 'manage', 'admin'].includes(r)))
+    if (
+      !!group.environments.find(env => env.envId === envId) &&
+      group.members.find(m => m.userId === uid)
+      .roles.some(r => ['edit', 'manage', 'admin'].includes(r))) {
+      allow = true;
+    }
+  });
+  return allow;
+}
+
+export {getUserGroupEnvs, userCanGroupViewEnv, userCanGroupEditEnv, userIsGroupMember, getHumanEnvPermission, userIsGroupManager, hasRemovePermission, userIsEnvOwner}
