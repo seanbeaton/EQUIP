@@ -10,6 +10,13 @@ import vis from "vis";
 import {getSequences} from "../../../../helpers/sequences";
 import {getStudents, getStudent} from "../../../../helpers/students";
 import {setupVis} from "../../../../helpers/timeline";
+import {
+  createStudentContribData,
+  createStudentTimeData, get_average, get_median,
+  getDiscourseDimensions,
+  getDiscourseOptionsForDimension, studentContribGraph,
+  studentTimeGraph
+} from "../../../../helpers/graphs";
 
 // const envSet = new ReactiveVar(false);
 const obsOptions = new ReactiveVar([]);
@@ -104,7 +111,7 @@ Template.histogramReport.helpers({
     return getDemographics()
   },
   discourseparams: function() {
-    return getDiscourseDimensions();
+    return getDiscourseDimensions(selectedEnvironment.get());
   },
 })
 
@@ -385,11 +392,6 @@ let updateHistogram = function(data, selector) {
   initHistogram(data, selector);
 }
 
-let getObservations = function() {
-  let obsIds = selectedObservations.get();
-  return Observations.find({_id: {$in: obsIds}}).fetch();
-}
-
 
 let getDemographics = function() {
   let envId = selectedEnvironment.get();
@@ -406,27 +408,6 @@ let getDemographicOptions = function() {
     return [];
   }
   let opt = options.find(opt => opt.name === selected_demo);
-  return opt
-    .options.split(',').map(function(opt) {return {name: opt.trim()}})
-};
-
-let getDiscourseDimensions = function() {
-  let envId = selectedEnvironment.get();
-  if (!envId) {
-    return []
-  }
-  return setupSequenceParameters(envId);
-};
-
-let getDiscourseOptionsForDimension = function(dimension) {
-  let options = getDiscourseDimensions();
-  if (dimension === false) {
-    return [];
-  }
-  let opt = options.find(opt => opt.name === dimension);
-  if (typeof opt === 'undefined') {
-    return [];
-  }
   return opt
     .options.split(',').map(function(opt) {return {name: opt.trim()}})
 };
@@ -489,205 +470,17 @@ let updateStudentContribGraph = function() {
     return;
   }
 
-  let data = createStudentContribData();
+  let data = createStudentContribData(
+    selectedEnvironment.get(),
+    selectedObservations.get(),
+    selectedStudent.get(),
+    dimension,
+    getDiscourseOptionsForDimension(selectedEnvironment.get(), dimension),
+    students.get()
+  );
 
   studentContribGraph(data, selector)
 };
-
-let createStudentContribData = function() {
-  let ret = [];
-
-  let envId = selectedEnvironment.get();
-  let obsIds = selectedObservations.get();
-  let student = selectedStudent.get();
-
-  let dimension = selectedSpotlightDimension.get();
-  let disc_opts = getDiscourseOptionsForDimension(dimension);
-  // let demo_opts = getDemographicOptions();
-
-  ret = disc_opts.map(function(opt) {
-    return {
-      name: opt.name,
-      count: 0,
-      all_students: students.get().map(stud => ({id: stud._id, count: 0})),
-      class_total: 0,
-    }
-  });
-
-  let all_students = students.get().map(stud => ({id: stud._id, count: 0}));
-
-  for (let obsId_k in obsIds) {
-    if (!obsIds.hasOwnProperty(obsId_k)) continue;
-    let obsId = obsIds[obsId_k];
-    let sequences = getSequences(obsId, envId);
-    for (let sequence_k in sequences) {
-      if (!sequences.hasOwnProperty(sequence_k)) continue;
-      let sequence = sequences[sequence_k];
-      disc_opts.map(function(opt) {
-        if (sequence.info.parameters[dimension] === opt.name) {
-          let ds_index = ret.findIndex(datapoint => datapoint.name === opt.name);
-          ret[ds_index].class_total += 1;
-          ret[ds_index].all_students.filter(stud => stud.id === sequence.info.student.studentId)[0].count += 1;
-          all_students.filter(stud => stud.id === sequence.info.student.studentId)[0].count += 1;
-          if (sequence.info.student.studentId === student._id) {
-            ret[ds_index].count += 1;
-            // total += 1;
-          }
-        }
-      });
-    }
-  }
-
-
-  let total = ret.map(d => d.count).reduce((a, b) => a + b, 0);
-
-  let class_total = ret.map(d => d.class_total).reduce((a, b) => a + b, 0);
-
-  let num_students = students.get().length;
-  ret.forEach(function(opt) {
-    let all_counts = opt.all_students.map(d => d.count);
-    opt.median = get_median(all_counts);
-    opt.average = get_average(all_counts);
-  });
-
-  ret.push({
-    name: 'Total (Student)',
-    count: total,
-    class_total: class_total,
-    average: class_total / num_students,
-    median: get_median(all_students.map(d => d.count)),
-  });
-
-  return ret
-};
-
-function get_median(values) {
-  if (values.length === 0) {
-    return 0;
-  }
-
-  values.sort((a, b) => a - b);
-
-  let mid_point = Math.floor(values.length / 2);
-
-  if (values.length % 2) {
-    return values[mid_point]
-  }
-  else {
-    return (values[mid_point] + values[mid_point - 1]) / 2.;
-  }
-}
-function get_average(values) {
-  if (values.length === 0) {
-    return 0;
-  }
-
-  return values.reduce((a, b) => a + b, 0) / values.length
-}
-
-let studentContribGraph = function(data, selector) {
-  let svg_tag = $('<svg width="718" height="400">' +
-    '<defs>\n' +
-    '  <style type="text/css">\n' +
-    '    @font-face {\n' +
-    '      font-family: Roboto;\n' +
-    '      @import url(\'https://fonts.googleapis.com/css?family=Roboto:300,400,700\');\n' +
-    '    }\n' +
-    '  </style>\n' +
-    '</defs>' +
-    '</svg>');
-  $(selector).html(svg_tag);
-
-  let container = d3.select(selector + ' svg'),
-    margin = {top: 30, right: 20, bottom: 80, left: 50},
-    width = +container.attr("width") - margin.left - margin.right,
-    height = +container.attr("height") - margin.top - margin.bottom,
-    g = container.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-  let x = d3.scaleBand() // inside each group
-  // .range([0, width])
-    .padding(0.10);
-
-  let y = d3.scaleLinear()
-    .rangeRound([height, 0]);
-
-  let x_group = d3.scaleBand() // each group
-    .rangeRound([0, width])
-    .paddingInner(0.1);
-
-  x_group.domain(data.map(d => d.name));
-  x.domain(['value', 'median']).rangeRound([0, x_group.bandwidth()]);
-  y.domain([0, d3.max(data, d => d.count)]);
-
-  let median_color = '#c8c8c8ff';
-  let total_color = '#555555ff';
-
-  let key_colors = getLabelColors(data.map(d => d.name));
-  key_colors["__BREAK__"] = '#ffffffff';
-  delete key_colors["Total (Student)"];
-  key_colors["Total (Student)"] = total_color;
-  key_colors["Median (Class)"] = median_color;
-  let z = d3.scaleOrdinal()
-    .range(Object.values(key_colors));
-  updateStudentContribKey('.student-contributions-graph__graph-key', Object.keys(key_colors), z)
-
-  let groups = g.append("g")
-    .selectAll("bar")
-    .data(data)
-    .enter().append('g')
-    .attr("transform", function(d) {
-      return "translate(" + x_group(d.name) + ",0)"
-    })
-    .attr("class", 'bar-group')
-    .selectAll('rect')
-    .data(function(d) {
-      return data.filter(i => i.name === d.name)
-    })
-    .enter();
-
-  groups.append("rect")
-    .style("fill", d => z(d.name))
-    .attr("x", x("value"))
-    .attr("width", x.bandwidth())
-    .attr("y", function(d) { return y(d.count); })
-    .attr("height", function(d) { return height - y(d.count); });
-
-  groups.append("rect")
-    .style("fill", z('Median (Class)'))
-    .attr("x", x("median"))
-    .attr("width", x.bandwidth())
-    .attr("y", function(d) { return y(d.median); })
-    .attr("height", function(d) { return height - y(d.median); });
-
-  g.append('g')
-  // .attr("class", "axis axis--x")
-    .attr("transform", "translate(0," + height + ")")
-    .call(d3.axisBottom(x_group));
-
-  g.append("g")
-  // .attr("class", "axis axis--y")
-    .call(d3.axisLeft(y).tickFormat(function(e){
-        if(Math.floor(e) !== e) {
-          return;
-        }
-        return e;
-      })
-    )
-};
-
-let updateStudentContribKey = function(key_wrapper, y_values, color_axis) {
-  let key_chunks = y_values.map(function(label) {
-    if (label === '__BREAK__') {
-      // it looks like even if the axis value isn't used, it applies it to the next item if you don't call this function.
-      let _ = color_axis(label);
-      return `<br />`;
-    }
-    return `<span class="key--label"><span class="key--color" style="background-color: ${color_axis(label)}"></span><span class="key--text">${label}</span></span>`
-  })
-
-  let html = `${key_chunks.join('')}`;
-  $(key_wrapper).html(html)
-}
 
 let updateStudentTimeGraph = function () {
   let selector = '.student-participation-time__graph';
@@ -709,191 +502,13 @@ let updateStudentTimeGraph = function () {
     return;
   }
 
-  let data = createStudentTimeData();
+  let data = createStudentTimeData(
+    selectedEnvironment.get(),
+    selectedObservations.get(),
+    selectedStudent.get(),
+    dimension,
+    getDiscourseOptionsForDimension(selectedEnvironment.get(), dimension)
+  );
 
-  studentTimeGraph(data, selector)
-}
-
-let createStudentTimeData = function() {
-
-  let ret = {
-    contributions_dataset: []
-  };
-
-  let student = selectedStudent.get();
-
-  let dimension = selectedSpotlightDimension.get();
-  let disc_opts = getDiscourseOptionsForDimension(dimension);
-
-  let envId = selectedEnvironment.get();
-  let obsIds = selectedObservations.get();
-
-
-  for (let obsId_k in obsIds) {
-
-    if (!obsIds.hasOwnProperty(obsId_k)) continue;
-    let obsId = obsIds[obsId_k];
-
-    let sequences = getSequences(obsId, envId);
-    for (let sequence_k in sequences) {
-      if (!sequences.hasOwnProperty(sequence_k)) continue;
-      let sequence = sequences[sequence_k];
-
-      if (!ret.contributions_dataset.find(datapoint => datapoint.obsId === obsId)) {
-        // If it wasn't there:
-        let obsers = getObservations();
-
-        let obs = obsers.find(obs => obs._id === obsId);
-        let parseTime = d3.timeParse('%Y-%m-%d');
-        let datapoint = {
-          obsId: obsId,
-          d3date: parseTime(obs.observationDate),
-          obsName: obs.name,
-          date: obs.observationDate,
-          _total: 0,
-        };
-
-        disc_opts.forEach(function (opt) {
-          datapoint[opt.name] = 0
-        });
-
-        ret.contributions_dataset.push(datapoint)
-      }
-
-      if (sequence.info.student.studentId !== student._id) {
-        continue;
-      }
-
-      let seq_disc_opt = sequence.info.parameters[dimension];
-      let ds_index = ret.contributions_dataset.findIndex(datapoint => datapoint.obsId === obsId);
-
-      ret.contributions_dataset[ds_index]._total += 1;
-      ret.contributions_dataset[ds_index][seq_disc_opt] += 1;
-
-    }
-  }
-
-  ret.contributions_dataset.forEach(function(obs) {
-    obs.max = obs._total;
-  });
-
-  return ret.contributions_dataset
-
-}
-let studentTimeGraph = function(data, selector) {
-
-  data = data.sort(function(a, b) {return a.d3date - b.d3date});
-
-  let svg_tag = $('<svg width="718" height="500">' +
-    '<defs>\n' +
-    '  <style type="text/css">\n' +
-    '    @font-face {\n' +
-    '      font-family: Roboto;\n' +
-    '      @import url(\'https://fonts.googleapis.com/css?family=Roboto:300,400,700\');\n' +
-    '    }\n' +
-    '  </style>\n' +
-    '</defs>' +
-    '</svg>');
-  $(selector).html(svg_tag);
-
-  let svg = d3.select(selector + " svg"),
-    margin = {top: 30, right: 20, bottom: 40, left: 50},
-    width = +svg.attr("width") - margin.left - margin.right,
-    height = +svg.attr("height") - margin.top - margin.bottom,
-    g = svg.append("g").attr('class', 'graph-container').attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-  let x = d3.scaleTime()
-    .domain(d3.extent(data, d => d.d3date))
-    .range([0, width]);
-
-  let y = d3.scaleLinear()
-    .domain([0, d3.max(data, d => d.max)])
-    .range([height, 0]);
-
-
-  // let lines = [];
-  let dim = selectedSpotlightDimension.get();
-  let discdims = getDiscourseOptionsForDimension(dim);
-
-  let total_line = d3.line()
-    .x(function(d) { return x(d.d3date)})
-    .y(function(d) { return y(d._total)});
-
-  let lines = discdims.map(function(dim) {
-    let line = d3.line()
-      .x(d => x(d.d3date))
-      .y(d => y(d[dim.name]));
-
-    return {line: line, dim: dim};
-  });
-
-
-  //
-  // let valLine = d3.line()
-  //   .x(function(d) {return x(d.date)})
-  //   .y(function(d) {return y(d.value)})
-  let total_color = '#555555ff';
-
-
-  g.append('path')
-    .data([data])
-    .attr('class', 'line line--total')
-    .style("stroke-width", 2)
-    .style('stroke', total_color)
-    .attr('d', total_line);
-
-  let key_colors = getLabelColors(getDiscourseOptionsForDimension(dim).map(demo_opt => demo_opt.name));
-
-  key_colors.Total = total_color;
-
-  let z = d3.scaleOrdinal()
-    .range(Object.values(key_colors));
-
-  updateStudentTimeKey('.student-participation-time__graph-key', Object.keys(key_colors), z)
-
-  lines.forEach(function(line) {
-
-    g.append('path')
-      .data([data])
-      .attr('class', 'line line--discdim')
-      .style("stroke", z(line.dim.name))
-      .style("stroke-width", 2)
-      .attr('d', line.line);
-
-    g.append('g')
-      .attr('class', 'dot-container')
-      .selectAll('dot')
-      .data(data)
-      .enter()
-      .append('circle')
-      .attr('r', 3)
-      .attr('class', 'dot')
-      .attr('cx', d => x(d.d3date))
-      .attr('cy', d => y(d[line.dim.name]))
-      .attr('data-dim-name', line.dim.name)
-      .style("fill", z(line.dim.name))
-  });
-
-  let ticks = data.map(datum => datum.d3date);
-
-  g.append("g")
-    .attr("transform", "translate(0," + height + ")")
-    .attr('class', 'x-axis')
-    .call(d3.axisBottom(x).tickValues(ticks));
-
-  // Add the Y Axis
-  g.append("g")
-    .attr('class', 'y-axis')
-    .call(d3.axisLeft(y));
-
-}
-
-let updateStudentTimeKey = function(key_wrapper, y_values, color_axis) {
-  let key_chunks = y_values.map(function(label) {
-    let color = color_axis(label)
-    return `<span class="key--label"><span class="key--color" style="background-color: ${color}"></span><span class="key--text">${label}</span></span>`
-  })
-
-  let html = `${key_chunks.join('')}`;
-  $(key_wrapper).html(html)
+  studentTimeGraph(data, selector, selectedEnvironment.get(), dimension)
 }

@@ -1,0 +1,50 @@
+<template name="editSubjectsAdvanced">
+    <div class="page-section">
+        <h3 class="page-section--header">Advanced Student Editing</h3>
+        <div class="page-section--nav">
+            <a href="{{pathFor route="editSubjects" _envId=envId}}">Back to simple student editing</a>
+        </div>
+        <div class="page-section__actions">
+            <div class="actions__group">
+                <button class="simple-button delete-all-students">Remove all students</button>
+                <button class="simple-button undelete-all-students">Un-remove all students</button>
+            </div>
+            <div class="actions__group">
+                <button class="simple-button check-all-students">Verify all data</button>
+                <button class="simple-button save-all-students">Save classroom students</button>
+            </div>
+        </div>
+        <div class="page-section--body">
+            <div class="students-table-explanation">
+                <p>Add new students by filling in the fields. New lines will be added automatically for you. Pasting in data copied from a spreadsheet will fill in the correct fields as long as you copied the header as well. The header fields must match the headers shown here exactly.</p>
+            </div>
+            <div class="subjects-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <td class="text-content"></td>
+                            <td class="text-content">Status</td>
+                            <td class="text-content">Name</td>
+                            {{#each param in subject_parameters}}
+                                <td class="student__header student__header--{{className param.name}} text-content">{{param.name}}</td>
+                            {{/each}}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{#if showStudentRows }}
+                        {{#each row in student_rows}}
+                            <tr class="student-row {{deletedClass row.id}}" data-deleted="{{isDeletedText row.id}}" data-student-id="{{row.id}}" data-row-status="{{row.status}}" data-x="{{row.data_x}}" data-y="{{row.data_y}}">
+                                <td class="text-content student-action"><button data-remove-id="{{column.id}}" class="simple-button simple-button--mini {{deleteButtonClass row.id}}">{{deleteButtonText row.id}}</button></td>
+                                <td class="text-content">{{row.status}}</td>
+                                {{#each column in row.columns}}
+                                    <td><input class="student-data-input" type="text" id="{{column.id}}" data-student-type="{{column.data_student_type}}" data-field-type="{{column.data_field_type}}" data-field="{{column.data_field}}" data-student-id="{{column.data_student_id}}" value="{{column.value}}"></td>
+                                {{/each}}
+                            </tr>
+                        {{/each}}
+                        {{/if}}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</template>

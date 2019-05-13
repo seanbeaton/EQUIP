@@ -9,6 +9,7 @@ import {getStudents} from "../../../../helpers/students";
 import {convertISODateToUS} from "../../../../helpers/dates";
 import {clone_object} from "../../../../helpers/objects";
 import {setupVis} from "../../../../helpers/timeline";
+import {getDiscourseDimensions, getDiscourseOptionsForDimension, getObservations} from "../../../../helpers/graphs";
 
 // const envSet = new ReactiveVar(false);
 const obsOptions = new ReactiveVar([]);
@@ -68,10 +69,10 @@ Template.timelineReport.helpers({
     return getEnvironment();
   },
   observations: function() {
-    return getObservations();
+    return getObservations(selectedObservations.get());
   },
   observationNames: function() {
-    let observations = getObservations();
+    let observations = getObservations(selectedObservations.get());
     let obsNames = observations.map(obs => obs.name);
 
     if (obsNames.length >= 3) {
@@ -89,7 +90,7 @@ Template.timelineReport.helpers({
     return getDemographics();
   },
   discourseparams: function() {
-    return getDiscourseDimensions();
+    return getDiscourseDimensions(selectedEnvironment.get());
   },
   demo_available: function() {
     setTimeout(function(){$(".chosen-select").trigger("chosen:updated");}, 100);
@@ -104,7 +105,7 @@ Template.timelineReport.helpers({
     return !!selectedDiscourseDimension.get() && !!selectedEnvironment.get() && !!(selectedObservations.get().length >= 2) ? '' : 'disabled'
   },
   selected_discourse_options: function() {
-    return getDiscourseOptions();
+    return getDiscourseOptionsForDimension(selectedEnvironment.get(), selectedDiscourseDimension.get());
   },
   dataset_types: function() {
     return [
@@ -131,27 +132,6 @@ let getDemographics = function() {
   return setupSubjectParameters(envId);
 };
 
-let getDiscourseDimensions = function() {
-  let envId = selectedEnvironment.get();
-  if (!envId) {
-    return []
-  }
-  return setupSequenceParameters(envId);
-};
-
-let getDiscourseOptions = function() {
-  let options = getDiscourseDimensions();
-  let selected_disc_dim = selectedDiscourseDimension.get();
-  if (selected_disc_dim === false) {
-    return [];
-  }
-  // console.log('options', options, 'selected_disc_dim', selected_disc_dim);
-  let opt = options.find(opt => opt.name === selected_disc_dim);
-  // console.log('opt', opt);
-  return opt
-    .options.split(',').map(function(opt) {return {name: opt.trim()}})
-};
-
 
 let getDemographicOptions = function() {
   let options = getDemographics();
@@ -166,11 +146,6 @@ let getDemographicOptions = function() {
 let getEnvironment = function() {
   let envId = selectedEnvironment.get();
   return Environments.findOne({_id: envId})
-}
-
-let getObservations = function() {
-  let obsIds = selectedObservations.get();
-  return Observations.find({_id: {$in: obsIds}}).fetch();
 }
 
 
@@ -277,7 +252,7 @@ let createTimelineData = function() {
 
       if (!ret.contributions_dataset.find(datapoint => datapoint.obsId === obsId)) {
         // If it wasn't there:
-        let obsers = getObservations();
+        let obsers = getObservations(selectedObservations.get());
         //console.log('getObservations()', obsers);
 
         let obs = obsers.find(obs => obs._id === obsId);
