@@ -510,7 +510,7 @@ function contributionRowTemplate(student, params) {
     return `
         <div class="contributions-grid-container-student">
             <h3 class="contributions-modal-header">${student.info.name}</h3>
-            <p class="o--toggle-links contributions-modal-link edit-stud" data-id="${student._id}" data-studentid="${student.info.studentId}">Edit</p>
+            <p class="o--toggle-links contributions-modal-link edit-stud" data-id="${student._id}" data-student-id="${student.info.studentId}">Edit</p>
             <p class="o--toggle-links contributions-modal-link delete-student" data-id="${student._id}" >Delete</p>
         </div>
         <div class="contributions-grid-item-container u--bold">

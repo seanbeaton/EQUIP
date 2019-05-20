@@ -1,6 +1,8 @@
 /*
 * JS file for observatory.js
 */
+import {userCanGroupEditEnv, userCanGroupViewEnv, userIsEnvOwner} from "../../../helpers/groups";
+
 var Stopwatch = require('stopwatchjs');
 var timer = new Stopwatch();
 //var timerUpdate;
@@ -9,6 +11,7 @@ var lastChoices = {};
 import * as observation_helpers from '/helpers/observations.js'
 import {updateStudent, updateStudents} from '/helpers/students.js'
 import {convertISODateToUS} from '/helpers/dates.js'
+import {userHasEnvEditAccess} from "../../../helpers/environments";
 
 const classroomMode = new ReactiveVar('code');
 
@@ -115,6 +118,9 @@ function createToggle(params, label) {
 }
 
 Template.observatory.helpers({
+  userHasEditAccess: function() {
+    return userHasEnvEditAccess(this.environment)
+  },
   smallGroup: function() {
     return this.observation.observationType === 'small_group';
   },
@@ -127,6 +133,17 @@ Template.observatory.helpers({
   },
   observation: function () {
     return this.observation;
+  },
+  accessModeText: function () {
+    if (userIsEnvOwner(this.environment._id)) {
+      return '';
+    }
+    else if (userCanGroupEditEnv(Meteor.userId(), this.environment._id)) {
+      return '<span class="access-level">Edit</span> access through group'
+    }
+    else if (userCanGroupViewEnv(Meteor.userId(), this.environment._id)) {
+      return '<span class="access-level">View</span> access through group'
+    }
   },
   subjects: function() {
     return Subjects.find({
@@ -195,6 +212,9 @@ Template.observatory.events({
     Router.go('observationList', {_envId:Router.current().params._envId});
   },
   'click .observatory.observatory--code .student-box.enabled': function(e) {
+    if (!userHasEnvEditAccess(this.environment)) {
+      return;
+    }
     //Create Sequence
     gtag('event', 'add', {'event_category': 'sequences'});
 
@@ -209,20 +229,17 @@ Template.observatory.events({
     $('#seq-param-modal').addClass('is-active');
   },
   'click .observatory.observatory--edit .student-box': function(e) {
+    if (!userHasEnvEditAccess(this.environment)) {
+      return;
+    }
     let target_id;
     if ($(e.target).is('.student-box')) {
       target_id = $(e.target).attr('id');
     } else {
       target_id = $(e.target).parents('.student-box').attr('id')
     }
-    console.log('tsds', {
-      obsId: this._id,
-      studentId: target_id,
-      action: $('#' + target_id).hasClass('enabled') ? 'mark' : 'unmark',
-    })
-
     Meteor.call('observationModifyAbsentStudent', {
-      obsId: this._id,
+      obsId: this.observation._id,
       studentId: target_id,
       action: $('#' + target_id).hasClass('enabled') ? 'mark' : 'unmark',
     });
@@ -265,15 +282,6 @@ Template.observatory.events({
     });
   },
   'click #save-seq-params': function(e) {
-    // var info = {};
-    // info['studentId'] = $('.js-modal-header').attr('data-id');
-    // info['Name'] = $('.js-modal-header').attr('data_name');
-    // envId = Router.current().params._envId;
-    // obsId = Router.current().params._obsId;
-
-    // var choices = [];
-    // var labels = [];
-
     let info = {
       student: {
         studentId:$('.js-modal-header').attr('data-id'),
@@ -303,38 +311,6 @@ Template.observatory.events({
       return;
     }
 
-    //
-    // $('.toggle-item').each(function () {
-    //   if ($(this).attr('data_label') == "Contribution Defaults") {
-    //     return;
-    //   }
-    //   labels.push($(this).attr('data_label'));
-    //   choices.push($(this).val());
-    // });
-    //
-    // $('.js-subject-labels').each(function () {
-    //   var chosenElement = false;
-    //   var chosenElements = this.nextElementSibling.querySelectorAll('.subj-box-params');
-    //
-    //   labels.push(this.textContent);
-    //   chosenElements.forEach(function(ele) {
-    //     if ($(ele).hasClass('chosen')) {
-    //         choices.push(ele.textContent.replace(/\n/ig, '').trim());
-    //         chosenElement = true;
-    //     }
-    //   })
-    //
-    //   if (chosenElement === false) {
-    //       choices.push(undefined);
-    //   }
-    // });
-    //
-    // for (label in labels) {
-    //   info[labels[label]] = choices[label];
-    // }
-    //
-    // lastChoices = info;
-
     const obsId = Router.current().params._obsId;
     const envId = Router.current().params._envId;
     let obsRaw = Observations.find({_id: obsId}).fetch()[0];
@@ -357,22 +333,21 @@ Template.observatory.events({
    });
   },
   'click .edit-seq': function(e) {
-    // observation_helpers.editContribution(e);
     gtag('event', 'edit', {'event_category': 'sequences'});
     $('#seq-data-modal').removeClass('is-active');
 
     let seqId = $(e.target).attr('data-id');
-    let subjId = $(e.target).attr('data-studentid');
+    let subjId = $(e.target).attr('data-student-id');
 
-    console.log('editing student id',  subjId, 'seq id', seqId);
+    console.log('editing student id',  subjId, 'seq id', seqId, 'envId', this.environment._id);
 
-    observation_helpers.populateParamBoxes(subjId, seqId);
+    observation_helpers.editParamBoxes(seqId, subjId, this.environment._id);
     $('#seq-param-modal').addClass('is-active');
 
 
   },
   'click .delete-seq': function(e) {
-    observation_helpers.deleteContribution(e);
+    observation_helpers.deleteContribution(e, this.observation._id);
   },
   'click #show-all-observations':function (e){
     observation_helpers.createTableOfContributions(this.observation._id);

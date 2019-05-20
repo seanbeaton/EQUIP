@@ -39,6 +39,7 @@
             <button style="display:none;" class="save-observation-date button is-small spaced-button">Save</button>
             </span>
         </h2>
+          {{#if userHasEditAccess}}
           <div class="toggle-sub">
               <p class="o--toggle-links edit-observation-date">Change Date</p>
               <p class="o--toggle-links edit-observation-name">Rename</p>
@@ -54,9 +55,11 @@
               {{/if}}
               <p class="o--toggle-links" id="delete-observation">Delete</p>
           </div>
+          {{/if}}
       </div>
-      <div class="columns c--observation-front__container">
-        <p class="column c--observation-front__title">Front Of Classroom</p>
+      <div class="c--observation-front__container">
+        <p class="c--observation-front__title">Front Of Classroom</p>
+        <p class="c--observation-front__access-level">{{{accessModeText}}}</p>
       </div>
       <!-- @FUTURE: remove hide when feature is more defined. -->
       <div class="columns c--observation-toggle__container toggle-dash" style="display: none;">

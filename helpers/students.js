@@ -7,7 +7,7 @@ function getStudents(envId) {
 }
 
 function getStudent(subjId, envId) {
-  let student = Subjects.find({_id: subjId}).fetch()[0];
+  let student = Subjects.findOne({_id: subjId});
   let allParams = setupSubjectParameters(envId);
   return updateStudent(student, allParams);
 

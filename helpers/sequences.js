@@ -2,7 +2,7 @@ import {setupSequenceParameters, setupSubjectParameters} from "./parameters";
 import {getStudent} from "./students";
 
 function getSequence(seqId, envId) {
-  let sequence = Sequences.find({_id:seqId}).fetch();
+  let sequence = Sequences.findOne({_id:seqId});
   let allParams = setupSequenceParameters(envId);
   return updateSequence(sequence, allParams);
 }

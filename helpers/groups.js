@@ -90,12 +90,12 @@ let userCanGroupEditEnv = function (uid, envId) {
   }).fetch();
 
   let allow = false;
-  console.log('checkibng fir uid', uid, 'and envID', envId, 'groups', groups)
+  console.log('checking for uid', uid, 'and envID', envId, 'groups', groups)
   groups.forEach(function (group) {
     console.log(group.environments.find(env => env.envId === envId), group.members.find(m => m.userId === Meteor.userId())
       .roles.some(r => ['edit', 'manage', 'admin'].includes(r)))
     if (
-      !!group.environments.find(env => env.envId === envId) &&
+      !!group.environments.find(env => env.envId === envId && env.share_type === 'edit') &&
       group.members.find(m => m.userId === uid)
       .roles.some(r => ['edit', 'manage', 'admin'].includes(r))) {
       allow = true;

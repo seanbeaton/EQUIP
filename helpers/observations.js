@@ -68,25 +68,27 @@
 import {setupSequenceParameters} from './parameters.js'
 import {getStudent, getStudents} from "./students.js";
 import {getSequence, getSequences} from "./sequences.js";
+import {userHasEnvEditAccess} from "./environments";
 
 
 function createTableOfContributions(obsId) {
   if (typeof obsId === 'undefined') {
     obsId = Router.current().params._obsId;
   }
+  let obs = Observations.findOne({_id: obsId});
+  let env = Environments.findOne({_id: obs.envId});
   $('#data-modal-content').children().remove();
-  var envId = Router.current().params._envId;
-  let seqs = getSequences(obsId, envId);
+  let seqs = getSequences(obsId, env._id);
 
   let modal = document.getElementById("data-modal-content");
   let allParams = setupSequenceParameters();
-  modal.innerHTML += contributionTableTemplate(seqs, allParams);
+  modal.innerHTML += contributionTableTemplate(seqs, allParams, env);
 }
 
-function contributionTableTemplate(sequences, parameters) {
+function contributionTableTemplate(sequences, parameters, env) {
   var params = parameters;
   var contributionRows = sequences.map((sequence) => {
-    return contributionRowTemplate(sequence, params)
+    return contributionRowTemplate(sequence, params, env)
   }).join("");
 
   return `
@@ -98,7 +100,7 @@ function contributionTableTemplate(sequences, parameters) {
 }
 
 
-function contributionRowTemplate(seqItem, params) {
+function contributionRowTemplate(seqItem, params, env) {
   let paramTemplate = params.map((param) => {
     return `
             <p class="o--modal-label contributions-grid-item">${param.name}</p>
@@ -116,8 +118,9 @@ function contributionRowTemplate(seqItem, params) {
   return `
         <div class="contributions-grid-container">
             <h3 class="contributions-modal-header">${seqItem.info.student.studentName}</h3>
-            <p class="o--toggle-links contributions-modal-link edit-seq" data-id="${seqItem._id}" data-student-id="${seqItem.info.student.studentId}">Edit</p>
-            <p class="o--toggle-links contributions-modal-link delete-seq" data-id="${seqItem._id}" >Delete</p>
+            ` +
+    ((!userHasEnvEditAccess(env)) ? '' : `<p class="o--toggle-links contributions-modal-link edit-seq" data-id="${seqItem._id}" data-student-id="${seqItem.info.student.studentId}">Edit</p><p class="o--toggle-links contributions-modal-link delete-seq" data-id="${seqItem._id}" >Delete</p>`)
+    + `
         </div>
         <div class="contributions-grid-item-container u--bold">
             <p class="o--modal-label contributions-grid-item">Time</p>
@@ -226,16 +229,11 @@ function populateParamBoxes(subjId, seqId) {
   }
   $('#param-modal-content').children().remove();
   var envId = Router.current().params._envId;
-  // var seqParams = SequenceParameters.find({'children.envId':envId}).fetch()[0];
-  // var parameterPairs = seqParams["children"]["parameterPairs"];
 
   let subj = getStudent(subjId, envId);
-  // var studentName = subj.info.name;
   var modal = document.getElementById("param-modal-content");
-  // var howDefault = $("*[data_label='Contribution Defaults']").val();
 
-  let allParams = setupSequenceParameters();
-  // let updated_sequence = updateSequence(subj, allParams);
+  let allParams = setupSequenceParameters(subj.envId);
 
   modal.innerHTML += contributionHeaderTemplate("Enter a contribution for " + subj.info.name, subj.info.name, subjId);
   modal.innerHTML += contributionParameterTemplate(allParams, null, "Save Contribution");
@@ -243,6 +241,20 @@ function populateParamBoxes(subjId, seqId) {
   attachOptionSelection()
 }
 
+
+function editParamBoxes(seqId, subjId, envId) {
+  $('#param-modal-content').children().remove();
+
+  var subj = getStudent(subjId, envId);
+  var seq = getSequence(seqId, envId);
+
+  var modal = document.getElementById('param-modal-content');
+
+  let allParams = setupSequenceParameters(envId);
+  modal.innerHTML += contributionHeaderTemplate(`Edit contribution for ${subj.info.name}`, subj.info.name, subjId);
+  modal.innerHTML += contributionParameterTemplate(allParams, seq, "Save Changes");
+  attachOptionSelection()
+}
 
 
 function contributionHeaderTemplate(type, studentName, subjId) {
@@ -313,38 +325,7 @@ var handleOptionSelect = function() {
   }
 }
 
-
-
-function editParamBoxes(seqId, subjId) {
-  $('#param-modal-content').children().remove();
-
-  // var subj = Subjects.find({_id: subjId}).fetch()[0];
-
-  var subj = getStudent(subjId);
-  var seq = getSequence(subjId);
-
-  var student = subj.info.name;
-
-  var modal = document.getElementById('param-modal-content');
-
-  let allParams = setupSequenceParameters();
-  modal.innerHTML += contributionHeaderTemplate(`Edit contribution for ${student}`, student, subjId);
-  modal.innerHTML += contributionParameterTemplate(allParams, seq, "Save Changes");
-  attachOptionSelection()
-}
-
-function editContribution(e) {
-  // gtag('event', 'edit', {'event_category': 'sequences'});
-  const seqId = $(e.target).attr('data-id');
-  const studentId = $(e.target).attr('data-student-id');
-
-  editParamBoxes(seqId, studentId);
-
-  $('#seq-data-modal').removeClass('is-active');
-  $('#seq-param-modal').addClass('is-active');
-}
-
-function deleteContribution(e) {
+function deleteContribution(e, obs) {
   var result = confirm("Press 'OK' to delete this Contribution.");
   if (result == false) {
     gtag('event', 'delete_cancelled', {'event_category': 'sequences'});
@@ -356,9 +337,9 @@ function deleteContribution(e) {
     gtag('event', 'delete', {'event_category': 'sequences'});
     return 0;
   });
-  createTableOfContributions();
+  createTableOfContributions(obs);
 }
 
 
 
-export {editParamBoxes, createTableOfContributions, populateParamBoxes, editContribution, deleteContribution}
+export {editParamBoxes, createTableOfContributions, populateParamBoxes, deleteContribution}
