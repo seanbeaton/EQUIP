@@ -50,6 +50,11 @@ let userIsGroupMember = function (gid, uid) {
   return !!group.members.find(m => m.userId === uid)
 }
 
+let envIsSharedToGroup = function (gid, envId) {
+  let group = Groups.findOne({_id: gid});
+  return !!group.environments.find(m => m.envId === envId)
+}
+
 let getUserGroupEnvs = function (userId) {
   let groups = Groups.find({
     "members.userId": userId
@@ -99,4 +104,15 @@ let userCanGroupEditEnv = function (uid, envId) {
   return allow;
 }
 
-export {getUserGroupEnvs, userCanGroupViewEnv, userCanGroupEditEnv, userIsGroupMember, getHumanEnvPermission, userIsGroupManager, hasRemovePermission, userIsEnvOwner}
+export {
+  getUserGroupEnvs,
+  userCanGroupViewEnv,
+  userCanGroupEditEnv,
+  userIsGroupMember,
+  getHumanEnvPermission,
+  userIsGroupManager,
+  hasRemovePermission,
+  userIsEnvOwner,
+  envIsSharedToGroup
+}
+
