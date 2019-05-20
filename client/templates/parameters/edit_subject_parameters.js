@@ -3,6 +3,8 @@
 * Propigates current subject parameters
 */
 
+import {envHasObservations} from "../../../helpers/environments";
+
 var serialize = require('form-serialize');
 
 Template.editSubjectParameters.helpers({
@@ -12,11 +14,7 @@ Template.editSubjectParameters.helpers({
      return result;
   },
   hasObsMade: function() {
-      var env = Environments.find({_id:Router.current().params._envId}).fetch();
-      var obs = Observations.find({envId:env[0]._id}, {sort: {lastModified: -1}}).fetch();
-      if (obs.length === 0) {
-          return true
-      }
+    return envHasObservations(this.environment._id)
   }
 });
 

@@ -4,15 +4,17 @@
 
 import { createModal } from '/helpers/modals.js'
 import {getSequences} from "/helpers/sequences";
+import {envHasObservations} from "../../../helpers/environments";
 
 let share_window_timeout;
 
+Template.environmentItem.rendered = function() {
+  if ($('.c-dashboard__accordion').attr('data-expand-children') === 'true') {
+    $('.toggle-accordion').trigger('click')
+  }
+}
+
 Template.environmentItem.events({
-  'click .enter-class': function(e) {
-     e.preventDefault();
-     var obsId = $(e.target).attr("data-id");
-     Router.go('observatory', {_envId:this._id, _obsId: obsId});
-  },
   'click .share-tab': function (e) {
       clearTimeout(share_window_timeout);
       removeAllShareDialogs();
@@ -37,8 +39,8 @@ Template.environmentItem.events({
               alert(error)
             }
             else {
-              let share_link = `${window.location.origin}/share/env/${result._id}`;
-              let share_link_students = `${window.location.origin}/share/env/${result._id_with_students}`;
+              let share_link = Router.routes['sharedEnv'].url({_shareId: result._id});
+              let share_link_students = Router.routes['sharedEnv'].url({_shareId: result._id_with_students});
               let share_button = $(e.target).parents('.share-tab-wrapper');
               let platform_modifier_key = (window.navigator.userAgent.indexOf("Mac") !== -1) ? '⌘' : 'ctrl';
               share_button
@@ -49,100 +51,12 @@ Template.environmentItem.events({
                 <input class="share-link-field-with-students" readonly value="${share_link_students}"></div>`);
               let share_link_field = $('.share-link-field', share_button);
               share_link_field.select();
-              //
-              // console.log( document.queryCommandSupported('copy'));
-              // console.log( document.queryCommandEnabled('copy'));
-              // setTimeout(function () {
-              //   console.log( document.queryCommandEnabled('copy'));
-              //   document.execCommand('Copy');
-              //
-              //   let res = document.execCommand('Copy');
-              //   console.log('res', res);
-              // }, 500);
-              // let res = document.execCommand('Copy');
-              // console.log('res', res);
-              // window.getSelection().removeAllRanges();
               share_window_timeout = setTimeout(removeAllShareDialogs, 15000);
             }
           })
         }
       });
   },
-  // 'click .export-tab': function (e) {
-  //   e.stopPropagation();
-  //   e.preventDefault();
-  //   var envId = this._id;
-  //   var name = this.envName
-  //   Meteor.call('exportAllParams', envId, function(error, result){
-  //     if (error){
-  //       alert(error.reason);
-  //     } else {
-  //       // Prompt save file dialogue
-  //       if ($.isEmptyObject(result)) {
-  //         alert("There are no parameters to export. Add parameters to this environment to be able to export.");
-  //         return;
-  //       }
-  //       var json = JSON.stringify(result);
-  //       var blob = new Blob([json], {type: "application/json"});
-  //       var url  = window.URL.createObjectURL(blob);
-  //
-  //       var a = document.createElement("a");
-  //       a.href = url;
-  //       a.download = '' + name + '_environment.json';
-  //       a.click();
-  //       window.URL.revokeObjectURL(url);
-  //     }
-  //   });
-  // },
-  // 'click .import-tab': function (e) {
-  //   e.stopPropagation();
-  //   e.preventDefault();
-  //
-  //   var envId = this._id;
-  //   var element = document.createElement('div');
-  //   element.innerHTML = '<input type="file">';
-  //   var fileInput = element.firstChild;
-  //
-  //   fileInput.addEventListener('change', function() {
-  //       var file = fileInput.files[0];
-  //       var jsonImport = {};
-  //
-  //       if (file.name.match(/\.(json)$/)) {
-  //           var reader = new FileReader();
-  //
-  //           reader.onload = function() {
-  //               var contents = reader.result;
-  //               jsonImport = JSON.parse(contents);
-  //               if ('subject' in jsonImport) {
-  //                 jsonImport['subject']['envId'] = envId;
-  //
-  //                 Meteor.call('importSubjParameters', jsonImport['subject'], function(error, result) {
-  //                   return 0;
-  //                 });
-  //               } else {
-  //                 alert("Incorrectly formatted JSON import. No Subject parameters.");
-  //               }
-  //
-  //               if ('sequence' in jsonImport) {
-  //                 jsonImport['sequence']['envId'] = envId;
-  //                 Meteor.call('importSeqParameters', jsonImport['sequence'], function(error, result) {
-  //                     return 0;
-  //                   });
-  //               } else {
-  //                 alert("Incorrectly formatted JSON import. No Sequence parameters.");
-  //               }
-  //
-  //
-  //           };
-  //           reader.readAsText(file);
-  //       } else {
-  //           alert("File not supported, .json files only");
-  //       }
-  //   });
-  //   alert("Please import files that have been previously exported from EQUIP only.")
-  //   fileInput.click(); // opening dialog
-  //
-  // },
   'click #edit-sequence-params': function(e) {
      e.preventDefault();
      Router.go('editSequenceParameters', {_envId:this._id});
@@ -360,10 +274,7 @@ Template.environmentItem.helpers({
         return Observations.find({envId:this._id}, {sort: {lastModified: -1}}).count();
     },
     hasObsMade: function() {
-        var obs = Observations.find({envId:this._id}, {sort: {lastModified: -1}}).fetch();
-        if (obs.length === 0) {
-            return true
-        }
+        return envHasObservations(this._id)
     },
     getEnvName: function() {
         return this.envName;

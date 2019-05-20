@@ -3,6 +3,8 @@
 * Propigates current sequence parameters
 */
 
+import {envHasObservations} from "../../../helpers/environments";
+
 var serialize = require('form-serialize');
 
 //Try to short circuit "enter" button?
@@ -17,18 +19,10 @@ Template.editSequenceParameters.rendered = function() {
 
 Template.editSequenceParameters.helpers({
   environment: function() {
-     var env = Environments.find({_id:Router.current().params._envId}).fetch();
-     var result = env[0];
-     return result;
+    return this.environment;
   },
   hasObsMade: function() {
-      var env = Environments.find({_id:Router.current().params._envId}).fetch();
-      var obs = Observations.find({envId:env[0]._id}, {sort: {lastModified: -1}}).fetch();
-      if (obs.length === 0) {
-          return true
-      } else {
-          return false
-      }
+    return envHasObservations(this.environment._id)
   }
 });
 

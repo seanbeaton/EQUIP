@@ -359,4 +359,6 @@ function deleteContribution(e) {
   createTableOfContributions();
 }
 
+
+
 export {editParamBoxes, createTableOfContributions, populateParamBoxes, editContribution, deleteContribution}

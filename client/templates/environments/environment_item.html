@@ -96,7 +96,7 @@
                     <li>
                         <div class="c--accordion-item__inner--observations">
                             {{#each observation in getObservations}}
-                                <p class="enter-class observation-labels o--box-item" data-id={{observation._id}}>({{incrementIndex @index }} - {{getClassTypeAbbreviation observation.observationType}}) {{observation.name}} </p>
+                                <a class="enter-class observation-labels o--box-item" href="{{pathFor 'observatory' _obsId=observation._id _envId=getEnvironmentId}}">({{incrementIndex @index }} - {{getClassTypeAbbreviation observation.observationType}}) {{observation.name}}</a>
                             {{/each}}
                             <p class="c--accordion-item_inner--count">Observations: {{getObservationsCount}}</p>
                         </div>

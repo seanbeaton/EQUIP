@@ -232,16 +232,6 @@ Template.environmentList.events({
   'click #absent-close-modal': function() {
     absentStudentSelectActive.set(false);
   },
-'click .enter-class': function(e) {
-  // var obj1 = SubjectParameters.find({'children.envId': this._id}).fetch();
-  // var obj2 = SequenceParameters.find({'children.envId': this._id}).fetch();
-  // if ($.isEmptyObject(obj1) || $.isEmptyObject(obj2) || $.isEmptyObject(obj3)) {
-  //  alert('You must add students to the environment to continue to do the observation.');
-  //  return;
-  // }
-    var obsId = $(e.target).attr("data-id");
-    Router.go('observatory', {_envId: this._id, _obsId: obsId});
-},
 
   //  'click #createNewEnvironment': function(e) {
   //   $('#createEnvPopup').modal({

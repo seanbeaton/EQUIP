@@ -28,10 +28,10 @@
                                 {{/if}}
                             </td>
                             <td>
+                                <a href="{{pathFor 'environmentItem' _envId=env.envId}}">View</a>
                                 {{#if hasRemovePermission env}}
                                     {{> removeEnvButton env=env group=group}}
                                 {{/if}}
-                                <a href="#">View (does not work)</a>
                             </td>
                         </tr>
                     {{/each}}
