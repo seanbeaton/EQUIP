@@ -88,6 +88,10 @@ Template.groupWorkReport.helpers({
         env.envName += ' (no group work obs.)';
         env.disabled = 'disabled';
       }
+
+      if (env.userId !== Meteor.userId()) {
+        env.envName += ' (shared)';
+      }
       return env
     });
     return envs;

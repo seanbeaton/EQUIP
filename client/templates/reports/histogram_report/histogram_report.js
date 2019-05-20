@@ -78,6 +78,10 @@ Template.histogramReport.helpers({
         env.envName += ' (no observations)';
         env.disabled = 'disabled';
       }
+
+      if (env.userId !== Meteor.userId()) {
+        env.envName += ' (shared)';
+      }
       return env
     });
     return envs;

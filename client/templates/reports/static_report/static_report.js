@@ -8,7 +8,14 @@ import {updateSequences, getSequences} from "/helpers/sequences";
 var d3 = require('d3');
 //Generate classroom buttons immediately
 Template.staticReport.rendered = function() {
-  var envs = Environments.find({}).fetch();
+  let envs = Environments.find({}, {sort: {submitted: -1}}).fetch();
+  envs = envs.map(function(env) {
+    if (env.userId !== Meteor.userId()) {
+      env.envName += ' (shared)';
+    }
+    return env
+  });
+
   if ($.isEmptyObject(envs)) {
     $('.env-selection').append('<h2 class="subtitle is-2" style="color: red;">You must create classroom data before doing an analysis is possible.</h2>')
   } else {
@@ -40,7 +47,14 @@ Template.staticReport.rendered = function() {
 
 Template.staticReport.helpers({
    environment: function() {
-      return Environments.find({}, {sort: {submitted: -1}});
+     let envs = Environments.find({}, {sort: {submitted: -1}}).fetch();
+     envs = envs.map(function(env) {
+       if (env.userId !== Meteor.userId()) {
+         env.envName += ' (shared)';
+       }
+       return env
+     });
+     return envs;
    },
 });
 
