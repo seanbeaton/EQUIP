@@ -131,15 +131,23 @@ Meteor.publish('groupObservation', function(obsId) {
   );
 });
 
-
-Meteor.publish('observations', function() {
+Meteor.publishComposite('observations', function() {
   if (!this.userId) {
     return this.ready();
   }
 
-  let envIds = Environments.find({userId: this.userId}).fetch().map(e => e._id)
-  return Observations.find({envId: {$in: envIds}});
-});
+  return {
+    find() {
+      return Environments.find({userId: this.userId}, {fields: {_id: 1}})
+    },
+    children: [{
+      find(env) {
+        return Observations.find({envId: env._id});
+      }
+    }]
+  }
+})
+
 
 Meteor.publish('envObservations', function(envId) {
   if (!this.userId) {
@@ -149,13 +157,11 @@ Meteor.publish('envObservations', function(envId) {
   // need to check ownership on the parent (environment), not the observation
   let env_ids = Environments.find({userId: this.userId}).fetch().map(e => e._id)
   if (!!env_ids.find(id => id === envId)) {
-    this.ready();
-  }
-  else {
     return Observations.find({
       envId: envId
     });
   }
+  this.ready()
 });
 
 Meteor.publish('observation', function(obsId) {
@@ -170,15 +176,35 @@ Meteor.publish('observation', function(obsId) {
   let envIds = Environments.find({userId: this.userId}).fetch().map(e => e._id);
   return Observations.find({envId: {$in: envIds}, _id: obsId});
 });
+//
+// Meteor.publish('subjects', function() {
+//   if (!this.userId) {
+//       return this.ready();
+//   }
+//
+//   let envIds = Environments.find({userId: this.userId}).fetch().map(e => e._id)
+//   return Subjects.find({envId: {$in: envIds}});
+// });
 
-Meteor.publish('subjects', function() {
+
+Meteor.publishComposite('subjects', function() {
   if (!this.userId) {
-      return this.ready();
+    return this.ready();
   }
 
-  let envIds = Environments.find({userId: this.userId}).fetch().map(e => e._id)
-  return Subjects.find({envId: {$in: envIds}});
-});
+  return {
+    find() {
+      console.log('looking for uid', this.userId);
+      return Environments.find({userId: this.userId}, {fields: {_id: 1}})
+    },
+    children: [{
+      find(env) {
+        return Subjects.find({envId: env._id});
+      }
+    }]
+  }
+})
+
 
 Meteor.publish('groupSubjects', function() {
   if (!this.userId) {
@@ -207,13 +233,11 @@ Meteor.publish('envSubjects', function(envId) {
   }
   let env_ids = Environments.find({userId: this.userId}).fetch().map(e => e._id);
   if (!!env_ids.find(id => id === envId)) {
-      this.ready();
-  }
-  else {
     return Subjects.find({
       envId: envId
     });
   }
+  this.ready();
 });
 
 Meteor.publish('groupEnvSubjects', function(envId) {
@@ -234,14 +258,22 @@ Meteor.publish('groupEnvSubjects', function(envId) {
   this.ready()
 });
 
-Meteor.publish('sequences', function() {
+Meteor.publishComposite('sequences', function() {
   if (!this.userId) {
     return this.ready();
   }
 
-  let env_ids = Environments.find({userId: this.userId}).fetch().map(e => e._id);
-  return Sequences.find({envId: {$in: env_ids}});
-});
+  return {
+    find() {
+      return Environments.find({userId: this.userId}, {fields: {_id: 1}})
+    },
+    children: [{
+      find(env) {
+        return Sequences.find({envId: env._id});
+      }
+    }]
+  }
+})
 
 Meteor.publish('envSequences', function(envId) {
   if (!this.userId) {
@@ -310,14 +342,23 @@ Meteor.publish('groupSequences', function() {
   return Sequences.find({envId: {$in: [...env_ids]}});
 });
 
-Meteor.publish('subjectParameters', function() {
+Meteor.publishComposite('subjectParameters', function() {
   if (!this.userId) {
     return this.ready();
   }
 
-  let env_ids = Environments.find({userId: this.userId}).fetch().map(e => e._id);
-  return SubjectParameters.find({'children.envId': {$in: env_ids}});
-});
+  return {
+    find() {
+      return Environments.find({userId: this.userId}, {fields: {_id: 1}})
+    },
+    children: [{
+      find(env) {
+        return SubjectParameters.find({'children.envId': env._id});
+      }
+    }]
+  }
+})
+
 
 Meteor.publish('envSubjectParameters', function(envId) {
   if (!this.userId) {
@@ -364,14 +405,23 @@ Meteor.publish('groupSubjectParameters', function() {
 });
 
 
-Meteor.publish('sequenceParameters', function() {
+Meteor.publishComposite('sequenceParameters', function() {
   if (!this.userId) {
     return this.ready();
   }
 
-  let env_ids = Environments.find({userId: this.userId}).fetch().map(e => e._id);
-  return SequenceParameters.find({"children.envId": {$in: env_ids}});
-});
+  return {
+    find() {
+      return Environments.find({userId: this.userId}, {fields: {_id: 1}})
+    },
+    children: [{
+      find(env) {
+        return SequenceParameters.find({'children.envId': env._id});
+      }
+    }]
+  }
+})
+
 
 Meteor.publish('envSequenceParameters', function(envId) {
   if (!this.userId) {
