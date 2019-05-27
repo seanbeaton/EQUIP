@@ -66,8 +66,8 @@
 
 // import {setupSubjectParameters} from "./parameters";
 import {setupSequenceParameters} from './parameters.js'
-import {getStudent, getStudents} from "./students.js";
-import {getSequence, getSequences} from "./sequences.js";
+import {getStudent, getStudents} from "../../helpers/students.js";
+import {getSequence, getSequences} from "../../helpers/sequences.js";
 
 
 function createTableOfContributions(obsId) {
@@ -79,7 +79,7 @@ function createTableOfContributions(obsId) {
   let seqs = getSequences(obsId, envId);
 
   let modal = document.getElementById("data-modal-content");
-  let allParams = setupSequenceParameters();
+  let allParams = setupSequenceParameters(envId);
   modal.innerHTML += contributionTableTemplate(seqs, allParams);
 }
 

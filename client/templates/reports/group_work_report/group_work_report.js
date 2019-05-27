@@ -5,8 +5,8 @@ let d3ScaleChromatic = require("d3-scale-chromatic");
 let d3Interpolate = require("d3-interpolate");
 let chosen = require("chosen-js");
 
-import {getSequences} from "../../../helpers/sequences";
-import {getStudents, getStudent} from "../../../helpers/students";
+import {getSequences} from "../../../../helpers/sequences";
+import {getStudents, getStudent} from "../../../../helpers/students";
 import {setupVis} from "../../../helpers/timeline";
 import {getDiscourseOptionsForDimension, getObservations} from "../../../helpers/graphs";
 
@@ -206,9 +206,10 @@ let initGroups = function(data, selector) {
   console.log('data', data);
 
   let markup = data.groups.map(function(group) {
+    let total_group_contribs = getGroupTotalContribs(group);
     let highest_contribs = Math.max(...group.students.map(stud => getStudentTotalContribs(stud)));
     let markup = "<div class='student-group'>" +
-      "<div class='student-group__title'><strong>" + group.name + "</strong> - " + group.observationDate + " (n = " + getGroupTotalContribs(group) + ")</div>" +
+      "<div class='student-group__title'><strong>" + group.name + "</strong> - " + group.observationDate + " (n = " + total_group_contribs + ")</div>" +
       "<div class='student-group__students'>" +
       group.students.map(function(student) {
         console.log('student', student);
@@ -216,7 +217,7 @@ let initGroups = function(data, selector) {
         let student_count = getStudentTotalContribs(student);
         let padding = getStudentPadding(student_count, highest_contribs);
         return '<div id="' + student._id + '" class="dragger student-box student-box--scaling" style="padding: ' + padding + '">' +
-          '<div class="student-box__wrapper"><p class="student-box__inner">' + student.info.name + ' (' + student_count + ')' +'</div>' +
+          '<div class="student-box__wrapper"><p class="student-box__inner">' + student.info.name + ' (n=' + student_count + ', ' + Math.round(student_count / total_group_contribs * 1000) / 10 + '%)' +'</div>' +
           '</p></div>'
       }).join('') +
       "</div>" +

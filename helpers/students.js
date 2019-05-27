@@ -1,4 +1,4 @@
-import {setupSubjectParameters} from "./parameters";
+import {setupSubjectParameters} from "/helpers/parameters";
 
 function getStudents(envId) {
   let students = Subjects.find({envId:envId}).fetch();

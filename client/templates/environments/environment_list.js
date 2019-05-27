@@ -2,7 +2,7 @@
 * JS file for environment_list.html
 */
 
-import {getStudents} from "../../helpers/students";
+import {getStudents} from "../../../helpers/students";
 
 const smallGroupStudentSelectActive = new ReactiveVar(false);
 const absentStudentSelectActive = new ReactiveVar(false);

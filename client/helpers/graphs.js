@@ -1,4 +1,4 @@
-import {getSequences} from "./sequences";
+import {getSequences} from "../../helpers/sequences";
 import {setupSequenceParameters} from "./parameters";
 let d3 = require('d3');
 

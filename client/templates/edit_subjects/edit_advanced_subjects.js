@@ -1,5 +1,5 @@
 import {setupSubjectParameters} from "../../helpers/parameters";
-import {getStudents} from "../../helpers/students";
+import {getStudents} from "../../../helpers/students";
 import {find_open_position} from "./edit_subjects";
 const partial_rows = new ReactiveVar([]);
 const showStudentRows = new ReactiveVar(true);

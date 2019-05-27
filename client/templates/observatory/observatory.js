@@ -7,7 +7,7 @@ var timer = new Stopwatch();
 var lastChoices = {};
 
 import * as observation_helpers from '/client/helpers/observations.js'
-import {updateStudent, updateStudents} from '/client/helpers/students.js'
+import {updateStudent, updateStudents} from '/helpers/students.js'
 import {convertISODateToUS} from '/client/helpers/dates.js'
 
 const classroomMode = new ReactiveVar('code');
@@ -374,7 +374,8 @@ Template.observatory.events({
   'click .delete-seq': function(e) {
     observation_helpers.deleteContribution(e);
   },
-  'click #show-all-observations':function (e){
+  'click .show-all-observations':function (e){
+    console.log('show-all-observations', e, this);
     observation_helpers.createTableOfContributions(this._id);
     gtag('event', 'view_sequence_list', {'event_category': 'observations'});
     $('#seq-data-modal').addClass('is-active');

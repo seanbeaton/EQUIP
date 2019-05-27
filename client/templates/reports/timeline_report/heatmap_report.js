@@ -5,8 +5,8 @@ let d3ScaleChromatic = require("d3-scale-chromatic");
 let d3Interpolate = require("d3-interpolate");
 let chosen = require("chosen-js");
 
-import {getSequences} from "../../../helpers/sequences";
-import {getStudents, getStudent} from "../../../helpers/students";
+import {getSequences} from "../../../../helpers/sequences";
+import {getStudents, getStudent} from "../../../../helpers/students";
 import {heatmapReportSortDemoChosen, heatmapReportSortType} from "../selection_elements";
 import {setupVis} from '../../../helpers/timeline';
 import {clone_object} from "../../../helpers/objects";

@@ -3,7 +3,7 @@
 */
 
 import { createModal } from '/client/helpers/modals.js'
-import {getSequences} from "../../helpers/sequences";
+import {getSequences} from "../../../helpers/sequences";
 
 let share_window_timeout;
 
