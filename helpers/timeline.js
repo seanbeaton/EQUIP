@@ -10,7 +10,7 @@
   selectedObservations is a ReactiveVar that will be updated with
   the currently active observations per the timeline.
  */
-import {getSequences} from "./sequences";
+import {getSequences} from "/helpers/sequences";
 import vis from "vis";
 
 let setupVis = function(visContainerId, selectionCallback, obsOptions, selectedObservations, class_type) {

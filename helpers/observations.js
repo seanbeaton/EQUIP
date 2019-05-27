@@ -70,7 +70,6 @@ import {getStudent, getStudents} from "./students.js";
 import {getSequence, getSequences} from "./sequences.js";
 import {userHasEnvEditAccess} from "./environments";
 
-
 function createTableOfContributions(obsId) {
   if (typeof obsId === 'undefined') {
     obsId = Router.current().params._obsId;

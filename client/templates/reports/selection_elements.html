@@ -94,7 +94,7 @@
     <div class="{{class_prefix}}-demographic__wrapper">
     <label for="{{class_prefix}}-demographic">Select Demographic</label>
     <select id="{{class_prefix}}-demographic" class="demographic {{class_prefix}}-demographic-chosen">
-        <option selected value="">- Select -</option>
+        <option selected value="">{{default}}</option>
         {{#each demographics}}
             <option data-options="{{options}}" value="{{name}}">{{name}}</option>
         {{/each}}

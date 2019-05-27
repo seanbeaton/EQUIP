@@ -20,7 +20,7 @@
 }
 
 .student-box--scaling {
-  width: 150px;
+  width: 200px;
   height: 50px;
   margin: 5px;
   //cursor: pointer;
@@ -42,15 +42,17 @@
 #group-work-d3-wrapper {
   display: flex;
   flex-flow: row wrap;
+  justify-content: center;
 
   .student-group {
-    flex: 1 1 400px;
+    flex: 0 1 460px;
     padding: 8px;
   }
   .student-group__students {
     display: flex;
     flex-flow: row wrap;
     justify-content: center;
+    border: 1px solid #666;
   }
   .student-group__title {
     text-align: center;

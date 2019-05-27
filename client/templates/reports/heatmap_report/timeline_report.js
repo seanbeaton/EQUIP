@@ -3,13 +3,14 @@ import {Sidebar} from '../../../../helpers/graph_sidebar';
 let d3 = require('d3');
 
 import '/node_modules/vis/dist/vis.min.css';
-import {setupSequenceParameters, setupSubjectParameters} from "../../../../helpers/parameters";
-import {getSequences} from "../../../../helpers/sequences";
-import {getStudents} from "../../../../helpers/students";
-import {convertISODateToUS} from "../../../../helpers/dates";
-import {clone_object} from "../../../../helpers/objects";
-import {setupVis} from "../../../../helpers/timeline";
-import {getDiscourseDimensions, getDiscourseOptionsForDimension, getObservations} from "../../../../helpers/graphs";
+
+import {setupSequenceParameters, setupSubjectParameters} from "/helpers/parameters";
+import {getSequences} from "/helpers/sequences";
+import {getStudents} from "/helpers/students";
+import {convertISODateToUS} from "/helpers/dates";
+import {clone_object} from "/helpers/objects";
+import {setupVis} from "/helpers/timeline";
+import {getDiscourseDimensions, getDiscourseOptionsForDimension, getObservations} from "/helpers/graphs";
 
 // const envSet = new ReactiveVar(false);
 const obsOptions = new ReactiveVar([]);

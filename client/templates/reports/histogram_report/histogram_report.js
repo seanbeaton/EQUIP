@@ -9,7 +9,7 @@ import vis from "vis";
 
 import {getSequences} from "../../../../helpers/sequences";
 import {getStudents, getStudent} from "../../../../helpers/students";
-import {setupVis} from "../../../../helpers/timeline";
+import {setupVis} from "/helpers/timeline";
 import {
   createStudentContribData,
   createStudentTimeData, get_average, get_median,

@@ -1,4 +1,4 @@
-import {setupSequenceParameters, setupSubjectParameters} from "./parameters";
+import {setupSequenceParameters, setupSubjectParameters} from "/helpers/parameters";
 import {getStudent} from "./students";
 
 function getSequence(seqId, envId) {
@@ -8,6 +8,7 @@ function getSequence(seqId, envId) {
 }
 function getSequences(obsId, envId) {
   let sequences;
+  console.log('obsId, envId', obsId, envId)
   if (obsId === null) {
     sequences = Sequences.find({envId:envId}).fetch();
   }
