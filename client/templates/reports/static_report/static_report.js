@@ -56,6 +56,12 @@ Template.staticReport.helpers({
    },
 });
 
+Template.staticReport.helpers({
+   observations: function() {
+      return Subjects.find();
+   },
+});
+
 
 
 Template.staticReport.events({
@@ -107,7 +113,7 @@ Template.staticReport.events({
     let demData = makeDemGraphs(envId, dParams, envId);
     let groupCData = makeContributionGraphs(obsIds, dParams, sParams, envId);
 
-    reportSummary(chosenClassroomName, obsNames, sParams, dParams, totalCont);
+    reportSummary(chosenClassroomName, obsIds, obsNames, sParams, dParams, totalCont);
     classStats(envId, sParams, obsIds);
     makeRatioGraphs(envId, groupCData, demData);
     makeIndividualGraphs(obsIds, envId);
@@ -124,7 +130,7 @@ Template.staticReport.events({
 
   'click .classroom-selection': function(e) {
     envId = $(e.target).attr('data_id');
-    obs = Observations.find({"envId": envId}).fetch();
+    obs = Observations.find({"envId": envId, observationType: 'whole_class'}).fetch();
     dparams = SubjectParameters.findOne({'children.envId': envId});
     sparams = SequenceParameters.findOne({'children.envId': envId});
 
@@ -275,14 +281,31 @@ Template.staticReport.events({
 });
 
 
-function reportSummary(chosenClassroomName, observations, sParams, dParams, totalCont) {
+function reportSummary(chosenClassroomName, obsIds, obsNames, sParams, dParams, totalCont) {
   let container = $('.classroom-summary');
+  let get_absent_students = function(obsId) {
+    let absent_students = Subjects.find({_id: {$in: Observations.findOne({_id: obsId}).absent}}).map(s => s.info.name);
+    if (absent_students.length !== 0) {
+      return absent_students.join(', ');
+    }
+    else {
+      return "- None -"
+    }
+  }
   container.append('<div><strong>Classroom: </strong><span>' + chosenClassroomName + '</span></div>');
   container.append('<div><strong>Total Contributions: </strong><span>' + totalCont + '</span></div>');
-  container.append('<div><strong>Observations: </strong>' + genUnorderedList(observations) + '</div>');
+  container.append('<div><strong>Observations: </strong>' + genUnorderedList(obsNames) + '</div>');
   container.append('<div><strong>Social Markers: </strong>' + genUnorderedList(dParams) + '</div>');
   container.append('<div><strong>Discourse Dimensions: </strong>' + genUnorderedList(sParams) + '</div>');
+  container.append('<div><strong>Absent Students</strong>: </strong>' + genUnorderedList(obsIds.map(function(obsId) {
+    let obs = Observations.findOne({_id: obsId});
+    return '<span class="absent-students-list__observation-name">' + obs.name + '</span><br/>' +
+    '<span class="absent-students-list__students-label">Absent: </span>' +
+    '<span class="absent-students-list__students-list">' + get_absent_students(obs._id)  + '</span>'
+  })) + '</div>');
 }
+
+
 
 function genUnorderedList(list) {
   let output = '<ul>';
