@@ -1,3 +1,27 @@
+const groupNameEditActive = ReactiveVar(false);
+
+Template.groupNameEditable.helpers({
+  editing: function() {
+    return groupNameEditActive.get()
+  }
+})
+
+Template.groupNameEditable.events({
+  'click .group__name--start-edit': function(e) {
+    groupNameEditActive.set(true);
+  },
+  'submit .group__name__edit-form': function(e) {
+    e.preventDefault();
+    let $group_name = $('.group__name__edit-field');
+    if (!$group_name.val()) {
+      alert('Invalid group name');
+      return;
+    }
+    Meteor.call('groupEdit', {gid: this.group._id, groupName: $group_name.val()}, function(err, res) {
+      groupNameEditActive.set(false);
+    })
+  }
+})
 
 Template.groupManage.helpers({
   group: function() {
@@ -13,7 +37,13 @@ Template.groupManage.helpers({
     }
   },
   getUserName: function(user) {
-    return Meteor.users.findOne({_id: user.userId}).username
+    let u = Meteor.users.findOne({_id: user.userId});
+    if (u) {
+      return u.username;
+    }
+    else {
+      return false
+    }
   },
   getGroupMembership: function(user, role) {
     return getUserRoles(user.userId, this)[role] === true;
@@ -85,11 +115,15 @@ let memberRemovalAllowed = function(member, group) {
 }
 
 Template.memberAddForm.events = {
-  'click .member-add-form__submit': function(e) {
-    let user = $('.member-add-form__input');
-    let userId = user.val();
-    Meteor.call('addUserToGroup', userId, this._id, addUserHandler)
-    $('.member-add-form__input').val('');
+  'submit .member-add-form': function(e) {
+    let $user = $('.member-add-form__input');
+    e.preventDefault();
+    if (!$user.val()) {
+      alert('group name required');
+      return;
+    }
+    Meteor.call('addUserToGroup', $user.val(), this._id, addUserHandler)
+    $user.val('');
   },
   'autocompleteselect .member-add-form__input': function(e, template, doc) {
     Meteor.call('addUserToGroup', doc._id, template.data.group._id, addUserHandler)
@@ -100,8 +134,13 @@ Template.memberAddForm.events = {
 
 let addUserHandler = function(error, result) {
   if (error) {
-    console.log('Error: ', error);
-    alert(error);
+    console.log('Error:', error);
+    if (error.error === 500) {
+      alert('Invalid user')
+    }
+    else {
+      alert(error.reason);
+    }
   }
 }
 
@@ -153,9 +192,13 @@ let getUserRoles = function(userId, group) {
     'edit': false,
     'view': false,
   }
-  group.members.find(u => u.userId === userId).roles.forEach(function(role) {
-    default_roles[role] = true;
-  })
+
+  let member_roles = group.members.find(u => u.userId === userId);
+  if (member_roles) {
+    member_roles.roles.forEach(function(role) {
+      default_roles[role] = true;
+    })
+  }
 
   if (default_roles.admin) {
     default_roles.manage = true;

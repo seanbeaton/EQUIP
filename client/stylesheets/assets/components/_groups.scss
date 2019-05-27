@@ -46,3 +46,36 @@
     margin-top: 6px;
   }
 }
+
+.group__name__edit-form {
+  display: inline-block;
+}
+
+.group__name__edit-field {
+  font-family: 'Roboto', sans-serif;
+  font-size: 24px;
+  line-height: 120%;
+  color: var(--teal);
+}
+
+.group__name--start-edit {
+  //text-indent: -999%;
+  //overflow: hidden;
+  position: relative;
+  height: 26px;
+  width: 26px;
+  border: 0;
+  background: 0;
+  color: transparent;
+  &:after {
+    font-size: 18px;
+    color: #333;
+    position: absolute;
+    left: 0;
+    padding: 4px;
+    line-height: 18px;
+    top: 0;
+    font-family: FontAwesome;
+    content: '\f040';
+  }
+}

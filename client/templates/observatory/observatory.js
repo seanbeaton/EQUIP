@@ -149,25 +149,6 @@ Template.observatory.helpers({
     return Subjects.find({
       envId: this.observation.envId,
     })
-    // if (this.observationType === 'small_group') {
-    //   return Subjects.find({
-    //     envId: this.envId,
-    //     _id: {
-    //       $in: this.small_group
-    //     }
-    //   });
-    // }
-    // if (this.observationType === 'whole_class') {
-    //   return Subjects.find({
-    //     envId: this.envId,
-    //     _id: {
-    //       $nin: this.absent
-    //     }
-    //   });
-    // }
-    // else {
-    //   return Subjects.find({envId: this.envId});
-    // }
   },
   studentActive: function(student) {
     if (this.observation.observationType === 'small_group') {

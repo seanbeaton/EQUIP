@@ -1,7 +1,16 @@
 <template name="groupsList">
     <div class="page--group">
         <h3>My groups</h3>
-        <button class="group-create">Create a new group</button>
+        <details>
+            <summary>Create a new group</summary>
+            <form class="group-creation">
+                <div class="group-creation__name">
+                    <label for="group-creation__name">Name</label>
+                    <input type="text" id="group-creation__name" placeholder="My workshop">
+                </div>
+                <button class="group-creation__submit">Create group</button>
+            </form>
+        </details>
         <table>
             <thead>
             <tr>
@@ -20,7 +29,10 @@
                     <td>{{myRole group}}</td>
                     <td>{{group.members.length}}</td>
                     <td>{{group.environments.length}}</td>
-                    <td>{{> groupViewLink group=group}} {{> groupManageLink group=group}}</td>
+                    <td>{{> groupViewLink group=group}}
+                        {{> groupManageLink group=group}}
+                        {{#if canDelete group}}{{> groupDeleteLink group=group}}{{/if}}
+                    </td>
                 </tr>
             {{/each}}
             </tbody>
@@ -30,9 +42,13 @@
 
 
 <template name="groupViewLink">
-    <a href="{{pathFor route='groupView' _groupId=group._id}}">View</a>
+    <a href="{{pathFor route='groupView' _groupId=group._id}}">Classrooms</a>
 </template>
 
 <template name="groupManageLink">
-    <a href="{{pathFor route='groupManage' _groupId=group._id}}">Manage</a>
+    <a href="{{pathFor route='groupManage' _groupId=group._id}}">Members</a>
+</template>
+
+<template name="groupDeleteLink">
+    <button class="delete-group">Delete</button>
 </template>

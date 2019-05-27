@@ -1,6 +1,6 @@
 <template name="groupManage">
     <div class="page--group">
-        <h3>Group {{group.groupName}} settings</h3>
+        <h3>Group {{>groupNameEditable group=group}} settings</h3>
         {{> memberAddForm group=group}}
         <details>
             <summary>
@@ -65,11 +65,21 @@
 </template>
 
 <template name="memberAddForm">
-    <div class="member-add-form autocomplete-form">
+    <form class="member-add-form autocomplete-form">
         <label for="member-add-form">Add user</label>
         {{> inputAutocomplete settings=settings id="member-add-form" class="member-add-form__input" placeholder="Type a name..."}}
         <!--<input class="member-add-form__input" id="member-add-form">-->
         <button class="member-add-form__submit">Add</button>
-    </div>
+    </form>
+</template>
+
+<template name="groupNameEditable">
+    <span class="group__name group__name--editable">
+    {{#if editing}}
+        <form class="group__name__edit-form"><input class="group__name__edit-field" title="group name" type="text" value="{{group.groupName}}"><input type="submit" value="save"></form>
+    {{else}}
+        {{group.groupName}}<button class="group__name--start-edit">Edit</button>
+    {{/if}}
+    </span>
 </template>
 
