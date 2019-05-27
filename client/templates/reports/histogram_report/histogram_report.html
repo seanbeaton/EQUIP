@@ -20,7 +20,7 @@
             {{#if observationNames}} <h3>Observations: {{ observationNames }}</h3> {{/if }}
             {{#if observationChosen }}
                 {{>absentStudents observations=observations}}
-                {{> histogramDemoSelect demographics=demographics class_prefix="histogram"}}
+                {{> histogramDemoSelect demographics=demographics class_prefix="histogram" default="- Select -"}}
             {{/if }}
         </section>
         <section class="report-section report-section__graph">

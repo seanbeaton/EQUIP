@@ -164,7 +164,8 @@ let getStudentPadding = function(count, max) {
   if (max === 0) {
     return max_padding + 'px';
   }
-  return ((max - count) / max * max_padding) + 'px';
+  let padding = ((max - count) / max * max_padding);
+  return padding + 'px ' + (padding * 2) + 'px';
 }
 
 let getStudentTotalContribs = function(student) {
@@ -213,8 +214,8 @@ let initGroups = function(data, selector) {
         console.log('student', student);
 
         let student_count = getStudentTotalContribs(student);
-
-        return '<div id="' + student._id + '" class="dragger student-box student-box--scaling" style="padding: ' + getStudentPadding(student_count, highest_contribs) + '">' +
+        let padding = getStudentPadding(student_count, highest_contribs);
+        return '<div id="' + student._id + '" class="dragger student-box student-box--scaling" style="padding: ' + padding + '">' +
           '<div class="student-box__wrapper"><p class="student-box__inner">' + student.info.name + ' (' + student_count + ')' +'</div>' +
           '</p></div>'
       }).join('') +
