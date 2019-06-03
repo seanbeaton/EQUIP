@@ -28,7 +28,7 @@
                                 {{/if}}
                             </td>
                             <td>
-                                <a href="{{pathFor 'environmentItem' _envId=env.envId}}">View</a>
+                                <a href="{{pathFor 'environmentSingle' _envId=env.envId}}">View</a>
                                 {{#if hasRemovePermission env}}
                                     {{> removeEnvButton env=env group=group}}
                                 {{/if}}
