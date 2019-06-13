@@ -151,6 +151,7 @@ Template.environmentList.events({
 
     var observation = {
       name: $('#observationName').val(),
+      description: $('#observationDescription').val(),
       observationDate: $('#altObservationDate').val(),
       observationType: $('input[name="classroom-type"]:checked').attr('data-classroom-type'),
       envId: id,

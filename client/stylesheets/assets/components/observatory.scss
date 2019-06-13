@@ -23,6 +23,49 @@
   }
 }
 
+label[for="observation__description"],
+label[for="observation__notes"] {
+  pointer-events: none;
+}
+
+.observation__description,
+.observation__notes {
+  padding: 8px 8px;
+  background: rgba(255,255,255,0.5);
+  display: block;
+}
+
+#obs-desc-form,
+#obs-notes-form {
+  button {
+    background-color: transparent;
+    border: 2px solid var(--orange);
+    margin: 10px 0;
+    padding: 4px 8px;
+    font-family: 'Roboto Condensed', sans-serif;
+    color: var(--orange);
+    font-weight: 700;
+    font-size: 16px;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+  .item-saved-message {
+    color: #008b34;
+    padding: 0 8px;
+  }
+}
+
+#observationDescription {
+  width: 100%;
+  padding: 8px 8px;
+  background: rgba(255,255,255,0.5);
+  display: block;
+}
+
+#obs-create-modal .control {
+  margin-bottom: 10px;
+}
+
 @keyframes students-pulse {
   0% {
     opacity: 1;

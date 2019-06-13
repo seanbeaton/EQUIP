@@ -59,6 +59,11 @@
                 <input name="classroom-type" type="radio" data-classroom-type="small_group" id="type--small-group">
                 <label for="type--small-group">Small Group</label>
             </p>
+          <label class="label" for="observationDescription">Description</label>
+            <p class="control">
+            <div>Write a short (max. 280 characters) description of the observation you're coding.</div>
+            <textarea rows='5' cols="70" maxlength="280" id="observationDescription" name="observationDescription">{{observation.description}}</textarea>
+            </p>
         </section>
         <footer class="modal-card-foot">
           <a id="save-obs-name" class="o--standard-button" style="margin-right: 10px;">Save changes</a>

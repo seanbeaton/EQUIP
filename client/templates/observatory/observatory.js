@@ -350,7 +350,39 @@ Template.observatory.events({
     else {
       classroomMode.set('code');
     }
-  }
+  },
+  'submit #obs-desc-form': function(e) {
+    e.preventDefault();
+
+    let $desc = $('.observation__description', e.target);
+    Meteor.call('observationUpdateDescription', {obsId: this.observation._id, description: $desc.val()}, function(err, res) {
+      if (err) {
+        alert(err)
+      }
+      else {
+        $('details', e.target).append('<span class="item-saved-message">Saved</span>')
+        setTimeout(function() {
+          $('.item-saved-message', e.target).remove()
+        }, 2000)
+      }
+    })
+  },
+  'submit #obs-notes-form': function(e) {
+    e.preventDefault();
+
+    let $notes = $('.observation__notes', e.target);
+    Meteor.call('observationUpdateNotes', {obsId: this.observation._id, notes: $notes.val()}, function(err, res) {
+      if (err) {
+        alert(err)
+      }
+      else {
+        $('details', e.target).append('<span class="item-saved-message">Saved</span>')
+        setTimeout(function() {
+          $('.item-saved-message', e.target).remove()
+        }, 2000)
+      }
+    })
+  },
 });
 
 function editSequence(e) {
