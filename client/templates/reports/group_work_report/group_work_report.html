@@ -42,6 +42,16 @@
                         {{/if }}
                     </div>
                     <div class="group-work-report__graph-key"></div>
+
+                    <div class="group-work-report__graph-display-type">
+                        {{#if observationChosen }}
+                            <label class="graph-display-type__title">Graph Type</label>
+                            <div class="graph-display-type graph-display-type--active-type--{{ groupDisplayType }}">
+                                <button class="graph-display-type__option" data-display-graph-type="blocks">Blocks</button>
+                                <button class="graph-display-type__option" data-display-graph-type="bars">Bar Graph</button>
+                            </div>
+                        {{/if}}
+                    </div>
                 </div>
             </div>
         </section>

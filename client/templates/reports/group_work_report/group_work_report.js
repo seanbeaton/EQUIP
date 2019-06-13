@@ -19,6 +19,7 @@ const selectedDemographic = new ReactiveVar(false);
 const students = new ReactiveVar([]);
 const selectedStudent = new ReactiveVar(false);
 const selectedSpotlightDimension = new ReactiveVar(false);
+const groupDisplayType = new ReactiveVar('blocks');
 
 
 Template.groupWorkReport.events({
@@ -71,6 +72,11 @@ Template.groupWorkReport.events({
     selectedDiscourseOption.set(selected.val());
     updateGraph()
   },
+  'click .graph-display-type__option': function(e) {
+    e.preventDefault();
+    groupDisplayType.set($(e.target).attr('data-display-graph-type'))
+    updateGraph()
+  },
 });
 
 
@@ -112,6 +118,9 @@ Template.groupWorkReport.helpers({
   multipleObservationsChosen: function() {
     return !!(selectedObservations.get().length >= 2)
   },
+  groupDisplayType: function() {
+    return groupDisplayType.get()
+  },
   environment: function() {
     return getEnvironment();
   },
@@ -142,8 +151,6 @@ let updateGraph = function() {
   let selector = '#group-work-d3-wrapper';
 
   if (selectedObservations.get().length < 1) {
-    // heatmap_wrapper.html('');
-    // heatmap_wrapper.removeClass('heatmap-created')
     return;
   }
 
@@ -212,36 +219,50 @@ let initGroups = function(data, selector) {
   let markup = data.groups.map(function(group) {
     let total_group_contribs = getGroupTotalContribs(group);
     let highest_contribs = Math.max(...group.students.map(stud => getStudentTotalContribs(stud)));
-    let markup = "<div class='student-group'>" +
-      "<div class='student-group__title'><strong>" + group.name + "</strong> - " + group.observationDate + " (n = " + total_group_contribs + ")</div>" +
-      "<div class='student-group__students'>" +
-      group.students.map(function(student) {
-        console.log('student', student);
+    let markup = "";
 
-        let student_count = getStudentTotalContribs(student);
-        let padding = getStudentPadding(student_count, highest_contribs);
-        return '<div id="' + student._id + '" class="dragger student-box student-box--scaling" style="padding: ' + padding + '">' +
-          '<div class="student-box__wrapper"><p class="student-box__inner">' + student.info.name + ' (n=' + student_count + ', ' + Math.round(student_count / total_group_contribs * 1000) / 10 + '%)' +'</div>' +
-          '</p></div>'
-      }).join('') +
-      "</div>" +
-      "</div>";
+
+    if (groupDisplayType.get() === 'blocks') {
+      markup = "<div class='student-group'>" +
+        "<div class='student-group__title'><strong>" + group.name + "</strong> - " + group.observationDate + " (n = " + total_group_contribs + ")</div>" +
+        "<div class='student-group__students'>" +
+        group.students.map(function(student) {
+          console.log('student', student);
+
+          let student_count = getStudentTotalContribs(student);
+          let padding = getStudentPadding(student_count, highest_contribs);
+          return '<div id="' + student._id + '" class="dragger student-box student-box--scaling" style="padding: ' + padding + '">' +
+            '<div class="student-box__wrapper"><p class="student-box__inner">' + student.info.name + ' (n=' + student_count + ', ' + Math.round(student_count / total_group_contribs * 1000) / 10 + '%)' +'</div>' +
+            '</p></div>'
+        }).join('') +
+        "</div>" +
+        "</div>";
+    }
+    else if (groupDisplayType.get() === 'bars') {
+      group.d3_id = Math.random().toString(36).replace(/[^a-z]+/g, '').substr(2, 10);
+      markup = "<div class='student-group'>" +
+        "<div class='student-group__title'><strong>" + group.name + "</strong> - " + group.observationDate + " (n = " + total_group_contribs + ")</div>" +
+        "<div class='student-group__students' id='" + group.d3_id + "'>" +
+        "</div>" +
+        "</div>";
+    }
+    else {
+      markup = "Error - incorrect display type."
+    }
+
     return markup;
   }).join('');
   container.html(markup);
-  //
-
-  $('.student-box').on('click', function() {
-    selectStudentForModal($(this).attr('id'));
-  });
-
   // let dim = selectedDemographic.get();
   let key_options = getDemographicOptions().map(demo_opt => demo_opt.name);
 
+  let color_scale = function() {
+    return '#898989'
+  }
   if (key_options.length > 0) {
     let key_colors = getLabelColors(key_options);
-    let color_scale = d3.scaleOrdinal()
-      .range(Object.values(key_colors))
+    color_scale = d3.scaleOrdinal()
+      .range(Object.values(key_colors));
 
     updateGroupWorkDemoKey('.group-work-report__graph-key', key_options, color_scale);
 
@@ -257,6 +278,99 @@ let initGroups = function(data, selector) {
   else {
     $('.group-work-report__graph-key').html('');
   }
+
+  console.log('color scale', color_scale);
+
+  data.groups.forEach(function(group) {
+    if (groupDisplayType.get() === 'bars') {
+      d3GroupGraph('#' + group.d3_id, group, color_scale)
+    }
+  })
+
+  $('.student-box, .student-vbar').on('click', function() {
+    selectStudentForModal($(this).attr('id'));
+  });
+
+
+}
+
+let d3GroupGraph = function(selector, group, color_scale) {
+  let data = group.students
+
+  data.forEach(student => {
+    student.count = getStudentTotalContribs(student)
+  });
+
+  console.log('d3 graph', group);
+  let svg_tag = $('<svg width="400" height="300"></svg>');
+  $(selector).html(svg_tag);
+
+  let svg = d3.select(selector + " svg"),
+    margin = {top: 30, right: 20, bottom: 40, left: 20},
+    width = +svg.attr("width") - margin.left - margin.right,
+    height = +svg.attr("height") - margin.top - margin.bottom,
+    g = svg.append("g").attr('class', 'graph-container').attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+  let x = d3.scaleBand()
+    .domain(data.map(function(d) { return d._id; }))
+    .range([0, width]);
+
+  let y = d3.scaleLinear()
+    .domain([0, d3.max(data, d => d.count)]).nice()
+    .range([height, 0]);
+
+  let x_axis = g.append("g")
+    .attr("class", "axis axis--x")
+    .attr("transform", "translate(0," + height + ")")
+    .append('g')
+    .attr("class", "x-axis-labels")
+    .call(d3.axisBottom(x).tickFormat(function(d) {
+      return data.find(s => s._id === d).info.name
+    }));
+
+  x_axis
+    .selectAll('.x-axis-labels text')
+    .attr("text-anchor", "end")
+    .attr('transform', 'rotate(-45,0,0)');
+
+  x_axis
+    .selectAll('.x-axis-labels line')
+    .attr('transform', 'translate(3,0)');
+
+  let selected_demo = selectedDemographic.get();
+  g.selectAll(".bar")
+    .data(data)
+    .enter().append("rect")
+    .attr("class", "student-vbar")
+    .attr("id", d => d._id)
+    .attr("x", function(d) {
+      return x(d._id) + x.bandwidth() * 0.1;
+    })
+    .attr("y", function(d) { return y(d.count) })
+    .attr("width", x.bandwidth() * 0.8)
+    .attr("height", function(d) { return height - y(d.count); })
+    .attr("fill", function(d) {
+      let s = color_scale(d.info.demographics[selected_demo])
+      console.log('color for d ', d.info.demographics, 'v', d.info.demographics[selected_demo], 's', s, 'selected_demo', selected_demo)
+      return s;
+    })
+
+  let total_group_contribs = getGroupTotalContribs(group);
+  g.selectAll(".bar")
+    .data(data)
+    .enter()
+    .append("text")
+    .text(function(d) { return '(n=' + d.count + ', ' + Math.round(d.count / total_group_contribs * 1000) / 10 + '%)'})
+    .attr("text-anchor", "middle")
+    .attr("x", function(d) {
+      return x(d._id) + (x.bandwidth() / 2);
+    })
+    .attr("y", function(d) { return y(d.count) - 8; })
+    .attr("font-family", "sans-serif")
+    .attr("font-size", "12px")
+    .attr("fill", "black")
+
+
 
 }
 
