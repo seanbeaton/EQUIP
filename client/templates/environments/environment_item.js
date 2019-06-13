@@ -248,24 +248,19 @@ Template.environmentItem.helpers({
         if (!user) {
           return;
         }
-        var students = Subjects.find({userId: user._id}).fetch();
-
-        let filteredStudents = students.filter(student => student.envId === this._id)
-            .map(student => student.info.name)
+        let students = Subjects.find({envId: this._id}).fetch();
 
         return {
-            names: filteredStudents.join(", "),
-            count: filteredStudents.length
+            names: students.map(student => student.info.name).join(", "),
+            count: students.length
         }
     },
     noStudentsAdded: function() {
         let user = Meteor.user();
-        let students = Subjects.find({userId: user._id}).fetch();
 
-        let filteredStudents = students.filter(student => student.envId === this._id)
-            .map(student => student.info.name)
+        let students = Subjects.find({envId: this._id}).fetch();
 
-        return filteredStudents.length === 0 ? true : false;
+        return students.length === 0;
     },
     getObservations: function() {
         return Observations.find({envId:this._id}, {sort: {datefield: 1}}).fetch();
