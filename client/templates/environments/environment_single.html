@@ -12,4 +12,16 @@
             <div class="help-icon"></div>
         </a>
     </section>
+
+    {{#if obsCreateModal}}
+        {{>obsCreationModal}}
+    {{/if}}
+
+    {{#if smallGroupStudentSelectActive}}
+        {{>obsSmallGroupModal}}
+    {{/if}}
+
+    {{#if absentStudentSelectActive}}
+        {{>obsAbsentModal}}
+    {{/if}}
 </template>

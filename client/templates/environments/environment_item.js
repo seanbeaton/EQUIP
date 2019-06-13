@@ -5,6 +5,7 @@
 import { createModal } from '/helpers/modals.js'
 import {getSequences} from "/helpers/sequences";
 import {envHasObservations} from "../../../helpers/environments";
+import {activeEnvId, obsCreateModal} from './environment_list'
 
 let share_window_timeout;
 
@@ -56,6 +57,12 @@ Template.environmentItem.events({
           })
         }
       });
+  },
+  'click #obs-create-button': function(e) {
+    console.log('starting');
+    var id = e.target.getAttribute('data-id');
+    obsCreateModal.set(true);
+    activeEnvId.set(id);
   },
   'click #edit-sequence-params': function(e) {
      e.preventDefault();
@@ -227,7 +234,7 @@ Template.environmentItem.helpers({
         var user = Meteor.user();
         var sequenceParameters = SequenceParameters.find({'children.envId': this._id}).fetch();
         var subjectParameters =  SubjectParameters.find({'children.envId': this._id}).fetch();
-        var students = Subjects.find({userId: user._id}).fetch();
+        var students = Subjects.find({envId: this._id}).fetch();
         let filteredStudents = students.filter(student => student.envId === this._id)
             .map(student => student.info.name)
         var validation = true;
