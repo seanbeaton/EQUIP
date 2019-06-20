@@ -6,6 +6,7 @@ export let data = {
       "observationType": "whole_class",
       "absent": [],
       "timer": 0,
+      "description": "Example observation",
       "observationDate": "2018-09-04"
     },
     {
@@ -14,6 +15,7 @@ export let data = {
       "observationType": "whole_class",
       "absent": [],
       "timer": 0,
+      "description": "Example observation",
       "observationDate": "2018-09-06"
     },
     {
@@ -22,6 +24,7 @@ export let data = {
       "observationType": "whole_class",
       "absent": [],
       "timer": 0,
+      "description": "Example observation",
       "observationDate": "2018-09-13"
     },
     {
@@ -30,6 +33,7 @@ export let data = {
       "observationDate": "2018-09-15",
       "observationType": "small_group",
       "timer": 0,
+      "description": "Example observation",
       "small_group": ["9qGH3fcWkiwR86iGi", "Ja8HnaEBThtxDk7jR", "MACbM7wxZvhYzmFKG", "eu2EALdccbuqZCNy8"],
     },
     {
@@ -38,6 +42,7 @@ export let data = {
       "observationDate": "2018-09-18",
       "observationType": "small_group",
       "timer": 0,
+      "description": "Example observation",
       "small_group": ["9qGH3fcWkiwR86iGi", "Ja8HnaEBThtxDk7jR", "MACbM7wxZvhYzmFKG", "eu2EALdccbuqZCNy8"],
     },
     {
@@ -46,6 +51,7 @@ export let data = {
       "observationDate": "2018-09-25",
       "observationType": "small_group",
       "timer": 0,
+      "description": "Example observation",
       "small_group": ["9qGH3fcWkiwR86iGi", "Ja8HnaEBThtxDk7jR", "ZceZCDAB6u7mmG2JG"],
     }
   ],
