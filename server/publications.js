@@ -149,6 +149,17 @@ Meteor.publishComposite('observations', function() {
 })
 
 
+Meteor.publish('ownObservations', function() {
+  if (!this.userId) {
+    return this.ready();
+  }
+
+  return Observations.find({userId: this.userId});
+});
+
+
+
+
 Meteor.publish('envObservations', function(envId) {
   if (!this.userId) {
     return this.ready();
@@ -176,15 +187,14 @@ Meteor.publish('observation', function(obsId) {
   let envIds = Environments.find({userId: this.userId}).fetch().map(e => e._id);
   return Observations.find({envId: {$in: envIds}, _id: obsId});
 });
-//
-// Meteor.publish('subjects', function() {
-//   if (!this.userId) {
-//       return this.ready();
-//   }
-//
-//   let envIds = Environments.find({userId: this.userId}).fetch().map(e => e._id)
-//   return Subjects.find({envId: {$in: envIds}});
-// });
+
+Meteor.publish('ownSubjects', function() {
+  if (!this.userId) {
+      return this.ready();
+  }
+
+  return Subjects.find({userId: this.userId});
+});
 
 
 Meteor.publishComposite('subjects', function() {
@@ -257,6 +267,16 @@ Meteor.publish('groupEnvSubjects', function(envId) {
   }
   this.ready()
 });
+
+
+Meteor.publish('ownSequences', function() {
+  if (!this.userId) {
+    return this.ready();
+  }
+
+  return Sequences.find({userId: this.userId});
+});
+
 
 Meteor.publishComposite('sequences', function() {
   if (!this.userId) {
@@ -342,6 +362,14 @@ Meteor.publish('groupSequences', function() {
   return Sequences.find({envId: {$in: [...env_ids]}});
 });
 
+Meteor.publish('ownSubjectParameters', function() {
+  if (!this.userId) {
+    return this.ready();
+  }
+
+  return SubjectParameters.find({userId: this.userId});
+});
+
 Meteor.publishComposite('subjectParameters', function() {
   if (!this.userId) {
     return this.ready();
@@ -403,6 +431,16 @@ Meteor.publish('groupSubjectParameters', function() {
 
   return SubjectParameters.find({'children.envId': {$in: [...env_ids]}});
 });
+
+
+Meteor.publish('ownSequenceParameters', function() {
+  if (!this.userId) {
+    return this.ready();
+  }
+
+  return SequenceParameters.find({userId: this.userId});
+});
+
 
 
 Meteor.publishComposite('sequenceParameters', function() {

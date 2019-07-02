@@ -1,4 +1,4 @@
-export let data = {
+export let import_data = {
   'observations': [
     {
       "name": "Observation #1 - 9/4",
