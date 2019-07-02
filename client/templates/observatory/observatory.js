@@ -131,6 +131,9 @@ Template.observatory.helpers({
   environment: function() {
     return this.environment;
   },
+  notes_status: function() {
+    return this.observation.notes.length > 0 ? "(notes logged)" : '(empty)'
+  },
   observation: function () {
     return this.observation;
   },

@@ -24,7 +24,7 @@
               Observation type: <strong>{{classTypeHuman observation.observationType}}</strong>
           </p>
           <form id="obs-desc-form">
-          <details>
+          <details open>
               <summary><label for="observation__description">Description</label></summary>
               <div>Write a short (max. 280 characters) description of the observation you're coding.</div>
               <textarea rows='8' cols="50" maxlength="280" class="observation__description" name="observation__description">{{observation.description}}</textarea>
@@ -33,7 +33,7 @@
           </form>
           <form id="obs-notes-form">
           <details>
-              <summary><label for="observation__notes">Notes</label></summary>
+              <summary><label for="observation__notes">Notes</label> <span class="observation__notes__status">{{notes_status}}</span></summary>
               <div>Take notes about anything at all you want to remember.</div>
               <textarea rows='10' cols="50" class="observation__notes" name="observation__notes">{{observation.notes}}</textarea>
               <button type="submit" form="obs-notes-form">Save</button>
