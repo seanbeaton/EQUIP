@@ -210,12 +210,11 @@ Template.editSubjects.events({
     $('#stud-param-modal').addClass('is-processing');
     let callback = function() {
       $('#stud-param-modal').removeClass('is-processing');
+      $('#stud-data-modal').addClass('is-active');
+      createTableOfStudents();
     }
     editStudent(e, callback);
-    //This should happen at the end...
-    $('#stud-param-modal').removeClass('is-active');
-    createTableOfStudents();
-    $('#stud-data-modal').addClass('is-active');
+    // $('#stud-param-modal').removeClass('is-active');
   },
   'click #edit-subj-params-exit': function (e) {
     $('#stud-param-modal').addClass('is-processing');
@@ -223,7 +222,7 @@ Template.editSubjects.events({
       $('#stud-param-modal').removeClass('is-processing');
     }
     editStudent(e, callback);
-    $('#stud-param-modal').removeClass('is-active');
+    // $('#stud-param-modal').removeClass('is-active');
     // createTableOfStudents();
     // $('#stud-data-modal').addClass('is-active');
   }
