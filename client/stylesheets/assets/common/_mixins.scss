@@ -30,3 +30,31 @@
   @include transition-duration($time);
   @include transition-timing-function($anim);
 }
+
+
+
+@keyframes spinner-border {
+  to { transform: rotate(0deg) translate(-50%, -50%); }
+  from { transform: rotate(360deg) translate(-50%, -50%); }
+}
+
+@mixin loading-spinner() {
+  position: relative;
+  &:after {
+    position: absolute;
+    left: 50%;
+    z-index: 20000;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    content: '';
+    display: inline-block;
+    width: 60px;
+    height: 60px;
+    vertical-align: text-bottom;
+    border: 0.25em solid $spinner-color;
+    border-radius: 50%;
+    border-right-color: transparent;
+    transform-origin: 0% 0%;
+    animation: spinner-border 1s linear infinite;
+  }
+}

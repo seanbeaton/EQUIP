@@ -116,7 +116,16 @@
 }
 
 .modal {
-    margin: 0
+  margin: 0;
+  &.is-active.is-processing {
+    .modal-content {
+      @include loading-spinner;
+    }
+    .modal-content > * {
+      opacity: 0.5;
+      pointer-events: none;
+    }
+  }
 }
 
 /* TODO: CLEAN UP OLD STYLES */

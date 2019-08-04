@@ -155,7 +155,11 @@ Template.editSubjects.events({
  },
 
   'click #save-subj-params': function(e) {
-    saveNewSubject(this)
+    $('#stud-param-modal').addClass('is-processing');
+    let callback = function() {
+      $('#stud-param-modal').removeClass('is-processing');
+    }
+    saveNewSubject(this, callback)
  },
   'click .edit-stud' : function (e) {
     let target = $(e.target)
@@ -409,7 +413,7 @@ function findStudentAtLocation(students, x, y) {
   });
 }
 
-function saveNewSubject(env) {
+function saveNewSubject(env, callback) {
   const students = Subjects.find({envId: Router.current().params._envId}).fetch();
   const numberOfStudents = students.length;
   let newStudentPositionX;
@@ -455,6 +459,9 @@ function saveNewSubject(env) {
 
   if (form_incomplete) {
     alert(`No selection made for ${incomplete_parameters.join(', ')}`);
+    if (typeof callback === 'function') {
+      callback()
+    }
     return;
   }
 
@@ -475,6 +482,9 @@ function saveNewSubject(env) {
       setTimeout(function() {
         $('.o--box-item#' + result._id).removeClass('just-added');
       }, 5000);
+      if (typeof callback === 'function') {
+        callback()
+      }
     }
   });
 }
