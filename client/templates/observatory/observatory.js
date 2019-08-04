@@ -56,9 +56,7 @@ function clockSet() {
 
 //Create Timer and Toggle Options
 Template.observatory.rendered = function() {
-  console.log(this);
   var obs = this.data.observation;
-  console.log('students', Subjects.find().fetch());
   var seqParams = SequenceParameters.find({'children.envId': Router.current().params._envId}).fetch()[0];
   var timerVal = obs.timer;
   timer.value = timerVal;
@@ -125,7 +123,6 @@ Template.observatory.helpers({
     return this.observation.observationType === 'small_group';
   },
   wholeClass: function() {
-    console.log('whole class', this);
     return this.observation.observationType === 'whole_class';
   },
   environment: function() {
@@ -158,8 +155,6 @@ Template.observatory.helpers({
       return !!this.observation.small_group.find(id => id === student._id)
     }
     if (this.observation.observationType === 'whole_class') {
-      console.log('whole class, ', student._id, this.observation.absent);
-      console.log('whole class, ', student, this.observation.absent);
       return !this.observation.absent.find(id => id === student._id)
     }
   },
@@ -260,7 +255,6 @@ Template.observatory.events({
       let param_opts = $('.subj-box-params', $(this))
       param_opts.removeClass('chosen');
       let index = Math.floor(param_opts.length * Math.random());
-      console.log('index ', index)
       param_opts[index].click()
 
     });
@@ -288,8 +282,6 @@ Template.observatory.events({
         info.parameters[parameter_name] = parameter_choice
       }
     });
-
-    console.log('info (params', info.parameters);
 
     if (form_incomplete) {
       return;
@@ -322,8 +314,6 @@ Template.observatory.events({
 
     let seqId = $(e.target).attr('data-id');
     let subjId = $(e.target).attr('data-student-id');
-
-    console.log('editing student id',  subjId, 'seq id', seqId, 'envId', this.environment._id);
 
     observation_helpers.editParamBoxes(seqId, subjId, this.environment._id);
     $('#seq-param-modal').addClass('is-active');
@@ -481,7 +471,6 @@ function editObservationName(obsId) {
     .on('click', function() {
     var new_obs_name = $('.edit-obs-name', context);
     var new_name = new_obs_name.val();
-    console.log('new name', new_name);
 
     var args = {
       'obsId': obsId,
@@ -562,7 +551,6 @@ function editObservationDate(obsId) {
     var new_obs_date_iso = $('.edit-obs-date--iso', context);
     var new_obs_date = $('.edit-obs-date', context);
     var new_date = new_obs_date_iso.val();
-    console.log('new date', new_date);
 
     if (!/^\d{4}-\d{2}-\d{2}$/.test(new_date)) {
       alert('Please input a valid date');
