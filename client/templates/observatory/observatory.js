@@ -4,8 +4,6 @@
 import {userCanGroupEditEnv, userCanGroupViewEnv, userIsEnvOwner} from "../../../helpers/groups";
 
 var Stopwatch = require('stopwatchjs');
-var timer = new Stopwatch();
-//var timerUpdate;
 var lastChoices = {};
 
 import * as observation_helpers from '/helpers/observations.js'
@@ -34,35 +32,10 @@ Template.observatory.created = function() {
   aTagSelectArray = []
 }
 
-// Updates Timerq
-function clockSet() {
-  var secs = timer.value;
-  var hours = Math.floor(secs / (60*60));
-  if (hours < 10) {
-    hours = '0' + hours;
-  }
-  var divisor_for_minutes = secs % (60 * 60);
-  var minutes = Math.floor(divisor_for_minutes / 60);
- if (minutes < 10) {
-    minutes = '0' + minutes;
-  }
-  var divisor_for_seconds = divisor_for_minutes % 60;
-  var seconds = Math.ceil(divisor_for_seconds);
-  if (seconds < 10) {
-    seconds = '0' + seconds;
-  }
-  //$('#obs-timer').text(''+hours+':'+minutes+':'+seconds);
-}
-
-//Create Timer and Toggle Options
+//Create Toggle Option
 Template.observatory.rendered = function() {
   var obs = this.data.observation;
   var seqParams = SequenceParameters.find({'children.envId': Router.current().params._envId}).fetch()[0];
-  var timerVal = obs.timer;
-  timer.value = timerVal;
-  timer.start();
-
-  //timerUpdate = setInterval(clockSet, 1000);
 
   var paramPairs = seqParams.children.parameterPairs;
   if (paramPairs) {
@@ -183,15 +156,11 @@ Template.observatory.helpers({
 Template.observatory.events({
   'click .back-head-params': function(e) {
     //Save stopwatch value
-    timer.stop();
-    //clearInterval(timerUpdate);
-    curr_time = timer.value;
-    update = {obsId: Router.current().params._obsId, timer: curr_time};
-    Meteor.call('timerUpdate', update);
     Router.go('observationList', {_envId:Router.current().params._envId});
   },
   'click .observatory.observatory--code .student-box.enabled': function(e) {
     if (!userHasEnvEditAccess(this.environment)) {
+      // access control also done on server side.
       return;
     }
     //Create Sequence
@@ -209,6 +178,7 @@ Template.observatory.events({
   },
   'click .observatory.observatory--edit .student-box': function(e) {
     if (!userHasEnvEditAccess(this.environment)) {
+      // access control also done on server side.
       return;
     }
     let target_id;
@@ -260,6 +230,10 @@ Template.observatory.events({
     });
   },
   'click #save-seq-params': function(e) {
+    $('#stud-param-modal').addClass('is-processing');
+    let callback = function() {
+      $('#stud-param-modal').removeClass('is-processing');
+    }
     let info = {
       student: {
         studentId:$('.js-modal-header').attr('data-id'),
@@ -284,6 +258,9 @@ Template.observatory.events({
     });
 
     if (form_incomplete) {
+      if (typeof callback === 'function') {
+        callback()
+      }
       return;
     }
 
@@ -293,18 +270,22 @@ Template.observatory.events({
 
     let sequence = {
       envId: envId,
-      time: timer.value,
       info: info,
       obsId: obsId,
       obsName: obsRaw.name
     };
 
+    console.log('about to insert sequence');
     Meteor.call('sequenceInsert', sequence, function(error, result) {
      if (error) {
        alert(error.reason);
      } else {
        gtag('event',  'add_success', {'event_category': 'sequences'});
        $('#seq-param-modal').removeClass('is-active');
+     }
+     console.log('sequence inserted');
+     if (typeof callback === 'function') {
+       callback()
      }
    });
   },
