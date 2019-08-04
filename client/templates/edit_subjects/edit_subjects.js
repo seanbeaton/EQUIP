@@ -207,22 +207,29 @@ Template.editSubjects.events({
     }
   },
   'click #edit-subj-params': function (e) {
-    editStudent(e);
+    $('#stud-param-modal').addClass('is-processing');
+    let callback = function() {
+      $('#stud-param-modal').removeClass('is-processing');
+    }
+    editStudent(e, callback);
     //This should happen at the end...
     $('#stud-param-modal').removeClass('is-active');
     createTableOfStudents();
     $('#stud-data-modal').addClass('is-active');
   },
   'click #edit-subj-params-exit': function (e) {
-    editStudent(e);
-    //This should happen at the end...
+    $('#stud-param-modal').addClass('is-processing');
+    let callback = function() {
+      $('#stud-param-modal').removeClass('is-processing');
+    }
+    editStudent(e, callback);
     $('#stud-param-modal').removeClass('is-active');
     // createTableOfStudents();
     // $('#stud-data-modal').addClass('is-active');
   }
 });
 
-function editStudent(e) {
+function editStudent(e, callback) {
   var subjId = $(e.target).attr('data-id');
 
   //Do this always in the case of editing from obs list
@@ -248,6 +255,9 @@ function editStudent(e) {
 
   if (form_incomplete) {
     alert(`No selection made for ${incomplete_parameters.join(', ')}`);
+    if (typeof callback === 'function') {
+      callback()
+    }
     return;
   }
 
@@ -261,6 +271,9 @@ function editStudent(e) {
       alert(error.reason);
     } else {
       $('#stud-param-modal').removeClass('is-active');
+    }
+    if (typeof callback === 'function') {
+      callback()
     }
   });
 }
@@ -482,9 +495,9 @@ function saveNewSubject(env, callback) {
       setTimeout(function() {
         $('.o--box-item#' + result._id).removeClass('just-added');
       }, 5000);
-      if (typeof callback === 'function') {
-        callback()
-      }
+    }
+    if (typeof callback === 'function') {
+      callback()
     }
   });
 }
