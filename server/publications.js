@@ -53,7 +53,7 @@ Meteor.publish('groupEnvironments', function() {
   let env_ids = getUserGroupEnvs(this.userId);
 
   if (env_ids.length === 0) {
-    this.ready()
+    return this.ready()
   }
 
   return Environments.find(
@@ -69,7 +69,7 @@ Meteor.publish('groupEnvironment', function(envId) {
   let env_ids = getUserGroupEnvs(this.userId);
 
   if (env_ids.length === 0) {
-    this.ready()
+    return this.ready()
   }
 
   if (env_ids.has(envId)) {
@@ -77,7 +77,7 @@ Meteor.publish('groupEnvironment', function(envId) {
       {_id: envId}
     );
   }
-  this.ready()
+  return this.ready()
 });
 
 Meteor.publish('groupObservations', function() {
@@ -88,7 +88,7 @@ Meteor.publish('groupObservations', function() {
   let env_ids = getUserGroupEnvs(this.userId);
 
   if (env_ids.length === 0) {
-    this.ready()
+    return this.ready()
   }
 
   return Observations.find(
@@ -104,7 +104,7 @@ Meteor.publish('groupEnvObservations', function(envId) {
   let env_ids = getUserGroupEnvs(this.userId);
 
   if (env_ids.length === 0) {
-    this.ready()
+    return this.ready()
   }
 
   if (env_ids.has(envId)) {
@@ -112,7 +112,7 @@ Meteor.publish('groupEnvObservations', function(envId) {
       {envId: envId}
     );
   }
-  this.ready()
+  return this.ready()
 });
 
 Meteor.publish('groupObservation', function(obsId) {
@@ -123,7 +123,7 @@ Meteor.publish('groupObservation', function(obsId) {
   let env_ids = getUserGroupEnvs(this.userId);
 
   if (env_ids.length === 0) {
-    this.ready()
+    return this.ready()
   }
 
   return Observations.find(
@@ -172,7 +172,7 @@ Meteor.publish('envObservations', function(envId) {
       envId: envId
     });
   }
-  this.ready()
+  return this.ready()
 });
 
 Meteor.publish('observation', function(obsId) {
@@ -181,7 +181,7 @@ Meteor.publish('observation', function(obsId) {
   }
 
   if (typeof obsId === 'undefined') {
-    this.ready();
+    return this.ready();
   }
 
   let envIds = Environments.find({userId: this.userId}).fetch().map(e => e._id);
@@ -224,7 +224,7 @@ Meteor.publish('groupSubjects', function() {
   let env_ids = getUserGroupEnvs(this.userId);
 
   if (env_ids.length === 0) {
-    this.ready();
+    return this.ready();
   }
 
   return Subjects.find(
@@ -239,7 +239,7 @@ Meteor.publish('envSubjects', function(envId) {
   }
 
   if (typeof envId === 'undefined') {
-    this.ready();
+    return this.ready();
   }
   let env_ids = Environments.find({userId: this.userId}).fetch().map(e => e._id);
   if (!!env_ids.find(id => id === envId)) {
@@ -247,7 +247,7 @@ Meteor.publish('envSubjects', function(envId) {
       envId: envId
     });
   }
-  this.ready();
+  return this.ready();
 });
 
 Meteor.publish('groupEnvSubjects', function(envId) {
@@ -255,7 +255,7 @@ Meteor.publish('groupEnvSubjects', function(envId) {
     return this.ready();
   }
   if (typeof envId === 'undefined') {
-    this.ready()
+    return this.ready()
   }
 
   let env_ids = getUserGroupEnvs(this.userId);
@@ -265,7 +265,7 @@ Meteor.publish('groupEnvSubjects', function(envId) {
       {envId: envId}
     );
   }
-  this.ready()
+  return this.ready()
 });
 
 
@@ -304,7 +304,7 @@ Meteor.publish('envSequences', function(envId) {
   if (!!env_ids.find(id => id === envId)) {
     return Sequences.find({envId: envId});
   }
-  this.ready()
+  return this.ready()
 });
 
 Meteor.publish('obsSequences', function(obsId) {
@@ -325,13 +325,13 @@ Meteor.publish('groupEnvSequences', function(envId) {
   let env_ids = getUserGroupEnvs(this.userId);
 
   if (env_ids.length === 0) {
-    this.ready()
+    return this.ready()
   }
 
   if (env_ids.has(envId)) {
     return Sequences.find({envId: envId});
   }
-  this.ready()
+  return this.ready()
 });
 
 Meteor.publish('groupObsSequences', function(obsId) {
@@ -342,7 +342,7 @@ Meteor.publish('groupObsSequences', function(obsId) {
   let env_ids = getUserGroupEnvs(this.userId);
 
   if (env_ids.length === 0) {
-    this.ready()
+    return this.ready()
   }
 
   return Sequences.find({obsId: obsId, envId: {$in: [...env_ids]}});
@@ -356,7 +356,7 @@ Meteor.publish('groupSequences', function() {
   let env_ids = getUserGroupEnvs(this.userId);
 
   if (env_ids.length === 0) {
-    this.ready()
+    return this.ready()
   }
 
   return Sequences.find({envId: {$in: [...env_ids]}});
@@ -397,7 +397,7 @@ Meteor.publish('envSubjectParameters', function(envId) {
   if (!!env_ids.find(id => id === envId)) {
       return SubjectParameters.find({'children.envId': envId});
   }
-  this.ready()
+  return this.ready()
 });
 
 Meteor.publish('groupEnvSubjectParameters', function(envId) {
@@ -408,13 +408,13 @@ Meteor.publish('groupEnvSubjectParameters', function(envId) {
   let env_ids = getUserGroupEnvs(this.userId);
 
   if (env_ids.length === 0) {
-    this.ready()
+    return this.ready()
   }
 
   if (env_ids.has(envId)) {
     return SubjectParameters.find({'children.envId': envId});
   }
-  this.ready()
+  return this.ready()
 });
 
 
@@ -426,7 +426,7 @@ Meteor.publish('groupSubjectParameters', function() {
   let env_ids = getUserGroupEnvs(this.userId);
 
   if (env_ids.length === 0) {
-    this.ready()
+    return this.ready()
   }
 
   return SubjectParameters.find({'children.envId': {$in: [...env_ids]}});
@@ -470,7 +470,7 @@ Meteor.publish('envSequenceParameters', function(envId) {
   if (!!env_ids.find(id => id === envId)) {
     return SequenceParameters.find({userId: this.userId, 'children.envId': envId});
   }
-  this.ready()
+  return this.ready()
 });
 
 Meteor.publish('groupEnvSequenceParameters', function(envId) {
@@ -481,13 +481,13 @@ Meteor.publish('groupEnvSequenceParameters', function(envId) {
   let env_ids = getUserGroupEnvs(this.userId);
 
   if (env_ids.length === 0) {
-    this.ready()
+    return this.ready()
   }
 
   if (env_ids.has(envId)) {
     return SequenceParameters.find({'children.envId': envId});
   }
-  this.ready()
+  return this.ready()
 });
 
 Meteor.publish('groupSequenceParameters', function() {
@@ -498,7 +498,7 @@ Meteor.publish('groupSequenceParameters', function() {
   let env_ids = getUserGroupEnvs(this.userId);
 
   if (env_ids.length === 0) {
-    this.ready()
+    return this.ready()
   }
 
   return SequenceParameters.find({'children.envId': {$in: [...env_ids]}});
@@ -517,7 +517,7 @@ Meteor.publish('allEnvs', function() {
   else {
     // return [];
     //
-    this.ready()
+    return this.ready()
   }
 
   // this.stop();
@@ -528,7 +528,7 @@ Meteor.publish('allObs', function() {
     return Observations.find();
   }
   else {
-    this.ready();
+    return this.ready();
     // return [];
   }
 
@@ -543,7 +543,7 @@ Meteor.publish('allSeqs', function() {
   else {
     // return [];
 
-    this.ready()
+    return this.ready()
   }
 
   // this.stop();
@@ -561,7 +561,7 @@ Meteor.publish('allSubjectsAndParams', function() {
   else {
     // return [];
 
-    this.ready()
+    return this.ready()
   }
 
   // this.stop();
@@ -578,7 +578,7 @@ Meteor.publish("autocompleteUsers", function(selector, options) {
   }
 
   Autocomplete.publishCursor(results, this);
-  this.ready();
+  return this.ready();
 });
 
 Meteor.publish("autocompleteEnvironments", function(selector, options) {
@@ -593,7 +593,7 @@ Meteor.publish("autocompleteEnvironments", function(selector, options) {
   let results = Environments.find(selector, options);
 
   Autocomplete.publishCursor(results, this);
-  this.ready();
+  return this.ready();
 });
 
 

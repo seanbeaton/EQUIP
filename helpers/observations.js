@@ -86,6 +86,7 @@ function createTableOfContributions(obsId) {
 
 function contributionTableTemplate(sequences, parameters, env) {
   var params = parameters;
+  console.log('parms', params);
   var contributionRows = sequences.map((sequence) => {
     return contributionRowTemplate(sequence, params, env)
   }).join("");
@@ -113,7 +114,7 @@ function contributionRowTemplate(seqItem, params, env) {
         `
   }).join("");
 
-  let time = `<p class="o--modal-label contributions-grid-item">${convertTime(Number(seqItem.time))}</p>`
+  // let time = `<p class="o--modal-label contributions-grid-item">${convertTime(Number(seqItem.time))}</p>`
   return `
         <div class="contributions-grid-container">
             <h3 class="contributions-modal-header">${seqItem.info.student.studentName}</h3>
@@ -122,34 +123,12 @@ function contributionRowTemplate(seqItem, params, env) {
     + `
         </div>
         <div class="contributions-grid-item-container u--bold">
-            <p class="o--modal-label contributions-grid-item">Time</p>
             ${paramTemplate}
         </div>
         <div class="contributions-grid-item-container">
-            ${time}
             ${paramValues}
         </div>
     `
-}
-
-
-function convertTime(secs) {
-  var hours = Math.floor(secs / (60 * 60));
-  if (hours < 10) {
-    hours = '0' + hours;
-  }
-  var divisor_for_minutes = secs % (60 * 60);
-  var minutes = Math.floor(divisor_for_minutes / 60);
-  if (minutes < 10) {
-    minutes = '0' + minutes;
-  }
-  var divisor_for_seconds = divisor_for_minutes % 60;
-  var seconds = Math.ceil(divisor_for_seconds);
-  if (seconds < 10) {
-    seconds = '0' + seconds;
-  }
-  final_str = '' + hours + ':' + minutes + ':' + seconds;
-  return final_str;
 }
 //
 // function populateParamBoxes(subjId) {
