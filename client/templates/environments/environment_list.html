@@ -88,6 +88,8 @@
                 </p>
                 <label class="label">Observation Type</label>
                 <p class="control">
+                    <span>Whole class groups allow you to code for the entire class, and mark certain students as absent. Small groups allow you to only code for a select few students, then analyse and compare data between different small groups. Small groups and Whole class observations can't be compared against each other.</span>
+                    <br />
                     <input name="classroom-type" type="radio" data-classroom-type="whole_class" id="type--whole-class" checked>
                     <label for="type--whole-class">Whole Class</label>
                     <input name="classroom-type" type="radio" data-classroom-type="small_group" id="type--small-group">
@@ -95,8 +97,9 @@
                 </p>
                 <label class="label" for="observationDescription">Description</label>
                 <p class="control">
-                <div>Write a short (max. 280 characters) description of the observation you're coding.</div>
-                <textarea rows='5' cols="70" maxlength="280" id="observationDescription" name="observationDescription"></textarea>
+                    <span>Write a short (max. 280 characters) description of the observation you're coding.</span>
+                    <br />
+                    <textarea rows='5' cols="70" maxlength="280" id="observationDescription" name="observationDescription"></textarea>
                 </p>
             </section>
             <footer class="modal-card-foot">
