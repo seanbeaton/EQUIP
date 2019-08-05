@@ -19,24 +19,27 @@ Template.editSubjectParameters.helpers({
 });
 
 //Helper function for adding a field in the subj
+// todo I don't think this is ever being used, this needs to be cleaned up.
 function addSubjFields() {
   var formCounter = $("#paramForm .single-param").length;
   var container = document.getElementById("paramForm");
 
+
+  //
   var singleParam = $('<div/>', {
       class: "single-param control myParam"+formCounter
     }).appendTo(container);
 
       $('<label/>', {
         class: "label",
-        text: "Name:"
+        text: "Social Marker:"
       }).appendTo(singleParam);
 
       $('<input/>', {
         class: "input",
         type: "text",
         name: "label"+formCounter,
-        placeholder: "Name"
+        placeholder: "e.g. gender, race"
       }).appendTo(singleParam);
 
       $('<label/>', {
@@ -360,7 +363,7 @@ const EditDemographics = function() {
     function oneResultTemplate(data,idx) {
         return `
             <div class="single-param control myParam${idx}">
-                <label class="o--form-labels">Name:</label>
+                <label class="o--form-labels">Social Marker:</label>
                 <input class="o--form-input" type="text" name="label${idx}" value="${data.name}">
                 <label class="o--form-labels">Options:</label>
                 <input class="o--form-input" type="text" style="margin-bottom: .25em" name="parameter${idx}" value="${data.input}">
@@ -372,8 +375,8 @@ const EditDemographics = function() {
     function oneParamRowTemplate(index) {
         return `
             <div class="single-param control myParam0">
-                <label class="o--form-labels">Name:</label>
-                <input class="o--form-input" type="text" name="label${index}" placeholder="Name">
+                <label class="o--form-labels">Social Marker:</label>
+                <input class="o--form-input" type="text" name="label${index}" placeholder="e.g. Gender, Race">
                 <label class="o--form-labels">Options:</label>
                 <input class="o--form-input" type="text" style="margin-bottom: .25em" name="parameter${index}" placeholder="List the options for selection separated by commas (e.g. male, female, unspecificied).">
                 <p class="o--toggle-links c--discourse-form__remove-button removeDem">Remove</p>
@@ -385,8 +388,8 @@ const EditDemographics = function() {
         return `
             <form id="paramForm">
                 <div class="single-param control myParam0">
-                    <label class="o--form-labels">Name:</label>
-                    <input class="o--form-input" type="text" name="label0" placeholder="Name">
+                    <label class="o--form-labels">Social Marker:</label>
+                    <input class="o--form-input" type="text" name="label0" placeholder="e.g. Gender, Race">
                     <label class="o--form-labels">Options:</label>
                     <input class="o--form-input" type="text" style="margin-bottom: .25em" name="parameter0" placeholder="List the options for selection separated by commas (e.g. male, female, unspecificied).">
                     <p class="o--toggle-links c--discourse-form__remove-button removeDem">Remove</p>
@@ -428,7 +431,7 @@ const EditDemographics = function() {
             return `
                 <div class="single-param control myParam${index}">
                     <div class="c--discourse-form__label-container">
-                        <label class="o--form-labels">Name:</label>
+                        <label class="o--form-labels">Social Marker:</label>
                     </div>
                     <input class="o--form-input" type="text" name="label${index}" value="${label}">
                     <label class="o--form-labels">Options:</label>
