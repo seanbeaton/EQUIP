@@ -166,7 +166,7 @@ Meteor.publish('envObservations', function(envId) {
   }
 
   // need to check ownership on the parent (environment), not the observation
-  let env_ids = Environments.find({userId: this.userId}).fetch().map(e => e._id)
+  let env_ids = Environments.find({userId: this.userId}, {fields: {_id: 1}}).fetch().map(e => e._id)
   if (!!env_ids.find(id => id === envId)) {
     return Observations.find({
       envId: envId
@@ -184,7 +184,7 @@ Meteor.publish('observation', function(obsId) {
     return this.ready();
   }
 
-  let envIds = Environments.find({userId: this.userId}).fetch().map(e => e._id);
+  let envIds = Environments.find({userId: this.userId}, {fields: {_id: 1}}).fetch().map(e => e._id);
   return Observations.find({envId: {$in: envIds}, _id: obsId});
 });
 
@@ -299,11 +299,14 @@ Meteor.publish('envSequences', function(envId) {
   if (!this.userId) {
     return this.ready();
   }
-
+  console.log('subscribe envSequences', 'before env_ids');
   let env_ids = Environments.find({userId: this.userId}).fetch().map(e => e._id);
+  console.log('subscribe envSequences', 'after env_ids');
   if (!!env_ids.find(id => id === envId)) {
+    console.log('subscribe envSequences', 'some env_ids found, looking for sequences');
     return Sequences.find({envId: envId});
   }
+  console.log('subscribe envSequences', 'no env_ids found, this.ready()');
   return this.ready()
 });
 
@@ -311,10 +314,22 @@ Meteor.publish('obsSequences', function(obsId) {
   if (!this.userId) {
     return this.ready();
   }
-
-  let env_ids = Environments.find({userId: this.userId}).fetch().map(e => e._id);
-  return Sequences.find({envId: {$in: env_ids}, obsId: obsId});
+  console.log('subscribe obsSequences', 'before env_ids');
+  let env_ids = Environments.find({userId: this.userId}, {fields: {_id: 1}}).fetch().map(e => e._id);
+  console.log('subscribe obsSequences', 'after env_ids');
+  console.log('subscribe obsSequences', 'about to find sequences');
+  let seqs = Sequences.find({envId: {$in: env_ids}, obsId: obsId});
+  console.log('subscribe obsSequences', 'found sequences, returning');
+  return seqs
 });
+//
+// Meteor.publish('obsSequences', function(obsId) {
+//   if (!this.userId) {
+//     return this.ready();
+//   }
+//
+//   return Sequences.find({userId: this.userId});
+// });
 
 
 Meteor.publish('groupEnvSequences', function(envId) {
@@ -393,7 +408,7 @@ Meteor.publish('envSubjectParameters', function(envId) {
     return this.ready();
   }
 
-  let env_ids = Environments.find({userId: this.userId}).fetch().map(e => e._id);
+  let env_ids = Environments.find({userId: this.userId}, {fields: {_id: 1}}).fetch().map(e => e._id);
   if (!!env_ids.find(id => id === envId)) {
       return SubjectParameters.find({'children.envId': envId});
   }
@@ -466,7 +481,7 @@ Meteor.publish('envSequenceParameters', function(envId) {
     return this.ready();
   }
 
-  let env_ids = Environments.find({userId: this.userId}).fetch().map(e => e._id);
+  let env_ids = Environments.find({userId: this.userId}, {fields: {_id: 1}}).fetch().map(e => e._id);
   if (!!env_ids.find(id => id === envId)) {
     return SequenceParameters.find({userId: this.userId, 'children.envId': envId});
   }
