@@ -268,13 +268,13 @@ function editStudent(e, callback) {
   Meteor.call('subjectUpdate', subject, function(error, result) {
     if (error) {
       alert(error.reason);
-    } else {
-      $('#stud-param-modal').removeClass('is-active');
-    }
-    if (typeof callback === 'function') {
-      callback()
     }
   });
+
+  if (typeof callback === 'function') {
+    callback()
+  }
+  $('#stud-param-modal').removeClass('is-active');
 }
 
 export let find_open_position = function(students) {
