@@ -157,7 +157,9 @@ Template.editSubjects.events({
   'click #save-subj-params': function(e) {
     $('#stud-param-modal').addClass('is-processing');
     let callback = function() {
-      $('#stud-param-modal').removeClass('is-processing');
+      setTimeout(function() {
+        $('#stud-param-modal').removeClass('is-processing');
+      }, 500);
     }
     saveNewSubject(this, callback)
  },
@@ -208,10 +210,13 @@ Template.editSubjects.events({
   },
   'click #edit-subj-params': function (e) {
     $('#stud-param-modal').addClass('is-processing');
+
     let callback = function() {
-      $('#stud-param-modal').removeClass('is-processing');
-      $('#stud-data-modal').addClass('is-active');
-      createTableOfStudents();
+      setTimeout(function() {
+        $('#stud-param-modal').removeClass('is-processing');
+        $('#stud-data-modal').addClass('is-active');
+        createTableOfStudents();
+      }, 500);
     }
     editStudent(e, callback);
     // $('#stud-param-modal').removeClass('is-active');
@@ -219,7 +224,9 @@ Template.editSubjects.events({
   'click #edit-subj-params-exit': function (e) {
     $('#stud-param-modal').addClass('is-processing');
     let callback = function() {
-      $('#stud-param-modal').removeClass('is-processing');
+      setTimeout(function() {
+        $('#stud-param-modal').removeClass('is-processing');
+      }, 500);
     }
     editStudent(e, callback);
     // $('#stud-param-modal').removeClass('is-active');
@@ -477,7 +484,6 @@ function saveNewSubject(env, callback) {
     return;
   }
 
-  console.log('yo', info);
   let subject = {
     data_x: String(newStudentPositionX),
     data_y: String(newStudentPositionY),
@@ -489,16 +495,17 @@ function saveNewSubject(env, callback) {
     if (error) {
       alert(error.reason);
     } else {
-      $('#stud-param-modal').removeClass('is-active');
       $('.o--box-item#' + result._id).addClass('just-added');
       setTimeout(function() {
         $('.o--box-item#' + result._id).removeClass('just-added');
       }, 5000);
     }
-    if (typeof callback === 'function') {
-      callback()
-    }
   });
+
+  if (typeof callback === 'function') {
+    callback()
+  }
+  $('#stud-param-modal').removeClass('is-active');
 }
 
 function contributionTableTemplate(students, parameters) {
