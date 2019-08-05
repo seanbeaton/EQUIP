@@ -214,9 +214,11 @@ Template.observatory.events({
     });
   },
   'click #save-seq-params': function(e) {
-    $('#stud-param-modal').addClass('is-processing');
+    $('#seq-param-modal').addClass('is-processing');
     let callback = function() {
-      $('#stud-param-modal').removeClass('is-processing');
+      setTimeout(function() {
+        $('#seq-param-modal').removeClass('is-processing');
+      }, 500)
     }
     let info = {
       student: {
@@ -230,11 +232,12 @@ Template.observatory.events({
     info.parameters = {};
 
     // todo this should cycle through known fields, not those that are in html
+    let missing_params = [];
     $('.c--modal-student-options-container').each(function() {
       let parameter_name = this.getAttribute('data-parameter-name');
       let parameter_choice = $('.chosen', $(this)).text().replace(/\n/ig, '').trim();
       if (parameter_choice.length === 0) {
-        alert(`No selection made for ${parameter_name}`);
+        missing_params.push(parameter_name)
         form_incomplete = true;
       } else {
         info.parameters[parameter_name] = parameter_choice
@@ -245,6 +248,7 @@ Template.observatory.events({
       if (typeof callback === 'function') {
         callback()
       }
+      alert(`No selection made for ${missing_params.join(', ')}`);
       return;
     }
 
@@ -258,20 +262,19 @@ Template.observatory.events({
       obsId: obsId,
       obsName: obsRaw.name
     };
-
     console.log('about to insert sequence');
     Meteor.call('sequenceInsert', sequence, function(error, result) {
-     if (error) {
-       alert(error.reason);
-     } else {
-       gtag('event',  'add_success', {'event_category': 'sequences'});
-       $('#seq-param-modal').removeClass('is-active');
-     }
-     console.log('sequence inserted');
-     if (typeof callback === 'function') {
-       callback()
-     }
-   });
+      if (error) {
+        alert(error.reason);
+      } else {
+        gtag('event',  'add_success', {'event_category': 'sequences'});
+      }
+      console.log('sequence inserted');
+    });
+    if (typeof callback === 'function') {
+      callback()
+    }
+    $('#seq-param-modal').removeClass('is-active');
   },
   'click .edit-seq': function(e) {
     gtag('event', 'edit', {'event_category': 'sequences'});
