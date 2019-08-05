@@ -236,7 +236,7 @@ function editStudent(e, callback) {
   let form_incomplete = false;
 
   let info = {};
-  info.name = $('.js-modal-header').attr('data-name');
+  info.name = $('#student-name').val();
 
   info.demographics = {};
 
@@ -567,6 +567,7 @@ function editParamBoxes(subjId) {
     let student = subj.info.name;
 
     modal.innerHTML += studentHeaderTemplate(`Edit ${student}`, student);
+    modal.innerHTML += studentInputTemplate(student);
     modal.innerHTML += studentParameterTemplate(allParams, subj, "Save Student");
     attachOptionSelection()
 }
@@ -580,13 +581,13 @@ function studentHeaderTemplate(type, student) {
     `
 }
 
-function studentInputTemplate() {
+function studentInputTemplate(name) {
     return `
         <div class="boxes-wrapper">
             <div class="c--modal-student-header">
                 <p>Name / Identifier for Student</p>
             </div>
-            <input class="c--modal-student-input student-name-field" id="student-name" type="text" placeholder="Type Student's First Name, Initials, or Pseudonym">
+            <input value="${name ? name : ''}" class="c--modal-student-input student-name-field" id="student-name" type="text" placeholder="Type Student's First Name, Initials, or Pseudonym">
         </div>
     `
 }
