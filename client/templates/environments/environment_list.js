@@ -21,8 +21,11 @@ Template.environmentList.rendered = function() {
       $('#onboarding-modal').removeClass("is-active");
       $('#env-create-modal').addClass("is-active");
   }
-  processDatepickers()
 }
+
+Template.obsCreationModal.rendered = function() {
+  processDatepickers();
+};
 
 Template.obsCreationModal.helpers({
   subjects: function() {
