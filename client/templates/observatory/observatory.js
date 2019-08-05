@@ -14,22 +14,6 @@ import {userHasEnvEditAccess} from "../../../helpers/environments";
 const classroomMode = new ReactiveVar('code');
 
 Template.observatory.created = function() {
-  Session.set('envId', Router.current().params._envId);
-  const obsId = Router.current().params._obsId;
-  // observation_helpers.createTableOfContributions(obsId);
-
-  var labelsObj = SequenceParameters.find({'children.envId':Router.current().params._envId}).fetch();
-
-  var parameterPairs = labelsObj[0]['children']['parameterPairs'];
-  seqLabels = []
-  for (i=0;i<parameterPairs;i++) {
-    if (!labelsObj[0]['children']['label'+i]) {
-      return;
-    } else {
-      seqLabels[i] = labelsObj[0]['children']['label'+i].replace(/\s+/g, '').replace(/[^\w\s]|_/g, "")
-    }
-  }
-  aTagSelectArray = []
 }
 
 //Create Toggle Option
