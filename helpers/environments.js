@@ -6,5 +6,8 @@ export let envHasObservations = function(envId) {
 }
 
 export let userHasEnvEditAccess = function(env) {
+  if (!env) {
+    return false
+  }
   return (Meteor.userId() === env.userId || userCanGroupEditEnv(Meteor.userId(), env._id))
 }

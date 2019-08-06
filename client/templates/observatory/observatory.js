@@ -16,27 +16,44 @@ const classroomMode = new ReactiveVar('code');
 Template.observatory.created = function() {
 }
 
+
+Template.observatory.onCreated(function created() {
+  this.subscribe('environment', this.data.envId);
+  this.subscribe('observation', this.data.obsId);
+  this.subscribe('envSubjects', this.data.envId);
+  this.subscribe('obsSequences', this.data.obsId);
+  this.subscribe('envSubjectParameters', this.data.envId);
+  this.subscribe('envSequenceParameters', this.data.envId);
+
+  this.data.environment = Environments.findOne(this.data.envId);
+  this.data.observation = Observations.findOne(this.data.obsId);
+  console.log('this outside', this);
+  this.autorun(() => {
+    console.log('this inside', this);
+  });
+});
+
 //Create Toggle Option
 Template.observatory.rendered = function() {
-  var obs = this.data.observation;
-  var seqParams = SequenceParameters.find({'children.envId': Router.current().params._envId}).fetch()[0];
-
-  var paramPairs = seqParams.children.parameterPairs;
-  if (paramPairs) {
-      for (var p=0; p<paramPairs;p++){
-        if(seqParams['children']['toggle'+p] == "on") {
-          var params = seqParams['children']['parameter'+p]
-          var label = seqParams['children']['label'+p]
-          createToggle(params, label);
-        }
-      }
-  }
-
-
-  var params = "Blank,Last Choices";
-  var label = "Contribution Defaults";
-
-  createToggle(params, label);
+  // var obs = this.data.observation;
+  // var seqParams = SequenceParameters.find({'children.envId': Router.current().params._envId}).fetch()[0];
+  //
+  // var paramPairs = seqParams.children.parameterPairs;
+  // if (paramPairs) {
+  //     for (var p=0; p<paramPairs;p++){
+  //       if(seqParams['children']['toggle'+p] == "on") {
+  //         var params = seqParams['children']['parameter'+p]
+  //         var label = seqParams['children']['label'+p]
+  //         createToggle(params, label);
+  //       }
+  //     }
+  // }
+  //
+  //
+  // var params = "Blank,Last Choices";
+  // var label = "Contribution Defaults";
+  //
+  // createToggle(params, label);
 
   $(document).keyup(function(e) {
      if (e.keyCode == 27) {
@@ -47,30 +64,30 @@ Template.observatory.rendered = function() {
   processDatepickers();
 }
 
-function createToggle(params, label) {
-  if (params) {
-    var choices = params.split(',');
-    togglers = $('.toggle-dash');
-    var wrap = $('<div/>', {class: 'column c--observation__toggle-container'}).appendTo(togglers);
-    $("<p/>",{
-      text: label,
-      class: 'c--observation-toggle__label o--modal-label',
-    }).appendTo(wrap);
-    var span = $('<span/>').appendTo(wrap);
-
-    var select = $('<select/>', {
-        class:"c--observation-toggle_select",
-        data_label: label
-      }).appendTo(span);
-
-    for (var c in choices) {
-      $('<option/>', {
-        value: choices[c],
-        text: choices[c]
-      }).appendTo(select);
-    }
-  }
-}
+// function createToggle(params, label) {
+//   if (params) {
+//     var choices = params.split(',');
+//     togglers = $('.toggle-dash');
+//     var wrap = $('<div/>', {class: 'column c--observation__toggle-container'}).appendTo(togglers);
+//     $("<p/>",{
+//       text: label,
+//       class: 'c--observation-toggle__label o--modal-label',
+//     }).appendTo(wrap);
+//     var span = $('<span/>').appendTo(wrap);
+//
+//     var select = $('<select/>', {
+//         class:"c--observation-toggle_select",
+//         data_label: label
+//       }).appendTo(span);
+//
+//     for (var c in choices) {
+//       $('<option/>', {
+//         value: choices[c],
+//         text: choices[c]
+//       }).appendTo(select);
+//     }
+//   }
+// }
 
 Template.observatory.helpers({
   userHasEditAccess: function() {
@@ -86,13 +103,13 @@ Template.observatory.helpers({
     return this.environment;
   },
   notes_status: function() {
-    return this.observation.notes.length > 0 ? "(notes logged)" : '(empty)'
+    return this.observation && this.observation.notes && this.observation.notes.length > 0 ? "(notes logged)" : '(empty)'
   },
   observation: function () {
     return this.observation;
   },
   accessModeText: function () {
-    if (userIsEnvOwner(this.environment._id)) {
+    if (!this.environment || userIsEnvOwner(this.environment._id)) {
       return '';
     }
     else if (userCanGroupEditEnv(Meteor.userId(), this.environment._id)) {
@@ -103,6 +120,9 @@ Template.observatory.helpers({
     }
   },
   subjects: function() {
+    if (!this.observation) {
+      return []
+    }
     return Subjects.find({
       envId: this.observation.envId,
     })

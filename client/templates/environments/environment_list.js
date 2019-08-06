@@ -10,6 +10,19 @@ export const obsCreateModal = new ReactiveVar(false);
 export const activeEnvId = new ReactiveVar(false);
 export const currentNewObservation = new ReactiveVar(false);
 
+
+Template.environmentList.onCreated(function created() {
+  this.autorun(() => {
+    Meteor.subscribe('environments');
+    Meteor.subscribe('observations');
+    Meteor.subscribe('subjects');
+    Meteor.subscribe('sequences');
+    Meteor.subscribe('subjectParameters');
+    Meteor.subscribe('sequenceParameters');
+  });
+});
+
+
 Template.environmentList.rendered = function() {
   // if (document.querySelector(".toggle-accordion")) {
   //     document.querySelectorAll('.toggle-accordion')[0].click(); // main
