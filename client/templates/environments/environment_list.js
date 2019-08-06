@@ -15,7 +15,7 @@ Template.environmentList.onCreated(function created() {
   this.subscribe('environments');
   this.subscribe('observations');
   this.subscribe('subjects');
-  this.subscribe('sequences');
+  // this.subscribe('sequences');
   this.subscribe('subjectParameters');
   this.subscribe('sequenceParameters');
 
@@ -267,8 +267,8 @@ Template.environmentList.helpers({
     // var subjects;
     var user = Meteor.user();
     var total_students = Subjects.find({userId: user._id}, {reactive: false}).count();
-    var total_obs = Sequences.find({userId: user._id}, {reactive: false}).count();
-    var results = {list: envs, num_env: parseInt(envs.length), num_students: parseInt(total_students), num_obs: parseInt(total_obs)};
+    // var total_obs = Sequences.find({userId: user._id}, {reactive: false}).count();
+    var results = {list: envs, num_env: parseInt(envs.length), num_students: parseInt(total_students)};
 
     return results;
   },
