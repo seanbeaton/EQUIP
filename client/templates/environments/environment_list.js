@@ -12,14 +12,14 @@ export const currentNewObservation = new ReactiveVar(false);
 
 
 Template.environmentList.onCreated(function created() {
-  this.autorun(() => {
-    Meteor.subscribe('environments');
-    Meteor.subscribe('observations');
-    Meteor.subscribe('subjects');
-    Meteor.subscribe('sequences');
-    Meteor.subscribe('subjectParameters');
-    Meteor.subscribe('sequenceParameters');
-  });
+  this.subscribe('environments');
+  this.subscribe('observations');
+  this.subscribe('subjects');
+  this.subscribe('sequences');
+  this.subscribe('subjectParameters');
+  this.subscribe('sequenceParameters');
+
+  // this.data.environments = Environments.find({}, {reactive: false}).fetch()
 });
 
 
@@ -76,9 +76,9 @@ Template.obsCreationModal.helpers({
 Template.obsCreationModal.events({
   'click #save-obs-name': function(e) {
     var id = $('#obs-create-modal').attr("data-id");
-    var sequenceParams = SequenceParameters.findOne({'children.envId': id});
-    var demographicParams = SubjectParameters.findOne({'children.envId': id});
-    var observations = Observations.find({"envId": id}).fetch();
+    var sequenceParams = SequenceParameters.findOne({'children.envId': id}, {reactive: false});
+    var demographicParams = SubjectParameters.findOne({'children.envId': id}, {reactive: false});
+    var observations = Observations.find({"envId": id}, {reactive: false}).fetch();
     var obsAccordion = $(`.c--accordion-item__inner[data-id=${id}]`);
 
     var observation = {
@@ -262,12 +262,12 @@ Template.environmentList.helpers({
     return getStudents(activeEnvId.get());
   },
   environment: function() {
-    var envs = Environments.find({}, {sort: {submitted: -1}}).fetch();
-    var obs;
-    var subjects;
+    var envs = this.environments;
+    // var obs;
+    // var subjects;
     var user = Meteor.user();
-    var total_students = Subjects.find({userId: user._id}).count();
-    var total_obs = Sequences.find({userId: user._id}).count();
+    var total_students = Subjects.find({userId: user._id}, {reactive: false}).count();
+    var total_obs = Sequences.find({userId: user._id}, {reactive: false}).count();
     var results = {list: envs, num_env: parseInt(envs.length), num_students: parseInt(total_students), num_obs: parseInt(total_obs)};
 
     return results;
@@ -297,7 +297,7 @@ Template.environmentList.helpers({
     '/' + date.getFullYear();
   },
   needsEnvironment: function() {
-    var obj = Environments.find({}).fetch();
+    var obj = Environments.find({}, {reactive: false}).fetch();
 
     return $.isEmptyObject(obj)?"green-pulse":"";
   }

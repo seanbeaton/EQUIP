@@ -2,7 +2,7 @@ import {setupSequenceParameters, setupSubjectParameters} from "/helpers/paramete
 import {getStudent} from "./students";
 
 function getSequence(seqId, envId) {
-  let sequence = Sequences.findOne({_id:seqId});
+  let sequence = Sequences.findOne({_id:seqId}, {reactive: false});
   let allParams = setupSequenceParameters(envId);
   return updateSequence(sequence, allParams);
 }
@@ -10,10 +10,10 @@ function getSequences(obsId, envId) {
   let sequences;
   console.log('obsId, envId', obsId, envId)
   if (obsId === null) {
-    sequences = Sequences.find({envId:envId}).fetch();
+    sequences = Sequences.find({envId:envId}, {reactive: false}).fetch();
   }
   else {
-    sequences = Sequences.find({obsId:obsId}).fetch();
+    sequences = Sequences.find({obsId:obsId}, {reactive: false}).fetch();
   }
   let allParams = setupSequenceParameters(envId);
   return updateSequences(sequences, allParams);

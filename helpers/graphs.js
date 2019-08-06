@@ -417,7 +417,7 @@ let updateStudentContribKey = function(key_wrapper, y_values, color_axis) {
 }
 
 let getObservations = function(obsIds) {
-  return Observations.find({_id: {$in: obsIds}}).fetch();
+  return Observations.find({_id: {$in: obsIds}}, {reactive: false}).fetch();
 }
 
 let getDiscourseDimensions = function(envId) {

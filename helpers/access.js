@@ -35,7 +35,7 @@ let checkAccess = function(id, type, access_level) {
   });
 
   if (type === 'environment') {
-    let env = Environments.findOne({_id: id});
+    let env = Environments.findOne({_id: id}, {reactive: false});
     if (env.userId === Meteor.userId()) {
       // if you're the owner, you can do whatever.
       return;
@@ -54,8 +54,8 @@ let checkAccess = function(id, type, access_level) {
     throw new Meteor.Error('403', `${access_level} access not allowed to this ${type}`);
   }
   else if (type === 'observation') {
-    let obs = Observations.findOne({_id: id});
-    let env = Environments.findOne({_id: obs.envId}) ;
+    let obs = Observations.findOne({_id: id}, {reactive: false});
+    let env = Environments.findOne({_id: obs.envId}, {reactive: false}) ;
     if (!env) {
       throw new Meteor.Error('403', `${access_level} access not allowed to this ${type}`);
     }
@@ -76,8 +76,8 @@ let checkAccess = function(id, type, access_level) {
     throw new Meteor.Error('403', `${access_level} access not allowed to this ${type}`);
   }
   else if (type === 'sequence') {
-    let seq = Sequences.findOne({_id: id});
-    let env = Environments.findOne({_id: seq.envId}) ;
+    let seq = Sequences.findOne({_id: id}, {reactive: false});
+    let env = Environments.findOne({_id: seq.envId}, {reactive: false}) ;
     if (!env) {
       throw new Meteor.Error('403', `${access_level} access not allowed to this ${type}`);
     }
@@ -104,8 +104,8 @@ let checkAccess = function(id, type, access_level) {
     throw new Meteor.Error('403', `${access_level} access not allowed to this ${type}`);
   }
   else if (type === 'subject') {
-    let subj = Subjects.findOne({_id: id});
-    let env = Environments.findOne({_id: subj.envId}) ;
+    let subj = Subjects.findOne({_id: id}, {reactive: false});
+    let env = Environments.findOne({_id: subj.envId}, {reactive: false}) ;
     if (!env) {
       throw new Meteor.Error('403', `${access_level} access not allowed to this ${type}`);
     }
@@ -135,7 +135,7 @@ let checkAccess = function(id, type, access_level) {
     throw new Meteor.Error('403', `${access_level} access not allowed to this ${type}`);
   }
   else if (type === 'group') {
-    let group = Groups.findOne({_id: id});
+    let group = Groups.findOne({_id: id}, {reactive: false});
     if (!group) {
       throw new Meteor.Error('403', 'Group not found or no permissions')
     }

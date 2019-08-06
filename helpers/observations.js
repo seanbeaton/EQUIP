@@ -74,8 +74,8 @@ function createTableOfContributions(obsId) {
   if (typeof obsId === 'undefined') {
     obsId = Router.current().params._obsId;
   }
-  let obs = Observations.findOne({_id: obsId});
-  let env = Environments.findOne({_id: obs.envId});
+  let obs = Observations.findOne({_id: obsId}, {reactive: false});
+  let env = Environments.findOne({_id: obs.envId}, {reactive: false});
   $('#data-modal-content').children().remove();
   let seqs = getSequences(obsId, env._id);
 

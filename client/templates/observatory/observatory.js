@@ -25,12 +25,12 @@ Template.observatory.onCreated(function created() {
   this.subscribe('envSubjectParameters', this.data.envId);
   this.subscribe('envSequenceParameters', this.data.envId);
 
-  this.data.environment = Environments.findOne(this.data.envId);
-  this.data.observation = Observations.findOne(this.data.obsId);
-  console.log('this outside', this);
-  this.autorun(() => {
-    console.log('this inside', this);
-  });
+  this.data.environment = Environments.findOne(this.data.envId, {reactive: false});
+  this.data.observation = Observations.findOne(this.data.obsId, {reactive: false});
+  // console.log('this outside', this);
+  // this.autorun(() => {
+  //   console.log('this inside', this);
+  // });
 });
 
 //Create Toggle Option
@@ -274,7 +274,7 @@ Template.observatory.events({
 
     const obsId = Router.current().params._obsId;
     const envId = Router.current().params._envId;
-    let obsRaw = Observations.find({_id: obsId}).fetch()[0];
+    let obsRaw = Observations.findOne({_id: obsId}, {reactive: false});
 
     let sequence = {
       envId: envId,

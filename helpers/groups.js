@@ -12,7 +12,7 @@ let hasRemovePermission = function (envId, group) {
 
 let userIsGroupManager = function (uid, group) {
   if (typeof group === 'string') {
-    group = Groups.findOne({_id: group});
+    group = Groups.findOne({_id: group}, {reactive: false});
   }
   try {
     checkAccess(group._id, 'group', 'manage')
@@ -38,7 +38,7 @@ let userIsEnvOwner = function (envId, uid) {
   if (typeof uid === 'undefined') {
     uid = Meteor.userId();
   }
-  let full_env = Environments.findOne({_id: envId});
+  let full_env = Environments.findOne({_id: envId}, {reactive: false});
   return full_env.userId === uid;
 }
 
@@ -46,19 +46,19 @@ let userIsGroupMember = function (gid, uid) {
   if (typeof uid === 'undefined') {
     uid = Meteor.userId();
   }
-  let group = Groups.findOne({_id: gid});
+  let group = Groups.findOne({_id: gid}, {reactive: false});
   return !!group.members.find(m => m.userId === uid)
 }
 
 let envIsSharedToGroup = function (gid, envId) {
-  let group = Groups.findOne({_id: gid});
+  let group = Groups.findOne({_id: gid}, {reactive: false});
   return !!group.environments.find(m => m.envId === envId)
 }
 
 let getUserGroupEnvs = function (userId) {
   let groups = Groups.find({
     "members.userId": userId
-  }).fetch();
+  }, {reactive: false}).fetch();
 
   let env_ids = new Set();
   groups.forEach(function (group) {
@@ -87,7 +87,7 @@ let userCanGroupEditEnv = function (uid, envId) {
 
   let groups = Groups.find({
     "members.userId": uid
-  }).fetch();
+  }, {reactive: false}).fetch();
 
   let allow = false;
   console.log('checking for uid', uid, 'and envID', envId, 'groups', groups)

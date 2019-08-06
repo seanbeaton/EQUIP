@@ -18,10 +18,10 @@ function setupParameters(parameterType, envId) {
 
   let subjParams;
   if (parameterType === 'subject') {
-    subjParams = SubjectParameters.find({'children.envId':envId}).fetch()[0];
+    subjParams = SubjectParameters.find({'children.envId':envId}, {reactive: false}).fetch()[0];
   }
   else {
-    subjParams = SequenceParameters.find({'children.envId':envId}).fetch()[0];
+    subjParams = SequenceParameters.find({'children.envId':envId}, {reactive: false}).fetch()[0];
   }
 
 

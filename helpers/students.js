@@ -1,13 +1,13 @@
 import {setupSubjectParameters} from "/helpers/parameters";
 
 function getStudents(envId) {
-  let students = Subjects.find({envId:envId}).fetch();
+  let students = Subjects.find({envId:envId}, {reactive: false}).fetch();
   let allParams = setupSubjectParameters(envId);
   return updateStudents(students, allParams);
 }
 
 function getStudent(subjId, envId) {
-  let student = Subjects.findOne({_id: subjId});
+  let student = Subjects.findOne({_id: subjId}, {reactive: false});
   let allParams = setupSubjectParameters(envId);
   return updateStudent(student, allParams);
 

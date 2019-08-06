@@ -1,6 +1,7 @@
 <!-- HTML for the observatory -->
 
 <template name="observatory">
+    {{#if observation}}
     <section class="c--discourse-header__container">
         <h1 class="c--discourse-header__title">Live Observation</h1>
         <div class="c--discourse-header__links-container">
@@ -125,5 +126,5 @@
       </footer>
     </div>
   </div>
-
+    {{/if}}
 </template>
