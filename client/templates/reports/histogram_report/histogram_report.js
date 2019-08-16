@@ -14,7 +14,7 @@ import {
   createStudentContribData,
   createStudentTimeData, get_average, get_median,
   getDiscourseDimensions,
-  getDiscourseOptionsForDimension, studentContribGraph,
+  getDiscourseOptionsForDimension, getObservations, studentContribGraph,
   studentTimeGraph
 } from "../../../../helpers/graphs";
 
@@ -100,7 +100,7 @@ Template.histogramReport.helpers({
     return getEnvironment();
   },
   observations: function() {
-    return getSelectedObservations();
+    return getObservations(selectedObservations.get());
   },
   students: function() {
     return students.get();

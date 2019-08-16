@@ -125,7 +125,7 @@ Template.groupWorkReport.helpers({
     return getEnvironment();
   },
   observations: function() {
-    return getSelectedObservations();
+    return getObservations(selectedObservations.get());
   },
   students: function() {
     return students.get();
