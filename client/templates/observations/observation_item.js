@@ -46,52 +46,52 @@ Template.observationItem.events({
   // 'click .delete-seq': function(e) {
   //   observation_helpers.deleteContribution(e);
   // },
-  'click #edit-seq-params': function(e) {
-    seqId = $(e.target).attr('data-seq');
-
-    var info = {};
-      info['studentId'] = $('.student-modal-head').attr('data-id');
-      info['Name'] = $('.student-modal-head').attr('data-name');
-      let envId = Router.current().params._envId;
-      let obsId = this._id;
-      var choices = [];
-      var labels = [];
-      //Do this always in the case of editing from obs list
-
-        $('.subj-box-labels').each(function () {
-          labels.push(this.textContent);
-          var c = $(this).siblings('.chosen')[0];
-          if (c) {
-            choices.push(c.textContent);
-          } else {
-            choices.push(null);
-          }
-        });
-
-      for (label in labels) {
-        info[labels[label]] = choices[label];
-      }
-
-      var sequence = {
-        info: info,
-        seqId: seqId
-      };
-
-      Meteor.call('sequenceUpdate', sequence, function(error, result) {
-       if (error) {
-         alert(error.reason);
-       } else {
-        $('#seq-param-modal').removeClass('is-active');
-       }
-     });
-    //This should happen at the end...
-    const seq = Sequences.findOne({_id: seqId});
-    obsId = seq['obsId'];
-    $('#seq-param-modal').removeClass('is-active');
-    observation_helpers.createTableOfContributions(obsId);
-    $('#seq-data-modal').addClass('is-active');
-  }
- });
+ //  'click #edit-seq-params': function(e) {
+ //    seqId = $(e.target).attr('data-seq');
+ //
+ //    var info = {};
+ //      info['studentId'] = $('.student-modal-head').attr('data-id');
+ //      info['Name'] = $('.student-modal-head').attr('data-name');
+ //      let envId = Router.current().params._envId;
+ //      let obsId = this._id;
+ //      var choices = [];
+ //      var labels = [];
+ //      //Do this always in the case of editing from obs list
+ //
+ //        $('.subj-box-labels').each(function () {
+ //          labels.push(this.textContent);
+ //          var c = $(this).siblings('.chosen')[0];
+ //          if (c) {
+ //            choices.push(c.textContent);
+ //          } else {
+ //            choices.push(null);
+ //          }
+ //        });
+ //
+ //      for (label in labels) {
+ //        info[labels[label]] = choices[label];
+ //      }
+ //
+ //      var sequence = {
+ //        info: info,
+ //        seqId: seqId
+ //      };
+ //
+ //      Meteor.call('sequenceUpdate', sequence, function(error, result) {
+ //       if (error) {
+ //         alert(error.reason);
+ //       } else {
+ //        $('#seq-param-modal').removeClass('is-active');
+ //       }
+ //     });
+ //    //This should happen at the end...
+ //    const seq = Sequences.findOne({_id: seqId});
+ //    obsId = seq['obsId'];
+ //    $('#seq-param-modal').removeClass('is-active');
+ //    observation_helpers.createTableOfContributions(obsId);
+ //    $('#seq-data-modal').addClass('is-active');
+ //  }
+});
 
  Template.observationItem.helpers({
 

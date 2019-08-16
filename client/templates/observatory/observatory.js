@@ -409,9 +409,11 @@ function editSequence(e) {
 
   var sequence = {
     info: info,
-    seqId: seqId
+    seqId: seqId,
+    envId: envId,
   };
 
+  console.log('seq', sequence)
 
 
   Meteor.call('sequenceUpdate', sequence, function(error, result) {
