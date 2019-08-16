@@ -42,6 +42,7 @@ let setupVis = function(visContainerId, selectionCallback, obsOptions, selectedO
   let options = {
     multiselect: true,
     zoomable: false,
+    zoomMin: 7*24*60*60*1000, // 1 week in ms
   }
   let timeline = new vis.Timeline(container, items, options)
 
