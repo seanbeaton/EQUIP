@@ -24,8 +24,14 @@
     <br>
     <br>
     <br>
-    <br>
-    <br>
-    {{>spinner}}
+      <div class="loading-data">
+          <p class="loading-data__text">Loading data {{percent_loaded}}%...</p>
+          <div class="loading-bar">
+              <div class="loading-bar__fill" style="width: {{percent_loaded}}%"></div>
+          </div>
+      </div>
   </div>
+</template>
+
+<template name="loadingBar">
 </template>

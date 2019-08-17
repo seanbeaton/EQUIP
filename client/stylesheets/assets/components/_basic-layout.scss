@@ -27,3 +27,26 @@ $padding: 16px;
   line-height: 1em;
   margin: 0;
 }
+
+.loading-data__text {
+  text-align: center;
+}
+
+.loading-bar {
+  width: 500px;
+  max-width: 100%;
+  overflow: hidden;
+  height: 40px;
+  margin: 0 auto;
+  position: relative;
+  padding: 1rem 0;
+}
+
+.loading-bar__fill {
+  height: 100%;
+  transition: width 0.2s ease-in-out;
+  position: absolute;
+  left: 0;
+  top: 0;
+  background-color: var(--orange);
+}
