@@ -40,3 +40,4 @@ percolate:migrations
 mizzao:autocomplete
 check
 reywood:publish-composite
+force-ssl
