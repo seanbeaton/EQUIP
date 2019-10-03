@@ -106,13 +106,18 @@ let create_graph = function(stats, selector) {
       .x(d => x(d.d3date))
       .y(d => y(d.value)));
 
-  let ticks = data.map(d => d.d3date);
+  // let ticks = data.map(d => d.d3date);
 
   g.append("g")
     .attr("transform", "translate(0," + height + ")")
     .attr('class', 'x-axis')
-    .call(d3.axisBottom(x)
-      .tickValues(ticks));
+    .call(d3.axisBottom(x).tickFormat(function(date){
+      if (d3.timeYear(date) < date) {
+        return d3.timeFormat('%b')(date);
+      } else {
+        return d3.timeFormat('%Y')(date);
+      }
+    }));
 
   // // Add the Y Axis
   // g.append("g")
