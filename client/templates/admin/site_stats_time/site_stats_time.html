@@ -3,9 +3,14 @@
 <template name="siteStatsTime">
     <div class="basic-container">
         <h2>Site stats</h2>
+        {{#if stat_gen_time }}
+            <span>Stats generated last at {{stat_gen_time}}.</span>
+            <br/>If the cached stats are more than 6 hours old, they will be automatically regenerated. You can refresh these stats manually using the button below, but be aware it may take some time. The stats shown below will automatically be replaced <br/>
+            <button class="refresh-site-stats">Refresh site stats</button>
+            <span class="refresh-site-stats-text"></span>
+        {{/if}}
         <div class="stat-loader__wrapper" style="{{#if statsLoaded }}display: none;{{/if}}">
-            <div class="stat-loader">Data loaded. Processing <span class="num-stats-loaded">0</span> of {{totalNumStats}} statistics...</div>
-            <div class="stat-loader">Data loaded. Processing statistics. This may take up to 30-60 seconds.</div>
+            <div class="stat-loader">Loading data from server. This may take a while.</div>
         </div>
         <div class="stats-container stats-container--graphs">
 

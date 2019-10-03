@@ -4,6 +4,9 @@
     <div class="basic-container">
         <h2>Site stats</h2>
         <div class="stats-container">
+            {{#if stat_gen_time }}
+                <span>Stats generated last at {{stat_gen_time}}</span>
+            {{/if}}
             <ul>
             {{#each stats}}
                 {{> stat }}
@@ -14,6 +17,9 @@
         </div>
         <div class="stats-container">
             <h4>Demographic usage</h4>
+            {{#if param_stat_gen_time }}
+                <span>Stats generated last at {{param_stat_gen_time}}</span>
+            {{/if}}
             <ul>
             {{#each demographic_popularities}}
                 {{> param_pop }}
@@ -24,6 +30,9 @@
         </div>
         <div class="stats-container">
             <h4>Discourse parameter usage</h4>
+            {{#if param_stat_gen_time }}
+                <span>Stats generated last at {{param_stat_gen_time}}</span>
+            {{/if}}
             <ul>
             {{#each discourse_param_popularities}}
                 {{> param_pop }}

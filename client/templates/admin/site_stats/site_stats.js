@@ -2,74 +2,45 @@
 //
 // });
 
+let demographic_popularities = new ReactiveVar([]);
+let discourse_param_popularities = new ReactiveVar([]);
+let param_stat_gen_time = new ReactiveVar('');
+let stat_gen_time = new ReactiveVar('');
+let stats = new ReactiveVar([]);
+
 Template.siteStats.helpers({
   stats: function() {
-    let stats = [];
-    stats.push({label: 'Number of users', value: Meteor.users.find().count()});
-    stats.push({label: 'Number of classrooms', value: Environments.find({isExample: null, envName: {$ne: "Example Classroom"}}).count()});
-    stats.push({label: 'Number of example classrooms', value: Environments.find({$or: [{isExample: true}, {envName: "Example Classroom"}]}).count()});
-    stats.push({label: 'Number of students', value: Subjects.find({origStudId: null}).count()});
-    stats.push({label: 'Number of observations', value: Observations.find({origObsId: null}).count()});
-    stats.push({label: 'Number of sequences', value: Sequences.find({origObsId: null}).count()});
-
-    console.log('stats', stats);
-    return stats;
+    return stats.get();
   },
   demographic_popularities: function() {
-    return getParamPopularity(SubjectParameters.find().fetch());
+    return demographic_popularities.get()
   },
   discourse_param_popularities: function() {
-    return getParamPopularity(SequenceParameters.find().fetch());
+    return discourse_param_popularities.get()
+  },
+  param_stat_gen_time: function() {
+    return param_stat_gen_time.get();
+  },
+  stat_gen_time: function() {
+    return stat_gen_time.get()
   }
-
 });
 
 
-function getParamPopularity(parameter_sets) {
-  let labels = {}
-  for (let pk in parameter_sets) {
-    let parameters = parameter_sets[pk]['children'];
-    // console.log('parameters')
-    for (let i = 0; i < parameters.parameterPairs; i++) {
-      if (typeof labels[parameters[`label${i}`]] !== 'undefined') {
-        labels[parameters[`label${i}`]]['count']++
-
-        let params = {};
-        let param_opts = parameters[`parameter${i}`];
-        if (typeof labels[parameters[`label${i}`]]['params'][param_opts] !== 'undefined') {
-          labels[parameters[`label${i}`]]['params'][param_opts]++
-        }
-        else {
-          labels[parameters[`label${i}`]]['params'][param_opts] = 1
-        }
-
-        // labels[parameters[`label${i}`]]['params'].push(parameters[`parameter${i}`])
-      }
-      else {
-        let params = {};
-        params[parameters[`parameter${i}`]] = 1;
-        labels[parameters[`label${i}`]] = {
-          count: 1,
-          params: params
-        }
-      }
+Template.siteStats.onRendered(function() {
+  Meteor.call('getCounts', function(err, res) {
+    if (!err) {
+      console.log('res', res);
+      stats.set(res.stats);
+      stat_gen_time.set(res.createdAt.toLocaleString());
     }
-  }
-  let ret = [];
-  for (let label in labels) {
-    let params = []
-    for (let param_label in labels[label]['params']) {
-      params.push({
-        label: param_label,
-        count: labels[label]['params'][param_label]
-      })
+  });
+  Meteor.call('getParamPopularity', function(err, res) {
+    if (!err) {
+      console.log('res', res);
+      demographic_popularities.set(res.demographics_pop);
+      discourse_param_popularities.set(res.sequences_pop);
+      param_stat_gen_time.set(res.createdAt.toLocaleString());
     }
-    ret.push({
-      label: label,
-      count: labels[label]['count'],
-      params: params
-    })
-  }
-  console.log('returning', ret);
-  return ret;
-}
+  });
+})
