@@ -16,7 +16,7 @@ Follow these instructions if you're not so familiar with how to run programs fro
 If you're looking to do a local install, you'll first need to download the files. 
 You have two options - the recommended way and the not-so-recommended way.
 
-#####The recommended way
+##### The recommended way
 
 We recommend downloading EQUIP via git, the version control software used to maintain the source code. It's installed by default on most linux and mac machines, and can be installed on windows by going to [https://git-scm.com](https://git-scm.com).
 
@@ -28,7 +28,7 @@ git clone git@github.com:seanbeaton/dataObs.git
 
 This should copy all the files into a directory called `dataObs` in your active directory (typically `~/`, your home directory).
 
-#####The not-so-recommended way
+##### The not-so-recommended way
 
 Github allows you to download a zip file of all the code for EQUIP. Doing it this way means you don't need git to download the files, but you won't be able to keep your installation up to date with all the latest feature and security updates.
 
@@ -80,7 +80,7 @@ To stop the app, press control-c while you're in the terminal window you used to
 
 ---
 
-###Developer instructions
+### Developer instructions
 
 There's a few options, one is a local install, another would be to use a cloud provider like heroku or atmosphere. You could also install it on a server somewhere in your network.
 #### Local install
