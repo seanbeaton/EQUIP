@@ -9,7 +9,7 @@ If you don't want to use the public EQUIP app, you can install it yourself eithe
 
 ### Teacher/Researcher instructions
 
-Follow these instructions if you're not so familiar with how to run programs from the command line. If you're a developer yourself, skip down to the [Developer instructions](###Developer Instructions)
+Follow these instructions if you're not so familiar with how to run programs from the command line. If you're a developer yourself, skip down to the [Developer instructions](#developer-instructions)
 
 #### Downloading EQUIP
 
