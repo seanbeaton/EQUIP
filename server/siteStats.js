@@ -232,7 +232,7 @@ let group_by = function(xs, key) {
     if (!x[key]) {
       date_month = 'Not recorded';
     } else {
-      date_month = x[key].toLocaleString(locale, {month: 'long', year: 'numeric'});
+      date_month = x[key].toLocaleString(locale, {timeZone: 'UTC', month: 'long', year: 'numeric'});
     }
     (rv[date_month] = rv[date_month] || []).push(x);
     return rv;
