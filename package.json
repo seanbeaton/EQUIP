@@ -4,7 +4,10 @@
   "description": "Redesign of EQUIP App for UW-Madison.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "test-server": "meteor test --full-app --driver-package tmeasday:acceptance-test-driver --port 3005",
+    "chimp-watch": "chimp --ddp=http://localhost:3005 --watch --path=tests/e2e/features",
+    "chimp-test": "chimp --ddp=http://localhost:3005 --path=tests/e2e/features"
   },
   "repository": {
     "type": "git",
@@ -17,25 +20,25 @@
   },
   "homepage": "https://github.com/simmeringc/meteor-dataObs#readme",
   "dependencies": {
-    "@babel/runtime": "^7.5.5",
+    "@babel/runtime": "^7.7.7",
     "babel-runtime": "^6.18.0",
     "bcrypt": "^2.0.1",
     "bulma_scss": "^0.3.0",
     "chosen-js": "^1.8.7",
-    "core-js": "^2.6.9",
+    "core-js": "^2.6.11",
     "d3": "^4.13.0",
-    "d3-interpolate": "^1.3.2",
-    "d3-scale-chromatic": "^1.3.3",
+    "d3-interpolate": "^1.4.0",
+    "d3-scale-chromatic": "^1.5.0",
     "form-serialize": "^0.7.1",
     "jquery": "^3.4.1",
     "jquery.joyride": "^2.2.0",
     "meteor-node-stubs": "^0.3.2",
-    "simpl-schema": "^1.5.5",
+    "simpl-schema": "^1.5.6",
     "slick-carousel": "^1.8.1",
     "stopwatchjs": "^0.1.1",
     "vis": "^4.21.0"
   },
   "devDependencies": {
-    "d3": "^4.9.1"
+    "jasmine": "^3.5.0"
   }
 }
