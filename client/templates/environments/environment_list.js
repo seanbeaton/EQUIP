@@ -266,6 +266,9 @@ Template.environmentList.helpers({
     // var obs;
     // var subjects;
     var user = Meteor.user();
+    if (!user) {
+      return {list: [], num_env: 0, num_students: 0};
+    }
     var total_students = Subjects.find({userId: user._id}, {reactive: false}).count();
     // var total_obs = Sequences.find({userId: user._id}, {reactive: false}).count();
     var results = {list: envs, num_env: parseInt(envs.length), num_students: parseInt(total_students)};
