@@ -123,8 +123,35 @@ var myStepDefinitionsWrapper = function () {
     }
   });
 
+  this.When(/^I wait "([\d]*)" ms$/, function (ms, callback) {
+    browser.pause(ms);
+    callback();
+  });
+
   this.When(/^I click on the item with the selector "([^"]*)"$/, function (sel, callback) {
+    browser.pause(250);
     let item = browser.$(sel);
+    item.waitForExist(2000);
+    item.click();
+    callback();
+  });
+
+  this.When(/^I hover over the item with the selector "([^"]*)"$/, function (sel, callback) {
+    let item = browser.$(sel);
+    item.waitForExist(2000);
+    // item.scrollIntoView();
+    browser.executeAsync((sel, cb) => {
+      document.querySelector(sel).dispatchEvent(new Event("mouseover"));
+      // console.log('hovering sel', sel);
+      cb()
+    }, sel);
+    callback();
+  });
+
+  this.When(/^I click on the item with the selector "([^"]*)" in the wrapper "([^"]*)"$/, function (sel, wrapper_sel, callback) {
+    let wrapper = browser.$(wrapper_sel);
+    wrapper.waitForExist(2000);
+    let item = wrapper.$(sel);
     item.waitForExist(2000);
     item.click();
     callback();
@@ -157,6 +184,47 @@ var myStepDefinitionsWrapper = function () {
     let field = browser.$(sel);
     field.waitForExist(4000);
     field.setValue(val);
+    callback();
+  });
+
+  this.When(/^I select the (option|chosen) in select "([^"]*)" with the (value|label) "([^"]*)"$/, function (chosen, sel, val_or_label, val, callback) {
+    if (chosen === 'chosen') {
+      assert(false);
+      // browser.executeAsync((sel, val_or_label, val, cb) => {
+      //   console.log('sel, val_or_label, val', sel, val_or_label, val);
+      //   let chosen = document.querySelector(sel);
+      //   console.log('chosen', chosen);
+      //
+      //   let selectItemByIndex = function(dropdown, label) {
+      //     console.log('dropdown, label', dropdown, label);
+      //     const index = Array.from(dropdown.options).findIndex(option => option.label === label);
+      //     console.log('index', index);
+      //     if (!index) {return dropdown.selectedIndex = index}
+      //   }
+      //   if (val_or_label === 'label') {
+      //     selectItemByIndex(chosen, val);
+      //     $(chosen).trigger('chosen:updated');
+      //   }
+      //   else {
+      //     $(chosen).val(val);
+      //     $(chosen).trigger('chosen:updated');
+      //   }
+      //   cb()
+      // }, sel, val_or_label, val)
+    }
+    else {
+      let select = browser.$(sel);
+      select.waitForExist(4000);
+      console.log(sel, val_or_label, val);
+      if (val_or_label === 'label') {
+        console.log('before select vis text', select.getText('option:checked'))
+        select.selectByVisibleText(val);
+        console.log('after select vis text', select.getText('option:checked'))
+      }
+      else {
+        select.selectByAttribute("value", val);
+      }
+    }
     callback();
   });
 
@@ -209,6 +277,17 @@ let delayedGo = function(loc) {
     Router.go(route);
     setTimeout(done, 200)
   }, loc)
+}
+
+let getMethods = function(obj)
+{
+  var res = [];
+  for(var m in obj) {
+    if(typeof obj[m] == "function") {
+      res.push(m)
+    }
+  }
+  return res;
 }
 
 module.exports = myStepDefinitionsWrapper;

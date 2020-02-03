@@ -1,4 +1,4 @@
-@watch
+#@watch
 Feature: Report selection page
   I can see the report selection page
 
@@ -27,17 +27,17 @@ Feature: Report selection page
     When I click on the item with the selector ".option--heatmap"
     Then I am on the route "heatmapReport"
 
-  Scenario: The heatmap view button works
+  Scenario: The student histogram view button works
     Given I visit the "reportsSelection" page
     When I click on the item with the selector ".option--student-histogram"
     Then I am on the route "histogramReport"
 
-  Scenario: The heatmap view button works
+  Scenario: The group work view button works
     Given I visit the "reportsSelection" page
     When I click on the item with the selector ".option--group-work"
     Then I am on the route "groupWorkReport"
 
-  Scenario: The heatmap view button works
+  Scenario: The static report view button works
     Given I visit the "reportsSelection" page
     When I click on the item with the selector ".option--static"
     Then I am on the route "staticReport"

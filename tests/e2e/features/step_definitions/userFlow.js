@@ -18,7 +18,13 @@ var myStepDefinitionsWrapper = function () {
   // });
 
   this.Given(/^I have generated an example classroom$/, function (callback) {
-    browser.execute((cb) => {Meteor.call('environmentInsertExample', null, function(error, result) { cb(); });}, callback)
+    browser.executeAsync(
+      (cb) => {
+        Meteor.call('environmentInsertExample', null, function(error, result) {
+          cb();
+        });
+        })
+    callback()
   });
 
   this.Given(/^I visit the login page$/, function (callback) {
