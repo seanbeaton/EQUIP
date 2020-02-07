@@ -123,6 +123,47 @@ var myStepDefinitionsWrapper = function () {
     }
   });
 
+  this.Then(/^I( don't | )see (a|an|[\d]+) "([^"]*)"( with( out| )the text "([^"]*)"|) in the wrapper "([^"]*)"$/, function (see_negation, number, selector, needs_text, text_negation, text, wrapper_sel, callback) {
+    see_negation = see_negation === " don't ";
+    text_negation = text_negation === "out ";
+    let wrapper = browser.$(wrapper_sel);
+    wrapper.waitForExist(2000);
+    if (number === "a" || number === "an") {
+      let searchItem = wrapper.$(selector);
+      if (!see_negation) {
+        searchItem.waitForExist(2000);
+      }
+      else {
+        browser.pause(2000);
+        assert(!searchItem.isExisting());
+      }
+      browser.pause(100);
+      if (needs_text !== "") {
+        assert.ok(text_negation !== (searchItem.getText().indexOf(text) !== -1))
+      }
+      callback()
+    }
+    else {
+      let searchItems = wrapper.elements(selector);
+      searchItems.value.forEach(function(searchItem) {
+
+        if (!see_negation) {
+          searchItem.waitForExist(2000);
+        }
+        else {
+          browser.pause(2000);
+          assert(!searchItem.isExisting());
+        }
+
+        browser.pause(100);
+        if (needs_text !== "") {
+          assert.ok(text_negation !== (searchItem.getText().indexOf(text) !== -1))
+        }
+      });
+      callback()
+    }
+  });
+
   this.When(/^I wait "([\d]*)" ms$/, function (ms, callback) {
     browser.pause(ms);
     callback();

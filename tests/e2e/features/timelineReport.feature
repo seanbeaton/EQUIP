@@ -1,4 +1,4 @@
-@watch
+#@watch
 Feature: Timeline report page
   I can use the timeline report page
 
