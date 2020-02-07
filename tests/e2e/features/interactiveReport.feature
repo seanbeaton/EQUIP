@@ -1,6 +1,6 @@
-@watch
-Feature: Report selection page
-  I can see the report selection page
+#@watch
+Feature: Interactive report page
+  I can use the interactive report page
 
   Background:
     Given I am on the site
@@ -99,3 +99,5 @@ Feature: Report selection page
     And I see a ".interactive-report__graph .bar-group[data-bar-group='Enthusiastic'] rect[data-bar-x='White'][height='235']"
     And I see a ".interactive-report__graph .bar-group[data-bar-group='Enthusiastic'] rect[data-bar-x='Mixed'][height='0']"
     And I see a ".interactive-report__graph .bar-group[data-bar-group='Enthusiastic'] rect[data-bar-x='Other'][height='0']"
+
+    # TODO Add equity ratio tests
