@@ -66,3 +66,5 @@ Feature: Heatmap report page
     And I see a ".c--observation__student-box=Rick (8)" in the wrapper ".student-box:not(.disabled-student)"
     And I click on the item with the selector ".vis-item-content=Observation #3 - 9/13 (2018-09-13 - WC)"
     And I see a ".c--observation__student-box=Rick (17)" in the wrapper ".student-box:not(.disabled-student)"
+
+    # todo test clicking on students

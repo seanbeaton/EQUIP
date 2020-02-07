@@ -104,12 +104,16 @@ var myStepDefinitionsWrapper = function () {
     }
     else {
       let searchItems = browser.elements(selector);
+      let found_items = 0;
       searchItems.value.forEach(function(searchItem) {
-
+        // console.log('searchItem', searchItem);
         if (!see_negation) {
+          // console.log("check does exist");
           searchItem.waitForExist(2000);
+          found_items += 1;
         }
         else {
+          // console.log("check doesn't exist");
           browser.pause(2000);
           assert(!searchItem.isExisting());
         }
@@ -119,6 +123,7 @@ var myStepDefinitionsWrapper = function () {
           assert.ok(text_negation !== (searchItem.getText().indexOf(text) !== -1))
         }
       });
+      assert(found_items === parseInt(number));
       callback()
     }
   });
@@ -217,6 +222,43 @@ var myStepDefinitionsWrapper = function () {
       browser.pause(300)
     }
 
+    callback();
+  });
+
+  this.Then(/^The values of css property "([^"]*)" on elements "([^"]*)" and "([^"]*)" are (the same|different)/, function (prop, el_1, el_2, different, callback) {
+    different = different === 'different';
+    let $el_1 = browser.$(el_1);
+    let $el_2 = browser.$(el_2);
+    $el_1.waitForExist(2000);
+    $el_2.waitForExist(2000);
+    // console.log('el1', $el_1.getCssProperty(prop).value);
+    // console.log('el2', $el_2.getCssProperty(prop).value);
+    assert(xor($el_1.getCssProperty(prop).value === $el_2.getCssProperty(prop).value, !!different));
+    callback();
+  });
+
+
+  this.Then(/^The values of css property "([^"]*)" on element "([^"]*)" and attribute "([^"]*)" on element "([^"]*)" are (the same|different)/, function (prop_1, el_1, prop_2, el_2, different, callback) {
+    different = different === 'different';
+    let $el_1 = browser.$(el_1);
+    let $el_2 = browser.$(el_2);
+    $el_1.waitForExist(2000);
+    $el_2.waitForExist(2000);
+
+    console.log('el1 css', prop_1, $el_1.getCssProperty(prop_1));
+    console.log('el1 css', prop_1, $el_1.getCssProperty(prop_1).value);
+    console.log('el2 attr', prop_2, $el_2.getAttribute(prop_2));
+    assert(xor($el_1.getCssProperty(prop_1).value === $el_2.getAttribute(prop_2), !!different));
+    callback();
+  });
+
+  this.Then(/^The values of attribute "([^"]*)" on element "([^"]*)" and attribute "([^"]*)" on element "([^"]*)" are (the same|different)/, function (prop_1, el_1, prop_2, el_2, different, callback) {
+    different = different === 'different';
+    let $el_1 = browser.$(el_1);
+    let $el_2 = browser.$(el_2);
+    $el_1.waitForExist(2000);
+    $el_2.waitForExist(2000);
+    assert(xor($el_1.getAttribute(prop_1) === $el_2.getAttribute(prop_2), !!different));
     callback();
   });
 
@@ -330,5 +372,10 @@ let getMethods = function(obj)
   }
   return res;
 }
+
+
+let xor = function(a, b) {
+  return (a && !b) || (!a && b)
+};
 
 module.exports = myStepDefinitionsWrapper;
