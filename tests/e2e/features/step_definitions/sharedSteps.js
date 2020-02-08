@@ -215,7 +215,6 @@ var myStepDefinitionsWrapper = function () {
     searchItem.waitForExist(2000);
     // console.log('searchItem', searchItem);
     // console.log('searchItem.getCssProperty(\'display\').value', searchItem.getCssProperty('display').value);
-    // console.log('searchItem', Object.getOwnPropertyNames(searchItem).filter((key) => key.startsWith("get")));
 
     let xor = function(a, b) {
       return (a && !b) || (!a && b)
@@ -342,6 +341,17 @@ var myStepDefinitionsWrapper = function () {
     callback();
   });
 
+
+  this.Then(/^I (confirm|dismiss) the alert$/, function (confirm, callback) {
+    confirm = confirm === 'confirm';
+    // console.log('searchItem', Object.getOwnPropertyNames(browser).filter((key) => key.startsWith("alert")));
+    if (confirm) {
+      browser.alertAcceptSync();
+    } else {
+      browser.alertDismissSync();
+    }
+    callback();
+  });
 
 
   this.Then(/^I am on the route "([^"]*)"$/, function (route_name, callback) {
