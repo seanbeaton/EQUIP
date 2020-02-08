@@ -115,7 +115,8 @@ var myStepDefinitionsWrapper = function () {
         else {
           // console.log("check doesn't exist");
           browser.pause(2000);
-          assert(!searchItem.isExisting());
+          // assert(!searchItem.isExisting());
+          assert(!searchItem.isExisting() || !searchItem.type || searchItem.type === "NoSuchElement");
         }
 
         browser.pause(100);
@@ -123,7 +124,8 @@ var myStepDefinitionsWrapper = function () {
           assert.ok(text_negation !== (searchItem.getText().indexOf(text) !== -1))
         }
       });
-      assert(found_items === parseInt(number));
+      // assert(found_items === parseInt(number));
+      assert(xor(found_items === parseInt(number), see_negation));
       callback()
     }
   });
@@ -135,12 +137,13 @@ var myStepDefinitionsWrapper = function () {
     wrapper.waitForExist(2000);
     if (number === "a" || number === "an") {
       let searchItem = wrapper.$(selector);
+
       if (!see_negation) {
         searchItem.waitForExist(2000);
       }
       else {
         browser.pause(2000);
-        assert(!searchItem.isExisting());
+        assert(!searchItem.isExisting() || !searchItem.type || searchItem.type === "NoSuchElement");
       }
       browser.pause(100);
       if (needs_text !== "") {
@@ -150,10 +153,12 @@ var myStepDefinitionsWrapper = function () {
     }
     else {
       let searchItems = wrapper.elements(selector);
+      let found_items = 0;
       searchItems.value.forEach(function(searchItem) {
 
         if (!see_negation) {
           searchItem.waitForExist(2000);
+          found_items += 1;
         }
         else {
           browser.pause(2000);
@@ -165,6 +170,7 @@ var myStepDefinitionsWrapper = function () {
           assert.ok(text_negation !== (searchItem.getText().indexOf(text) !== -1))
         }
       });
+      assert(xor(found_items === parseInt(number), see_negation));
       callback()
     }
   });
@@ -336,11 +342,27 @@ var myStepDefinitionsWrapper = function () {
     callback();
   });
 
+
+
   this.Then(/^I am on the route "([^"]*)"$/, function (route_name, callback) {
     let current_route = browser.executeAsync(function(route_name, done) {
       done(Router.current().route.getName())
     }, route_name);
     assert(current_route.value === route_name);
+    callback();
+  });
+
+
+  this.When(/^the field "([^"]*)" (has|doesn't have) the text "([^"]*)"$/, function (field_sel, negation, text, callback) {
+    negation = negation === "doesn't have";
+    let field = browser.$(field_sel);
+    field.waitForExist(2000);
+    assert(xor(text === field.getValue(), negation));
+    callback();
+  });
+
+  this.When(/^I refresh the browser$/, function (callback) {
+    browser.refresh();
     callback();
   });
 };
