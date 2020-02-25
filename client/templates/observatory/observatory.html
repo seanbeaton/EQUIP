@@ -82,15 +82,16 @@
       <div class="columns c--observation-toggle__container toggle-dash" style="display: none;">
         <h3 class="column c--observation-toggle__title">Toggles</h3>
       </div>
-      <div class="subjects observatory {{classroomMode}}">
+      <div class="subjects observatory {{classroomMode}} {{#if currentSearchExists}} search-active{{/if}}">
         {{#each subject in subjects}}
-          <div id="{{subject._id}}" style='transform:translate({{subject.data_x}}px, {{subject.data_y}}px);' data-x="{{subject.data_x}}" data-y="{{subject.data_y}}" class="student-box dragger c--observation__student-box-container {{#if studentActive subject}} enabled{{/if}}">
+          <div id="{{subject._id}}" style='transform:translate({{subject.data_x}}px, {{subject.data_y}}px);' data-x="{{subject.data_x}}" data-y="{{subject.data_y}}" tabindex="{{#if allowTabbing subject}}0{{else}}-1{{/if}}" class="student-box dragger c--observation__student-box-container {{#if studentActive subject}} enabled{{/if}} {{#if searchEnabled subject}} search-enabled {{else}} search-disabled{{/if}}">
             <p class="c--observation__student-box">{{subject.info.name}}</p>
           </div>
         {{/each}}
       </div>
   </section>
 
+{{#if currentSearchExists}}<div class="current-search-popup">{{currentSearch}}</div>{{/if}}
 
   <!-- MODAL FOR SEQ PARAMS -->
   <div id="seq-param-modal" class="modal">

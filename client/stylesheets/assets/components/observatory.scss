@@ -1,4 +1,13 @@
 
+.observatory.search-active {
+  .search-disabled {
+    opacity: 0.5;
+  }
+  .search-enabled {
+    border: 2px solid #333;
+  }
+}
+
 .observatory {
   &.observatory--code {
     .student-box {
@@ -20,9 +29,27 @@
     &:not(.enabled) {
       opacity: 0.3;
     }
+    &:focus, &:hover {
+      border: 2px solid #0f81cc;
+      outline: #0f81cc;
+    }
   }
 }
 
+
+.current-search-popup {
+  position: fixed;
+  bottom: 20px;
+  //margin: 0 auto;
+  background: rgba(0,0,0,0.7);
+  font-size: 30px;
+  padding: 14px 20px;
+  border-radius: 5px;
+  color: white;
+  z-index: 1000;
+  left: 50%;
+  transform: translate(-50%, 0);
+}
 label[for="observation__description"],
 label[for="observation__notes"] {
   pointer-events: none;

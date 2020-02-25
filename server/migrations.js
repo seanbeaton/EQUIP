@@ -47,3 +47,14 @@ Migrations.add({
     Observations.update({observationType: 'small_group', small_group: {$exists: false}}, {$set: {"small_group": []}}, {multi:true});
   },
 });
+
+
+Migrations.add({
+  version: 4,
+  name: 'Convert data_x and data_y to int',
+  up: function () {
+    Subjects.find().forEach(function(res) {
+      Subjects.update({'_id': res._id}, {$set: {data_x: parseInt(res.data_x) || 0, data_y: parseInt(res.data_y) || 0}})
+    });
+  },
+});

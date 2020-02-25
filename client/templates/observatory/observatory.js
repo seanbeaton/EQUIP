@@ -2,9 +2,11 @@
 * JS file for observatory.js
 */
 import {userCanGroupEditEnv, userCanGroupViewEnv, userIsEnvOwner} from "../../../helpers/groups";
+import Fuse from 'fuse.js'
 
 var Stopwatch = require('stopwatchjs');
 var lastChoices = {};
+
 
 import * as observation_helpers from '/helpers/observations.js'
 import {updateStudent, updateStudents} from '/helpers/students.js'
@@ -12,10 +14,11 @@ import {convertISODateToUS} from '/helpers/dates.js'
 import {userHasEnvEditAccess} from "../../../helpers/environments";
 
 const classroomMode = new ReactiveVar('code');
+const classroomStudentsSearchable = new ReactiveVar([]);
+const currentSearch = new ReactiveVar('');
 
 Template.observatory.created = function() {
 }
-
 
 Template.observatory.onCreated(function created() {
   this.subscribe('environment', this.data.envId);
@@ -27,67 +30,107 @@ Template.observatory.onCreated(function created() {
 
   this.data.environment = Environments.findOne(this.data.envId, {reactive: false});
   this.data.observation = Observations.findOne(this.data.obsId, {reactive: false});
-  // console.log('this outside', this);
-  // this.autorun(() => {
-  //   console.log('this inside', this);
-  // });
+  let that = this;
+  classroomStudentsSearchable.set(Subjects.find({
+    envId: that.data.observation.envId,
+  }).map(function(s) {
+    return {'name': s.info.name.toLowerCase(), 'active': true, _id:s._id}
+  }))
 });
 
-//Create Toggle Option
-Template.observatory.rendered = function() {
-  // var obs = this.data.observation;
-  // var seqParams = SequenceParameters.find({'children.envId': Router.current().params._envId}).fetch()[0];
-  //
-  // var paramPairs = seqParams.children.parameterPairs;
-  // if (paramPairs) {
-  //     for (var p=0; p<paramPairs;p++){
-  //       if(seqParams['children']['toggle'+p] == "on") {
-  //         var params = seqParams['children']['parameter'+p]
-  //         var label = seqParams['children']['label'+p]
-  //         createToggle(params, label);
-  //       }
-  //     }
-  // }
-  //
-  //
-  // var params = "Blank,Last Choices";
-  // var label = "Contribution Defaults";
-  //
-  // createToggle(params, label);
-
+Template.observatory.onRendered(function() {
   $(document).keyup(function(e) {
-     if (e.keyCode == 27) {
-        $('#seq-param-modal').removeClass('is-active');
+    if (e.keyCode == 27) {
+      $('#seq-param-modal').removeClass('is-active');
       $('#seq-data-modal').removeClass('is-active');
     }
   });
+
+  processKeyboardObservationNavigation(this.data.observation);
   processDatepickers();
+})
+
+let processKeyboardObservationNavigation = function(obs) {
+  let searchTimeout;
+  const fuse_options = {
+    shouldSort: true,
+    threshold: 0.2,
+    location: 0,
+    distance: 100,
+    maxPatternLength: 32,
+    minMatchCharLength: 1,
+    keys: [
+      "name",
+    ]
+  };
+  let fuse = new Fuse(classroomStudentsSearchable.get(), fuse_options);
+  let has_scrolled_to_view = false;
+
+  // name search
+  $(document).keydown(function(e) {
+    if (['select', 'option', 'optionset', 'textarea', 'input', 'button'].indexOf(e.target.localName) !== -1) {
+      return;
+    }
+    if (e.ctrlKey || e.metaKey || e.altKey) {
+      return;
+    }
+    // don't catch non-alphanum, for this.
+    if (!e.key.toLowerCase().match(/^[a-z0-9]$/)) {
+      return;
+    }
+    // if (e.key === 'Tab') {
+    //   // handle tab
+    //   return;
+    // }
+    if (searchTimeout) {clearTimeout(searchTimeout);}
+
+    searchTimeout = setTimeout(function() {
+      currentSearch.set('')
+    }, 2000);
+    currentSearch.set(currentSearch.get() + e.key)
+    let results = fuse.search(currentSearch.get());
+
+    classroomStudentsSearchable.set(classroomStudentsSearchable.get().map(function(s) {
+      s.active = results.findIndex(r => r.name === s.name) !== -1;
+      if (s.active && obs.observationType === 'small_group' && !obs.small_group.find(id => id === s._id)) {
+        s.active = false;
+        results.splice(results.findIndex(r => r._id === s._id), 1)
+      }
+      if (s.active && obs.observationType === 'whole_class' && !!obs.absent.find(id => id === s._id)) {
+        s.active = false;
+        results.splice(results.findIndex(r => r._id === s._id), 1)
+      }
+      return s
+    }))
+
+    if (!has_scrolled_to_view) {
+      window.scrollTo(0, $('.observatory--code').position().top - 50);
+      has_scrolled_to_view = true;
+    }
+    if (results.length > 0) {
+      $('#' + results[0]._id).focus()
+    }
+  });
 }
 
-// function createToggle(params, label) {
-//   if (params) {
-//     var choices = params.split(',');
-//     togglers = $('.toggle-dash');
-//     var wrap = $('<div/>', {class: 'column c--observation__toggle-container'}).appendTo(togglers);
-//     $("<p/>",{
-//       text: label,
-//       class: 'c--observation-toggle__label o--modal-label',
-//     }).appendTo(wrap);
-//     var span = $('<span/>').appendTo(wrap);
+// let getStudentMatches = function(needle) {
+  // let studentsSearch = classroomStudentsSearchable.get()
 //
-//     var select = $('<select/>', {
-//         class:"c--observation-toggle_select",
-//         data_label: label
-//       }).appendTo(span);
+// }
+
+// let is_alphanumeric = function(str) {
+//   let code, i, len;
 //
-//     for (var c in choices) {
-//       $('<option/>', {
-//         value: choices[c],
-//         text: choices[c]
-//       }).appendTo(select);
+//   for (i = 0, len = str.length; i < len; i++) {
+//     let code = str.charCodeAt(i);
+//     if (!(code > 47 && code < 58) && // numeric (0-9)
+//       !(code > 64 && code < 91) && // upper alpha (A-Z)
+//       !(code > 96 && code < 123)) { // lower alpha (a-z)
+//       return false;
 //     }
 //   }
-// }
+//   return true;
+// };
 
 Template.observatory.helpers({
   userHasEditAccess: function() {
@@ -119,13 +162,32 @@ Template.observatory.helpers({
       return '<span class="access-level">View</span> access through group'
     }
   },
+  currentSearch: function() {
+    return currentSearch.get();
+  },
+  currentSearchExists: function() {
+    return currentSearch.get() !== '';
+  },
+  allowTabbing: function(student) {
+    // console.log('at', student, this.observation);
+    if (this.observation.observationType === 'small_group' && !this.observation.small_group.find(id => id === student._id)) {
+      return false;
+    }
+    if (this.observation.observationType === 'whole_class' && !!this.observation.absent.find(id => id === student._id)) {
+      return false;
+    }
+    if (currentSearch.get() === '') {
+      return true;
+    }
+    return classroomStudentsSearchable.get().find(s => s.name === student.info.name.toLowerCase()).active
+  },
   subjects: function() {
     if (!this.observation) {
       return []
     }
     return Subjects.find({
       envId: this.observation.envId,
-    })
+    }, {sort: {data_y: 1, data_x: 1}})
   },
   studentActive: function(student) {
     if (this.observation.observationType === 'small_group') {
@@ -134,6 +196,9 @@ Template.observatory.helpers({
     if (this.observation.observationType === 'whole_class') {
       return !this.observation.absent.find(id => id === student._id)
     }
+  },
+  searchEnabled: function(student) {
+    return classroomStudentsSearchable.get().find(s => s.name === student.info.name.toLowerCase()).active;
   },
   convertISODateToUS: function(isoDate) {
     return convertISODateToUS(isoDate);
@@ -179,6 +244,98 @@ Template.observatory.events({
 
     observation_helpers.populateParamBoxes(myId);
     $('#seq-param-modal').addClass('is-active');
+  },
+  'keydown .observatory.observatory--code .student-box.enabled': function(e) {
+    if (!userHasEnvEditAccess(this.environment)) {
+      // access control also done on server side.
+      return;
+    }
+
+    if (e.key === 'Enter') {
+      //Create Sequence
+      gtag('event', 'add', {'event_category': 'sequences'});
+
+      var myId;
+      if ($(e.target).is('p')) {
+        myId = $(e.target).parent().attr('id')
+      } else {
+        myId = $(e.target).attr('id');
+      }
+
+      observation_helpers.populateParamBoxes(myId);
+      $('#seq-param-modal').addClass('is-active');
+    }
+    if (e.key.startsWith('Arrow')) {
+      console.log('e.key', e.key)
+      let tar = null;
+      let allowed_student_ids = getAllowedStudentIds(this.environment._id, this.observation);
+      console.log('allowed_student_ids', allowed_student_ids);
+      if (e.key === 'ArrowDown') {
+        tar = Subjects.findOne({
+          envId: this.environment._id,
+          _id: {$in: allowed_student_ids},
+          data_x: parseInt($(e.target).attr('data-x')),
+          data_y: {$gt: parseInt($(e.target).attr('data-y'))}
+        }, {sort: {data_y: 1}})
+        if (!tar) {
+          tar = Subjects.findOne({
+            envId: this.environment._id,
+            _id: {$in: allowed_student_ids},
+            data_x: parseInt($(e.target).attr('data-x')),
+          }, {sort: {data_y: 1}})
+        }
+      }
+      else if (e.key === 'ArrowUp') {
+        tar = Subjects.findOne({
+          envId: this.environment._id,
+          _id: {$in: allowed_student_ids},
+          data_x: parseInt($(e.target).attr('data-x')),
+          data_y: {$lt: parseInt($(e.target).attr('data-y'))}
+        }, {sort: {data_y: -1}})
+        if (!tar) {
+          tar = Subjects.findOne({
+            envId: this.environment._id,
+            _id: {$in: allowed_student_ids},
+            data_x: parseInt($(e.target).attr('data-x')),
+          }, {sort: {data_y: -1}})
+        }
+      }
+      else if (e.key === 'ArrowRight') {
+        tar = Subjects.findOne({
+          envId: this.environment._id,
+          _id: {$in: allowed_student_ids},
+          data_x: {$gt: parseInt($(e.target).attr('data-x'))},
+          data_y: parseInt($(e.target).attr('data-y')),
+        }, {sort: {data_x: 1}})
+        if (!tar) {
+          tar = Subjects.findOne({
+            envId: this.environment._id,
+            _id: {$in: allowed_student_ids},
+            data_y: parseInt($(e.target).attr('data-y')),
+          }, {sort: {data_x: 1}})
+        }
+      }
+      else if (e.key === 'ArrowLeft') {
+        tar = Subjects.findOne({
+          envId: this.environment._id,
+          _id: {$in: allowed_student_ids},
+          data_x: {$lt: parseInt($(e.target).attr('data-x'))},
+          data_y: parseInt($(e.target).attr('data-y')),
+        }, {sort: {data_x: -1}})
+        if (!tar) {
+          tar = Subjects.findOne({
+            envId: this.environment._id,
+            _id: {$in: allowed_student_ids},
+            data_y: parseInt($(e.target).attr('data-y')),
+          }, {sort: {data_x: -1}})
+        }
+      }
+
+      if (tar) {
+        e.preventDefault();
+        $('#' + tar._id).focus()
+      }
+    }
   },
   'click .observatory.observatory--edit .student-box': function(e) {
     if (!userHasEnvEditAccess(this.environment)) {
@@ -365,6 +522,18 @@ Template.observatory.events({
     })
   },
 });
+
+function getAllowedStudentIds(envId, obs) {
+  return Subjects.find({envId: envId}).fetch().map(function(s) {
+    if (obs.observationType === 'small_group' && !obs.small_group.find(id => id === s._id)) {
+      return;
+    }
+    if (obs.observationType === 'whole_class' && !!obs.absent.find(id => id === s._id)) {
+      return;
+    }
+    return s._id
+  })
+}
 
 function editSequence(e) {
 
