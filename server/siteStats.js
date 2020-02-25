@@ -30,8 +30,8 @@ Meteor.methods({
     console.log('cached stats', stats);
 
     if (!stats) {
-      let seq_params = SequenceParameters.find().fetch();
-      let subj_params = SubjectParameters.find().fetch();
+      let seq_params = SequenceParameters.find({}, {reactive: false}).fetch();
+      let subj_params = SubjectParameters.find({}, {reactive: false}).fetch();
       stats = {
         sequences_pop: _getParamPopularity(seq_params),
         demographics_pop: _getParamPopularity(subj_params),
@@ -65,12 +65,12 @@ Meteor.methods({
 
     if (!stats) {
       let items = []
-      items.push({label: 'Number of users', value: Meteor.users.find().count()});
-      items.push({label: 'Number of classrooms', value: Environments.find({isExample: null, envName: {$ne: "Example Classroom"}}).count()});
-      items.push({label: 'Number of example classrooms', value: Environments.find({$or: [{isExample: true}, {envName: "Example Classroom"}]}).count()});
-      items.push({label: 'Number of students', value: Subjects.find({origStudId: null}).count()});
-      items.push({label: 'Number of observations', value: Observations.find({origObsId: null}).count()});
-      items.push({label: 'Number of sequences', value: Sequences.find({origObsId: null}).count()});
+      items.push({label: 'Number of users', value: Meteor.users.find({}, {reactive: false}).count()});
+      items.push({label: 'Number of classrooms', value: Environments.find({isExample: null, envName: {$ne: "Example Classroom"}}, {reactive: false}).count()});
+      items.push({label: 'Number of example classrooms', value: Environments.find({$or: [{isExample: true}, {envName: "Example Classroom"}]}, {reactive: false}).count()});
+      items.push({label: 'Number of students', value: Subjects.find({origStudId: null}, {reactive: false}).count()});
+      items.push({label: 'Number of observations', value: Observations.find({origObsId: null}).count()}, {reactive: false});
+      items.push({label: 'Number of sequences', value: Sequences.find({origObsId: null}).count()}, {reactive: false});
 
       stats = {
         stats: items,
@@ -181,23 +181,23 @@ function _getParamPopularity(parameter_sets) {
 
 
 let users_over_time = function() {
-  return get_grouped_data(Meteor.users.find().fetch(), 'createdAt')
+  return get_grouped_data(Meteor.users.find({}, {reactive: false}).fetch(), 'createdAt')
 }
 
 let classrooms_over_time = function() {
-  return get_grouped_data(Environments.find({isExample: null, envName: {$ne: "Example Classroom"}}).fetch(), 'submitted')
+  return get_grouped_data(Environments.find({isExample: null, envName: {$ne: "Example Classroom"}}, {reactive: false}).fetch(), 'submitted')
 }
 
 let students_over_time = function() {
-  return get_grouped_data(Subjects.find({origStudId: null}).fetch(), 'submitted')
+  return get_grouped_data(Subjects.find({origStudId: null}, {reactive: false}).fetch(), 'submitted')
 }
 
 let observations_over_time = function() {
-  return get_grouped_data(Observations.find({origObsId: null}).fetch(), 'submitted')
+  return get_grouped_data(Observations.find({origObsId: null}, {reactive: false}).fetch(), 'submitted')
 }
 
 let sequences_over_time = function() {
-  return get_grouped_data(Sequences.find({origObsId: null}).fetch(), 'submitted')
+  return get_grouped_data(Sequences.find({origObsId: null}, {reactive: false}).fetch(), 'submitted')
 }
 
 
