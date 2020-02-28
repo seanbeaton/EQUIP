@@ -69,6 +69,7 @@ import {setupSequenceParameters} from './parameters.js'
 import {getStudent, getStudents} from "./students.js";
 import {getSequence, getSequences} from "./sequences.js";
 import {userHasEnvEditAccess} from "./environments";
+import {htmlClass} from "./html";
 
 function createTableOfContributions(obsId) {
   if (typeof obsId === 'undefined') {
@@ -248,17 +249,20 @@ function contributionParameterTemplate(allParams, sequence, type) {
 
   let boxes = allParams.map((param) => {
 
-    let options = param.options.split(',').map(function(item) { return item.trim() });
+    let options = param.options.split(',').map(function (item) {
+      return item.trim()
+    });
 
     let optionNodes = options.map((opt) => {
       let selected = "";
 
-      if (sequence) { selected = sequence.info.parameters[param.name] === opt ? "chosen" : "" }
+      if (sequence) {
+        selected = sequence.info.parameters[param.name] === opt ? "checked" : ""
+      }
       // console.log('creating options for student, ', student);
       return `
-                <div class="column has-text-centered subj-box-params ${selected} optionSelection">
-                    ${opt}
-                </div>
+<input class="column has-text-centered subj-box-params optionSelection" type="radio" name="${param.name}" value="${opt}" id="${htmlClass(param.name + "__" + opt)}"${selected}>
+<label for="${htmlClass(param.name + "__" + opt)}">${opt}</label>
             `
     }).join("");
 
@@ -277,16 +281,18 @@ function contributionParameterTemplate(allParams, sequence, type) {
             <!--<button id="randomize-selected" class="o&#45;&#45;standard-button c&#45;&#45;discourse-form__save-button">Randomize</button>-->
         <div class="boxes-wrapper">
         
+        <form id="${saveBtn}-form">
             ${boxes}
-        </div>
-        <div class="button-container">
-            <button class="o--standard-button u--margin-zero-auto" data-seq="${seqId}" id="${saveBtn}">
-                ${type}
-            </button>
+            
+          <div class="button-container">
+              <button class="o--standard-button u--margin-zero-auto" type="submit" data-seq="${seqId}" id="${saveBtn}">
+                  ${type}
+              </button>
+          </div>
+        </form>
         </div>
     `
 }
-
 
 function attachOptionSelection() {
   var allNodes = document.querySelectorAll(".optionSelection");

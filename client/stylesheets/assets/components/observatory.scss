@@ -93,6 +93,44 @@ label[for="observation__notes"] {
   margin-bottom: 10px;
 }
 
+
+.c--modal-student-options-container {
+  input {
+    position: absolute !important;
+    height: 1px;
+    width: 1px;
+    overflow: hidden;
+    clip: rect(1px 1px 1px 1px); /* IE6, IE7 */
+    clip: rect(1px, 1px, 1px, 1px);
+    white-space: nowrap; /* added line */
+  }
+  input:checked + label {
+    background: rgba(52,196,196,.2);
+    color: #34c4c4;
+    font-weight: 700;
+  }
+  input:hover + label,
+  input:focus + label {
+    border: 2px solid #333;
+  }
+  label {
+    border: 2px solid transparent;
+    transition: all .2s linear;
+    display: inline-block;
+    text-align: center;
+    padding: 8px 5px;
+    background: #f2f2f2;
+    color: var(--orange);
+    cursor: pointer;
+    width: 100%;
+    margin: 0.25em;
+  }
+}
+
+.button-container {
+  padding-top: 20px;
+}
+
 @keyframes students-pulse {
   0% {
     opacity: 1;

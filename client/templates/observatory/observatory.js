@@ -7,15 +7,17 @@ import Fuse from 'fuse.js'
 var Stopwatch = require('stopwatchjs');
 var lastChoices = {};
 
-
 import * as observation_helpers from '/helpers/observations.js'
 import {updateStudent, updateStudents} from '/helpers/students.js'
 import {convertISODateToUS} from '/helpers/dates.js'
 import {userHasEnvEditAccess} from "../../../helpers/environments";
+import {setupSequenceParameters} from "../../../helpers/parameters";
 
 const classroomMode = new ReactiveVar('code');
 const classroomStudentsSearchable = new ReactiveVar([]);
 const currentSearch = new ReactiveVar('');
+const currentStudentId = new ReactiveVar('');
+const activeEditSequence = new ReactiveVar('');
 
 Template.observatory.created = function() {
 }
@@ -30,12 +32,15 @@ Template.observatory.onCreated(function created() {
 
   this.data.environment = Environments.findOne(this.data.envId, {reactive: false});
   this.data.observation = Observations.findOne(this.data.obsId, {reactive: false});
+  this.data.sequenceParameters = setupSequenceParameters(this.data.envId);
   let that = this;
   classroomStudentsSearchable.set(Subjects.find({
     envId: that.data.observation.envId,
   }).map(function(s) {
     return {'name': s.info.name.toLowerCase(), 'active': true, _id:s._id}
   }))
+
+  processKeyboardObservationNavigation(this.data.observation);
 });
 
 Template.observatory.onRendered(function() {
@@ -46,7 +51,6 @@ Template.observatory.onRendered(function() {
     }
   });
 
-  processKeyboardObservationNavigation(this.data.observation);
   processDatepickers();
 })
 
@@ -75,7 +79,7 @@ let processKeyboardObservationNavigation = function(obs) {
       return;
     }
     // don't catch non-alphanum, for this.
-    if (!e.key.toLowerCase().match(/^[a-z0-9]$/)) {
+    if (!e.key.toLowerCase().match(/^[a-z0-9]|Backspace$/) || e.key.length !== 1) {
       return;
     }
     // if (e.key === 'Tab') {
@@ -87,7 +91,14 @@ let processKeyboardObservationNavigation = function(obs) {
     searchTimeout = setTimeout(function() {
       currentSearch.set('')
     }, 2000);
-    currentSearch.set(currentSearch.get() + e.key)
+    if (e.key === "Backspace") {
+      let s = currentSearch.get();
+      currentSearch.set(s.substring(0, s.length-1))
+    }
+    else {
+      currentSearch.set(currentSearch.get() + e.key.toLowerCase())
+    }
+
     let results = fuse.search(currentSearch.get());
 
     classroomStudentsSearchable.set(classroomStudentsSearchable.get().map(function(s) {
@@ -241,7 +252,7 @@ Template.observatory.events({
     } else {
       myId = $(e.target).attr('id');
     }
-
+    currentStudentId.set(myId);
     observation_helpers.populateParamBoxes(myId);
     $('#seq-param-modal').addClass('is-active');
   },
@@ -255,13 +266,14 @@ Template.observatory.events({
       //Create Sequence
       gtag('event', 'add', {'event_category': 'sequences'});
 
-      var myId;
+      let myId;
       if ($(e.target).is('p')) {
         myId = $(e.target).parent().attr('id')
       } else {
         myId = $(e.target).attr('id');
       }
 
+      currentStudentId.set(myId);
       observation_helpers.populateParamBoxes(myId);
       $('#seq-param-modal').addClass('is-active');
     }
@@ -381,47 +393,42 @@ Template.observatory.events({
   'click #delete-observation': function(e) {
     deleteObservation(this.observation._id);
   },
-  'click #randomize-selected': function(e) {
-    $('.c--modal-student-options-container').each(function() {
-      let param_opts = $('.subj-box-params', $(this))
-      param_opts.removeClass('chosen');
-      let index = Math.floor(param_opts.length * Math.random());
-      param_opts[index].click()
+  'submit #save-seq-params-form': function(e) {
+    e.preventDefault();
 
-    });
-  },
-  'click #save-seq-params': function(e) {
-    $('#seq-param-modal').addClass('is-processing');
     let callback = function() {
       setTimeout(function() {
         $('#seq-param-modal').removeClass('is-processing');
       }, 500)
-    }
-    let info = {
-      student: {
-        studentId:$('.js-modal-header').attr('data-id'),
-        studentName: $('.js-modal-header').attr('data-name'),
-      },
     };
 
-    let form_incomplete = false;
+    currentStudentId.get();
 
-    info.parameters = {};
+    let sid = currentStudentId.get();
+    let sequence = {
+      envId: this.environment._id,
+      info: {
+        student: {
+          studentId: sid,
+          studentName: Subjects.findOne({_id: sid}),
+        },
+      },
+      obsId: this.observation._id,
+      obsName: this.observation.name
+    };
 
-    // todo this should cycle through known fields, not those that are in html
+    sequence.info.parameters = {};
+
     let missing_params = [];
-    $('.c--modal-student-options-container').each(function() {
-      let parameter_name = this.getAttribute('data-parameter-name');
-      let parameter_choice = $('.chosen', $(this)).text().replace(/\n/ig, '').trim();
-      if (parameter_choice.length === 0) {
-        missing_params.push(parameter_name)
-        form_incomplete = true;
-      } else {
-        info.parameters[parameter_name] = parameter_choice
+    this.sequenceParameters.forEach(function(param) {
+      let param_value = $('input[name="' + param.name + '"]:checked').attr('value');
+      if (typeof param_value === 'undefined') {
+        missing_params.push(param.name);
       }
+      sequence.info.parameters[param.name] = param_value;
     });
 
-    if (form_incomplete) {
+    if (missing_params.length > 1) {
       if (typeof callback === 'function') {
         callback()
       }
@@ -429,29 +436,60 @@ Template.observatory.events({
       return;
     }
 
-    const obsId = Router.current().params._obsId;
-    const envId = Router.current().params._envId;
-    let obsRaw = Observations.findOne({_id: obsId}, {reactive: false});
-
-    let sequence = {
-      envId: envId,
-      info: info,
-      obsId: obsId,
-      obsName: obsRaw.name
-    };
-    console.log('about to insert sequence');
     Meteor.call('sequenceInsert', sequence, function(error, result) {
       if (error) {
         alert(error.reason);
       } else {
         gtag('event',  'add_success', {'event_category': 'sequences'});
       }
-      console.log('sequence inserted');
     });
-    if (typeof callback === 'function') {
-      callback()
-    }
+
     $('#seq-param-modal').removeClass('is-active');
+  },
+  'submit #edit-seq-params-form': function(e) {
+    if (activeEditSequence.get().length === 0) {
+      alert('There was an error with editing that student. Please try again later, or if the issue persists, contact us with the link at the bottom of the page.');
+      $('#seq-data-modal').removeClass('is-active');
+      $('#seq-param-modal').removeClass('is-active');
+
+      // todo change this to use a "active modal" reactive var?
+      return;
+    }
+    e.preventDefault();
+
+    let sequence = {
+      seqId: activeEditSequence.get(),
+      envId: this.environment._id,
+    };
+
+    let missing_params = [];
+    sequence.info = {parameters: {}};
+    this.sequenceParameters.forEach(function(param) {
+      let param_value = $('input[name="' + param.name + '"]:checked').attr('value');
+      if (typeof param_value === 'undefined') {
+        missing_params.push(param.name);
+      }
+      sequence.info.parameters[param.name] = param_value;
+    });
+
+    if (missing_params.length > 1) {
+      alert(`No selection made for ${missing_params.join(', ')}`);
+      return;
+    }
+
+    let that = this;
+
+    console.log('sequence about to send to server:', sequence)
+    Meteor.call('sequenceUpdate', sequence, function(error, result) {
+      if (error) {
+        alert(error.reason);
+      } else {
+        $('#seq-param-modal').removeClass('is-active');
+        observation_helpers.createTableOfContributions(that.observation._id);
+        $('#seq-data-modal').addClass('is-active');
+        activeEditSequence.set('');
+      }
+    });
   },
   'click .edit-seq': function(e) {
     gtag('event', 'edit', {'event_category': 'sequences'});
@@ -460,10 +498,9 @@ Template.observatory.events({
     let seqId = $(e.target).attr('data-id');
     let subjId = $(e.target).attr('data-student-id');
 
+    activeEditSequence.set(seqId);
     observation_helpers.editParamBoxes(seqId, subjId, this.environment._id);
     $('#seq-param-modal').addClass('is-active');
-
-
   },
   'click .delete-seq': function(e) {
     observation_helpers.deleteContribution(e, this.observation._id);
@@ -471,14 +508,6 @@ Template.observatory.events({
   'click #show-all-observations':function (e){
     observation_helpers.createTableOfContributions(this.observation._id);
     gtag('event', 'view_sequence_list', {'event_category': 'observations'});
-    $('#seq-data-modal').addClass('is-active');
-  },
-  'click #edit-seq-params': function(e) {
-
-    editSequence(e);
-    //This should happen at the end...
-    $('#seq-param-modal').removeClass('is-active');
-    observation_helpers.createTableOfContributions(this.observation._id);
     $('#seq-data-modal').addClass('is-active');
   },
   'click .edit-included-students': function() {
@@ -535,68 +564,6 @@ function getAllowedStudentIds(envId, obs) {
   })
 }
 
-function editSequence(e) {
-
-  seqId = $(e.target).attr('data-seq');
-
-  var info = {};
-  info['studentId'] = $('.js-modal-header').attr('data-id');
-  info['Name'] = $('.js-modal-header').attr('data-name');
-  envId = Router.current().params._envId;
-  obsId = Router.current().params._obsId;
-  var choices = [];
-  var labels = [];
-  $('.toggle-item').each(function () {
-    if ($(this).attr('data_label') == "Contribution Defaults") {
-      return;
-    }
-    labels.push($(this).attr('data_label'));
-    choices.push($(this).val());
-  });
-
-
-  $('.js-subject-labels').each(function () {
-    var chosenElement = false;
-    var chosenElements = this.nextElementSibling.querySelectorAll('.subj-box-params');
-    labels.push(this.textContent);
-    chosenElements.forEach(function(ele) {
-      if ($(ele).hasClass('chosen')) {
-        choices.push(ele.textContent.replace(/\n/ig, '').trim());
-        chosenElement = true;
-      }
-    })
-
-    if (chosenElement === false) {
-      choices.push(undefined);
-    }
-  });
-
-
-  for (label in labels) {
-    info[labels[label]] = choices[label];
-  }
-
-  var sequence = {
-    info: info,
-    seqId: seqId,
-    envId: envId,
-  };
-
-  console.log('seq', sequence)
-
-
-  Meteor.call('sequenceUpdate', sequence, function(error, result) {
-    if (error) {
-      alert(error.reason);
-    } else {
-      $('#seq-param-modal').removeClass('is-active');
-    }
-  });
-}
-
-function editSeqParamBoxes(seqId) {
-
-}
 
 Template.registerHelper( 'math', function () {
   return {
