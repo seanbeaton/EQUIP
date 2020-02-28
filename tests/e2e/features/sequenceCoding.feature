@@ -1,6 +1,7 @@
-@watch
-Feature: Observation creation
-  I can create an observation
+#@watch
+Feature: Sequence coding and observations settings
+  I can code sequences on an observation
+  And I can change observations settings
 
   Background:
     Given I am on the site
@@ -20,19 +21,19 @@ Feature: Observation creation
     And I click on the item with the selector ".enter-class=(7 - WC) Test observation name"
     # First seq
     And I click on the item with the selector ".c--observation__student-box=Brenda"
-    And I click on the item with the selector ".subj-box-params=Explanation" in the wrapper ".boxes-wrapper .c--modal-student-options-container:nth-child(2)"
-    And I click on the item with the selector ".subj-box-params=Extended Contribution" in the wrapper ".boxes-wrapper .c--modal-student-options-container:nth-child(4)"
-    And I click on the item with the selector ".subj-box-params=Explanation" in the wrapper ".boxes-wrapper .c--modal-student-options-container:nth-child(6)"
-    And I click on the item with the selector ".subj-box-params=Long" in the wrapper ".boxes-wrapper .c--modal-student-options-container:nth-child(8)"
-    And I click on the item with the selector ".subj-box-params=Enthusiastic" in the wrapper ".boxes-wrapper .c--modal-student-options-container:nth-child(10)"
+    And I click on the item with the selector "label[for='student-talk--type-__explanation']"
+    And I click on the item with the selector "label[for='student-talk--length-__extended-contribution']"
+    And I click on the item with the selector "label[for='teacher-question--type-__explanation']"
+    And I click on the item with the selector "label[for='teacher-wait-time__long']"
+    And I click on the item with the selector "label[for='teacher-tone__enthusiastic']"
     And I click on the item with the selector "#save-seq-params"
     # Second seq
     And I click on the item with the selector ".c--observation__student-box=Elan"
-    And I click on the item with the selector ".subj-box-params=Procedural" in the wrapper ".boxes-wrapper .c--modal-student-options-container:nth-child(2)"
-    And I click on the item with the selector ".subj-box-params=Brief Contribution" in the wrapper ".boxes-wrapper .c--modal-student-options-container:nth-child(4)"
-    And I click on the item with the selector ".subj-box-params=Procedural" in the wrapper ".boxes-wrapper .c--modal-student-options-container:nth-child(6)"
-    And I click on the item with the selector ".subj-box-params=Short" in the wrapper ".boxes-wrapper .c--modal-student-options-container:nth-child(8)"
-    And I click on the item with the selector ".subj-box-params=Neutral" in the wrapper ".boxes-wrapper .c--modal-student-options-container:nth-child(10)"
+    And I click on the item with the selector "label[for='student-talk--type-__procedural']"
+    And I click on the item with the selector "label[for='student-talk--length-__brief-contribution']"
+    And I click on the item with the selector "label[for='teacher-question--type-__procedural']"
+    And I click on the item with the selector "label[for='teacher-wait-time__short']"
+    And I click on the item with the selector "label[for='teacher-tone__neutral']"
     And I click on the item with the selector "#save-seq-params"
     # Verify it exists
     And I click on the item with the selector "#show-all-observations"
