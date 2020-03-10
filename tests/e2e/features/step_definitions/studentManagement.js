@@ -25,8 +25,6 @@ var myStepDefinitionsWrapper = function () {
 
     let student_box = browser.$('.c--student-body__container-drag-label=' + name);
     student_box.waitForExist(2000);
-    let student_edit_button = browser.$('//p[@class="c--student-body__container-drag-label" and .="' + name + '"]/following-sibling::span')
-    student_edit_button.click();
 
     let res = browser.executeAsync(function(name, demo1, demo1val, demo2, demo2val, cb) {
       let student_search = {
