@@ -1,4 +1,5 @@
 const assert = require('assert');
+var {Then} = require('cucumber');
 
 var myStepDefinitionsWrapper = function () {
   this.Given(/^I am on the staging site$/, function(callback) {
@@ -8,7 +9,8 @@ var myStepDefinitionsWrapper = function () {
 
   this.When(/^If I'm not logged in, I create an account with username prefix "([^"]*)" and password "([^"]*)"$/, function(user, pass, callback) {
 
-    let current_user = browser.execute(() => {return Meteor.user()});
+    let current_user = browser.executeAsync((done) => {done(Meteor.userId())});
+    console.log(current_user);
     if (!current_user.value) {
       console.log('Not logged in, creating account')
       createAccount(user, pass)
@@ -22,6 +24,61 @@ var myStepDefinitionsWrapper = function () {
     }, classroom);
     assert(env_found);
     callback()
+  });
+  this.When(/^I pause like a human$/, function (callback) {
+    browser.pause(10000);
+    callback()
+  });
+  this.When(/^I quickly pause like a human$/, function (callback) {
+    browser.pause(5000);
+    callback()
+  });
+  this.When(/^I really quickly pause like a human$/, function (callback) {
+    browser.pause(1500);
+    callback()
+  });
+  this.When(/^I slowly pause like a human$/, function (callback) {
+    browser.pause(15000);
+    callback()
+  });
+
+  this.When(/^I create a student named "([^"]*)" with the demographics "([^"]*)": "([^"]*)" and "([^"]*)": "([^"]*)"$/, function (name, demo1, demo1val, demo2, demo2val, callback) {
+    let add_student_button = browser.$('#add-student');
+    add_student_button.waitForExist(2000);
+    add_student_button.click();
+    console.log('test');
+
+    let name_field = browser.$('.student-name-field');
+    name_field.waitForExist(2000);
+    name_field.setValue(name);
+
+    let container1 = browser.$('.c--modal-student-options-container[data-parameter-name="' + demo1 + '"]');
+    container1.$('.subj-box-params=' + demo1val).click();
+    let container2 = browser.$('.c--modal-student-options-container[data-parameter-name="' + demo2 + '"]');
+    container2.$('.subj-box-params=' + demo2val).click();
+
+    browser.$('#save-subj-params').click();
+    callback();
+  });
+
+  this.Then(/^a student named "([^"]*)" with the demographics "([^"]*)": "([^"]*)" and "([^"]*)": "([^"]*)"( does not | )exist[s]? on the student page$/, function (name, demo1, demo1val, demo2, demo2val, negation, callback) {
+    negation = negation === ' does not ';
+
+    let student_box = browser.$('.c--student-body__container-drag-label=' + name);
+    student_box.waitForExist(2000);
+
+    let res = browser.executeAsync(function(name, demo1, demo1val, demo2, demo2val, cb) {
+      let student_search = {
+        'info.name': name
+      }
+      student_search['info.demographics.' + demo1] = demo1val;
+      student_search['info.demographics.' + demo2] = demo2val;
+      let student_search_result = Subjects.findOne(student_search);
+      cb(student_search_result);
+      // return student_search_result;
+    }, name, demo1, demo1val, demo2, demo2val);
+    assert(negation !== (res && res.value && res.value._id));
+    callback();
   });
 
 };
@@ -41,7 +98,7 @@ let createAccount = function(username, password) {
   browser.$('#at-field-intended_use').setValue("Intended use test");
   browser.$('#at-field-how_did_you_hear').setValue("How did you hear test");
   browser.pause(250);
-  browser.$('#at-btn').waitForExist(2000);
+  browser.$('#at-btn').waitForExist(5000);
   browser.$('#at-btn').click();
   browser.$('#at-btn').click();
   browser.pause(2250);
@@ -52,7 +109,7 @@ let logInAccount = function(username, password) {
   browser.$('#at-field-username_and_email').setValue(username);
   browser.$('#at-field-password').setValue(password);
   browser.pause(250);
-  browser.$('#at-btn').waitForExist(2000);
+  browser.$('#at-btn').waitForExist(5000);
   browser.$('#at-btn').click();
   browser.pause(250);
 }

@@ -8,7 +8,7 @@ var myStepDefinitionsWrapper = function () {
 
   this.When(/^I click "([^"]*)" with class "\.?([^"]*)"$/, function (label, cssClass, callback) {
     let link = browser.$('.' + cssClass);
-    link.waitForExist(2000);
+    link.waitForExist(5000);
     link.click();
     callback()
   });
@@ -72,13 +72,13 @@ var myStepDefinitionsWrapper = function () {
 
   this.Then(/^I see the page header text is "([^"]*)"$/, function (arg1, callback) {
     let title = browser.$('h1, .page__heading');
-    title.waitForExist(2000);
+    title.waitForExist(5000);
     assert.strictEqual(title.getText().toLowerCase(), arg1.toLowerCase());
     callback()
   })
   this.When(/^I click on the link with path "([^"]*)" in the wrapper "\.?([^"]*)"$/, function (path, wrapper, callback) {
     let link = browser.$('.' + wrapper + ' a[href="' + path + '"]')
-    link.waitForExist(2000);
+    link.waitForExist(5000);
     link.click();
     callback()
   });
@@ -90,10 +90,10 @@ var myStepDefinitionsWrapper = function () {
     if (number === "a" || number === "an") {
       let searchItem = browser.$(selector);
       if (!see_negation) {
-        searchItem.waitForExist(2000);
+        searchItem.waitForExist(5000);
       }
       else {
-        browser.pause(2000);
+        browser.pause(5000);
         assert(!searchItem.isExisting());
       }
       browser.pause(100);
@@ -109,12 +109,12 @@ var myStepDefinitionsWrapper = function () {
         // console.log('searchItem', searchItem);
         if (!see_negation) {
           // console.log("check does exist");
-          searchItem.waitForExist(2000);
+          searchItem.waitForExist(5000);
           found_items += 1;
         }
         else {
           // console.log("check doesn't exist");
-          browser.pause(2000);
+          browser.pause(5000);
           // assert(!searchItem.isExisting());
           assert(!searchItem.isExisting() || !searchItem.type || searchItem.type === "NoSuchElement");
         }
@@ -134,15 +134,15 @@ var myStepDefinitionsWrapper = function () {
     see_negation = see_negation === " don't ";
     text_negation = text_negation === "out ";
     let wrapper = browser.$(wrapper_sel);
-    wrapper.waitForExist(2000);
+    wrapper.waitForExist(5000);
     if (number === "a" || number === "an") {
       let searchItem = wrapper.$(selector);
 
       if (!see_negation) {
-        searchItem.waitForExist(2000);
+        searchItem.waitForExist(5000);
       }
       else {
-        browser.pause(2000);
+        browser.pause(5000);
         assert(!searchItem.isExisting() || !searchItem.type || searchItem.type === "NoSuchElement");
       }
       browser.pause(100);
@@ -157,11 +157,11 @@ var myStepDefinitionsWrapper = function () {
       searchItems.value.forEach(function(searchItem) {
 
         if (!see_negation) {
-          searchItem.waitForExist(2000);
+          searchItem.waitForExist(5000);
           found_items += 1;
         }
         else {
-          browser.pause(2000);
+          browser.pause(5000);
           assert(!searchItem.isExisting());
         }
 
@@ -183,14 +183,14 @@ var myStepDefinitionsWrapper = function () {
   this.When(/^I click on the item with the selector "([^"]*)"$/, function (sel, callback) {
     browser.pause(250);
     let item = browser.$(sel);
-    item.waitForExist(2000);
+    item.waitForExist(5000);
     item.click();
     callback();
   });
 
   this.When(/^I hover over the item with the selector "([^"]*)"$/, function (sel, callback) {
     let item = browser.$(sel);
-    item.waitForExist(2000);
+    item.waitForExist(5000);
     // item.scrollIntoView();
     browser.executeAsync((sel, cb) => {
       document.querySelector(sel).dispatchEvent(new Event("mouseover"));
@@ -202,9 +202,9 @@ var myStepDefinitionsWrapper = function () {
 
   this.When(/^I click on the item with the selector "([^"]*)" in the wrapper "([^"]*)"$/, function (sel, wrapper_sel, callback) {
     let wrapper = browser.$(wrapper_sel);
-    wrapper.waitForExist(2000);
+    wrapper.waitForExist(5000);
     let item = wrapper.$(sel);
-    item.waitForExist(2000);
+    item.waitForExist(5000);
     item.click();
     callback();
   });
@@ -212,7 +212,7 @@ var myStepDefinitionsWrapper = function () {
   this.When(/^I click on the item with the selector "([^"]*)" if "([^"]*)" is( not | )display none/, function (sel, if_sel, negate, callback) {
     negate = negate === ' not ';
     let searchItem = browser.$(if_sel);
-    searchItem.waitForExist(2000);
+    searchItem.waitForExist(5000);
     // console.log('searchItem', searchItem);
     // console.log('searchItem.getCssProperty(\'display\').value', searchItem.getCssProperty('display').value);
 
@@ -222,7 +222,7 @@ var myStepDefinitionsWrapper = function () {
 
     if (xor(searchItem.getCssProperty('display').value === 'none', !!negate)) {
       let item = browser.$(sel);
-      item.waitForExist(2000);
+      item.waitForExist(5000);
       item.click();
       browser.pause(300)
     }
@@ -234,8 +234,8 @@ var myStepDefinitionsWrapper = function () {
     different = different === 'different';
     let $el_1 = browser.$(el_1);
     let $el_2 = browser.$(el_2);
-    $el_1.waitForExist(2000);
-    $el_2.waitForExist(2000);
+    $el_1.waitForExist(5000);
+    $el_2.waitForExist(5000);
     // console.log('el1', $el_1.getCssProperty(prop).value);
     // console.log('el2', $el_2.getCssProperty(prop).value);
     assert(xor($el_1.getCssProperty(prop).value === $el_2.getCssProperty(prop).value, !!different));
@@ -247,8 +247,8 @@ var myStepDefinitionsWrapper = function () {
     different = different === 'different';
     let $el_1 = browser.$(el_1);
     let $el_2 = browser.$(el_2);
-    $el_1.waitForExist(2000);
-    $el_2.waitForExist(2000);
+    $el_1.waitForExist(5000);
+    $el_2.waitForExist(5000);
 
     console.log('el1 css', prop_1, $el_1.getCssProperty(prop_1));
     console.log('el1 css', prop_1, $el_1.getCssProperty(prop_1).value);
@@ -261,8 +261,8 @@ var myStepDefinitionsWrapper = function () {
     different = different === 'different';
     let $el_1 = browser.$(el_1);
     let $el_2 = browser.$(el_2);
-    $el_1.waitForExist(2000);
-    $el_2.waitForExist(2000);
+    $el_1.waitForExist(5000);
+    $el_2.waitForExist(5000);
     assert(xor($el_1.getAttribute(prop_1) === $el_2.getAttribute(prop_2), !!different));
     callback();
   });
@@ -366,7 +366,7 @@ var myStepDefinitionsWrapper = function () {
   this.When(/^the field "([^"]*)" (has|doesn't have) the text "([^"]*)"$/, function (field_sel, negation, text, callback) {
     negation = negation === "doesn't have";
     let field = browser.$(field_sel);
-    field.waitForExist(2000);
+    field.waitForExist(5000);
     assert(xor(text === field.getValue(), negation));
     callback();
   });
