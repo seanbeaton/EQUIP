@@ -8,7 +8,7 @@
     "test-server": "meteor test --full-app --driver-package tmeasday:acceptance-test-driver --port 3005",
     "chimp-watch": "chimp --ddp=http://localhost:3005 --watch --path=tests/e2e/features",
     "chimp-test": "chimp --ddp=http://localhost:3005 --path=tests/e2e/features",
-    "chimp-stress-stage": "chimp --path=tests/stress/features --watch"
+    "chimp-stress-stage": "chimp --path=tests/stress/features"
   },
   "repository": {
     "type": "git",
