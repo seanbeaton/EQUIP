@@ -57,6 +57,7 @@ iron:middleware-stack@1.1.0
 iron:router@1.1.2
 iron:url@1.1.0
 jquery@1.11.11
+lamhieu:meteorx@2.1.1
 launch-screen@1.1.1
 less@2.8.0
 livedata@1.0.18
@@ -79,6 +80,8 @@ mongo@1.6.2
 mongo-decimal@0.1.1
 mongo-dev-server@1.1.0
 mongo-id@1.0.7
+mongo-livedata@1.0.12
+montiapm:agent@2.38.1
 natestrauser:animate-css@3.5.1
 npm-bcrypt@0.9.3
 npm-mongo@3.1.2

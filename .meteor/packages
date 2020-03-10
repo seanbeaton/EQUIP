@@ -41,3 +41,9 @@ mizzao:autocomplete
 check
 reywood:publish-composite
 force-ssl
+meteortesting:mocha
+dburles:factory
+xolvio:cleaner
+tmeasday:acceptance-test-driver
+xolvio:backdoor
+montiapm:agent
