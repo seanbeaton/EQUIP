@@ -278,9 +278,6 @@ Template.environmentItem.helpers({
     hasObsMade: function() {
         return envHasObservations(this._id)
     },
-    getEnvName: function() {
-        return this.envName;
-    }
 });
 
 
