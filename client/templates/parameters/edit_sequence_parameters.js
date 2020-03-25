@@ -7,6 +7,22 @@ import {envHasObservations} from "../../../helpers/environments";
 
 var serialize = require('form-serialize');
 
+
+Template.editSequenceParameters.onCreated(function created() {
+  this.autorun(() => {
+    Meteor.subscribe('environment', this.data.environment._id);
+    Meteor.subscribe('envObservations', this.data.environment._id);
+    Meteor.subscribe('envSequenceParameters', this.data.environment._id);
+    //
+    // Meteor.subscribe('environment', this._id);
+    // Meteor.subscribe('envObservations', this._id);
+    // Meteor.subscribe('envSubjects', this._id);
+    // Meteor.subscribe('envSubjectParameters', this._id);
+    // Meteor.subscribe('envSequenceParameters', this._id);
+  })
+});
+
+
 //Try to short circuit "enter" button?
 Template.editSequenceParameters.rendered = function() {
   $(document).keypress(function(e) {
@@ -27,20 +43,6 @@ Template.editSequenceParameters.helpers({
 });
 
 Template.editSequenceParameters.events({
-
-  'click .help-button': function (e) {
-    $('#help-env-modal').addClass("is-active");
-  },
-  'click #help-close-modal': function(e) {
-    $('#help-env-modal').removeClass("is-active");
-  },
-  'click .modal-card-foot .button': function(e) {
-    $('#help-env-modal').removeClass("is-active");
-  },
-  'click .back-head-params': function(e) {
-   e.preventDefault();
-   Router.go('environmentList');
- },
  'click .import-button': function (e) {
     var envId = Router.current().params._envId;
     var element = document.createElement('div');
@@ -73,7 +75,7 @@ Template.editSequenceParameters.events({
             alert("File not supported, .json files only");
         }
     });
-    alert("If you select a valid file to import for this classrom, it will overwrite any parameters already set.")
+    alert("If you select a valid file to import for this classroom, it will overwrite any parameters already set.")
     fileInput.click(); // opening dialog
 
  },
@@ -103,87 +105,83 @@ Template.editSequenceParameters.events({
       }
     });
   },
-'click .demo-param-button': function(e) {
-   e.preventDefault();
-   Router.go('editSubjectParameters', {_envId:Router.current().params._envId});
- },
-'click #save-seq-params': function(e) {
-  e.preventDefault();
-  var parameterPairs = 0;
-  let formValidated = true;
-  var form = document.querySelector('#paramForm');
-  var obj = serialize(form, { hash: true, empty: false });
-  for (key in obj) {
-    if (key.includes('label')){
-      num = key.split('label')[1];
-      if (obj['parameter'+num]){
-        parameterPairs++;
+  'click #save-seq-params': function(e) {
+    e.preventDefault();
+    var parameterPairs = 0;
+    let formValidated = true;
+    var form = document.querySelector('#paramForm');
+    var obj = serialize(form, { hash: true, empty: false });
+    for (key in obj) {
+      if (key.includes('label')){
+        num = key.split('label')[1];
+        if (obj['parameter'+num]){
+          parameterPairs++;
+        } else {
+          alert('One of your parameters has a label but no options. Please fix this issue and try saving again.')
+          return;
+        }
       } else {
-        alert('One of your parameters has a label but no options. Please fix this issue and try saving again.')
-        return;
-      }
-    } else {
-      obj[key] = obj[key].split(",").filter(function(o) { return o }).join(",");
-      const sequenceKeys = obj[key].split(",");
+        obj[key] = obj[key].split(",").filter(function(o) { return o }).join(",");
+        const sequenceKeys = obj[key].split(",");
 
-      sequenceKeys.forEach((key) => {
-          if (key.trim().length === 0) {
-              alert("One of your options are blank. Please enter with the correct format.");
-              formValidated = false;
-          }
-      });
+        sequenceKeys.forEach((key) => {
+            if (key.trim().length === 0) {
+                alert("One of your options are blank. Please enter with the correct format.");
+                formValidated = false;
+            }
+        });
+      }
     }
+
+    if (!formValidated) return;
+
+    var clean_obj = {}
+    var count = 0;
+    for (key in obj) {
+      if (key.includes('label')){
+        var n = key.split('label')[1];
+        clean_obj['label'+count] = obj[key];
+        clean_obj['parameter'+count] = obj['parameter'+n];
+        if (obj['toggle'+n]){
+          clean_obj['toggle'+count] = obj['toggle'+n];
+        }
+        count++;
+      }
+    }
+    var extendObj = _.extend(clean_obj, {
+      envId: Router.current().params._envId,
+      parameterPairs: parameterPairs
+    });
+    gtag('event', 'save', {'event_category': 'sequence_params', 'event_label': JSON.stringify(clean_obj)});
+
+    Meteor.call('updateSeqParameters', clean_obj, function(error, result) {
+      if (error){
+        alert(error.reason);
+      } else {
+        toastr.options = {
+          "closeButton": false,
+          "debug": false,
+          "newestOnTop": false,
+          "progressBar": false,
+          "positionClass": "toast-bottom-full-width",
+          "preventDuplicates": false,
+          "onclick": null,
+          "showDuration": "300",
+          "hideDuration": "1000",
+          "timeOut": "5000",
+          "extendedTimeOut": "1000",
+          "showEasing": "swing",
+          "hideEasing": "linear",
+          "showMethod": "fadeIn",
+          "hideMethod": "fadeOut"
+        }
+        Command: toastr["success"]("NOTE: After the first observation is created, you will not be able to edit discourse dimensions or demographics.","Save Successful","Observation Parameters");
+      }
+      setTimeout(() => {
+        Router.go('environmentList')
+      },1000)
+    });
   }
-
-  if (!formValidated) return;
-
-  var clean_obj = {}
-  var count = 0;
-  for (key in obj) {
-    if (key.includes('label')){
-      var n = key.split('label')[1];
-      clean_obj['label'+count] = obj[key];
-      clean_obj['parameter'+count] = obj['parameter'+n];
-      if (obj['toggle'+n]){
-        clean_obj['toggle'+count] = obj['toggle'+n];
-      }
-      count++;
-    }
-  }
-  var extendObj = _.extend(clean_obj, {
-    envId: Router.current().params._envId,
-    parameterPairs: parameterPairs
-  });
-  gtag('event', 'save', {'event_category': 'sequence_params', 'event_label': JSON.stringify(clean_obj)});
-
-  Meteor.call('updateSeqParameters', clean_obj, function(error, result) {
-    if (error){
-      alert(error.reason);
-    } else {
-      toastr.options = {
-        "closeButton": false,
-        "debug": false,
-        "newestOnTop": false,
-        "progressBar": false,
-        "positionClass": "toast-bottom-full-width",
-        "preventDuplicates": false,
-        "onclick": null,
-        "showDuration": "300",
-        "hideDuration": "1000",
-        "timeOut": "5000",
-        "extendedTimeOut": "1000",
-        "showEasing": "swing",
-        "hideEasing": "linear",
-        "showMethod": "fadeIn",
-        "hideMethod": "fadeOut"
-      }
-      Command: toastr["success"]("NOTE: After the first observation is created, you will not be able to edit discourse dimensions or demographics.","Save Successful","Observation Parameters");
-    }
-    setTimeout(() => {
-      Router.go('environmentList')
-    },1000)
-  });
-}
 });
 
 Template.editSequenceParameters.rendered = function() {

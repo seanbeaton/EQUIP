@@ -23,23 +23,26 @@ Template.observatory.created = function() {
 }
 
 Template.observatory.onCreated(function created() {
-  this.subscribe('environment', this.data.envId);
-  this.subscribe('observation', this.data.obsId);
-  this.subscribe('envSubjects', this.data.envId);
-  this.subscribe('obsSequences', this.data.obsId);
-  this.subscribe('envSubjectParameters', this.data.envId);
-  this.subscribe('envSequenceParameters', this.data.envId);
+  this.autorun(() => {
+    Meteor.subscribe('environment', this.data.envId);
+    Meteor.subscribe('observation', this.data.obsId);
+    Meteor.subscribe('envSubjects', this.data.envId);
+    Meteor.subscribe('obsSequences', this.data.obsId);
+    Meteor.subscribe('envSubjectParameters', this.data.envId);
+    Meteor.subscribe('envSequenceParameters', this.data.envId);
 
-  this.data.environment = Environments.findOne(this.data.envId, {reactive: false});
-  this.data.observation = Observations.findOne(this.data.obsId, {reactive: false});
-  this.data.sequenceParameters = setupSequenceParameters(this.data.envId);
-  let that = this;
-  classroomStudentsSearchable.set(Subjects.find({
-    envId: that.data.observation.envId,
-  }).map(function(s) {
-    return {'name': s.info.name.toLowerCase(), 'active': true, _id:s._id}
-  }))
 
+    this.data.environment = Environments.findOne(this.data.envId, {reactive: true});
+    this.data.observation = Observations.findOne(this.data.obsId, {reactive: true});
+    this.data.sequenceParameters = setupSequenceParameters(this.data.envId, true);
+    let that = this;
+    let subjects = Subjects.find({
+      envId: that.data.observation.envId,
+    });
+    classroomStudentsSearchable.set(subjects.map(function(s) {
+      return {'name': s.info.name.toLowerCase(), 'active': true, _id: s._id}
+    }));
+  })
   processKeyboardObservationNavigation(this.data.observation);
 });
 
@@ -79,7 +82,7 @@ let processKeyboardObservationNavigation = function(obs) {
       return;
     }
     // don't catch non-alphanum, for this.
-    if (!e.key.toLowerCase().match(/^[a-z0-9]|Backspace$/) || e.key.length !== 1) {
+    if (!e.key.toLowerCase().match(/^[a-z0-9]|backspace$/)) {
       return;
     }
     // if (e.key === 'Tab') {
@@ -209,7 +212,8 @@ Template.observatory.helpers({
     }
   },
   searchEnabled: function(student) {
-    return classroomStudentsSearchable.get().find(s => s.name === student.info.name.toLowerCase()).active;
+    let result = classroomStudentsSearchable.get().find(s => s.name === student.info.name.toLowerCase());
+    return result && result.active;
   },
   convertISODateToUS: function(isoDate) {
     return convertISODateToUS(isoDate);

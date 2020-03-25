@@ -1,29 +1,36 @@
 
 
-function setupSequenceParameters(envId) {
-  return setupParameters('sequence', envId)
+function setupSequenceParameters(envId, reactive) {
+  return setupParameters('sequence', envId, reactive)
 }
 
-function setupSubjectParameters(envId) {
-  return setupParameters('subject', envId)
+function setupSubjectParameters(envId, reactive) {
+  return setupParameters('subject', envId, reactive)
 }
 
-function setupParameters(parameterType, envId) {
+function setupParameters(parameterType, envId, reactive) {
   if (typeof envId === 'undefined') {
     envId = Router.current().params._envId
   }
   if (typeof parameterType === 'undefined') {
     parameterType = 'subject'
   }
+  if (typeof reactive === 'undefined') {
+    reactive = false
+  }
 
   let subjParams;
   if (parameterType === 'subject') {
-    subjParams = SubjectParameters.find({'children.envId':envId}, {reactive: false}).fetch()[0];
+    subjParams = SubjectParameters.findOne({'children.envId':envId}, {reactive: reactive});
   }
   else {
-    subjParams = SequenceParameters.find({'children.envId':envId}, {reactive: false}).fetch()[0];
+    subjParams = SequenceParameters.findOne({'children.envId':envId}, {reactive: reactive});
   }
 
+  if (typeof subjParams === 'undefined') {
+    console.log('no ' + parameterType + ' params found for envId ' + envId);
+    return [];
+  }
 
   let allParams = [];
 

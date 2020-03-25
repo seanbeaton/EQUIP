@@ -7,6 +7,17 @@ import {envHasObservations} from "../../../helpers/environments";
 
 var serialize = require('form-serialize');
 
+
+Template.editSubjectParameters.onCreated(function created() {
+  this.autorun(() => {
+    Meteor.subscribe('environment', this.data.environment._id);
+    Meteor.subscribe('envObservations', this.data.environment._id);
+    Meteor.subscribe('envSequenceParameters', this.data.environment._id);
+    Meteor.subscribe('envSubjectParameters', this.data.environment._id);
+  })
+});
+
+
 Template.editSubjectParameters.helpers({
   environment: function() {
      var env = Environments.find({_id:Router.current().params._envId}).fetch();
@@ -17,74 +28,6 @@ Template.editSubjectParameters.helpers({
     return envHasObservations(this.environment._id)
   }
 });
-
-//Helper function for adding a field in the subj
-// todo I don't think this is ever being used, this needs to be cleaned up.
-function addSubjFields() {
-  var formCounter = $("#paramForm .single-param").length;
-  var container = document.getElementById("paramForm");
-
-
-  //
-  var singleParam = $('<div/>', {
-      class: "single-param control myParam"+formCounter
-    }).appendTo(container);
-
-      $('<label/>', {
-        class: "label",
-        text: "Social Marker:"
-      }).appendTo(singleParam);
-
-      $('<input/>', {
-        class: "input",
-        type: "text",
-        name: "label"+formCounter,
-        placeholder: "e.g. gender, race"
-      }).appendTo(singleParam);
-
-      $('<label/>', {
-        class: "label",
-        text: "Options:"
-      }).appendTo(singleParam);
-
-      $('<input/>', {
-        class: "input",
-        type: "text",
-        style: "margin-bottom: .25em",
-        name: "parameter"+formCounter,
-        placeholder: "List the options for selection separated by commas (e.g. male, female, unspecificied) or leave blank to for text input."
-      }).appendTo(singleParam);
-
-      removeButton = $('<button/>', {
-        class: "button is-small is-danger is-pulled-right removeDem remove"+formCounter,
-        text: "Remove Parameter",
-        style: "margin-right: .5em"
-      }).appendTo(singleParam);
-
-      removeButton.click( function (e) {
-        e.preventDefault();
-        var test = $(this).parent().remove();
-      });
-
-      toastr.options = {
-          "closeButton": false,
-          "debug": false,
-          "newestOnTop": false,
-          "progressBar": false,
-          "positionClass": "toast-bottom-right",
-          "preventDuplicates": false,
-          "onclick": null,
-          "showDuration": "300",
-          "hideDuration": "1000",
-          "timeOut": "2000",
-          "extendedTimeOut": "1000",
-          "showEasing": "swing",
-          "hideEasing": "linear",
-          "showMethod": "fadeIn",
-          "hideMethod": "fadeOut"
-        }
-        Command: toastr["info"]("Scroll to bottom to edit new parameter.","Parameter Added")
-}
 
 Template.editSubjectParameters.events({
   'click .help-button': function (e) {
