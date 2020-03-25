@@ -21,14 +21,6 @@ const selectedDiscourseDimension = new ReactiveVar(false);
 const selectedDiscourseOption = new ReactiveVar(false);
 const selectedDatasetType = new ReactiveVar('contributions');
 
-Template.timelineReport.rendered = function(){
-  $('.timeline-param-select.chosen-select')
-    .filter(':not(.chosen--processed)').addClass('chosen--processed')
-    .chosen({disable_search_threshold: 10, width: "300px"});
-  // $(".param-select-form-item.chosen-select").trigger("chosen:updated");   // update chosen to take the updated values into account
-};
-
-
 Template.timelineReport.helpers({
   environments: function() {
     // //console.log('envs', Environments.find());
@@ -94,15 +86,15 @@ Template.timelineReport.helpers({
     return getDiscourseDimensions(selectedEnvironment.get());
   },
   demo_available: function() {
-    setTimeout(function(){$(".chosen-select").trigger("chosen:updated");}, 100);
+    setTimeout(function(){$(".chosen-select").trigger("chosen:updated");}, 100);  // makes these elements respect the disabled attr on their selects
     return !!selectedEnvironment.get() && !!(selectedObservations.get().length >= 2) ? '' : 'disabled'
   },
   disc_available: function() {
-    setTimeout(function(){$(".chosen-select").trigger("chosen:updated");}, 100);
+    setTimeout(function(){$(".chosen-select").trigger("chosen:updated");}, 100);  // makes these elements respect the disabled attr on their selects
     return !!selectedEnvironment.get() && !!(selectedObservations.get().length >= 2) ? '' : 'disabled'
   },
   disc_options_available: function() {
-    setTimeout(function(){$(".chosen-select").trigger("chosen:updated");}, 100);
+    setTimeout(function(){$(".chosen-select").trigger("chosen:updated");}, 100);  // makes these elements respect the disabled attr on their selects
     return !!selectedDiscourseDimension.get() && !!selectedEnvironment.get() && !!(selectedObservations.get().length >= 2) ? '' : 'disabled'
   },
   selected_discourse_options: function() {

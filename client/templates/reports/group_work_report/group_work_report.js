@@ -103,7 +103,7 @@ Template.groupWorkReport.helpers({
     return envs;
   },
   disc_options_available: function() {
-    setTimeout(function(){$(".chosen-select").trigger("chosen:updated");}, 100);
+    setTimeout(function(){$(".chosen-select").trigger("chosen:updated");}, 100);  // makes these elements respect the disabled attr on their selects
     return !!selectedDiscourseDimension.get() && !!selectedEnvironment.get() && !!(selectedObservations.get().length >= 1) ? '' : 'disabled'
   },
   selected_discourse_options: function() {
