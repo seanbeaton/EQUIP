@@ -1,6 +1,5 @@
 import vis from 'vis';
 import {Sidebar} from '../../../../helpers/graph_sidebar';
-let d3 = require('d3');
 
 import '/node_modules/vis/dist/vis.min.css';
 
@@ -20,6 +19,18 @@ const selectedDemographic = new ReactiveVar(false);
 const selectedDiscourseDimension = new ReactiveVar(false);
 const selectedDiscourseOption = new ReactiveVar(false);
 const selectedDatasetType = new ReactiveVar('contributions');
+
+
+Template.timelineReport.onCreated(function created() {
+  this.autorun(() => {
+    this.subscribe('observations');
+    this.subscribe('environments');
+    this.subscribe('sequences');
+    this.subscribe('subjects');
+    this.subscribe('subjectParameters');
+    this.subscribe('sequenceParameters');
+  })
+});
 
 Template.timelineReport.helpers({
   environments: function() {
@@ -197,6 +208,8 @@ Template.timelineReport.events({
 
 
 let createTimelineData = function() {
+  let d3 = require('d3');
+
   let ret = {
     contributions_dataset: []
   };
@@ -385,6 +398,7 @@ let updateGraph = function() {
 
 
 let initTimelineGraph = function(full_data, containerSelector) {
+  let d3 = require('d3');
   let data;
 
   let dataset = selectedDatasetType.get();
@@ -587,166 +601,7 @@ let initTimelineGraph = function(full_data, containerSelector) {
 
 
 let updateTimelineGraph = function(full_data, containerSelector) {
-  // console.log('updating timeline graph');
   initTimelineGraph(full_data, containerSelector)
-
-  // Disabling on the fly d3 updating due to some complications with
-  // figuring out which items need to be reassigned. When the parameters that create the data
-  // change whenever the graph needs to be updated, it's hard to make it work.
-  // Only time it could work is when you add a new observation, but that doesn't work
-  // as of yet.
-  // For now, we're going to rebuild the graph each time the parameters are updated.
-
-
-  // let data;
-  //
-  // if (selectedDatasetType.get() === 'contributions') {
-  //   data = full_data.contributions_dataset;
-  // }
-  // else {
-  //   data = full_data.equity_dataset;
-  // }
-  //
-  // data = data.sort(function(a, b) {return a.d3date - b.d3date});
-  // //
-  // // svg = $('<svg width="718" height="500">' +
-  // //   '<defs>\n' +
-  // //   '  <style type="text/css">\n' +
-  // //   '    @font-face {\n' +
-  // //   '      font-family: Roboto;\n' +
-  // //   '      @import url(\'https://fonts.googleapis.com/css?family=Roboto:300,400,700\');\n' +
-  // //   '    }\n' +
-  // //   '  </style>\n' +
-  // //   '</defs>' +
-  // //   '</svg>');
-  // // $(containerSelector).html(svg);
-  //
-  // let svg = d3.select(containerSelector + " svg"),
-  //   margin = {top: 30, right: 20, bottom: 40, left: 50},
-  //   width = +svg.attr("width") - margin.left - margin.right,
-  //   height = +svg.attr("height") - margin.top - margin.bottom,
-  //   // g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-  //   g = svg.select("g.graph-container")
-  //
-  // let x = d3.scaleTime()
-  //   .domain(d3.extent(data, d => d.d3date))
-  //   .range([0, width]);
-  //
-  // let y = d3.scaleLinear()
-  //   .domain([0, d3.max(data, d => d.max)])
-  //   .range([height, 0]);
-  //
-  //
-  // // let lines = [];
-  // let demos = getDemographicOptions();
-  //
-  // let total_line = d3.line()
-  //   .x(function(d) { return x(d.d3date)})
-  //   .y(function(d) { return y(d._total)});
-  //
-  //
-  // let lines = demos.map(function(demo) {
-  //   let line = d3.line()
-  //     .x(d => x(d.d3date))
-  //     .y(d => y(d[demo.name]));
-  //   //console.log('demo', demo.name);
-  //   // let line = d3.line()
-  //   //   .x(function(d) { return x(d.d3date)})
-  //   //   .y(function(d) { return y(d[demo.name])});
-  //
-  //   return {line: line, demo: demo};
-  // });
-  //
-  //
-  // //
-  // // let valLine = d3.line()
-  // //   .x(function(d) {return x(d.date)})
-  // //   .y(function(d) {return y(d.value)})
-  //
-  //
-  // g.select('path.line--total')
-  //   .data([data])
-  //   .attr('class', 'line line--total')
-  //   .style("stroke-width", 2)
-  //   .attr('d', total_line);
-  //
-  // let key_colors = getLabelColors(getDemographicOptions().map(demo_opt => demo_opt.name));
-  // let z = d3.scaleOrdinal()
-  //   .range(Object.values(key_colors));
-  //
-  // updateKey('.timeline-report__graph-key', demos, z)
-  //
-  // //console.log('key_colors', key_colors);
-  //
-  // lines.forEach(function(line) {
-  //   //console.log('data is', data);
-  //   //console.log('z(line.demo)', z(line.demo.name), line.demo.name);
-  //
-  //
-  //   let d3line = g.selectAll('path.line--demo')
-  //     .data([data]);
-  //
-  //   d3line.enter()
-  //     .append('path')
-  //     .attr('class', 'line line--demo')
-  //     .style("stroke", z(line.demo.name))
-  //     .style("stroke-width", 2)
-  //     .attr('d', line.line)
-  //     .merge(d3line)
-  //     .transition()
-  //     .duration(500)
-  //     .attr('d', line.line)
-  //
-  //   g.selectAll('dot')
-  //     .data(data)
-  //     .enter()
-  //     .transition()
-  //     // .append('circle')
-  //     .attr('r', 3)
-  //     .attr('class', 'dot')
-  //     .attr('cx', d => x(d.d3date))
-  //     .attr('cy', d => y(d[line.demo.name]))
-  //     .attr('data-demo-name', line.demo.name)
-  //     .style("fill", z(line.demo.name))
-  //     .on('mouseover', function(d) {
-  //       d['line_name'] = line.demo.name;
-  //       let data = [];
-  //       let circles = g.selectAll('circle[cx="' + x(d.d3date) + '"][cy="' + y(d[line.demo.name]) + '"]');
-  //       if (circles.size() > 1) {
-  //         //console.log('more than one circle');
-  //         //console.log('d', d);
-  //         //console.log('this', this);
-  //         //console.log('circles', circles);
-  //         circles.each(function(d) {
-  //           let datum = clone_object(d);
-  //           datum.line_name = $(this).attr('data-demo-name');
-  //           data.push(datum)
-  //         });
-  //       }
-  //       else {
-  //         data = [d];
-  //       }
-  //
-  //       //console.log('abut to use data', data);
-  //
-  //       buildBarTooltipSlide(data, z)
-  //     })
-  //     .on('mouseout', function() {
-  //       // sidebar.setCurrentPanel('start', 250)
-  //     });
-  //
-  // });
-  //
-  // g.select("g.x-axis")
-  //   .transition()
-  //   .attr("transform", "translate(0," + height + ")")
-  //   .call(d3.axisBottom(x));
-  //
-  // // Add the Y Axis
-  // g.select("g.y-axis")
-  //   .transition()
-  //   .call(d3.axisLeft(y));
-
 };
 
 let updateKey = function(key_wrapper, y_values, color_axis) {

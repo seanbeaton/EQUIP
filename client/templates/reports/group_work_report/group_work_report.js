@@ -1,10 +1,5 @@
 import {setupSequenceParameters, setupSubjectParameters} from "/helpers/parameters";
 
-let d3 = require('d3');
-let d3ScaleChromatic = require("d3-scale-chromatic");
-let d3Interpolate = require("d3-interpolate");
-let chosen = require("chosen-js");
-
 import {getSequences} from "/helpers/sequences";
 import {getStudents, getStudent} from "/helpers/students";
 import {setupVis} from "/helpers/timeline";
@@ -21,6 +16,16 @@ const selectedStudent = new ReactiveVar(false);
 const selectedSpotlightDimension = new ReactiveVar(false);
 const groupDisplayType = new ReactiveVar('blocks');
 
+Template.groupWorkReport.onCreated(function created() {
+  this.autorun(() => {
+    this.subscribe('observations');
+    this.subscribe('environments');
+    this.subscribe('sequences');
+    this.subscribe('subjects');
+    this.subscribe('subjectParameters');
+    this.subscribe('sequenceParameters');
+  })
+});
 
 Template.groupWorkReport.events({
   'change #env-select': function(e) {
@@ -214,6 +219,7 @@ let getGroupTotalContribs = function(group) {
 
 let initGroups = function(data, selector) {
   let container = $(selector + '');
+  let d3 = require('d3');
   console.log('data', data);
 
   let markup = data.groups.map(function(group) {
@@ -295,6 +301,7 @@ let initGroups = function(data, selector) {
 }
 
 let d3GroupGraph = function(selector, group, color_scale) {
+  let d3 = require('d3');
   let data = group.students
 
   data.forEach(student => {

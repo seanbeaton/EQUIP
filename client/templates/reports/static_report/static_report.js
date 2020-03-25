@@ -5,7 +5,6 @@ import {getStudent, getStudents, updateStudent, updateStudents} from "/helpers/s
 import {setupSequenceParameters, setupSubjectParameters} from "/helpers/parameters";
 import {updateSequences, getSequences} from "/helpers/sequences";
 
-var d3 = require('d3');
 //Generate classroom buttons immediately
 Template.staticReport.rendered = function() {
   let envs = Environments.find({}, {sort: {submitted: -1}}).fetch();
@@ -433,6 +432,7 @@ function classStats(envId, sParams, obsIds) {
 }
 
 function makeDemGraphs(envId, dparams) {
+  var d3 = require('d3');
   let subs = getStudents(envId);
   var data = {};
 
@@ -462,6 +462,7 @@ function makeDemGraphs(envId, dparams) {
 }
 
 function makeContributionGraphs(obsIds, dp, sp, envId) {
+  var d3 = require('d3');
   data = {};
   for (d in dp) {
     data[dp[d]] = {};
@@ -517,6 +518,7 @@ function makeContributionGraphs(obsIds, dp, sp, envId) {
 }
 
 function makeRatioGraphs(envId, cData, dData) {
+  var d3 = require('d3');
   console.log('makeRatioGraphs');
   var statData = {};
   var total = d3.sum(d3.values(dData[d3.keys(dData)[0]]))
@@ -604,6 +606,7 @@ function makeRatioGraphs(envId, cData, dData) {
 }
 
 function makeIndividualGraphs(oIds, envId) {
+  var d3 = require('d3');
   let subjects = getStudents(envId);
 
   var contribs = {};
@@ -737,6 +740,7 @@ function makeIndividualGraphs(oIds, envId) {
 }
 
 function makePieChart(data, label) {
+  var d3 = require('d3');
   var margin = {header: 50, top: 20, right: 30, bottom: 20, left: 30},
   width = 400,
   height = 400 - margin.top - margin.bottom - margin.header,
@@ -851,6 +855,7 @@ function makePieChart(data, label) {
 }
 
 function makeStackedBar(dataEnum, label, selector, yLabel) {
+  var d3 = require('d3');
   var margin = {top: 50, right: 20, bottom: 30, left: 40},
     width = 550 - margin.left - margin.right,
     height = 500 - margin.top - margin.bottom,
