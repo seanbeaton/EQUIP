@@ -1,7 +1,6 @@
 // Meteor.siteStats.events({
 //
 // });
-let d3 = require('d3');
 
 const stats = new ReactiveVar([]);
 const statsLoaded = new ReactiveVar(false);
@@ -63,6 +62,7 @@ let updateStats = function(refresh, callback) {
 }
 
 let create_graph = function(stats, selector) {
+  let d3 = require('d3');
   let data = stats.months;
 
   let svg_tag = $('<svg width="718" height="500"></svg>');
