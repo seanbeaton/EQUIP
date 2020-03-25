@@ -4,7 +4,6 @@ import {Sidebar} from '../../../../helpers/graph_sidebar';
 import '/node_modules/vis/dist/vis.min.css';
 
 import {setupSequenceParameters, setupSubjectParameters} from "/helpers/parameters";
-import {getSequences} from "/helpers/sequences";
 import {getStudents} from "/helpers/students";
 import {convertISODateToUS} from "/helpers/dates";
 import {clone_object} from "/helpers/objects";
@@ -19,13 +18,13 @@ const selectedDemographic = new ReactiveVar(false);
 const selectedDiscourseDimension = new ReactiveVar(false);
 const selectedDiscourseOption = new ReactiveVar(false);
 const selectedDatasetType = new ReactiveVar('contributions');
-
+const cacheInfo = new ReactiveVar();
 
 Template.timelineReport.onCreated(function created() {
   this.autorun(() => {
     this.subscribe('observations');
     this.subscribe('environments');
-    this.subscribe('sequences');
+    // this.subscribe('sequences');
     this.subscribe('subjects');
     this.subscribe('subjectParameters');
     this.subscribe('sequenceParameters');
@@ -124,6 +123,9 @@ Template.timelineReport.helpers({
         selected: ''
       }
     ]
+  },
+  cache_info: function() {
+    return cacheInfo.get();
   }
 });
 
@@ -204,153 +206,14 @@ Template.timelineReport.events({
     selectedDatasetType.set(selected.val());
     updateGraph()
   },
+  'click .refresh-report': function(e) {
+    e.preventDefault();
+    updateGraph(true)
+  }
 })
 
 
-let createTimelineData = function() {
-  let d3 = require('d3');
-
-  let ret = {
-    contributions_dataset: []
-  };
-
-  let envId = selectedEnvironment.get();
-  let obsIds = selectedObservations.get();
-  let demo = selectedDemographic.get();
-  let dimension = selectedDiscourseDimension.get();
-  let option = selectedDiscourseOption.get();
-  let allStudents = getStudents(envId);
-  let demo_opts = getDemographicOptions();
-
-
-
-  let students_by_demo = demo_opts.map(function(demo_opt) {
-    //console.log('demo_opt', demo_opt);
-    return {
-      name: demo_opt.name,
-      count: 0
-    };
-  });
-
-  allStudents.forEach(function(student) {
-    let demoCountIndex = students_by_demo.findIndex(demoopt => demoopt.name === student.info.demographics[demo])
-    students_by_demo[demoCountIndex].count++;
-  });
-
-  students_by_demo.forEach(function(demographic) {
-    demographic.percent = demographic.count / students_by_demo.reduce((t, d) => d.count + t, 0)
-  });
-
-
-
-  //console.log('creating data for ', obsIds, demo, dimension, option);
-  for (let obsId_k in obsIds) {
-
-    if (!obsIds.hasOwnProperty(obsId_k)) continue;
-    let obsId = obsIds[obsId_k];
-
-    let sequences = getSequences(obsId, envId);
-    for (let sequence_k in sequences) {
-      if (!sequences.hasOwnProperty(sequence_k)) continue;
-      let sequence = sequences[sequence_k];
-
-      // //console.log('sequence', sequence);
-
-      if (!ret.contributions_dataset.find(datapoint => datapoint.obsId === obsId)) {
-        // If it wasn't there:
-        let obsers = getObservations(selectedObservations.get());
-        //console.log('getObservations()', obsers);
-
-        let obs = obsers.find(obs => obs._id === obsId);
-        let parseTime = d3.timeParse('%Y-%m-%d');
-        //console.log('ob SEACH', obs);
-        let datapoint = {
-          obsId: obsId,
-          d3date: parseTime(obs.observationDate),
-          obsName: obs.name,
-          date: obs.observationDate,
-          studentsByDemo: students_by_demo,
-          _total: 0,
-        };
-
-        demo_opts.forEach(function (opt) {
-          datapoint[opt.name] = 0
-        });
-
-        ret.contributions_dataset.push(datapoint)
-      }
-
-      let seqDemoOption = sequence.info.student.demographics[demo];
-
-      let ds_index = ret.contributions_dataset.findIndex(datapoint => datapoint.obsId === obsId);
-
-      if (sequence.info.parameters[dimension] === option) {
-        ret.contributions_dataset[ds_index]._total += 1;
-        ret.contributions_dataset[ds_index][seqDemoOption] += 1;
-      }
-
-    }
-  }
-
-  ret.equity_dataset = [];
-
-  //console.log('allStudents', allStudents);
-
-  ret.equity_dataset = ret.contributions_dataset.map(function(observation) {
-    //console.log('obs', observation)
-    let obs_equity = {
-      _total: 1,
-      obsId: observation.obsId,
-      obsName: observation.obsName,
-      d3date: observation.d3date,
-      date: observation.date,
-      studentsByDemo: students_by_demo,
-      contribsByDemo: [],
-    }
-    demo_opts.forEach(function(demo_opt) {
-      let percent_of_contribs = observation[demo_opt.name] / observation._total;
-      // console.log('percent_of_contribs', percent_of_contribs);
-      if (isNaN(percent_of_contribs)) {
-        percent_of_contribs = 0;
-      }
-
-      obs_equity.contribsByDemo.push({
-        name: demo_opt.name,
-        percent: percent_of_contribs,
-        count: observation[demo_opt.name],
-        total: observation._total
-      });
-      let percent_of_students = students_by_demo.find(demo => demo.name === demo_opt.name).percent;
-      if (isNaN(percent_of_students)) {
-        percent_of_students = 0;
-      }
-
-      if (percent_of_students === 0) {
-        obs_equity[demo_opt.name] = 0;
-      }
-      else {
-        let equity_ratio = percent_of_contribs / percent_of_students;
-        obs_equity[demo_opt.name] = isNaN(equity_ratio) ? 0 : equity_ratio;
-      }
-    });
-    return obs_equity
-  })
-
-  ret.contributions_dataset.forEach(function(obs) {
-    // obs.max = obs._total;
-    let vals = demo_opts.map(demo_opt => obs[demo_opt.name]);
-    //console.log('vals', vals);
-    obs.max = Math.max.apply(null, vals);
-  });
-  ret.equity_dataset.forEach(function(obs) {
-    let vals = demo_opts.map(demo_opt => obs[demo_opt.name]);
-    //console.log('vals', vals);
-    obs.max = Math.max.apply(null, vals);
-  })
-
-  console.table(ret.contributions_dataset);
-  console.table(ret.equity_dataset);
-  return ret
+let createTimelineData = async function() {
 };
 
 let sidebar;
@@ -361,7 +224,10 @@ let clearGraph = function() {
   $(timeline_selector + ' svg').remove();
 }
 
-let updateGraph = function() {
+let updateGraph = async function(refresh) {
+  if (typeof refresh === 'undefined') {
+    refresh = false;
+  }
   let timeline_wrapper = $('.timeline-report-wrapper');
   let timeline_selector = '.timeline-report__graph';
 
@@ -378,21 +244,40 @@ let updateGraph = function() {
   }
 
 
-  let data = createTimelineData();
-  if (!timeline_wrapper.hasClass('timeline-created')) {
-    timeline_wrapper.addClass('timeline-created');
-    let sidebarLevels = {
-      0: 'start',
-      1: 'bar_tooltip',
-    };
-    sidebar = new Sidebar('.timeline-report__sidebar', sidebarLevels);
-    sidebar.setSlide('start', 'Hover a point (or tap on mobile) to see more information', '')
-    initTimelineGraph(data, timeline_selector)
+  let timeline_params = {
+    envId: selectedEnvironment.get(),
+    obsIds: selectedObservations.get(),
+    demo: selectedDemographic.get(),
+    dimension: selectedDiscourseDimension.get(),
+    option: selectedDiscourseOption.get(),
+    allStudents: getStudents(selectedEnvironment.get()),
+    demo_opts: getDemographicOptions(),
+    selectedObservations: selectedObservations.get(),
   }
-  else {
-    sidebar.setCurrentPanel('start');
-    updateTimelineGraph(data, timeline_selector)
-  }
+
+  Meteor.call('getTimelineData', timeline_params, refresh, function(err, result) {
+    if (err) {
+      console.log('error', err);
+      return;
+    }
+
+    if (!timeline_wrapper.hasClass('timeline-created')) {
+      timeline_wrapper.addClass('timeline-created');
+      let sidebarLevels = {
+        0: 'start',
+        1: 'bar_tooltip',
+      };
+      sidebar = new Sidebar('.timeline-report__sidebar', sidebarLevels);
+      sidebar.setSlide('start', 'Hover a point (or tap on mobile) to see more information', '')
+      initTimelineGraph(result.data, timeline_selector)
+    }
+    else {
+      sidebar.setCurrentPanel('start');
+      updateTimelineGraph(result.data, timeline_selector)
+    }
+    cacheInfo.set(result.createdAt.toLocaleString());
+    console.log('result.createdAt.toLocaleString()', result.createdAt.toLocaleString());
+  });
 }
 
 

@@ -17,9 +17,9 @@ let setupVis = function(visContainerId, selectionCallback, obsOptions, selectedO
 
   let observations = obsOptions.get();
   let disabled_class = function(obs) {
-    if (getSequences(obs._id, obs.envId).length < 1) {
-      return 'disabled';
-    }
+    // if (getSequences(obs._id, obs.envId).length < 1) {
+    //   return 'disabled';
+    // }
     if (class_type === 'all') {
       return '';
     }
