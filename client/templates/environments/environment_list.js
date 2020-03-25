@@ -12,14 +12,14 @@ export const currentNewObservation = new ReactiveVar(false);
 
 
 Template.environmentList.onCreated(function created() {
-  this.subscribe('environments');
-  this.subscribe('observations');
-  this.subscribe('subjects');
-  // this.subscribe('sequences');
-  this.subscribe('subjectParameters');
-  this.subscribe('sequenceParameters');
-
-  // this.data.environments = Environments.find({}, {reactive: false}).fetch()
+  this.autorun(() => {
+    this.subscribe('environments');
+    this.subscribe('observations');
+    this.subscribe('subjects');
+    // this.subscribe('sequences');
+    this.subscribe('subjectParameters');
+    this.subscribe('sequenceParameters');
+  })
 });
 
 
