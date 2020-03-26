@@ -46,7 +46,6 @@ var myStepDefinitionsWrapper = function () {
     let add_student_button = browser.$('#add-student');
     add_student_button.waitForExist(2000);
     add_student_button.click();
-    console.log('test');
 
     let name_field = browser.$('.student-name-field');
     name_field.waitForExist(2000);
