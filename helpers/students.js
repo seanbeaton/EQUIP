@@ -1,13 +1,19 @@
 import {setupSubjectParameters} from "/helpers/parameters";
 
-function getStudents(envId) {
-  let students = Subjects.find({envId:envId}, {reactive: false}).fetch();
+function getStudents(envId, reactive) {
+  if (typeof reactive === 'undefined') {
+    reactive = false;
+  }
+  let students = Subjects.find({envId:envId}, {reactive: reactive}).fetch();
   let allParams = setupSubjectParameters(envId);
   return updateStudents(students, allParams);
 }
 
-function getStudent(subjId, envId) {
-  let student = Subjects.findOne({_id: subjId}, {reactive: false});
+function getStudent(subjId, envId, reactive) {
+  if (typeof reactive === 'undefined') {
+    reactive = false;
+  }
+  let student = Subjects.findOne({_id: subjId}, {reactive: reactive});
   let allParams = setupSubjectParameters(envId);
   return updateStudent(student, allParams);
 
