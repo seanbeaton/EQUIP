@@ -1,9 +1,5 @@
 import {setupSequenceParameters, setupSubjectParameters} from "../../../../helpers/parameters";
 
-let d3 = require('d3');
-let d3ScaleChromatic = require("d3-scale-chromatic");
-let d3Interpolate = require("d3-interpolate");
-let chosen = require("chosen-js");
 
 import {getSequences} from "../../../../helpers/sequences";
 import {getStudents, getStudent} from "../../../../helpers/students";
@@ -30,6 +26,17 @@ const selectedSpotlightDimension = new ReactiveVar(false);
 const totalContributions = new ReactiveVar(0);
 
 const currentDemoFilters = new ReactiveVar(false);
+
+Template.heatmapReport.onCreated(function created() {
+  this.autorun(() => {
+    this.subscribe('observations');
+    this.subscribe('environments');
+    this.subscribe('sequences');
+    this.subscribe('subjects');
+    this.subscribe('subjectParameters');
+    this.subscribe('sequenceParameters');
+  })
+});
 
 Template.heatmapReport.helpers({
   environments: function() {
@@ -111,15 +118,15 @@ Template.heatmapReport.helpers({
     return (students.get().length > 0) && (selectedObservations.get().length > 0);
   },
   demo_available: function() {
-    setTimeout(function(){$(".chosen-select").trigger("chosen:updated");}, 100);
+    setTimeout(function(){$(".chosen-select").trigger("chosen:updated");}, 100);  // makes these elements respect the disabled attr on their selects
     return !!selectedEnvironment.get() && !!(selectedObservations.get().length >= 2) ? '' : 'disabled'
   },
   disc_available: function() {
-    setTimeout(function(){$(".chosen-select").trigger("chosen:updated");}, 100);
+    setTimeout(function(){$(".chosen-select").trigger("chosen:updated");}, 100);  // makes these elements respect the disabled attr on their selects
     return !!selectedEnvironment.get() && !!(selectedObservations.get().length >= 2) ? '' : 'disabled'
   },
   disc_options_available: function() {
-    setTimeout(function(){$(".chosen-select").trigger("chosen:updated");}, 100);
+    setTimeout(function(){$(".chosen-select").trigger("chosen:updated");}, 100);  // makes these elements respect the disabled attr on their selects
     return !!selectedDiscourseDimension.get() && !!selectedEnvironment.get() && !!(selectedObservations.get().length >= 2) ? '' : 'disabled'
   },
   selected_discourse_options: function() {
@@ -482,6 +489,8 @@ let updateTotalContribs = function(data) {
 
 let initHeatmapGraph = function(full_data, containerSelector) {
   let data;
+  let d3 = require('d3');
+  let d3Interpolate = require("d3-interpolate");
 
   data = full_data.contributions_dataset;
 
@@ -532,6 +541,9 @@ let selectStudentForModal = function(studentId) {
 
 let updateHeatmapGraph = function(full_data, containerSelector) {
   let data;
+
+  let d3 = require('d3');
+  let d3Interpolate = require("d3-interpolate");
 
   data = full_data.contributions_dataset;
 
@@ -585,6 +597,8 @@ let updateHeatmapGraph = function(full_data, containerSelector) {
 
 
 let updateHeatmapKey = function(selector, color_axis) {
+  let d3 = require('d3');
+
   $(selector).html('<div class="heatmap-key"></div>');
 
   let key_height = 80;

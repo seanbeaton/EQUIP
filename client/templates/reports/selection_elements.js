@@ -1,5 +1,15 @@
 let chosen = require('chosen-js');
 
+
+let handleChosenUpdates = function(e) {
+  if (e.target.tagName.toLowerCase() === "select") {
+    $(e.target).trigger("chosen:updated");
+  }
+  else if (e.target.tagName.toLowerCase() === "option") {
+    $(e.target).parents('select').trigger("chosen:updated");
+  }
+}
+
 // Template.dataTypeSelect.helpers({
 //   environments: function() {
 //     let envs = Environments.find().fetch();
@@ -50,6 +60,9 @@ let chosen = require('chosen-js');
 //   },
 // });
 
+Template.environmentSelect.events({
+  'DOMSubtreeModified select.chosen-select': handleChosenUpdates,
+})
 Template.environmentSelect.rendered = function(){
   // import '/node_modules/chosen-js/chosen.min.css';
   $('.env-select.chosen-select')
@@ -59,6 +72,19 @@ Template.environmentSelect.rendered = function(){
 };
 
 
+Template.timelineReport.events({
+  'DOMSubtreeModified select.chosen-select': handleChosenUpdates,
+})
+Template.timelineReport.rendered = function(){
+  $('.timeline-param-select.chosen-select')
+    .filter(':not(.chosen--processed)').addClass('chosen--processed')
+    .chosen({disable_search_threshold: 10, width: "300px"});
+  // $(".param-select-form-item.chosen-select").trigger("chosen:updated");   // update chosen to take the updated values into account
+};
+
+Template.dataTypeSelect.events({
+  'DOMSubtreeModified select.chosen-select': handleChosenUpdates,
+})
 Template.dataTypeSelect.rendered = function(){
   // import '/node_modules/chosen-js/chosen.min.css';
   $('.dataset.chosen-select')
@@ -68,6 +94,9 @@ Template.dataTypeSelect.rendered = function(){
 };
 
 
+Template.interactiveReport.events({
+  'DOMSubtreeModified select.chosen-select': handleChosenUpdates,
+})
 Template.interactiveReport.rendered = function(){
   // import '/node_modules/chosen-js/chosen.min.css';
   $('.param-select-form-item.chosen-select')
@@ -76,6 +105,10 @@ Template.interactiveReport.rendered = function(){
   // $(".param-select-form-item.chosen-select").trigger("chosen:updated");   // update chosen to take the updated values into account
 };
 
+
+Template.groupWorkDiscSelect.events({
+  'DOMSubtreeModified select.chosen-select': handleChosenUpdates,
+})
 Template.groupWorkDiscSelect.rendered = function() {
   $('.group-work-report__graph-disc-select .chosen-select')
     .filter(':not(.chosen--processed)').addClass('chosen--processed')
@@ -83,18 +116,30 @@ Template.groupWorkDiscSelect.rendered = function() {
   // $(".param-select-form-item.chosen-select").trigger("chosen:updated");   // update chosen to take the updated values into account
 }
 
+
+Template.demographicHeatmapFilter.events({
+  'DOMSubtreeModified select.chosen-select': handleChosenUpdates,
+})
 Template.demographicHeatmapFilter.rendered = function() {
   $('.filter.chosen-select')
     .filter(':not(.chosen--processed)').addClass('chosen--processed')
     .chosen({disable_search_threshold: 10, width: "240px", placeholder_text_multiple: "Choose Multiple Options"});
 }
 
+
+Template.spotlightDiscourseSelect.events({
+  'DOMSubtreeModified select.chosen-select': handleChosenUpdates,
+})
 Template.spotlightDiscourseSelect.rendered = function() {
   $('.disc-select-chosen')
     .filter(':not(.chosen--processed)').addClass('chosen--processed')
     .chosen({disable_search_threshold: 10, width: "250px"});
 }
 
+
+Template.heatmapReportSort.events({
+  'DOMSubtreeModified select.chosen-select': handleChosenUpdates,
+})
 Template.heatmapReportSort.rendered = function() {
   console.log('rendered run');
   $('.students-select-sort')
@@ -103,6 +148,10 @@ Template.heatmapReportSort.rendered = function() {
     .chosen({disable_search_threshold: 10, width: "300px", placeholder_text_multiple: "Choose Multiple Options"});
 }
 
+
+Template.heatmapReportSortDemo.events({
+  'DOMSubtreeModified select.chosen-select': handleChosenUpdates,
+})
 Template.heatmapReportSortDemo.rendered = function() {
   $('.students-select-buckets-demo')
     .trigger('change')
@@ -110,6 +159,10 @@ Template.heatmapReportSortDemo.rendered = function() {
     .chosen({disable_search_threshold: 10, width: "240px", placeholder_text_multiple: 'Choose Multiple Options'});
 }
 
+
+Template.histogramDemoSelect.events({
+  'DOMSubtreeModified select.chosen-select': handleChosenUpdates,
+})
 Template.histogramDemoSelect.rendered = function() {
   $('.' + this.data.class_prefix + '-demographic-chosen')
     .trigger('change')
@@ -126,6 +179,10 @@ Template.heatmapReportSort.helpers({
   }
 })
 
+
+Template.heatmapReportSort.events({
+  'DOMSubtreeModified select.chosen-select': handleChosenUpdates,
+})
 Template.heatmapReportSort.events({
   'change #students-sort': function(e) {
     let selected = $('option:selected', e.target);
@@ -133,6 +190,11 @@ Template.heatmapReportSort.events({
     heatmapReportSortType.set(selected.val());
     $(window).trigger('heatmap_student_sort_updated', selected.val())
   }
+})
+
+
+Template.heatmapReportSortDemo.events({
+  'DOMSubtreeModified select.chosen-select': handleChosenUpdates,
 })
 Template.heatmapReportSortDemo.events({
   'change #students-buckets-demo': function(e) {
@@ -142,6 +204,10 @@ Template.heatmapReportSortDemo.events({
   }
 })
 
+
+Template.studentSpotlight.events({
+  'DOMSubtreeModified select.chosen-select': handleChosenUpdates,
+})
 Template.studentSpotlight.helpers({
   arrayify: function(obj) {
     let result = [];
@@ -174,4 +240,5 @@ Template.studentSpotlight.helpers({
 //   }
 // }
 
-export {heatmapReportSortDemoChosen, heatmapReportSortType}
+
+export {heatmapReportSortDemoChosen, heatmapReportSortType, handleChosenUpdates}

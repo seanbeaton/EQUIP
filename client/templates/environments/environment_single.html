@@ -5,7 +5,9 @@
                 <!--To view classrooms shared with you, <a href="{{pathFor route='groupsList'}}">take a look at your groups.</a>-->
             <!--</p>-->
             <ul class="c-dashboard__accordion" data-expand-children="true">
-                {{> environmentItem }}
+                {{#each environment_false_list}}
+                    {{> environmentItem }}
+                {{/each}}
             </ul>
         </div>
         <a href="{{pathFor 'help'}}">

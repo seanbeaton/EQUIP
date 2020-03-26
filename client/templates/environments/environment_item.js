@@ -6,6 +6,7 @@ import { createModal } from '/helpers/modals.js'
 import {getSequences} from "/helpers/sequences";
 import {envHasObservations} from "../../../helpers/environments";
 import {activeEnvId, obsCreateModal} from './environment_list'
+import {setupSequenceParameters, setupSubjectParameters} from "../../../helpers/parameters";
 
 let share_window_timeout;
 
@@ -184,18 +185,12 @@ Template.environmentItem.helpers({
         return this._id;
     },
     getSubjectParameters: function() {
-        var subjectParameters =  SubjectParameters.find({'children.envId': this._id}).fetch();
-
-        if (subjectParameters.length === 0) return;
-
-        var parsedSubjectParameters = subjectParameters[0].children;
-        var labels = [];
-        for (student in parsedSubjectParameters) {
-            if (student.includes("label")) {
-                labels.push(parsedSubjectParameters[student]);
-            }
-        }
-        return labels.join(", ")
+      let params = setupSubjectParameters(this._id, true);
+      return params.map((p) => p.name).join(", ")
+    },
+    getDiscourseParameters: function() {
+      let params = setupSequenceParameters(this._id, true);
+      return params.map((p) => p.name).join(", ")
     },
     noSubjectParametersEntered: function() {
         let subjectParameters =  SubjectParameters.find({'children.envId': this._id}).fetch();
@@ -215,40 +210,11 @@ Template.environmentItem.helpers({
             return false;
         }
     },
-    getDiscourceParameters: function() {
-        var sequenceParameters = SequenceParameters.find({'children.envId': this._id}).fetch();
-
-        if (sequenceParameters.length === 0) return;
-
-        var parsedDiscourseParameters = sequenceParameters[0].children;
-        var labels = [];
-
-        for (type in parsedDiscourseParameters) {
-            if (type.includes("label")) {
-                labels.push(parsedDiscourseParameters[type]);
-            }
-        }
-        return labels.join(", ")
-    },
     isClassValidated: function() {
-        var user = Meteor.user();
-        var sequenceParameters = SequenceParameters.find({'children.envId': this._id}).fetch();
-        var subjectParameters =  SubjectParameters.find({'children.envId': this._id}).fetch();
-        var students = Subjects.find({envId: this._id}).fetch();
-        let filteredStudents = students.filter(student => student.envId === this._id)
-            .map(student => student.info.name)
-        var validation = true;
-        var seqParamLength = sequenceParameters[0] ? sequenceParameters[0].children.parameterPairs : sequenceParameters.length;
-        var subParamLength = subjectParameters[0] ? subjectParameters[0].children.parameterPairs : subjectParameters.length;
-        var parameters = [seqParamLength, subParamLength, filteredStudents.length];
-
-        parameters.forEach((p) => {
-            if (p === 0) {
-                validation = false;
-            }
-        });
-
-        return validation;
+      let hasStudents = Subjects.find({envId: this._id}).count() > 0;
+      let hasSeqParams = setupSequenceParameters(this._id, true).length > 0;
+      let hasSubjParams = setupSubjectParameters(this._id, true).length > 0;
+      return hasStudents && hasSeqParams && hasSubjParams;
     },
     getStudents: function() {
         var user = Meteor.user();
@@ -278,9 +244,6 @@ Template.environmentItem.helpers({
     hasObsMade: function() {
         return envHasObservations(this._id)
     },
-    getEnvName: function() {
-        return this.envName;
-    }
 });
 
 

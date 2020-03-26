@@ -1,11 +1,9 @@
 import vis from 'vis';
 import {Sidebar} from '../../../../helpers/graph_sidebar';
-let d3 = require('d3');
 
 import '/node_modules/vis/dist/vis.min.css';
 
 import {setupSequenceParameters, setupSubjectParameters} from "/helpers/parameters";
-import {getSequences} from "/helpers/sequences";
 import {getStudents} from "/helpers/students";
 import {convertISODateToUS} from "/helpers/dates";
 import {clone_object} from "/helpers/objects";
@@ -20,14 +18,18 @@ const selectedDemographic = new ReactiveVar(false);
 const selectedDiscourseDimension = new ReactiveVar(false);
 const selectedDiscourseOption = new ReactiveVar(false);
 const selectedDatasetType = new ReactiveVar('contributions');
+const cacheInfo = new ReactiveVar();
 
-Template.timelineReport.rendered = function(){
-  $('.timeline-param-select.chosen-select')
-    .filter(':not(.chosen--processed)').addClass('chosen--processed')
-    .chosen({disable_search_threshold: 10, width: "300px"});
-  // $(".param-select-form-item.chosen-select").trigger("chosen:updated");   // update chosen to take the updated values into account
-};
-
+Template.timelineReport.onCreated(function created() {
+  this.autorun(() => {
+    this.subscribe('observations');
+    this.subscribe('environments');
+    // this.subscribe('sequences');
+    this.subscribe('subjects');
+    this.subscribe('subjectParameters');
+    this.subscribe('sequenceParameters');
+  })
+});
 
 Template.timelineReport.helpers({
   environments: function() {
@@ -94,15 +96,15 @@ Template.timelineReport.helpers({
     return getDiscourseDimensions(selectedEnvironment.get());
   },
   demo_available: function() {
-    setTimeout(function(){$(".chosen-select").trigger("chosen:updated");}, 100);
+    setTimeout(function(){$(".chosen-select").trigger("chosen:updated");}, 100);  // makes these elements respect the disabled attr on their selects
     return !!selectedEnvironment.get() && !!(selectedObservations.get().length >= 2) ? '' : 'disabled'
   },
   disc_available: function() {
-    setTimeout(function(){$(".chosen-select").trigger("chosen:updated");}, 100);
+    setTimeout(function(){$(".chosen-select").trigger("chosen:updated");}, 100);  // makes these elements respect the disabled attr on their selects
     return !!selectedEnvironment.get() && !!(selectedObservations.get().length >= 2) ? '' : 'disabled'
   },
   disc_options_available: function() {
-    setTimeout(function(){$(".chosen-select").trigger("chosen:updated");}, 100);
+    setTimeout(function(){$(".chosen-select").trigger("chosen:updated");}, 100);  // makes these elements respect the disabled attr on their selects
     return !!selectedDiscourseDimension.get() && !!selectedEnvironment.get() && !!(selectedObservations.get().length >= 2) ? '' : 'disabled'
   },
   selected_discourse_options: function() {
@@ -121,6 +123,9 @@ Template.timelineReport.helpers({
         selected: ''
       }
     ]
+  },
+  cache_info: function() {
+    return cacheInfo.get();
   }
 });
 
@@ -201,151 +206,14 @@ Template.timelineReport.events({
     selectedDatasetType.set(selected.val());
     updateGraph()
   },
+  'click .refresh-report': function(e) {
+    e.preventDefault();
+    updateGraph(true)
+  }
 })
 
 
-let createTimelineData = function() {
-  let ret = {
-    contributions_dataset: []
-  };
-
-  let envId = selectedEnvironment.get();
-  let obsIds = selectedObservations.get();
-  let demo = selectedDemographic.get();
-  let dimension = selectedDiscourseDimension.get();
-  let option = selectedDiscourseOption.get();
-  let allStudents = getStudents(envId);
-  let demo_opts = getDemographicOptions();
-
-
-
-  let students_by_demo = demo_opts.map(function(demo_opt) {
-    //console.log('demo_opt', demo_opt);
-    return {
-      name: demo_opt.name,
-      count: 0
-    };
-  });
-
-  allStudents.forEach(function(student) {
-    let demoCountIndex = students_by_demo.findIndex(demoopt => demoopt.name === student.info.demographics[demo])
-    students_by_demo[demoCountIndex].count++;
-  });
-
-  students_by_demo.forEach(function(demographic) {
-    demographic.percent = demographic.count / students_by_demo.reduce((t, d) => d.count + t, 0)
-  });
-
-
-
-  //console.log('creating data for ', obsIds, demo, dimension, option);
-  for (let obsId_k in obsIds) {
-
-    if (!obsIds.hasOwnProperty(obsId_k)) continue;
-    let obsId = obsIds[obsId_k];
-
-    let sequences = getSequences(obsId, envId);
-    for (let sequence_k in sequences) {
-      if (!sequences.hasOwnProperty(sequence_k)) continue;
-      let sequence = sequences[sequence_k];
-
-      // //console.log('sequence', sequence);
-
-      if (!ret.contributions_dataset.find(datapoint => datapoint.obsId === obsId)) {
-        // If it wasn't there:
-        let obsers = getObservations(selectedObservations.get());
-        //console.log('getObservations()', obsers);
-
-        let obs = obsers.find(obs => obs._id === obsId);
-        let parseTime = d3.timeParse('%Y-%m-%d');
-        //console.log('ob SEACH', obs);
-        let datapoint = {
-          obsId: obsId,
-          d3date: parseTime(obs.observationDate),
-          obsName: obs.name,
-          date: obs.observationDate,
-          studentsByDemo: students_by_demo,
-          _total: 0,
-        };
-
-        demo_opts.forEach(function (opt) {
-          datapoint[opt.name] = 0
-        });
-
-        ret.contributions_dataset.push(datapoint)
-      }
-
-      let seqDemoOption = sequence.info.student.demographics[demo];
-
-      let ds_index = ret.contributions_dataset.findIndex(datapoint => datapoint.obsId === obsId);
-
-      if (sequence.info.parameters[dimension] === option) {
-        ret.contributions_dataset[ds_index]._total += 1;
-        ret.contributions_dataset[ds_index][seqDemoOption] += 1;
-      }
-
-    }
-  }
-
-  ret.equity_dataset = [];
-
-  //console.log('allStudents', allStudents);
-
-  ret.equity_dataset = ret.contributions_dataset.map(function(observation) {
-    //console.log('obs', observation)
-    let obs_equity = {
-      _total: 1,
-      obsId: observation.obsId,
-      obsName: observation.obsName,
-      d3date: observation.d3date,
-      date: observation.date,
-      studentsByDemo: students_by_demo,
-      contribsByDemo: [],
-    }
-    demo_opts.forEach(function(demo_opt) {
-      let percent_of_contribs = observation[demo_opt.name] / observation._total;
-      // console.log('percent_of_contribs', percent_of_contribs);
-      if (isNaN(percent_of_contribs)) {
-        percent_of_contribs = 0;
-      }
-
-      obs_equity.contribsByDemo.push({
-        name: demo_opt.name,
-        percent: percent_of_contribs,
-        count: observation[demo_opt.name],
-        total: observation._total
-      });
-      let percent_of_students = students_by_demo.find(demo => demo.name === demo_opt.name).percent;
-      if (isNaN(percent_of_students)) {
-        percent_of_students = 0;
-      }
-
-      if (percent_of_students === 0) {
-        obs_equity[demo_opt.name] = 0;
-      }
-      else {
-        let equity_ratio = percent_of_contribs / percent_of_students;
-        obs_equity[demo_opt.name] = isNaN(equity_ratio) ? 0 : equity_ratio;
-      }
-    });
-    return obs_equity
-  })
-
-  ret.contributions_dataset.forEach(function(obs) {
-    // obs.max = obs._total;
-    let vals = demo_opts.map(demo_opt => obs[demo_opt.name]);
-    //console.log('vals', vals);
-    obs.max = Math.max.apply(null, vals);
-  });
-  ret.equity_dataset.forEach(function(obs) {
-    let vals = demo_opts.map(demo_opt => obs[demo_opt.name]);
-    //console.log('vals', vals);
-    obs.max = Math.max.apply(null, vals);
-  })
-
-  console.table(ret.contributions_dataset);
-  console.table(ret.equity_dataset);
-  return ret
+let createTimelineData = async function() {
 };
 
 let sidebar;
@@ -356,7 +224,10 @@ let clearGraph = function() {
   $(timeline_selector + ' svg').remove();
 }
 
-let updateGraph = function() {
+let updateGraph = async function(refresh) {
+  if (typeof refresh === 'undefined') {
+    refresh = false;
+  }
   let timeline_wrapper = $('.timeline-report-wrapper');
   let timeline_selector = '.timeline-report__graph';
 
@@ -373,26 +244,46 @@ let updateGraph = function() {
   }
 
 
-  let data = createTimelineData();
-  if (!timeline_wrapper.hasClass('timeline-created')) {
-    timeline_wrapper.addClass('timeline-created');
-    let sidebarLevels = {
-      0: 'start',
-      1: 'bar_tooltip',
-    };
-    sidebar = new Sidebar('.timeline-report__sidebar', sidebarLevels);
-    sidebar.setSlide('start', 'Hover a point (or tap on mobile) to see more information', '')
-    initTimelineGraph(data, timeline_selector)
+  let timeline_params = {
+    envId: selectedEnvironment.get(),
+    obsIds: selectedObservations.get(),
+    demo: selectedDemographic.get(),
+    dimension: selectedDiscourseDimension.get(),
+    option: selectedDiscourseOption.get(),
+    allStudents: getStudents(selectedEnvironment.get()),
+    demo_opts: getDemographicOptions(),
+    selectedObservations: selectedObservations.get(),
   }
-  else {
-    sidebar.setCurrentPanel('start');
-    updateTimelineGraph(data, timeline_selector)
-  }
+
+  Meteor.call('getTimelineData', timeline_params, refresh, function(err, result) {
+    if (err) {
+      console.log('error', err);
+      return;
+    }
+
+    if (!timeline_wrapper.hasClass('timeline-created')) {
+      timeline_wrapper.addClass('timeline-created');
+      let sidebarLevels = {
+        0: 'start',
+        1: 'bar_tooltip',
+      };
+      sidebar = new Sidebar('.timeline-report__sidebar', sidebarLevels);
+      sidebar.setSlide('start', 'Hover a point (or tap on mobile) to see more information', '')
+      initTimelineGraph(result.data, timeline_selector)
+    }
+    else {
+      sidebar.setCurrentPanel('start');
+      updateTimelineGraph(result.data, timeline_selector)
+    }
+    cacheInfo.set(result.createdAt.toLocaleString());
+    console.log('result.createdAt.toLocaleString()', result.createdAt.toLocaleString());
+  });
 }
 
 
 
 let initTimelineGraph = function(full_data, containerSelector) {
+  let d3 = require('d3');
   let data;
 
   let dataset = selectedDatasetType.get();
@@ -595,166 +486,7 @@ let initTimelineGraph = function(full_data, containerSelector) {
 
 
 let updateTimelineGraph = function(full_data, containerSelector) {
-  // console.log('updating timeline graph');
   initTimelineGraph(full_data, containerSelector)
-
-  // Disabling on the fly d3 updating due to some complications with
-  // figuring out which items need to be reassigned. When the parameters that create the data
-  // change whenever the graph needs to be updated, it's hard to make it work.
-  // Only time it could work is when you add a new observation, but that doesn't work
-  // as of yet.
-  // For now, we're going to rebuild the graph each time the parameters are updated.
-
-
-  // let data;
-  //
-  // if (selectedDatasetType.get() === 'contributions') {
-  //   data = full_data.contributions_dataset;
-  // }
-  // else {
-  //   data = full_data.equity_dataset;
-  // }
-  //
-  // data = data.sort(function(a, b) {return a.d3date - b.d3date});
-  // //
-  // // svg = $('<svg width="718" height="500">' +
-  // //   '<defs>\n' +
-  // //   '  <style type="text/css">\n' +
-  // //   '    @font-face {\n' +
-  // //   '      font-family: Roboto;\n' +
-  // //   '      @import url(\'https://fonts.googleapis.com/css?family=Roboto:300,400,700\');\n' +
-  // //   '    }\n' +
-  // //   '  </style>\n' +
-  // //   '</defs>' +
-  // //   '</svg>');
-  // // $(containerSelector).html(svg);
-  //
-  // let svg = d3.select(containerSelector + " svg"),
-  //   margin = {top: 30, right: 20, bottom: 40, left: 50},
-  //   width = +svg.attr("width") - margin.left - margin.right,
-  //   height = +svg.attr("height") - margin.top - margin.bottom,
-  //   // g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-  //   g = svg.select("g.graph-container")
-  //
-  // let x = d3.scaleTime()
-  //   .domain(d3.extent(data, d => d.d3date))
-  //   .range([0, width]);
-  //
-  // let y = d3.scaleLinear()
-  //   .domain([0, d3.max(data, d => d.max)])
-  //   .range([height, 0]);
-  //
-  //
-  // // let lines = [];
-  // let demos = getDemographicOptions();
-  //
-  // let total_line = d3.line()
-  //   .x(function(d) { return x(d.d3date)})
-  //   .y(function(d) { return y(d._total)});
-  //
-  //
-  // let lines = demos.map(function(demo) {
-  //   let line = d3.line()
-  //     .x(d => x(d.d3date))
-  //     .y(d => y(d[demo.name]));
-  //   //console.log('demo', demo.name);
-  //   // let line = d3.line()
-  //   //   .x(function(d) { return x(d.d3date)})
-  //   //   .y(function(d) { return y(d[demo.name])});
-  //
-  //   return {line: line, demo: demo};
-  // });
-  //
-  //
-  // //
-  // // let valLine = d3.line()
-  // //   .x(function(d) {return x(d.date)})
-  // //   .y(function(d) {return y(d.value)})
-  //
-  //
-  // g.select('path.line--total')
-  //   .data([data])
-  //   .attr('class', 'line line--total')
-  //   .style("stroke-width", 2)
-  //   .attr('d', total_line);
-  //
-  // let key_colors = getLabelColors(getDemographicOptions().map(demo_opt => demo_opt.name));
-  // let z = d3.scaleOrdinal()
-  //   .range(Object.values(key_colors));
-  //
-  // updateKey('.timeline-report__graph-key', demos, z)
-  //
-  // //console.log('key_colors', key_colors);
-  //
-  // lines.forEach(function(line) {
-  //   //console.log('data is', data);
-  //   //console.log('z(line.demo)', z(line.demo.name), line.demo.name);
-  //
-  //
-  //   let d3line = g.selectAll('path.line--demo')
-  //     .data([data]);
-  //
-  //   d3line.enter()
-  //     .append('path')
-  //     .attr('class', 'line line--demo')
-  //     .style("stroke", z(line.demo.name))
-  //     .style("stroke-width", 2)
-  //     .attr('d', line.line)
-  //     .merge(d3line)
-  //     .transition()
-  //     .duration(500)
-  //     .attr('d', line.line)
-  //
-  //   g.selectAll('dot')
-  //     .data(data)
-  //     .enter()
-  //     .transition()
-  //     // .append('circle')
-  //     .attr('r', 3)
-  //     .attr('class', 'dot')
-  //     .attr('cx', d => x(d.d3date))
-  //     .attr('cy', d => y(d[line.demo.name]))
-  //     .attr('data-demo-name', line.demo.name)
-  //     .style("fill", z(line.demo.name))
-  //     .on('mouseover', function(d) {
-  //       d['line_name'] = line.demo.name;
-  //       let data = [];
-  //       let circles = g.selectAll('circle[cx="' + x(d.d3date) + '"][cy="' + y(d[line.demo.name]) + '"]');
-  //       if (circles.size() > 1) {
-  //         //console.log('more than one circle');
-  //         //console.log('d', d);
-  //         //console.log('this', this);
-  //         //console.log('circles', circles);
-  //         circles.each(function(d) {
-  //           let datum = clone_object(d);
-  //           datum.line_name = $(this).attr('data-demo-name');
-  //           data.push(datum)
-  //         });
-  //       }
-  //       else {
-  //         data = [d];
-  //       }
-  //
-  //       //console.log('abut to use data', data);
-  //
-  //       buildBarTooltipSlide(data, z)
-  //     })
-  //     .on('mouseout', function() {
-  //       // sidebar.setCurrentPanel('start', 250)
-  //     });
-  //
-  // });
-  //
-  // g.select("g.x-axis")
-  //   .transition()
-  //   .attr("transform", "translate(0," + height + ")")
-  //   .call(d3.axisBottom(x));
-  //
-  // // Add the Y Axis
-  // g.select("g.y-axis")
-  //   .transition()
-  //   .call(d3.axisLeft(y));
-
 };
 
 let updateKey = function(key_wrapper, y_values, color_axis) {

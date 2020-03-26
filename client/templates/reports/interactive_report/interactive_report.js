@@ -11,6 +11,16 @@ const selectedXParameter = new ReactiveVar(false);
 const selectedYParameter = new ReactiveVar(false);
 const selectedDatasetType = new ReactiveVar('contributions');
 
+Template.interactiveReport.onCreated(function created() {
+  this.autorun(() => {
+    this.subscribe('observations');
+    this.subscribe('environments');
+    this.subscribe('sequences');
+    this.subscribe('subjects');
+    this.subscribe('subjectParameters');
+    this.subscribe('sequenceParameters');
+  })
+});
 
 Template.interactiveReport.helpers({
   environments: function() {
@@ -50,11 +60,11 @@ Template.interactiveReport.helpers({
     return getDiscourseDimensions();
   },
   demo_available: function() {
-    setTimeout(function(){$(".chosen-select").trigger("chosen:updated");}, 100);
+    setTimeout(function(){$(".chosen-select").trigger("chosen:updated");}, 100);  // makes these elements respect the disabled attr on their selects
     return !!selectedEnvironment.get() && !!(selectedObservations.get().length >= 1) ? '' : 'disabled'
   },
   disc_available: function() {
-    setTimeout(function(){$(".chosen-select").trigger("chosen:updated");}, 100);
+    setTimeout(function(){$(".chosen-select").trigger("chosen:updated");}, 100);  // makes these elements respect the disabled attr on their selects
     return !!selectedEnvironment.get() && !!(selectedObservations.get().length >= 1) ? '' : 'disabled'
   },
   dataset_types: function() {
@@ -257,7 +267,6 @@ let getSelectedObservations = function() {
 //   }
 // });
 
-var d3 = require('d3');
 
 let getCurrentDiscourseSelection = function() {
   let selected = $('.param-select-form-item[data-param-type="discourse"] option:selected');
@@ -402,6 +411,7 @@ let updateGraph = function() {
 };
 
 let createGraph = function(contribData, containerSelector, dataset) {
+  var d3 = require('d3');
   let data,
     y_label = '';
   if (selectedDatasetType.get() === 'contributions') {
@@ -921,6 +931,7 @@ let increaseValueForStudent = function(data, y, x, student) {
 // }
 
 let updateKey = function(key_wrapper) {
+  var d3 = require('d3');
   let y_axis = getYAxisSelection();
   let color_function;
   if (y_axis.param_type === 'demographics') {
@@ -988,6 +999,7 @@ let avail_colors_viridis = [
 //   return label_colors
 // }
 let getLabelColors = function(labels, color_function) {
+  var d3 = require('d3');
   if (typeof color_function === 'undefined') {
     color_function = d3.interpolateViridis;
   }
