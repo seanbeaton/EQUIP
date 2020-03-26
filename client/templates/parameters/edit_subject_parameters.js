@@ -2,6 +2,7 @@
 * JS file for edit_subject_parameters.html
 * Propigates current subject parameters
 */
+import {console_log_conditional} from "/helpers/logging"
 
 import {envHasObservations} from "../../../helpers/environments";
 

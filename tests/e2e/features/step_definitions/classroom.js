@@ -1,4 +1,5 @@
 const assert = require('assert');
+import {console_log_conditional} from "../../../../helpers/logging";
 
 var myStepDefinitionsWrapper = function () {
   this.Then(/^A classroom exists with the name "([^"]*)"$/, function (classroom, callback) {
@@ -22,7 +23,7 @@ var myStepDefinitionsWrapper = function () {
     let env_found = browser.executeAsync(function(classroom_name, cb) {
       let envId_res = Meteor.call('environmentInsert',  {envName: classroom_name}, function (err, res) {
         if (err) {
-          console.log('error', err);
+          console_log_conditional('error', err);
           cb();
           return;
         }
@@ -97,7 +98,7 @@ var myStepDefinitionsWrapper = function () {
     let env_found = browser.executeAsync(function(classroom_name, cb) {
       let envId_res = Meteor.call('environmentInsert',  {envName: classroom_name}, function (err, res) {
         if (err) {
-          console.log('error', err);
+          console_log_conditional('error', err);
           cb();
           return;
         }

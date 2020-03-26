@@ -1,6 +1,7 @@
 // Meteor.siteStats.events({
 //
 // });
+import {console_log_conditional} from "/helpers/logging"
 
 const stats = new ReactiveVar([]);
 const statsLoaded = new ReactiveVar(false);
@@ -46,13 +47,13 @@ let updateStats = function(refresh, callback) {
       $('.stats-container--graphs').html('');
       $('.stats-container--text').html('');
       res.stats.forEach(function(stat) {
-        console.log('stat', stat);
+        console_log_conditional('stat', stat);
         $('.stats-container--graphs').append('<div class="' + stat.selector + '"><h4>' + stat.group_label_prefix + stat.group_label + '</h4><div id="' + stat.selector + '"></div></div>')
         $('.stats-container--text').append('<div class="' + stat.selector + '"><h4>New/Total ' + stat.group_label + '</h4><div id="' + stat.selector + '--text">' + create_text(stat) + '</div></div>')
         create_graph(stat, "#" + stat.selector);
       })
       statsLoaded.set(true);
-      console.log('res', res);
+      console_log_conditional('res', res);
       stat_gen_time.set(res.createdAt.toLocaleString())
       if (typeof callback === 'function') {
         callback()

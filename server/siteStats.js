@@ -1,4 +1,5 @@
 
+import {console_log_conditional} from "/helpers/logging"
 
 
 CachedStats = new Mongo.Collection('cached_stats');
@@ -127,7 +128,7 @@ function _getParamPopularity(parameter_sets) {
   let labels = {}
   for (let pk in parameter_sets) {
     let parameters = parameter_sets[pk]['children'];
-    // console.log('parameters')
+    // console_log_conditional('parameters')
     for (let i = 0; i < parameters.parameterPairs; i++) {
       if (typeof labels[parameters[`label${i}`]] !== 'undefined') {
         labels[parameters[`label${i}`]]['count']++
@@ -168,7 +169,7 @@ function _getParamPopularity(parameter_sets) {
       params: params
     })
   }
-  console.log('returning', ret);
+  console_log_conditional('returning', ret);
   return ret;
 }
 
@@ -220,7 +221,7 @@ let get_grouped_data = async function(search, collection, key) {
       count: { $sum: 1 }
     }
   }];
-  console.log('command', command);
+  console_log_conditional('command', command);
   let res = collection.rawCollection().aggregate(command);
   const locale = 'en-us';
   let stats = []

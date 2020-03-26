@@ -1,3 +1,4 @@
+import {console_log_conditional} from "/helpers/logging"
 
 Meteor.startup(function() {
   Migrations.migrateTo('latest');
@@ -9,10 +10,10 @@ Migrations.add({
   name: 'Adds date field to all observations',
   up: function () {
     Observations.find().forEach(function(res) {
-      console.log('res', res);
+      console_log_conditional('res', res);
       if (typeof res.observationDate === 'undefined') {
         let subDate = new Date(Date.parse(res.submitted));
-        console.log('subDate', subDate);
+        console_log_conditional('subDate', subDate);
         function pad(number) {
           if (number < 10) {
             return '0' + number;

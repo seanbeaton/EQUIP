@@ -5,6 +5,7 @@ Feature: The header works
 
   Background:
     Given I am on the site
+    And a clean database
 
   Scenario: Click the header logo
     Given I visit the about page
@@ -14,7 +15,7 @@ Feature: The header works
     Given I visit the homepage
     When I click on the link with path "/about" in the wrapper "header-container"
     Then I see the page header text is "About equip"
-  Scenario: Click the header about link
+  Scenario: Click the header press link
     Given I visit the homepage
     When I click on the link with path "/press" in the wrapper "header-container"
     Then I see the page header text is "Equip in the news"

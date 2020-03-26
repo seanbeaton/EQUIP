@@ -1,3 +1,4 @@
+import {console_log_conditional} from "/helpers/logging"
 
 Template.sharedEnv.events({
   'click .save-shared-env': function(e) {
@@ -5,7 +6,7 @@ Template.sharedEnv.events({
     e.stopPropagation();
     //
     // if (!Meteor.user()) {
-    //   console.log('logged out');
+    //   console_log_conditional('logged out');
     // }
 
     Router.go('sharedEnvSave', {_shareId:Router.current().params._shareId});
@@ -77,7 +78,7 @@ function copySharedClassroom(shareId) {
         "hideMethod": "fadeOut"
       };
       toastr["info"]("Classroom copied.");
-      console.log(result);
+      console_log_conditional(result);
     }
   })
 }

@@ -1,4 +1,5 @@
 import {setupSubjectParameters} from "/helpers/parameters";
+import {console_log_conditional} from "./logging"
 
 function getStudents(envId, reactive) {
   if (typeof reactive === 'undefined') {
@@ -20,7 +21,7 @@ function getStudent(subjId, envId, reactive) {
 }
 
 function updateStudents(students, allParams) {
-  // console.log('updateStudents', students, allParams);
+  // console_log_conditional('updateStudents', students, allParams);
 
   // if we have the legacy student params, convert to the new ones.
   students.forEach(function(student) {

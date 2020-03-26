@@ -1,6 +1,8 @@
 // Meteor.siteStats.events({
 //
 // });
+import {console_log_conditional} from "/helpers/logging"
+
 
 let demographic_popularities = new ReactiveVar([]);
 let discourse_param_popularities = new ReactiveVar([]);
@@ -30,14 +32,14 @@ Template.siteStats.helpers({
 Template.siteStats.onRendered(function() {
   Meteor.call('getCounts', function(err, res) {
     if (!err) {
-      console.log('res', res);
+      console_log_conditional('res', res);
       stats.set(res.stats);
       stat_gen_time.set(res.createdAt.toLocaleString());
     }
   });
   Meteor.call('getParamPopularity', function(err, res) {
     if (!err) {
-      console.log('res', res);
+      console_log_conditional('res', res);
       demographic_popularities.set(res.demographics_pop);
       discourse_param_popularities.set(res.sequences_pop);
       param_stat_gen_time.set(res.createdAt.toLocaleString());

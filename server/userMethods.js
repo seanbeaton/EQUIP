@@ -1,3 +1,5 @@
+import {console_log_conditional} from "/helpers/logging"
+
 Meteor.methods({
   /**
    * update a user's permissions

@@ -1,3 +1,5 @@
+import {console_log_conditional} from "/helpers/logging"
+
 Meteor.startup(function() {
   Environments.rawCollection().createIndex({userId: 1})
   Environments.rawCollection().createIndex({"_id": 1, "userId": 1})

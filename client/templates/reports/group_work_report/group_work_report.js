@@ -1,4 +1,5 @@
 import {setupSequenceParameters, setupSubjectParameters} from "/helpers/parameters";
+import {console_log_conditional, console_table_conditional} from "/helpers/logging"
 
 import {getSequences} from "/helpers/sequences";
 import {getStudents, getStudent} from "/helpers/students";
@@ -35,7 +36,7 @@ Template.groupWorkReport.events({
     selectedEnvironment.set(selected.val());
     obsOptions.set(getObsOptions());
     students.set(getStudents(selectedEnvironment.get(), true));
-    console.log('students', students.get());
+    console_log_conditional('students', students.get());
     setTimeout(function() {
       setupVis('vis-container', function() {
         if (selectedObservations.get().length === 0) {
@@ -73,7 +74,7 @@ Template.groupWorkReport.events({
   },
   'change #disc-opt-select': function(e) {
     let selected = $('option:selected', e.target);
-    //console.log('disc-opt-select,', selected.val());
+    //console_log_conditional('disc-opt-select,', selected.val());
     selectedDiscourseOption.set(selected.val());
     updateGraph()
   },
@@ -90,7 +91,7 @@ Template.groupWorkReport.helpers({
     let envs = Environments.find().fetch();
     envs = envs.map(function(env) {
       let obsOpts = getObsOptions(env._id);
-      console.log('obs_opts', obsOpts);
+      console_log_conditional('obs_opts', obsOpts);
       if (obsOpts.length === 0) {
         env.envName += ' (no observations)';
         env.disabled = 'disabled';
@@ -176,7 +177,7 @@ let updateGraph = function() {
 let getStudentPadding = function(count, max) {
   let max_padding = 12;
   // the higher the count, the smaller the padding. max of 12 px.
-  console.log('max, count', max ,count);
+  console_log_conditional('max, count', max ,count);
   if (max === 0) {
     return max_padding + 'px';
   }
@@ -191,8 +192,8 @@ let getStudentTotalContribs = function(student) {
       return student.total_contributions
   }
   else {
-    console.log('student', student);
-    console.log('disc_option_active', disc_option_active);
+    console_log_conditional('student', student);
+    console_log_conditional('disc_option_active', disc_option_active);
     return student.sorted_contributions
       .find(c => c.dim === selectedDiscourseDimension.get())
       .option_counts
@@ -207,7 +208,7 @@ let getGroupTotalContribs = function(group) {
     return group.sequences.length
   }
   else {
-    console.log('group.seqs, selected dim', group.sequences, selectedDiscourseDimension.get(), disc_option_active)
+    console_log_conditional('group.seqs, selected dim', group.sequences, selectedDiscourseDimension.get(), disc_option_active)
     return group.sequences
       .filter(c => c.info.parameters[selectedDiscourseDimension.get()] === disc_option_active)
       .length
@@ -220,7 +221,7 @@ let getGroupTotalContribs = function(group) {
 let initGroups = function(data, selector) {
   let container = $(selector + '');
   let d3 = require('d3');
-  console.log('data', data);
+  console_log_conditional('data', data);
 
   let markup = data.groups.map(function(group) {
     let total_group_contribs = getGroupTotalContribs(group);
@@ -233,7 +234,7 @@ let initGroups = function(data, selector) {
         "<div class='student-group__title'><strong>" + group.name + "</strong> - " + group.observationDate + " (n = " + total_group_contribs + ")</div>" +
         "<div class='student-group__students'>" +
         group.students.map(function(student) {
-          console.log('student', student);
+          console_log_conditional('student', student);
 
           let student_count = getStudentTotalContribs(student);
           let padding = getStudentPadding(student_count, highest_contribs);
@@ -285,7 +286,7 @@ let initGroups = function(data, selector) {
     $('.group-work-report__graph-key').html('');
   }
 
-  console.log('color scale', color_scale);
+  console_log_conditional('color scale', color_scale);
 
   data.groups.forEach(function(group) {
     if (groupDisplayType.get() === 'bars') {
@@ -308,7 +309,7 @@ let d3GroupGraph = function(selector, group, color_scale) {
     student.count = getStudentTotalContribs(student)
   });
 
-  console.log('d3 graph', group);
+  console_log_conditional('d3 graph', group);
   let svg_tag = $('<svg width="400" height="300"></svg>');
   $(selector).html(svg_tag);
 
@@ -358,7 +359,7 @@ let d3GroupGraph = function(selector, group, color_scale) {
     .attr("height", function(d) { return height - y(d.count); })
     .attr("fill", function(d) {
       let s = color_scale(d.info.demographics[selected_demo])
-      console.log('color for d ', d.info.demographics, 'v', d.info.demographics[selected_demo], 's', s, 'selected_demo', selected_demo)
+      console_log_conditional('color for d ', d.info.demographics, 'v', d.info.demographics[selected_demo], 's', s, 'selected_demo', selected_demo)
       return s;
     })
 
@@ -450,7 +451,7 @@ let createData = function() {
   let allStudents = getStudents(envId);
 
   ret.groups = observations.map(function(observation) {
-    console.log('observation', observation);
+    console_log_conditional('observation', observation);
     observation.sequences = getSequences(observation._id, envId);
     // let obs = getObs
     observation.students = observation.small_group.map(function(studId) {
@@ -458,14 +459,14 @@ let createData = function() {
       student.sequences = observation.sequences.filter(seq => seq.info.student.studentId === student._id);
       student.total_contributions = student.sequences.length;
       student.sorted_contributions = getDiscourseDimensions().map(function(dim) {
-        // let sequences = student.sequences.filter(seq => console.log(seq));
+        // let sequences = student.sequences.filter(seq => console_log_conditional(seq));
         return {
           dim: dim.name,
           option_counts: dim.options.split(',')
             .map(function(opt) {return {name: opt.trim()}})
             .map(function(opt) {
               let filtered_seqs = student.sequences.filter(seq => seq.info.parameters[dim.name] === opt.name);
-              console.log(opt, filtered_seqs);
+              console_log_conditional(opt, filtered_seqs);
               return {
                 option: opt.name,
                 count: filtered_seqs.length,
@@ -529,8 +530,8 @@ let createData = function() {
   //   }).sort((a, b) => b.count - a.count)
   // })
   //
-  // console.table(ret.students);
-  // console.table(ret.quartiles);
+  // console_table_conditional(ret.students);
+  // console_table_conditional(ret.quartiles);
   //
   // return ret
 }

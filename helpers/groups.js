@@ -1,4 +1,5 @@
 import {checkAccess} from "./access";
+import {console_log_conditional} from "./logging"
 
 let hasRemovePermission = function (envId, group) {
   if (userIsEnvOwner(envId)) {
@@ -90,9 +91,9 @@ let userCanGroupEditEnv = function (uid, envId) {
   }, {reactive: false}).fetch();
 
   let allow = false;
-  console.log('checking for uid', uid, 'and envID', envId, 'groups', groups)
+  console_log_conditional('checking for uid', uid, 'and envID', envId, 'groups', groups)
   groups.forEach(function (group) {
-    console.log(group.environments.find(env => env.envId === envId), group.members.find(m => m.userId === Meteor.userId())
+    console_log_conditional(group.environments.find(env => env.envId === envId), group.members.find(m => m.userId === Meteor.userId())
       .roles.some(r => ['edit', 'manage', 'admin'].includes(r)))
     if (
       !!group.environments.find(env => env.envId === envId && env.share_type === 'edit') &&

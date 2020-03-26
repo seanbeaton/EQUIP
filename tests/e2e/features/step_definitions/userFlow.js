@@ -2,10 +2,11 @@
 // import {generateData} from "../../../imports/api/generate-data.app-tests"
 // import {delayedGo} from "./sharedSteps.js"
 const assert = require('assert');
+import {console_log_conditional} from "../../../../helpers/logging";
 
 var myStepDefinitionsWrapper = function () {
   // this.Before(function(scenario) {
-  //   console.log('this');
+  //   console_log_conditional('this');
   //   server.call('logout');
   //   server.execute(function() {
   //     Package['xolvio:cleaner'].resetDatabase();

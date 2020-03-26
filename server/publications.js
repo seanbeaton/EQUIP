@@ -4,6 +4,7 @@
 * Once a collection is published with a set of restricting parameters, the subset of data is sent to the user, where the user must be subscribed in the router.js file in order to gain access
 * Subscriptions are handled in ../lib/router.js
 */
+import {console_log_conditional} from "/helpers/logging"
 
 import {getUserGroupEnvs} from "../helpers/groups";
 
@@ -216,7 +217,7 @@ Meteor.publishComposite('subjects', function() {
 
   return {
     find() {
-      console.log('looking for uid', this.userId);
+      console_log_conditional('looking for uid', this.userId);
       return Environments.find({userId: this.userId}, {fields: {_id: 1}})
     },
     children: [{
@@ -322,14 +323,14 @@ Meteor.publish('envSequences', function(envId) {
   if (!this.userId) {
     return this.ready();
   }
-  console.log('subscribe envSequences', 'before env_ids');
+  console_log_conditional('subscribe envSequences', 'before env_ids');
   let env_ids = Environments.find({userId: this.userId}).fetch().map(e => e._id);
-  console.log('subscribe envSequences', 'after env_ids');
+  console_log_conditional('subscribe envSequences', 'after env_ids');
   if (!!env_ids.find(id => id === envId)) {
-    console.log('subscribe envSequences', 'some env_ids found, looking for sequences');
+    console_log_conditional('subscribe envSequences', 'some env_ids found, looking for sequences');
     return Sequences.find({envId: envId});
   }
-  console.log('subscribe envSequences', 'no env_ids found, this.ready()');
+  console_log_conditional('subscribe envSequences', 'no env_ids found, this.ready()');
   return this.ready()
 });
 
@@ -337,12 +338,12 @@ Meteor.publish('obsSequences', function(obsId) {
   if (!this.userId) {
     return this.ready();
   }
-  console.log('subscribe obsSequences', 'before env_ids');
+  console_log_conditional('subscribe obsSequences', 'before env_ids');
   let env_ids = Environments.find({userId: this.userId}, {fields: {_id: 1}}).fetch().map(e => e._id);
-  console.log('subscribe obsSequences', 'after env_ids');
-  console.log('subscribe obsSequences', 'about to find sequences');
+  console_log_conditional('subscribe obsSequences', 'after env_ids');
+  console_log_conditional('subscribe obsSequences', 'about to find sequences');
   let seqs = Sequences.find({envId: {$in: env_ids}, obsId: obsId});
-  console.log('subscribe obsSequences', 'found sequences, returning');
+  console_log_conditional('subscribe obsSequences', 'found sequences, returning');
   return seqs
 });
 

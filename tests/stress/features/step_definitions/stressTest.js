@@ -1,4 +1,6 @@
 const assert = require('assert');
+import {console_log_conditional} from "../../../../helpers/logging";
+
 var {Then} = require('cucumber');
 
 var myStepDefinitionsWrapper = function () {
@@ -10,9 +12,9 @@ var myStepDefinitionsWrapper = function () {
   this.When(/^If I'm not logged in, I create an account with username prefix "([^"]*)" and password "([^"]*)"$/, function(user, pass, callback) {
 
     let current_user = browser.executeAsync((done) => {done(Meteor.userId())});
-    console.log(current_user);
+    console_log_conditional(current_user);
     if (!current_user.value) {
-      console.log('Not logged in, creating account')
+      console_log_conditional('Not logged in, creating account')
       createAccount(user, pass)
     }
     callback()
@@ -89,7 +91,7 @@ let createAccount = function(username, password) {
   username = username + ("" + Math.floor(Math.random() * Math.floor(99999))).padStart(5, '0');
   browser.$('#at-field-username').setValue(username);
   browser.$('#at-field-email').setValue(username + '@example.com');
-  console.log('Creating account with name username:', username);
+  console_log_conditional('Creating account with name username:', username);
   browser.$('#at-field-password').setValue(password);
   browser.$('#at-field-password_again').setValue(password);
   browser.$('#at-field-institution').setValue("Institution test");

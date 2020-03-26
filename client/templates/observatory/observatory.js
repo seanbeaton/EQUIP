@@ -12,6 +12,7 @@ import {updateStudent, updateStudents} from '/helpers/students.js'
 import {convertISODateToUS} from '/helpers/dates.js'
 import {userHasEnvEditAccess} from "../../../helpers/environments";
 import {setupSequenceParameters} from "../../../helpers/parameters";
+import {console_log_conditional} from "/helpers/logging"
 
 const classroomMode = new ReactiveVar('code');
 const classroomStudentsSearchable = new ReactiveVar([]);
@@ -183,7 +184,7 @@ Template.observatory.helpers({
     return currentSearch.get() !== '';
   },
   allowTabbing: function(student) {
-    // console.log('at', student, this.observation);
+    // console_log_conditional('at', student, this.observation);
     if (this.observation.observationType === 'small_group' && !this.observation.small_group.find(id => id === student._id)) {
       return false;
     }
@@ -282,10 +283,10 @@ Template.observatory.events({
       $('#seq-param-modal').addClass('is-active');
     }
     if (e.key.startsWith('Arrow')) {
-      console.log('e.key', e.key)
+      console_log_conditional('e.key', e.key)
       let tar = null;
       let allowed_student_ids = getAllowedStudentIds(this.environment._id, this.observation);
-      console.log('allowed_student_ids', allowed_student_ids);
+      console_log_conditional('allowed_student_ids', allowed_student_ids);
       if (e.key === 'ArrowDown') {
         tar = Subjects.findOne({
           envId: this.environment._id,
@@ -483,7 +484,7 @@ Template.observatory.events({
 
     let that = this;
 
-    console.log('sequence about to send to server:', sequence)
+    console_log_conditional('sequence about to send to server:', sequence)
     Meteor.call('sequenceUpdate', sequence, function(error, result) {
       if (error) {
         alert(error.reason);

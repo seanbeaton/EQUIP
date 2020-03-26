@@ -1,4 +1,5 @@
 const assert = require('assert');
+import {console_log_conditional} from "../../../../helpers/logging";
 
 var myStepDefinitionsWrapper = function () {
 

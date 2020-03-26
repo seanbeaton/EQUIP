@@ -1,6 +1,8 @@
 /*
 * JS file for observation_environment_item.html
 */
+import {console_log_conditional} from "/helpers/logging"
+
 
 import * as observation_helpers from '/helpers/observations.js'
 

@@ -3,6 +3,7 @@ import {getSequences} from "../../../../helpers/sequences";
 import {getStudent, getStudents} from "../../../../helpers/students";
 import {Sidebar} from '../../../../helpers/graph_sidebar';
 import {setupVis} from '../../../../helpers/timeline';
+import {console_log_conditional} from "/helpers/logging"
 
 const obsOptions = new ReactiveVar([]);
 const selectedEnvironment = new ReactiveVar(false);
@@ -28,7 +29,7 @@ Template.interactiveReport.helpers({
     // let default_set = false;
     envs = envs.map(function(env) {
       let obsOpts = getObsOptions(env._id);
-      //console.log('obs_opts', obsOpts);
+      //console_log_conditional('obs_opts', obsOpts);
       if (obsOpts.length === 0) {
         env.envName += ' (no observations)';
         env.disabled = 'disabled';
@@ -48,12 +49,12 @@ Template.interactiveReport.helpers({
     return getSelectedObservations();
   },
   observationChosen: function() {
-    // //console.log('observationChosen', obsOptions.get(), !!(obsOptions.get()));
+    // //console_log_conditional('observationChosen', obsOptions.get(), !!(obsOptions.get()));
 
     return !!(selectedObservations.get().length)
   },
   demographics: function() {
-    //console.log('getDemographics', getDemographics());
+    //console_log_conditional('getDemographics', getDemographics());
     return getDemographics();
   },
   discourseparams: function() {
@@ -88,7 +89,7 @@ Template.interactiveReport.helpers({
 
 
 let clearGraph = function() {
-  //console.log('clearing-graph');
+  //console_log_conditional('clearing-graph');
   let timeline_selector = '.interactive-report__graph';
   $(timeline_selector + ' svg').remove();
 }
@@ -114,7 +115,7 @@ Template.interactiveReport.events({
   'change #env-select': function(e) {
 
     let selected = $('option:selected', e.target);
-    //console.log('env-select,', selected.val());
+    //console_log_conditional('env-select,', selected.val());
     selectedEnvironment.set(selected.val());
     clearGraph();
     clearObservations();
@@ -332,7 +333,7 @@ let getAxisSelection = function(axis) {
     param_type: param_type,
     options: options,
   }
-  //console.log('ret in ', axis, ' axis', ret);
+  //console_log_conditional('ret in ', axis, ' axis', ret);
   return ret
 }
 
@@ -399,7 +400,7 @@ let updateGraph = function() {
   // let graphData = getContributionData(obsIds, xParams, yParams, envId);
   // let demData = makeDemGraphs(envId, xParams, envId);
   // makeRatioGraphs(envId, graphData, demData);
-  // //console.log('graphData', graphData);
+  // //console_log_conditional('graphData', graphData);
 
 
   let contribData = compileContributionData(obsIds, xParams, yParams, envId);
@@ -456,7 +457,7 @@ let createGraph = function(contribData, containerSelector, dataset) {
 
 
   let color_function;
-  console.log('contribData', contribData);
+  console_log_conditional('contribData', contribData);
   if (contribData.y_axis_param_type === 'demographics') {
     color_function = d3.interpolateViridis
   }
@@ -754,7 +755,7 @@ let compileContributionData = function(obsIds, xParams, yParams, envId) {
   });
 
   // Record contributions
-  // //console.log('obsIds', obsIds);
+  // //console_log_conditional('obsIds', obsIds);
 
   for (let obsId_k in obsIds) {
 
@@ -765,7 +766,7 @@ let compileContributionData = function(obsIds, xParams, yParams, envId) {
     for (let sequence_k in sequences) {
       if (!sequences.hasOwnProperty(sequence_k)) continue;
       let sequence = sequences[sequence_k];
-      // //console.log('sequence', sequence);
+      // //console_log_conditional('sequence', sequence);
 
       let sequence_y;
       if (yParams.param_type === 'demographics') {
@@ -862,7 +863,7 @@ let compileContributionData = function(obsIds, xParams, yParams, envId) {
     delete column_values['student_contributions'];
     let equity_ratios = {}
     Object.keys(column_values).forEach(function(key) {
-      // //console.log('contrib_data', contrib_data, 'key', key);
+      // //console_log_conditional('contrib_data', contrib_data, 'key', key);
 
       let demo_key = (yParams.param_type === 'demographics') ? key : y.column_name;
       // let param_key = (yParams.param_type === 'discourse') ? key: y.column_name;
@@ -872,12 +873,12 @@ let compileContributionData = function(obsIds, xParams, yParams, envId) {
 
       let contrib_axis_n_value = (yParams.param_type === 'demographics') ? contrib_data.x_axis_n_values[y.column_name].n : contrib_data.y_axis_n_values[key];
 
-      //console.log('column_values ', column_values);
+      //console_log_conditional('column_values ', column_values);
       let percent_of_contribs = (column_values[key] / contrib_axis_n_value);
       if (isNaN(percent_of_contribs)) percent_of_contribs = 0;
 
-      //console.log('percent of contribs', percent_of_contribs);
-      //console.log('percent_of_demo', percent_of_demo);
+      //console_log_conditional('percent of contribs', percent_of_contribs);
+      //console_log_conditional('percent_of_demo', percent_of_demo);
       equity_ratios[key] = percent_of_contribs / percent_of_demo
     });
     equity_ratios['column_name'] = y['column_name'];
@@ -887,7 +888,7 @@ let compileContributionData = function(obsIds, xParams, yParams, envId) {
 
   // and we're done
 
-  //console.log('contrib_data', contrib_data);
+  //console_log_conditional('contrib_data', contrib_data);
 
   return contrib_data;
 }
@@ -1052,5 +1053,5 @@ let getLabelColors = function(labels, color_function) {
 //     '<div class="interactive-report__sidebar"></div>' +
 //     '</div>')
 //   report_wrapper.append(report_structure);
-//   //console.log('created report structure');
+//   //console_log_conditional('created report structure');
 // }

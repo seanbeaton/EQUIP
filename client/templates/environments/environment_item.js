@@ -7,6 +7,7 @@ import {getSequences} from "/helpers/sequences";
 import {envHasObservations} from "../../../helpers/environments";
 import {activeEnvId, obsCreateModal} from './environment_list'
 import {setupSequenceParameters, setupSubjectParameters} from "../../../helpers/parameters";
+import {console_log_conditional} from "/helpers/logging"
 
 let share_window_timeout;
 
@@ -23,7 +24,7 @@ Template.environmentItem.events({
       var envId = this._id;
       e.stopPropagation();
       e.preventDefault();
-      console.log('envId', envId);
+      console_log_conditional('envId', envId);
 
 
       Meteor.call('exportAllParams', envId, function(error, result){
@@ -60,7 +61,7 @@ Template.environmentItem.events({
       });
   },
   'click #obs-create-button': function(e) {
-    console.log('starting');
+    console_log_conditional('starting');
     var id = e.target.getAttribute('data-id');
     obsCreateModal.set(true);
     activeEnvId.set(id);
@@ -252,7 +253,7 @@ function removeAllShareDialogs() {
 }
 
 function editClassroomName(envId) {
-  console.log('envId', envId);
+  console_log_conditional('envId', envId);
   let context = $('.environment[data-env-id="' + envId + '"]');
 
   var env_name = $('.environment-name', context);

@@ -1,5 +1,7 @@
+import {console_log_conditional} from "/helpers/logging"
+
 Template.tour.rendered = function() {
-  // console.log('rendering tour', this);
+  // console_log_conditional('rendering tour', this);
   let joyride = require('jquery.joyride');
   let that = this;
   setTimeout(function() {

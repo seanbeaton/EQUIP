@@ -1,6 +1,7 @@
 import {getStudents} from "../../helpers/students";
 import {getSequences} from "../../helpers/sequences";
 import {getObservations} from "../../helpers/graphs";
+import {console_log_conditional} from "/helpers/logging"
 
 
 CachedReportData = new Mongo.Collection('cached_report_data');
@@ -35,7 +36,7 @@ Meteor.methods({
       };
       CachedReportData.insert(Object.assign({}, report_data, {cached: true}))
     }
-    console.log('report data', report_data);
+    console_log_conditional('report data', report_data);
     return report_data
   },
 })
@@ -43,7 +44,7 @@ Meteor.methods({
 let createTimelineData = function(params) {
   let d3 = require('d3');
 
-  console.log('params', params);
+  console_log_conditional('params', params);
   let ret = {
     contributions_dataset: []
   };
@@ -58,7 +59,7 @@ let createTimelineData = function(params) {
   let selectedObservations = params.selectedObservations;
 
   let students_by_demo = demo_opts.map(function(demo_opt) {
-    //console.log('demo_opt', demo_opt);
+    //console_log_conditional('demo_opt', demo_opt);
     return {
       name: demo_opt.name,
       count: 0

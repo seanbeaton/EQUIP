@@ -70,6 +70,7 @@ import {getStudent, getStudents} from "./students.js";
 import {getSequence, getSequences} from "./sequences.js";
 import {userHasEnvEditAccess} from "./environments";
 import {htmlClass} from "./html";
+import {console_log_conditional} from "./logging"
 
 function createTableOfContributions(obsId) {
   if (typeof obsId === 'undefined') {
@@ -87,7 +88,7 @@ function createTableOfContributions(obsId) {
 
 function contributionTableTemplate(sequences, parameters, env) {
   var params = parameters;
-  console.log('parms', params);
+  console_log_conditional('parms', params);
   var contributionRows = sequences.map((sequence) => {
     return contributionRowTemplate(sequence, params, env)
   }).join("");
@@ -259,7 +260,7 @@ function contributionParameterTemplate(allParams, sequence, type) {
       if (sequence) {
         selected = sequence.info.parameters[param.name] === opt ? "checked" : ""
       }
-      // console.log('creating options for student, ', student);
+      // console_log_conditional('creating options for student, ', student);
       return `
 <input class="column has-text-centered subj-box-params optionSelection" type="radio" name="${param.name}" value="${opt}" id="${htmlClass(param.name + "__" + opt)}"${selected}>
 <label for="${htmlClass(param.name + "__" + opt)}">${opt}</label>

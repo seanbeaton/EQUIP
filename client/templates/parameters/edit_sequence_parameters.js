@@ -2,6 +2,7 @@
 * JS file for edit_sequence_parameters.html
 * Propigates current sequence parameters
 */
+import {console_log_conditional} from "/helpers/logging"
 
 import {envHasObservations} from "../../../helpers/environments";
 

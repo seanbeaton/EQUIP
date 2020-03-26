@@ -1,4 +1,5 @@
 let chosen = require('chosen-js');
+import {console_log_conditional} from "/helpers/logging"
 
 
 let handleChosenUpdates = function(e) {
@@ -16,7 +17,7 @@ let handleChosenUpdates = function(e) {
 //     // let default_set = false;
 //     envs = envs.map(function(env) {
 //       let obsOpts = getObsOptions(env._id);
-//       //console.log('obs_opts', obsOpts);
+//       //console_log_conditional('obs_opts', obsOpts);
 //       if (obsOpts.length === 0) {
 //         env.envName += ' (no observations)';
 //         env.disabled = 'disabled';
@@ -41,7 +42,7 @@ let handleChosenUpdates = function(e) {
 //     // let default_set = false;
 //     envs = envs.map(function(env) {
 //       let obsOpts = getObsOptions(env._id);
-//       //console.log('obs_opts', obsOpts);
+//       //console_log_conditional('obs_opts', obsOpts);
 //       if (obsOpts.length === 0) {
 //         env.envName += ' (no observations)';
 //         env.disabled = 'disabled';
@@ -141,7 +142,7 @@ Template.heatmapReportSort.events({
   'DOMSubtreeModified select.chosen-select': handleChosenUpdates,
 })
 Template.heatmapReportSort.rendered = function() {
-  console.log('rendered run');
+  console_log_conditional('rendered run');
   $('.students-select-sort')
     .trigger('change')
     .filter(':not(.chosen--processed)').addClass('chosen--processed')
@@ -223,7 +224,7 @@ Template.studentSpotlight.helpers({
 // Template.studentSpotlight.events({
 //   'change #student-spotlight__discourse-select': function(e) {
 //     let selected = $('option:selected', e.target);
-//     console.log('this', this);
+//     console_log_conditional('this', this);
 //     selectedSpotlightDimension.set(selected.val());
 //     updateStudentContribGraph();
 //     updateStudentTimeGraph();

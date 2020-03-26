@@ -1,3 +1,5 @@
+import {console_log_conditional} from "/helpers/logging"
+
 Template.absentStudents.helpers({
   getAbsentStudents: function(obsId) {
     let absent_students = Subjects.find({_id: {$in: Observations.findOne({_id: obsId}).absent}}).map(s => s.info.name);
@@ -9,7 +11,7 @@ Template.absentStudents.helpers({
     }
   },
   anyAbsentStudents: function(observations) {
-    console.log('obs here', observations, !observations.every(o => o.absent.length === 0));
+    console_log_conditional('obs here', observations, !observations.every(o => o.absent.length === 0));
     return !observations.every(o => o.absent.length === 0)
   }
 })

@@ -1,4 +1,5 @@
 const assert = require('assert');
+import {console_log_conditional} from "../../../../helpers/logging";
 
 var myStepDefinitionsWrapper = function () {
   this.Given(/^I am on the site$/, function(callback) {
@@ -60,7 +61,7 @@ var myStepDefinitionsWrapper = function () {
 
     signOut();
     callback()
-    // browser.execute((cb) => {Meteor.logout(function(err) {console.log('err2', err);cb();})}, callback);
+    // browser.execute((cb) => {Meteor.logout(function(err) {console_log_conditional('err2', err);cb();})}, callback);
   });
 
 
@@ -106,14 +107,14 @@ var myStepDefinitionsWrapper = function () {
       let searchItems = browser.elements(selector);
       let found_items = 0;
       searchItems.value.forEach(function(searchItem) {
-        // console.log('searchItem', searchItem);
+        // console_log_conditional('searchItem', searchItem);
         if (!see_negation) {
-          // console.log("check does exist");
+          // console_log_conditional("check does exist");
           searchItem.waitForExist(5000);
           found_items += 1;
         }
         else {
-          // console.log("check doesn't exist");
+          // console_log_conditional("check doesn't exist");
           browser.pause(5000);
           // assert(!searchItem.isExisting());
           assert(!searchItem.isExisting() || !searchItem.type || searchItem.type === "NoSuchElement");
@@ -194,7 +195,7 @@ var myStepDefinitionsWrapper = function () {
     // item.scrollIntoView();
     browser.executeAsync((sel, cb) => {
       document.querySelector(sel).dispatchEvent(new Event("mouseover"));
-      // console.log('hovering sel', sel);
+      // console_log_conditional('hovering sel', sel);
       cb()
     }, sel);
     callback();
@@ -213,8 +214,8 @@ var myStepDefinitionsWrapper = function () {
     negate = negate === ' not ';
     let searchItem = browser.$(if_sel);
     searchItem.waitForExist(5000);
-    // console.log('searchItem', searchItem);
-    // console.log('searchItem.getCssProperty(\'display\').value', searchItem.getCssProperty('display').value);
+    // console_log_conditional('searchItem', searchItem);
+    // console_log_conditional('searchItem.getCssProperty(\'display\').value', searchItem.getCssProperty('display').value);
 
     let xor = function(a, b) {
       return (a && !b) || (!a && b)
@@ -236,8 +237,8 @@ var myStepDefinitionsWrapper = function () {
     let $el_2 = browser.$(el_2);
     $el_1.waitForExist(5000);
     $el_2.waitForExist(5000);
-    // console.log('el1', $el_1.getCssProperty(prop).value);
-    // console.log('el2', $el_2.getCssProperty(prop).value);
+    // console_log_conditional('el1', $el_1.getCssProperty(prop).value);
+    // console_log_conditional('el2', $el_2.getCssProperty(prop).value);
     assert(xor($el_1.getCssProperty(prop).value === $el_2.getCssProperty(prop).value, !!different));
     callback();
   });
@@ -250,9 +251,9 @@ var myStepDefinitionsWrapper = function () {
     $el_1.waitForExist(5000);
     $el_2.waitForExist(5000);
 
-    console.log('el1 css', prop_1, $el_1.getCssProperty(prop_1));
-    console.log('el1 css', prop_1, $el_1.getCssProperty(prop_1).value);
-    console.log('el2 attr', prop_2, $el_2.getAttribute(prop_2));
+    console_log_conditional('el1 css', prop_1, $el_1.getCssProperty(prop_1));
+    console_log_conditional('el1 css', prop_1, $el_1.getCssProperty(prop_1).value);
+    console_log_conditional('el2 attr', prop_2, $el_2.getAttribute(prop_2));
     assert(xor($el_1.getCssProperty(prop_1).value === $el_2.getAttribute(prop_2), !!different));
     callback();
   });
@@ -279,14 +280,14 @@ var myStepDefinitionsWrapper = function () {
     if (chosen === 'chosen') {
       assert(false);
       // browser.executeAsync((sel, val_or_label, val, cb) => {
-      //   console.log('sel, val_or_label, val', sel, val_or_label, val);
+      //   console_log_conditional('sel, val_or_label, val', sel, val_or_label, val);
       //   let chosen = document.querySelector(sel);
-      //   console.log('chosen', chosen);
+      //   console_log_conditional('chosen', chosen);
       //
       //   let selectItemByIndex = function(dropdown, label) {
-      //     console.log('dropdown, label', dropdown, label);
+      //     console_log_conditional('dropdown, label', dropdown, label);
       //     const index = Array.from(dropdown.options).findIndex(option => option.label === label);
-      //     console.log('index', index);
+      //     console_log_conditional('index', index);
       //     if (!index) {return dropdown.selectedIndex = index}
       //   }
       //   if (val_or_label === 'label') {
@@ -303,11 +304,11 @@ var myStepDefinitionsWrapper = function () {
     else {
       let select = browser.$(sel);
       select.waitForExist(4000);
-      console.log(sel, val_or_label, val);
+      console_log_conditional(sel, val_or_label, val);
       if (val_or_label === 'label') {
-        console.log('before select vis text', select.getText('option:checked'))
+        console_log_conditional('before select vis text', select.getText('option:checked'))
         select.selectByVisibleText(val);
-        console.log('after select vis text', select.getText('option:checked'))
+        console_log_conditional('after select vis text', select.getText('option:checked'))
       }
       else {
         select.selectByAttribute("value", val);
@@ -328,7 +329,7 @@ var myStepDefinitionsWrapper = function () {
   this.Then(/^an alert with the( partial | )text "([^"]*)"( does not | )exist[s]?$/, function (can_be_partial, alert_search_text, negation, callback) {
     can_be_partial = can_be_partial === ' partial ';
     negation = negation === ' does not ';
-    // console.log('browser', Object.getOwnPropertyNames(browser));
+    // console_log_conditional('browser', Object.getOwnPropertyNames(browser));
     let alert_text = browser.alertText();
     browser.alertAcceptSync();
 
@@ -344,7 +345,7 @@ var myStepDefinitionsWrapper = function () {
 
   this.Then(/^I (confirm|dismiss) the alert$/, function (confirm, callback) {
     confirm = confirm === 'confirm';
-    // console.log('searchItem', Object.getOwnPropertyNames(browser).filter((key) => key.startsWith("alert")));
+    // console_log_conditional('searchItem', Object.getOwnPropertyNames(browser).filter((key) => key.startsWith("alert")));
     if (confirm) {
       browser.alertAcceptSync();
     } else {
@@ -390,7 +391,7 @@ let signOut = function() {
 let delayedGo = function(loc) {
   browser.executeAsync(function(route, done) {
     Router.go(route);
-    setTimeout(done, 200)
+    setTimeout(done, 1000)
   }, loc)
 }
 

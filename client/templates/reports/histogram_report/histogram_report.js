@@ -1,4 +1,5 @@
 import {setupSequenceParameters, setupSubjectParameters} from "../../../../helpers/parameters";
+import {console_log_conditional, console_table_conditional} from "/helpers/logging"
 
 import {getSequences} from "../../../../helpers/sequences";
 import {getStudents, getStudent} from "../../../../helpers/students";
@@ -40,7 +41,7 @@ Template.histogramReport.events({
     selectedEnvironment.set(selected.val());
     obsOptions.set(getObsOptions());
     students.set(getStudents(selectedEnvironment.get()));
-    console.log('students', students.get());
+    console_log_conditional('students', students.get());
     setTimeout(function() {
       setupVis('vis-container', function() {
         if (selectedObservations.get().length === 0) {
@@ -77,7 +78,7 @@ Template.histogramReport.helpers({
     let envs = Environments.find().fetch();
     envs = envs.map(function(env) {
       let obsOpts = getObsOptions(env._id);
-      //console.log('obs_opts', obsOpts);
+      //console_log_conditional('obs_opts', obsOpts);
       if (obsOpts.length === 0) {
         env.envName += ' (no observations)';
         env.disabled = 'disabled';
@@ -231,8 +232,8 @@ let createHistogramData = function() {
     }).sort((a, b) => b.count - a.count)
   })
 
-  console.table(ret.students);
-  console.table(ret.quartiles);
+  console_table_conditional(ret.students);
+  console_table_conditional(ret.quartiles);
 
   return ret
 }
@@ -293,12 +294,12 @@ let get_n_groups = function(values, n, zero_separate, group_name) {
 
   let min = 0;
   let max;
-  console.log('values, ', values)
-  console.log('step, ', step)
+  console_log_conditional('values, ', values)
+  console_log_conditional('step, ', step)
   for (let i = 1; i <= n; i++) {
-    console.log('i', i);
+    console_log_conditional('i', i);
     max = Math.ceil(step * i);
-    console.log('min and max', min, max);
+    console_log_conditional('min and max', min, max);
     let name = get_ordinal_suffix(i) + '&nbsp;' + group_name + "&nbsp;(n&nbsp;=&nbsp;";
     if ((min + 1) !== max) {
       name += (min + 1) + "&nbsp;to&nbsp;" + max + ")";
@@ -314,7 +315,7 @@ let get_n_groups = function(values, n, zero_separate, group_name) {
     min = max;
   }
 
-  console.log('rett', ret);
+  console_log_conditional('rett', ret);
   return ret;
 }
 
@@ -375,10 +376,10 @@ let initHistogram = function(data, selector) {
     let student_boxes = $('.student-box');
     student_boxes.each(function(box_index) {
       let $box = $($('.student-box')[box_index]);
-      console.log('box', $box);
-      console.log('getting students');
+      console_log_conditional('box', $box);
+      console_log_conditional('getting students');
       let student = all_students.filter(stud => stud._id === $box.attr('id'))[0]
-      console.log('student', student);
+      console_log_conditional('student', student);
       $box.css('background-color', color_scale(student.info.demographics[demo]));
     })
   }

@@ -1,3 +1,5 @@
+import {console_log_conditional} from "./logging"
+
 function createModal(title, content, id, active) {
   if (typeof active === 'undefined') {
     active = false
@@ -37,7 +39,7 @@ function createModal(title, content, id, active) {
 
   modal.find('.delete, .cancel').on('click', function(e) {
     e.stopPropagation();
-    console.log('closing modal');
+    console_log_conditional('closing modal');
     modal.remove();
   });
 

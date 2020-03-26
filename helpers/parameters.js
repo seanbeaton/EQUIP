@@ -1,3 +1,4 @@
+import {console_log_conditional} from "./logging"
 
 
 function setupSequenceParameters(envId, reactive) {
@@ -28,13 +29,13 @@ function setupParameters(parameterType, envId, reactive) {
   }
 
   if (typeof subjParams === 'undefined') {
-    console.log('no ' + parameterType + ' params found for envId ' + envId);
+    console_log_conditional('no ' + parameterType + ' params found for envId ' + envId);
     return [];
   }
 
   let allParams = [];
 
-  // console.log('subjParams', subjParams);
+  // console_log_conditional('subjParams', subjParams);
 
   if (subjParams.children["parameters"] === undefined) {
     // for legacy classrooms

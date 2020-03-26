@@ -1,6 +1,7 @@
 import {setupSubjectParameters} from "/helpers/parameters";
 import {getStudents} from "/helpers/students";
 import {find_open_position} from "./edit_subjects";
+import {console_log_conditional} from "/helpers/logging"
 const partial_rows = new ReactiveVar([]);
 const showStudentRows = new ReactiveVar(true);
 const deletedRows = new ReactiveVar({});
@@ -163,12 +164,12 @@ Template.editSubjectsAdvanced.events({
   'paste .student-data-input': function(e, template) {
     let target = $(e.target);
     let data = e.originalEvent.clipboardData.getData('text');
-    // console.log('e.clipboardData.types', e.originalEvent.clipboardData.types);
+    // console_log_conditional('e.clipboardData.types', e.originalEvent.clipboardData.types);
     // e.originalEvent.clipboardData.types.forEach(function(type) {
-    //   console.log('version', type, e.originalEvent.clipboardData.getData(type));
+    //   console_log_conditional('version', type, e.originalEvent.clipboardData.getData(type));
     // });
     if (!data.match(/\t.*[\n\r]/g)) {
-      console.log('no tabular data found on paste');
+      console_log_conditional('no tabular data found on paste');
       return;
     }
     let rows = data.split(/(\r\n|[\n\r])/g);
@@ -189,16 +190,16 @@ Template.editSubjectsAdvanced.events({
           headers[index] = header_item;
         }
         else {
-          console.log("didn't find any headers in item", header_item);
+          console_log_conditional("didn't find any headers in item", header_item);
         }
       })
     }
     else {
-      console.log('No headers found.')
+      console_log_conditional('No headers found.')
     }
 
     let structured_data = rows.map(function(row) {
-      console.log('row', row);
+      console_log_conditional('row', row);
       return row.split(/\t/g);
     })
 
@@ -217,7 +218,7 @@ Template.editSubjectsAdvanced.events({
         Object.keys(headers).forEach(function(index) {
           new_row_data[headers[index]] = row[index]
         })
-        console.log('new row data', new_row_data);
+        console_log_conditional('new row data', new_row_data);
         addNewRow(params, new_row_data);
       }
       else {

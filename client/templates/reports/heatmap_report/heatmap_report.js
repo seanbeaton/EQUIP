@@ -1,4 +1,5 @@
 import {setupSequenceParameters, setupSubjectParameters} from "../../../../helpers/parameters";
+import {console_log_conditional} from "/helpers/logging"
 
 
 import {getSequences} from "../../../../helpers/sequences";
@@ -43,7 +44,7 @@ Template.heatmapReport.helpers({
     let envs = Environments.find().fetch();
     envs = envs.map(function(env) {
       let obsOpts = getObsOptions(env._id);
-      //console.log('obs_opts', obsOpts);
+      //console_log_conditional('obs_opts', obsOpts);
       if (obsOpts.length === 0) {
         env.envName += ' (no observations)';
         env.disabled = 'disabled';
@@ -247,12 +248,12 @@ Template.heatmapReport.events({
 
 $(window).on('heatmap_student_sort_updated', function(e, sort_type) {
   updateGraph();
-  console.log('currentValue sort', sort_type, heatmapReportSortType.get())
+  console_log_conditional('currentValue sort', sort_type, heatmapReportSortType.get())
 })
 
 $(window).on('heatmap_student_sort_demo_updated', function(e, sort_buckets_demo) {
   updateGraph();
-  console.log('demo val', sort_buckets_demo, heatmapReportSortDemoChosen.get());
+  console_log_conditional('demo val', sort_buckets_demo, heatmapReportSortDemoChosen.get());
 })
 
 let createHeatmapData = function() {
@@ -418,7 +419,7 @@ let updateGraph = function() {
 let updateFilteredStudents = function() {
   let selected_filters = currentDemoFilters.get();
   let active_filters = !!selected_filters.map(filter => filter.selected.length).reduce((a, b) => a + b);
-  console.log('active filteres', active_filters)
+  console_log_conditional('active filteres', active_filters)
   if (active_filters) {
     $('.heatmap-report-wrapper').addClass('filters-active');
   }
@@ -433,7 +434,7 @@ let updateFilteredStudents = function() {
       if (filter.selected.length === 0) {
         return true;
       }
-      console.log('student_data', student_data);
+      console_log_conditional('student_data', student_data);
       if (!student_data) {
         return false;
       }

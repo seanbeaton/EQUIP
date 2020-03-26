@@ -1,6 +1,7 @@
 /*
 * JS file for landing_page.html
 */
+import {console_log_conditional} from "/helpers/logging"
 
 Template.landingPage.events({
   'click [data-action="signUp"]': function(e) {

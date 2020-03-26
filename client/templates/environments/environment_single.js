@@ -1,4 +1,5 @@
 import {absentStudentSelectActive, obsCreateModal, smallGroupStudentSelectActive} from "./environment_list";
+import {console_log_conditional} from "/helpers/logging"
 
 Template.environmentSingle.events({
 

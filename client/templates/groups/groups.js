@@ -1,4 +1,5 @@
 import {checkAccess} from "../../../helpers/access";
+import {console_log_conditional} from "/helpers/logging"
 
 Template.groupDeleteLink.events({
   'click .delete-group': function() {

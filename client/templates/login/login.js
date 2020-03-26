@@ -1,3 +1,5 @@
+import {console_log_conditional} from "/helpers/logging"
+
 AccountsTemplates.configure({
   // Behavior
   confirmPassword: true,
@@ -37,13 +39,13 @@ AccountsTemplates.configure({
     Router.go('landingPage');
   },
   onSubmitHook: function (error, state) {
-    console.log('state', state);
+    console_log_conditional('state', state);
     if (state === 'signUp') {
       gtag('event', 'signup', {'event_category': 'user'});
-      console.log('signup');
+      console_log_conditional('signup');
     }
     else if (state === 'signIn') {
-      console.log('signin');
+      console_log_conditional('signin');
       gtag('event', 'login', {'event_category': 'user'})
     }
   },
@@ -127,7 +129,7 @@ AccountsTemplates.addFields([
     minLength: 5,
     func: function (value) {
       if (Meteor.isClient) {
-        // console.log("Validating username...");
+        // console_log_conditional("Validating username...");
         var self = this;
         self.setSuccess();
         Meteor.call("userExists", value, function (err, userExists) {

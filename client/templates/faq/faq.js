@@ -1,3 +1,5 @@
+import {console_log_conditional} from "/helpers/logging"
+
 Template.faq.rendered = function() {
     const filterFaqSelectButton = document.querySelector(".js-faq__select");
 

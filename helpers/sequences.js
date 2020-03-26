@@ -1,5 +1,6 @@
 import {setupSequenceParameters, setupSubjectParameters} from "/helpers/parameters";
 import {getStudent} from "./students";
+import {console_log_conditional} from "./logging"
 
 function getSequence(seqId, envId) {
   let sequence = Sequences.findOne({_id:seqId}, {reactive: false});
@@ -8,7 +9,7 @@ function getSequence(seqId, envId) {
 }
 function getSequences(obsId, envId) {
   let sequences;
-  console.log('obsId, envId', obsId, envId)
+  console_log_conditional('obsId, envId', obsId, envId)
   if (obsId === null) {
     sequences = Sequences.find({envId:envId}, {reactive: false}).fetch();
   }
@@ -28,7 +29,7 @@ function updateSequences(sequences, allParams) {
 }
 
 function updateSequence(sequence, allParams) {
-  // console.log('updateSequence', sequence, allParams);
+  // console_log_conditional('updateSequence', sequence, allParams);
   if (sequence.info['parameters'] === undefined || !sequence.info['parameters']) {
     sequence.info.parameters = {};
 
@@ -47,13 +48,13 @@ function updateSequence(sequence, allParams) {
   }
   else {
     let student = getStudent(sequence.info.student.studentId, sequence.envId);
-    // console.log('updating sequeence, student', student);
+    // console_log_conditional('updating sequeence, student', student);
 
     sequence.info.student.studentName = student.info.name;
     sequence.info.student.demographics = student.info.demographics;
 
   }
-  // console.log('done with updateSequence', sequence, allParams);
+  // console_log_conditional('done with updateSequence', sequence, allParams);
 
   return sequence
 }

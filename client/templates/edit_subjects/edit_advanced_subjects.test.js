@@ -5,8 +5,9 @@ import { Factory } from 'meteor/dburles:factory';
 import { assert } from 'chai';
 import { Template } from 'meteor/templating';
 import { $ } from 'meteor/jquery';
+import {console_log_conditional} from "/helpers/logging"
 
-console.log('testing');
+console_log_conditional('testing');
 
 import { withRenderedTemplate } from '../../../imports/ui/test-helpers.js';
 

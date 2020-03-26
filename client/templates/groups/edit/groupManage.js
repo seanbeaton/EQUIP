@@ -1,3 +1,4 @@
+import {console_log_conditional} from "/helpers/logging"
 const groupNameEditActive = ReactiveVar(false);
 
 Template.groupNameEditable.helpers({
@@ -90,11 +91,11 @@ Template.memberPermissionCheckbox.events = {
     let gid = this.group._id;
 
     if (tar.prop('checked')) {
-      console.log('adding role', role, 'to user', uid);
+      console_log_conditional('adding role', role, 'to user', uid);
       Meteor.call('addRoleToUser', uid, gid, role)
     }
     else {
-      console.log('removing role', role, 'from user', uid);
+      console_log_conditional('removing role', role, 'from user', uid);
       Meteor.call('removeRoleFromUser', uid, gid, role)
     }
   }
@@ -134,7 +135,7 @@ Template.memberAddForm.events = {
 
 let addUserHandler = function(error, result) {
   if (error) {
-    console.log('Error:', error);
+    console_log_conditional('Error:', error);
     if (error.error === 500) {
       alert('Invalid user')
     }
@@ -178,7 +179,7 @@ Template.memberRemoveButton.events = {
 }
 
 Template.memberAddForm.rendered = function() {
-  // console.log('hello');
+  // console_log_conditional('hello');
 }
 
 let currentUserRoles = function(group) {

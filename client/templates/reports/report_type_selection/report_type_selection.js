@@ -1,3 +1,4 @@
+import {console_log_conditional} from "/helpers/logging"
 
 //Generate classroom buttons immediately
 Template.reportsSelection.rendered = function() {

@@ -1,10 +1,13 @@
 /*
 * JS file for header.html
 */
+import {console_log_conditional} from "/helpers/logging"
+
+
 Template.header.events({
   'click #signOut': function (e) {
     Meteor.logout(function () {
-      console.log("user logged out");
+      console_log_conditional("user logged out");
       Router.go('landingPage');
       gtag('event', 'logout', {'event_category': 'User'})
     });

@@ -1,4 +1,5 @@
 import {userIsGroupMember, getHumanEnvPermission, hasRemovePermission, userIsEnvOwner} from "/helpers/groups";
+import {console_log_conditional} from "/helpers/logging"
 
 Template.groupView.helpers({
   group: function() {
@@ -12,7 +13,7 @@ Template.groupView.helpers({
     return Meteor.users.findOne({_id: ownerId}).username;
   },
   getEnvName: function(envId) {
-    console.log('getEnvName', envId);
+    console_log_conditional('getEnvName', envId);
     return Environments.findOne({_id: envId}).envName
   },
   isEnvOwner: function(envId) {
@@ -22,18 +23,18 @@ Template.groupView.helpers({
     return getHumanEnvPermission(perm);
   },
   hasRemovePermission(env) {
-    console.log('env', env);
+    console_log_conditional('env', env);
     return hasRemovePermission(env.envId, this.group);
   }
 });
 
 
 Template.groupView.onCreated(function() {
-  console.log('this before', this.data);
+  console_log_conditional('this before', this.data);
   let group_ids = this.data.group.environments.map(env => env.envId);
-  console.log('ret', group_ids)
+  console_log_conditional('ret', group_ids)
   this.data.environments = Environments.find({_id: {$in: group_ids}}).fetch()
-  console.log('this', this.data);
+  console_log_conditional('this', this.data);
 })
 
 Template.envShareTypeChanger.helpers({
@@ -95,7 +96,7 @@ Template.groupView.events = {
 
 Template.removeEnvButton.events = {
   'click .remove-env-from-group': function(e, template, doc) {
-    console.log('temp, doc', template, doc);
+    console_log_conditional('temp, doc', template, doc);
     Meteor.call('removeEnvFromGroup', template.data.env.envId, template.data.group._id)
   }
 }

@@ -5,6 +5,7 @@
 import {updateStudent, updateStudents, getStudents} from '/helpers/students.js'
 import {setupSubjectParameters} from '/helpers/parameters.js'
 import {getStudent} from "/helpers/students.js";
+import {console_log_conditional} from "/helpers/logging"
 
 Template.editSubjects.helpers({
     subject: function() {
@@ -169,7 +170,7 @@ Template.editSubjects.events({
       target = target.parents('.edit-stud');
     }
     let studId = target.attr('data-id');
-    console.log('e', e);
+    console_log_conditional('e', e);
     editParamBoxes(studId);
 
     $('#stud-data-modal').removeClass('is-active');
@@ -308,7 +309,7 @@ export let find_open_position = function(students) {
 }
 
 export let align_all_students = function(students, alphabetically, callback) {
-  console.log('students', students);
+  console_log_conditional('students', students);
   if (typeof alphabetically === 'undefined') {
     alphabetically = false;
   }
@@ -522,7 +523,7 @@ function contributionTableTemplate(students, parameters) {
 }
 
 function contributionRowTemplate(student, params) {
-  console.log(student, params);
+  console_log_conditional(student, params);
     let paramTemplate = params.map((param) => {
         return `
             <p class="o--modal-label contributions-grid-item">${param.name}</p>
@@ -603,9 +604,9 @@ function studentParameterTemplate(allParams, student, type) {
     let saveBtn = type === "Add Student" ? "save-subj-params" : "edit-subj-params";
     let studentId = student ? student._id.trim() : "";
 
-    console.log(allParams);
+    console_log_conditional(allParams);
     let boxes = allParams.map((param) => {
-      console.log('param', param);
+      console_log_conditional('param', param);
         // let params = subjects['children']['parameter' + param];
         let options = param.options.split(',').map(function(item) { return item.trim() });
 
@@ -616,7 +617,7 @@ function studentParameterTemplate(allParams, student, type) {
             let selected = "";
 
             if (student) { selected = student.info.demographics[param.name] === opt ? "chosen" : "" }
-            console.log('creating options for student, ', student);
+            console_log_conditional('creating options for student, ', student);
 
             return `
                 <div class="column has-text-centered subj-box-params ${selected} optionSelection">

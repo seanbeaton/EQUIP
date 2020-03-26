@@ -3,6 +3,7 @@
 */
 
 import {getStudents} from "/helpers/students";
+import {console_log_conditional} from "/helpers/logging"
 
 export const smallGroupStudentSelectActive = new ReactiveVar(false);
 export const absentStudentSelectActive = new ReactiveVar(false);
@@ -111,7 +112,7 @@ Template.obsCreationModal.events({
     }
 
     if (sequenceParams === undefined || demographicParams === undefined) {
-      console.log('sequence ', sequenceParams, demographicParams);
+      console_log_conditional('sequence ', sequenceParams, demographicParams);
       alert("You must add students and parameters to the environment to continue to do the observation.")
       return;
     }
@@ -181,7 +182,7 @@ Template.obsAbsentModal.events({
     e.preventDefault();
     let observation = currentNewObservation.get();
     observation.absent = getAbsentStudents();
-    console.log('about to save observation:', observation)
+    console_log_conditional('about to save observation:', observation)
     Meteor.call('observationInsert', observation, function(error, result) {
       return 0
     });
@@ -223,7 +224,7 @@ Template.obsSmallGroupModal.events({
       alert('You need to select at least two students');
       return;
     }
-    console.log('observations small group', observation.small_group);
+    console_log_conditional('observations small group', observation.small_group);
     Meteor.call('observationInsert', observation, function(error, result) {
       return 0
     });
@@ -358,7 +359,7 @@ let getSmallGroupStudents = function() {
   $('.small-group-student.selected').each(function() {
     ret.push($(this).attr('id'))
   })
-  // console.log('ret', ret);
+  // console_log_conditional('ret', ret);
   return ret;
 };
 
@@ -367,7 +368,7 @@ let getAbsentStudents = function() {
   $('.class-absent-student.selected').each(function() {
     ret.push($(this).attr('id'))
   })
-  // console.log('ret', ret);
+  // console_log_conditional('ret', ret);
   return ret;
 };
 

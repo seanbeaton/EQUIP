@@ -1,4 +1,5 @@
 const assert = require('assert');
+import {console_log_conditional} from "../../../../helpers/logging";
 
 var myStepDefinitionsWrapper = function () {
   this.When(/^I create a student named "([^"]*)" with the demographics "([^"]*)": "([^"]*)" and "([^"]*)": "([^"]*)"$/, function (name, demo1, demo1val, demo2, demo2val, callback) {
