@@ -18,12 +18,12 @@ const groupDisplayType = new ReactiveVar('blocks');
 
 Template.groupWorkReport.onCreated(function created() {
   this.autorun(() => {
-    this.subscribe('observations');
-    this.subscribe('environments');
-    this.subscribe('sequences');
     this.subscribe('subjects');
+    this.subscribe('observations');
+    this.subscribe('sequences');
     this.subscribe('subjectParameters');
     this.subscribe('sequenceParameters');
+    this.subscribe('environments');
   })
 });
 
@@ -34,7 +34,7 @@ Template.groupWorkReport.events({
 
     selectedEnvironment.set(selected.val());
     obsOptions.set(getObsOptions());
-    students.set(getStudents(selectedEnvironment.get()));
+    students.set(getStudents(selectedEnvironment.get(), true));
     console.log('students', students.get());
     setTimeout(function() {
       setupVis('vis-container', function() {

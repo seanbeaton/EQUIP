@@ -23,12 +23,12 @@ const selectedSpotlightDimension = new ReactiveVar(false);
 
 Template.histogramReport.onCreated(function created() {
   this.autorun(() => {
-    this.subscribe('observations');
-    this.subscribe('environments');
-    this.subscribe('sequences');
     this.subscribe('subjects');
+    this.subscribe('observations');
+    this.subscribe('sequences');
     this.subscribe('subjectParameters');
     this.subscribe('sequenceParameters');
+    this.subscribe('environments');
   })
 });
 
