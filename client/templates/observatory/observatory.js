@@ -19,6 +19,8 @@ const classroomStudentsSearchable = new ReactiveVar([]);
 const currentSearch = new ReactiveVar('');
 const currentStudentId = new ReactiveVar('');
 const activeEditSequence = new ReactiveVar('');
+const environment = new ReactiveVar();
+const observation = new ReactiveVar();
 
 Template.observatory.created = function() {
 }
@@ -34,7 +36,11 @@ Template.observatory.onCreated(function created() {
 
 
     this.data.environment = Environments.findOne(this.data.envId, {reactive: true});
+    environment.set(this.data.environment);
+
     this.data.observation = Observations.findOne(this.data.obsId, {reactive: true});
+    observation.set(this.data.observation);
+
     this.data.sequenceParameters = setupSequenceParameters(this.data.envId, true);
     let that = this;
     let subjects = Subjects.find({
@@ -149,32 +155,32 @@ let processKeyboardObservationNavigation = function(obs) {
 
 Template.observatory.helpers({
   userHasEditAccess: function() {
-    console_log_conditional('userHasEditAccess', this.environment);
-    return userHasEnvEditAccess(this.environment)
+    console_log_conditional('environment.get()', environment.get());
+    return userHasEnvEditAccess(environment.get());
   },
   smallGroup: function() {
-    return this.observation.observationType === 'small_group';
+    return observation.get().observationType === 'small_group';
   },
   wholeClass: function() {
-    return this.observation.observationType === 'whole_class';
+    return observation.get().observationType === 'whole_class';
   },
   environment: function() {
-    return this.environment;
+    return environment.get();
   },
   notes_status: function() {
-    return this.observation && this.observation.notes && this.observation.notes.length > 0 ? "(notes logged)" : '(empty)'
+    return observation.get() && observation.get().notes && observation.get().notes.length > 0 ? "(notes logged)" : '(empty)'
   },
   observation: function () {
-    return this.observation;
+    return observation.get();
   },
   accessModeText: function () {
-    if (!this.environment || userIsEnvOwner(this.environment._id)) {
+    if (!environment.get() || userIsEnvOwner(environment.get()._id)) {
       return '';
     }
-    else if (userCanGroupEditEnv(Meteor.userId(), this.environment._id)) {
+    else if (userCanGroupEditEnv(Meteor.userId(), environment.get()._id)) {
       return '<span class="access-level">Edit</span> access through group'
     }
-    else if (userCanGroupViewEnv(Meteor.userId(), this.environment._id)) {
+    else if (userCanGroupViewEnv(Meteor.userId(), environment.get()._id)) {
       return '<span class="access-level">View</span> access through group'
     }
   },
@@ -186,10 +192,10 @@ Template.observatory.helpers({
   },
   allowTabbing: function(student) {
     // console_log_conditional('at', student, this.observation);
-    if (this.observation.observationType === 'small_group' && !this.observation.small_group.find(id => id === student._id)) {
+    if (observation.get().observationType === 'small_group' && !observation.get().small_group.find(id => id === student._id)) {
       return false;
     }
-    if (this.observation.observationType === 'whole_class' && !!this.observation.absent.find(id => id === student._id)) {
+    if (observation.get().observationType === 'whole_class' && !!observation.get().absent.find(id => id === student._id)) {
       return false;
     }
     if (currentSearch.get() === '') {
@@ -198,19 +204,19 @@ Template.observatory.helpers({
     return classroomStudentsSearchable.get().find(s => s.name === student.info.name.toLowerCase()).active
   },
   subjects: function() {
-    if (!this.observation) {
+    if (!observation.get()) {
       return []
     }
     return Subjects.find({
-      envId: this.observation.envId,
+      envId: observation.get().envId,
     }, {sort: {data_y: 1, data_x: 1}})
   },
   studentActive: function(student) {
-    if (this.observation.observationType === 'small_group') {
-      return !!this.observation.small_group.find(id => id === student._id)
+    if (observation.get().observationType === 'small_group') {
+      return !!observation.get().small_group.find(id => id === student._id)
     }
-    if (this.observation.observationType === 'whole_class') {
-      return !this.observation.absent.find(id => id === student._id)
+    if (observation.get().observationType === 'whole_class') {
+      return !observation.get().absent.find(id => id === student._id)
     }
   },
   searchEnabled: function(student) {
@@ -245,7 +251,7 @@ Template.observatory.events({
     Router.go('observationList', {_envId:Router.current().params._envId});
   },
   'click .observatory.observatory--code .student-box.enabled': function(e) {
-    if (!userHasEnvEditAccess(this.environment)) {
+    if (!userHasEnvEditAccess(environment.get())) {
       // access control also done on server side.
       return;
     }
@@ -263,7 +269,7 @@ Template.observatory.events({
     $('#seq-param-modal').addClass('is-active');
   },
   'keydown .observatory.observatory--code .student-box.enabled': function(e) {
-    if (!userHasEnvEditAccess(this.environment)) {
+    if (!userHasEnvEditAccess(environment.get())) {
       // access control also done on server side.
       return;
     }
@@ -286,18 +292,18 @@ Template.observatory.events({
     if (e.key.startsWith('Arrow')) {
       console_log_conditional('e.key', e.key)
       let tar = null;
-      let allowed_student_ids = getAllowedStudentIds(this.environment._id, this.observation);
+      let allowed_student_ids = getAllowedStudentIds(environment.get()._id, observation.get());
       console_log_conditional('allowed_student_ids', allowed_student_ids);
       if (e.key === 'ArrowDown') {
         tar = Subjects.findOne({
-          envId: this.environment._id,
+          envId: environment.get()._id,
           _id: {$in: allowed_student_ids},
           data_x: parseInt($(e.target).attr('data-x')),
           data_y: {$gt: parseInt($(e.target).attr('data-y'))}
         }, {sort: {data_y: 1}})
         if (!tar) {
           tar = Subjects.findOne({
-            envId: this.environment._id,
+            envId: environment.get()._id,
             _id: {$in: allowed_student_ids},
             data_x: parseInt($(e.target).attr('data-x')),
           }, {sort: {data_y: 1}})
@@ -305,14 +311,14 @@ Template.observatory.events({
       }
       else if (e.key === 'ArrowUp') {
         tar = Subjects.findOne({
-          envId: this.environment._id,
+          envId: environment.get()._id,
           _id: {$in: allowed_student_ids},
           data_x: parseInt($(e.target).attr('data-x')),
           data_y: {$lt: parseInt($(e.target).attr('data-y'))}
         }, {sort: {data_y: -1}})
         if (!tar) {
           tar = Subjects.findOne({
-            envId: this.environment._id,
+            envId: environment.get()._id,
             _id: {$in: allowed_student_ids},
             data_x: parseInt($(e.target).attr('data-x')),
           }, {sort: {data_y: -1}})
@@ -320,14 +326,14 @@ Template.observatory.events({
       }
       else if (e.key === 'ArrowRight') {
         tar = Subjects.findOne({
-          envId: this.environment._id,
+          envId: environment.get()._id,
           _id: {$in: allowed_student_ids},
           data_x: {$gt: parseInt($(e.target).attr('data-x'))},
           data_y: parseInt($(e.target).attr('data-y')),
         }, {sort: {data_x: 1}})
         if (!tar) {
           tar = Subjects.findOne({
-            envId: this.environment._id,
+            envId: environment.get()._id,
             _id: {$in: allowed_student_ids},
             data_y: parseInt($(e.target).attr('data-y')),
           }, {sort: {data_x: 1}})
@@ -335,14 +341,14 @@ Template.observatory.events({
       }
       else if (e.key === 'ArrowLeft') {
         tar = Subjects.findOne({
-          envId: this.environment._id,
+          envId: environment.get()._id,
           _id: {$in: allowed_student_ids},
           data_x: {$lt: parseInt($(e.target).attr('data-x'))},
           data_y: parseInt($(e.target).attr('data-y')),
         }, {sort: {data_x: -1}})
         if (!tar) {
           tar = Subjects.findOne({
-            envId: this.environment._id,
+            envId: environment.get()._id,
             _id: {$in: allowed_student_ids},
             data_y: parseInt($(e.target).attr('data-y')),
           }, {sort: {data_x: -1}})
@@ -356,7 +362,7 @@ Template.observatory.events({
     }
   },
   'click .observatory.observatory--edit .student-box': function(e) {
-    if (!userHasEnvEditAccess(this.environment)) {
+    if (!userHasEnvEditAccess(environment.get())) {
       // access control also done on server side.
       return;
     }
@@ -367,7 +373,7 @@ Template.observatory.events({
       target_id = $(e.target).parents('.student-box').attr('id')
     }
     Meteor.call('observationModifyAbsentStudent', {
-      obsId: this.observation._id,
+      obsId: observation.get()._id,
       studentId: target_id,
       action: $('#' + target_id).hasClass('enabled') ? 'mark' : 'unmark',
     });
@@ -391,13 +397,13 @@ Template.observatory.events({
     $('#seq-data-modal').removeClass('is-active');
   },
   'click .edit-observation-name': function(e) {
-    editObservationName(this.observation._id);
+    editObservationName(observation.get()._id);
   },
   'click .edit-observation-date': function(e) {
-    editObservationDate(this.observation._id);
+    editObservationDate(observation.get()._id);
   },
   'click #delete-observation': function(e) {
-    deleteObservation(this.observation._id);
+    deleteObservation(observation.get()._id);
   },
   'submit #save-seq-params-form': function(e) {
     e.preventDefault();
@@ -412,15 +418,15 @@ Template.observatory.events({
 
     let sid = currentStudentId.get();
     let sequence = {
-      envId: this.environment._id,
+      envId: environment.get()._id,
       info: {
         student: {
           studentId: sid,
           studentName: Subjects.findOne({_id: sid}),
         },
       },
-      obsId: this.observation._id,
-      obsName: this.observation.name
+      obsId: observation.get()._id,
+      obsName: observation.get().name
     };
 
     sequence.info.parameters = {};
@@ -465,7 +471,7 @@ Template.observatory.events({
 
     let sequence = {
       seqId: activeEditSequence.get(),
-      envId: this.environment._id,
+      envId: environment.get()._id,
     };
 
     let missing_params = [];
@@ -505,14 +511,14 @@ Template.observatory.events({
     let subjId = $(e.target).attr('data-student-id');
 
     activeEditSequence.set(seqId);
-    observation_helpers.editParamBoxes(seqId, subjId, this.environment._id);
+    observation_helpers.editParamBoxes(seqId, subjId, environment.get()._id);
     $('#seq-param-modal').addClass('is-active');
   },
   'click .delete-seq': function(e) {
-    observation_helpers.deleteContribution(e, this.observation._id);
+    observation_helpers.deleteContribution(e, observation.get()._id);
   },
   'click #show-all-observations':function (e){
-    observation_helpers.createTableOfContributions(this.observation._id);
+    observation_helpers.createTableOfContributions(observation.get()._id);
     gtag('event', 'view_sequence_list', {'event_category': 'observations'});
     $('#seq-data-modal').addClass('is-active');
   },
@@ -528,7 +534,7 @@ Template.observatory.events({
     e.preventDefault();
 
     let $desc = $('.observation__description', e.target);
-    Meteor.call('observationUpdateDescription', {obsId: this.observation._id, description: $desc.val()}, function(err, res) {
+    Meteor.call('observationUpdateDescription', {obsId: observation.get()._id, description: $desc.val()}, function(err, res) {
       if (err) {
         alert(err)
       }
@@ -544,7 +550,7 @@ Template.observatory.events({
     e.preventDefault();
 
     let $notes = $('.observation__notes', e.target);
-    Meteor.call('observationUpdateNotes', {obsId: this.observation._id, notes: $notes.val()}, function(err, res) {
+    Meteor.call('observationUpdateNotes', {obsId: observation.get()._id, notes: $notes.val()}, function(err, res) {
       if (err) {
         alert(err)
       }

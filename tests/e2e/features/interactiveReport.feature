@@ -72,6 +72,7 @@ Feature: Interactive report page
 
   Scenario: Adding another observation changes the data displayed
     When I click on the item with the selector "#env_select_chosen"
+    And I wait "5000" ms
     And I click on the item with the selector ".active-result=Example Classroom" in the wrapper "#env_select_chosen"
     And I see a ".report-section--select h4" with the text "Choose one or more observations"
     And I wait "2000" ms

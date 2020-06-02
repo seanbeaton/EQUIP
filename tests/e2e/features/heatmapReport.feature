@@ -12,6 +12,7 @@ Feature: Heatmap report page
   Scenario: The whole classrooms view works
     When I don't see a ".heatmap-report__graph h3"
     And I click on the item with the selector "#env_select_chosen"
+    And I wait "5000" ms
     And I click on the item with the selector ".active-result=Example Classroom" in the wrapper "#env_select_chosen"
     And I see a ".heatmap-report__graph h3" with the text "Click on a student"
     And I wait "2000" ms
@@ -43,6 +44,7 @@ Feature: Heatmap report page
 
   Scenario: The demographic groups view works
     When I click on the item with the selector "#env_select_chosen"
+    And I wait "5000" ms
     And I click on the item with the selector ".active-result=Example Classroom" in the wrapper "#env_select_chosen"
     When I click on the item with the selector "#students_sort_chosen"
     And I click on the item with the selector ".active-result=Demographic Groups" in the wrapper "#students_sort_chosen"
@@ -58,6 +60,7 @@ Feature: Heatmap report page
 
   Scenario: The modifying observations automatically changes the data displayed
     When I click on the item with the selector "#env_select_chosen"
+    And I wait "5000" ms
     And I click on the item with the selector ".active-result=Example Classroom" in the wrapper "#env_select_chosen"
     And I wait "4000" ms
     And I click on the item with the selector ".vis-item-content=Observation #1 - 9/4 (2018-09-04 - WC)"
@@ -69,6 +72,7 @@ Feature: Heatmap report page
 
   Scenario: The student detail view works
     When I click on the item with the selector "#env_select_chosen"
+    And I wait "5000" ms
     And I click on the item with the selector ".active-result=Example Classroom" in the wrapper "#env_select_chosen"
     And I wait "4000" ms
     And I click on the item with the selector ".vis-item-content=Observation #1 - 9/4 (2018-09-04 - WC)"

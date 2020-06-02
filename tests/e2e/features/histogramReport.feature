@@ -11,6 +11,7 @@ Feature: Student histogram report page
 
   Scenario: The columns have the right number of students
     When I click on the item with the selector "#env_select_chosen"
+    And I wait "5000" ms
     And I click on the item with the selector ".active-result=Example Classroom" in the wrapper "#env_select_chosen"
     And I wait "2000" ms
     And I click on the item with the selector ".vis-item-content=Observation #1 - 9/4 (2018-09-04 - WC)"
@@ -33,6 +34,7 @@ Feature: Student histogram report page
 
   Scenario: The demographic selector highlights work
     When I click on the item with the selector "#env_select_chosen"
+    And I wait "5000" ms
     And I click on the item with the selector ".active-result=Example Classroom" in the wrapper "#env_select_chosen"
     And I wait "2000" ms
     And I click on the item with the selector ".vis-item-content=Observation #1 - 9/4 (2018-09-04 - WC)"
