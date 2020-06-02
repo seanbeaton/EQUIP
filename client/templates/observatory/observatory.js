@@ -25,12 +25,12 @@ Template.observatory.created = function() {
 
 Template.observatory.onCreated(function created() {
   this.autorun(() => {
-    Meteor.subscribe('environment', this.data.envId);
+    Meteor.subscribe('envSubjectParameters', this.data.envId);
+    Meteor.subscribe('envSequenceParameters', this.data.envId);
     Meteor.subscribe('observation', this.data.obsId);
     Meteor.subscribe('envSubjects', this.data.envId);
     Meteor.subscribe('obsSequences', this.data.obsId);
-    Meteor.subscribe('envSubjectParameters', this.data.envId);
-    Meteor.subscribe('envSequenceParameters', this.data.envId);
+    Meteor.subscribe('environment', this.data.envId);
 
 
     this.data.environment = Environments.findOne(this.data.envId, {reactive: true});
@@ -83,7 +83,7 @@ let processKeyboardObservationNavigation = function(obs) {
       return;
     }
     // don't catch non-alphanum, for this.
-    if (!e.key.toLowerCase().match(/^[a-z0-9]|backspace$/)) {
+    if (!e.key.toLowerCase().match(/^[a-z0-9]$|^backspace$/)) {
       return;
     }
     // if (e.key === 'Tab') {
@@ -149,6 +149,7 @@ let processKeyboardObservationNavigation = function(obs) {
 
 Template.observatory.helpers({
   userHasEditAccess: function() {
+    console_log_conditional('userHasEditAccess', this.environment);
     return userHasEnvEditAccess(this.environment)
   },
   smallGroup: function() {
