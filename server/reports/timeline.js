@@ -4,9 +4,6 @@ import {getObservations} from "../../helpers/graphs";
 import {console_log_conditional} from "/helpers/logging"
 
 
-CachedReportData = new Mongo.Collection('cached_report_data');
-
-
 Meteor.methods({
   getTimelineData: function(parameters, refresh) {
     if (typeof refresh === 'undefined') {

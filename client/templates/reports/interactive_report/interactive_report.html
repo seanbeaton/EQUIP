@@ -65,6 +65,9 @@
                 <div class="interactive-report__sidebar"></div>
                 </div>
         </div>
+        {{#if cache_info }}
+            <span class="cache-info">Stats generated last at {{cache_info}}. They will be automatically updated every hour, or you can <a class="refresh-report">refresh</a> them now.</span>
+        {{/if}}
     </section>
     </div>
     <!--</div></div>-->
