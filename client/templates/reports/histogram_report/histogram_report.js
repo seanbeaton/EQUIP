@@ -29,9 +29,8 @@ const loadingData = new ReactiveVar(false);
 
 Template.histogramReport.onCreated(function created() {
   this.autorun(() => {
-    this.subscribe('subjects');
     this.subscribe('observations');
-    this.subscribe('sequences');
+    this.subscribe('subjects');
     this.subscribe('subjectParameters');
     this.subscribe('sequenceParameters');
     this.subscribe('environments');
