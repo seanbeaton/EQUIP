@@ -4,7 +4,12 @@ import {console_log_conditional, console_table_conditional} from "/helpers/loggi
 import {getSequences} from "/helpers/sequences";
 import {getStudents, getStudent} from "/helpers/students";
 import {setupVis} from "/helpers/timeline";
-import {getDiscourseOptionsForDimension, getObservations} from "/helpers/graphs";
+// import {getDiscourseOptionsForDimension, getObservations} from "/helpers/graphs";
+import {
+  getDiscourseDimensions, studentContribGraph,
+  getDiscourseOptionsForDimension, getObservations,
+  studentTimeGraph
+} from "../../../../helpers/graphs";
 
 const obsOptions = new ReactiveVar([]);
 const selectedEnvironment = new ReactiveVar(false);
@@ -18,6 +23,8 @@ const selectedSpotlightDimension = new ReactiveVar(false);
 const groupDisplayType = new ReactiveVar('blocks');
 
 const cacheInfo = new ReactiveVar();
+const cacheInfoStudentContrib = new ReactiveVar();
+const cacheInfoStudentTime = new ReactiveVar();
 const loadingData = new ReactiveVar(false);
 
 Template.groupWorkReport.onCreated(function created() {
@@ -86,6 +93,18 @@ Template.groupWorkReport.events({
     groupDisplayType.set($(e.target).attr('data-display-graph-type'))
     updateGraph()
   },
+  'click .refresh-report': function(e) {
+    e.preventDefault();
+    updateGraph(true)
+  },
+  'click .refresh-report-student-contrib': function(e) {
+    e.preventDefault();
+    updateStudentContribGraph(true)
+  },
+  'click .refresh-report-student-time': function(e) {
+    e.preventDefault();
+    updateStudentTimeGraph(true)
+  },
 });
 
 
@@ -153,6 +172,12 @@ Template.groupWorkReport.helpers({
   },
   cache_info: function() {
     return cacheInfo.get();
+  },
+  cache_info_student_time: function() {
+    return cacheInfoStudentTime.get();
+  },
+  cache_info_student_contrib: function() {
+    return cacheInfoStudentContrib.get();
   },
   loadingDataClass: function() {
     return loadingData.get();
@@ -564,14 +589,6 @@ let getDemographicOptions = function() {
     .options.split(',').map(function(opt) {return {name: opt.trim()}})
 };
 
-let getDiscourseDimensions = function() {
-  let envId = selectedEnvironment.get();
-  if (!envId) {
-    return []
-  }
-  return setupSequenceParameters(envId);
-};
-
 
 let clearGraph = function() {
   students.set([])
@@ -581,31 +598,6 @@ let clearGraph = function() {
   $('#group-work-d3-wrapper').html('');
   $('.group-work-report__graph-key').html('');
 }
-
-let updateStudentContribGraph = function() {
-  let selector = '.student-contributions-graph__graph';
-
-  let dimension = selectedSpotlightDimension.get();
-
-  if (dimension === false) {
-    return;
-  }
-  if (selectedObservations.get().length < 1) {
-    return;
-  }
-
-  let data = createStudentContribData();
-
-  studentContribGraph(data, selector)
-};
-
-let createStudentContribData = function() {
-  return {};
-};
-
-let studentContribGraph = function(data, selector) {
-
-};
 
 let getObsOptions = function(envId) {
   if (typeof envId === 'undefined') {
@@ -618,3 +610,87 @@ let getObsOptions = function(envId) {
     return false;
   }
 };
+
+
+let updateStudentContribGraph = function(refresh) {
+  let selector = '.student-contributions-graph__graph';
+  let $selector = $(selector);
+  // Wait till the graph exists.
+  if ($selector.length === 0) {
+    setTimeout(function() {updateStudentContribGraph(refresh)}, 50);
+    return;
+  }
+
+  let dimension = selectedSpotlightDimension.get();
+  if (dimension === false) {
+    return;
+  }
+  if (selectedObservations.get().length < 1) {
+    return;
+  }
+
+  let student_contrib_params = {
+    envId: selectedEnvironment.get(),
+    obsIds: selectedObservations.get(),
+    student: selectedStudent.get(),
+    dimension: dimension,
+    disc_opts: getDiscourseOptionsForDimension(selectedEnvironment.get(), dimension),
+    students: students.get(),
+  }
+
+  loadingData.set(true)
+  Meteor.call('getStudentContribData', student_contrib_params, refresh, function(err, result) {
+    if (err) {
+      console_log_conditional('error', err);
+      return;
+    }
+
+    studentContribGraph(result.data, selector)
+
+    cacheInfoStudentContrib.set({createdAt: result.createdAt.toLocaleString(), timeToGenerate: result.timeToGenerate, timeToFetch: result.timeToFetch});
+    loadingData.set(false);
+    console_log_conditional('result.createdAt.toLocaleString()', result.createdAt.toLocaleString());
+  });
+};
+
+let updateStudentTimeGraph = function (refresh) {
+  let selector = '.student-participation-time__graph';
+  let $selector = $(selector);
+  // Wait till the graph exists.
+  if ($selector.length === 0) {
+    setTimeout(function() {updateStudentTimeGraph(refresh)}, 50);
+    return;
+  }
+
+  let dimension = selectedSpotlightDimension.get();
+
+  if (dimension === false) {
+    return;
+  }
+  if (selectedObservations.get().length < 2) {
+    return;
+  }
+
+  let student_time_params = {
+    envId: selectedEnvironment.get(),
+    obsIds: selectedObservations.get(),
+    student: selectedStudent.get(),
+    dimension: dimension,
+    disc_opts: getDiscourseOptionsForDimension(selectedEnvironment.get(), dimension),
+  }
+
+  loadingData.set(true)
+  Meteor.call('getStudentTimeData', student_time_params, refresh, function(err, result) {
+    if (err) {
+      console_log_conditional('error', err);
+      return;
+    }
+
+    studentTimeGraph(result.data, selector, selectedEnvironment.get(), dimension)
+
+    cacheInfoStudentTime.set({createdAt: result.createdAt.toLocaleString(), timeToGenerate: result.timeToGenerate, timeToFetch: result.timeToFetch});
+    loadingData.set(false);
+    console_log_conditional('result.createdAt.toLocaleString()', result.createdAt.toLocaleString());
+  });
+}
+

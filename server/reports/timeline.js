@@ -41,7 +41,7 @@ Meteor.methods({
     else {
       report_data['timeToFetch'] = new Date().getTime() - fetch_start;
     }
-    console_log_conditional('report data', report_data);
+    console_log_conditional('getTimelineData data', report_data);
     return report_data
   },
 })

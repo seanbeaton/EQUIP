@@ -36,11 +36,12 @@
                             <div class="subjects" id="histogram-d3-wrapper">
 
                             </div>
+                            {{>cacheInfoBlock cache_info=cache_info}}
                         {{/if}}
                     </div>
                     <div class="histogram-report__graph-key"></div>
                     <div class="histogram-report__student-spotlight spotlight-wrapper {{#if selectedStudent}} student-spotlight--active {{/if}}">
-                        {{> studentSpotlight selectedStudent=selectedStudent discourseparams=discourseparams multipleObservationsChosen=multipleObservationsChosen}}
+                        {{> studentSpotlight selectedStudent=selectedStudent discourseparams=discourseparams multipleObservationsChosen=multipleObservationsChosen cache_info_student_time=cache_info_student_time cache_info_student_contrib=cache_info_student_contrib}}
                     </div>
                 </div>
             </div>

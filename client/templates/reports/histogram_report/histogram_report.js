@@ -5,12 +5,12 @@ import {getSequences} from "../../../../helpers/sequences";
 import {getStudents, getStudent} from "../../../../helpers/students";
 import {setupVis} from "/helpers/timeline";
 import {
-  createStudentContribData,
-  createStudentTimeData, get_average, get_median,
   getDiscourseDimensions,
   getDiscourseOptionsForDimension, getObservations, studentContribGraph,
   studentTimeGraph
 } from "../../../../helpers/graphs";
+import {Sidebar} from "../../../../helpers/graph_sidebar";
+import {heatmapReportSortDemoChosen, heatmapReportSortType} from "../selection_elements";
 
 // const envSet = new ReactiveVar(false);
 const obsOptions = new ReactiveVar([]);
@@ -23,6 +23,8 @@ const selectedStudent = new ReactiveVar(false);
 const selectedSpotlightDimension = new ReactiveVar(false);
 
 const cacheInfo = new ReactiveVar();
+const cacheInfoStudentContrib = new ReactiveVar();
+const cacheInfoStudentTime = new ReactiveVar();
 const loadingData = new ReactiveVar(false);
 
 Template.histogramReport.onCreated(function created() {
@@ -72,6 +74,18 @@ Template.histogramReport.events({
   },
   'click .student-spotlight__close': function() {
     selectedStudent.set(false);
+  },
+  'click .refresh-report': function(e) {
+    e.preventDefault();
+    updateGraph(true)
+  },
+  'click .refresh-report-student-contrib': function(e) {
+    e.preventDefault();
+    updateStudentContribGraph(true)
+  },
+  'click .refresh-report-student-time': function(e) {
+    e.preventDefault();
+    updateStudentTimeGraph(true)
   },
 });
 
@@ -128,6 +142,12 @@ Template.histogramReport.helpers({
   cache_info: function() {
     return cacheInfo.get();
   },
+  cache_info_student_time: function() {
+    return cacheInfoStudentTime.get();
+  },
+  cache_info_student_contrib: function() {
+    return cacheInfoStudentContrib.get();
+  },
   loadingDataClass: function() {
     return loadingData.get();
   },
@@ -160,7 +180,7 @@ let getObsOptions = function(envId) {
   }
 }
 
-let updateGraph = function() {
+let updateGraph = function(refresh) {
   let histogram_wrapper = $('.histogram-report-wrapper');
   let histogram_selector = '#histogram-d3-wrapper';
 
@@ -170,178 +190,35 @@ let updateGraph = function() {
     return;
   }
 
-  let data = createHistogramData();
 
-  if (!histogram_wrapper.hasClass('histogram-created')) {
-    histogram_wrapper.addClass('histogram-created');
-
-    initHistogram(data, histogram_selector)
+  let histogram_params = {
+    obsIds: selectedObservations.get(),
+    envId: selectedEnvironment.get(),
   }
-  else {
-    $('#heatmap-d3-wrapper').html('');
-    updateHistogram(data, histogram_selector)
-  }
-  // updateFilteredStudents()
-}
 
-let createHistogramData = function() {
-  let ret = {
-    students: [],
-    // groups: []
-  };
-
-  let envId = selectedEnvironment.get();
-  let obsIds = selectedObservations.get();
-  let allStudents = getStudents(envId);
-
-  ret.students = allStudents.map(function(student) {
-    return {
-      name: student.info.name,
-      studentId: student._id,
-      class: '',
-      student: student,
-      count: 0,
-      show_count: true,
-      sort_first: false,
+  loadingData.set(true);
+  Meteor.call('getHistogramData', histogram_params, refresh, function(err, result) {
+    if (err) {
+      console_log_conditional('error', err);
+      return;
     }
-  });
 
 
-  allStudents.map(function(student) {
-    for (let obsId_k in obsIds) {
+    if (!histogram_wrapper.hasClass('histogram-created')) {
+      histogram_wrapper.addClass('histogram-created');
 
-      if (!obsIds.hasOwnProperty(obsId_k)) continue;
-      let obsId = obsIds[obsId_k];
-
-      let sequences = getSequences(obsId, envId);
-      for (let sequence_k in sequences) {
-        if (!sequences.hasOwnProperty(sequence_k)) continue;
-        let sequence = sequences[sequence_k];
-        let ds_index = ret.students.findIndex(datapoint => datapoint.studentId === student._id);
-        if (sequence.info.student.studentId === student._id) {
-          ret.students[ds_index].count += 1;
-        }
-      }
-    }
-  });
-
-
-  let all_counts = ret.students.map(d => d.count);
-  ret.median = get_median(all_counts);
-  ret.average = (all_counts);
-  ret.quartiles = get_n_groups(all_counts, 4, true, 'Group'); //quartiles
-  ret.students.forEach(function(student) {
-    student.median = get_median(all_counts);
-    student.average = get_average(all_counts);
-  })
-
-  ret.quartiles.forEach(function(quartile) {
-    quartile.students = ret.students.filter(function(student) {
-      return quartile.min_exclusive < student.count && student.count <= quartile.max_inclusive
-    }).sort((a, b) => b.count - a.count)
-  })
-
-  console_table_conditional(ret.students);
-  console_table_conditional(ret.quartiles);
-
-  return ret
-}
-
-let get_ntiles = function(values, n, zero_separate, ntile_name) {
-  if (typeof ntile_name === 'undefined') {
-    ntile_name = n + '-tile';
-  }
-  let ret = []
-  if (zero_separate) {
-    ret.push({
-      name: 'No contributions',
-      min_exclusive: -1,
-      max_inclusive: 0,
-    })
-  }
-
-  let max_value = Math.max(...values);
-  if (n > max_value) {
-    n = max_value;
-  }
-  let group_size = values.length / n;
-  let min = -1;
-  if (zero_separate) {
-    min = 0
-  }
-  for (let i = 1; i <= n; i++) {
-    let index = Math.min(Math.round(i * group_size), values.length - 1)
-    let max = values[index];
-    ret.push({
-      name: get_ordinal_suffix(i) + '&nbsp;' + ntile_name,
-      min_exclusive: min,
-      max_inclusive: max
-    });
-    min = max;
-  }
-  return ret;
-}
-
-let get_n_groups = function(values, n, zero_separate, group_name) {
-  if (typeof group_name === 'undefined') {
-    group_name = n + ' group';
-  }
-  let ret = []
-  if (zero_separate) {
-    ret.push({
-      name: 'No contributions',
-      min_exclusive: -1,
-      max_inclusive: 0,
-    })
-  }
-
-  if (n > Math.max(...values)) {
-    n = Math.max(...values);
-  }
-
-  let step = Math.max(...values) / n;
-
-  let min = 0;
-  let max;
-  console_log_conditional('values, ', values)
-  console_log_conditional('step, ', step)
-  for (let i = 1; i <= n; i++) {
-    console_log_conditional('i', i);
-    max = Math.ceil(step * i);
-    console_log_conditional('min and max', min, max);
-    let name = get_ordinal_suffix(i) + '&nbsp;' + group_name + "&nbsp;(n&nbsp;=&nbsp;";
-    if ((min + 1) !== max) {
-      name += (min + 1) + "&nbsp;to&nbsp;" + max + ")";
+      initHistogram(result.data, histogram_selector)
     }
     else {
-      name += max + ")"
+      $('#heatmap-d3-wrapper').html('');
+      updateHistogram(result.data, histogram_selector)
     }
-    ret.push({
-      name: name,
-      min_exclusive: min,
-      max_inclusive: max
-    });
-    min = max;
-  }
 
-  console_log_conditional('rett', ret);
-  return ret;
-}
 
-let get_ordinal_suffix = function(i) {
-  let j = i % 10,
-      k = i % 100;
-
-  if (j === 1 && k !== 11) {
-    return i + "st";
-  }
-  if (j === 2 && k !== 12) {
-    return i + "nd";
-  }
-  if (j === 3 && k !== 13) {
-    return i + "rd";
-  }
-  return i + "th";
+    cacheInfo.set({createdAt: result.createdAt.toLocaleString(), timeToGenerate: result.timeToGenerate, timeToFetch: result.timeToFetch});
+    loadingData.set(false);
+    console_log_conditional('result.createdAt.toLocaleString()', result.createdAt.toLocaleString());
+  });
 }
 
 let selectStudentForModal = function(studentId) {
@@ -477,11 +354,16 @@ let getLabelColors = function(labels) {
 // (students, selected student, env, observations) to the spotlight somehow.
 //
 
-let updateStudentContribGraph = function() {
+let updateStudentContribGraph = function(refresh) {
   let selector = '.student-contributions-graph__graph';
+  let $selector = $(selector);
+  // Wait till the graph exists.
+  if ($selector.length === 0) {
+    setTimeout(function() {updateStudentContribGraph(refresh)}, 50);
+    return;
+  }
 
   let dimension = selectedSpotlightDimension.get();
-
   if (dimension === false) {
     return;
   }
@@ -489,26 +371,36 @@ let updateStudentContribGraph = function() {
     return;
   }
 
-  let data = createStudentContribData(
-    selectedEnvironment.get(),
-    selectedObservations.get(),
-    selectedStudent.get(),
-    dimension,
-    getDiscourseOptionsForDimension(selectedEnvironment.get(), dimension),
-    students.get()
-  );
+  let student_contrib_params = {
+    envId: selectedEnvironment.get(),
+    obsIds: selectedObservations.get(),
+    student: selectedStudent.get(),
+    dimension: dimension,
+    disc_opts: getDiscourseOptionsForDimension(selectedEnvironment.get(), dimension),
+    students: students.get(),
+  }
 
-  studentContribGraph(data, selector)
+  loadingData.set(true)
+  Meteor.call('getStudentContribData', student_contrib_params, refresh, function(err, result) {
+    if (err) {
+      console_log_conditional('error', err);
+      return;
+    }
+
+    studentContribGraph(result.data, selector)
+
+    cacheInfoStudentContrib.set({createdAt: result.createdAt.toLocaleString(), timeToGenerate: result.timeToGenerate, timeToFetch: result.timeToFetch});
+    loadingData.set(false);
+    console_log_conditional('result.createdAt.toLocaleString()', result.createdAt.toLocaleString());
+  });
 };
 
-let updateStudentTimeGraph = function () {
+let updateStudentTimeGraph = function (refresh) {
   let selector = '.student-participation-time__graph';
-
   let $selector = $(selector);
-
   // Wait till the graph exists.
   if ($selector.length === 0) {
-    setTimeout(updateStudentTimeGraph, 50);
+    setTimeout(function() {updateStudentTimeGraph(refresh)}, 50);
     return;
   }
 
@@ -521,14 +413,26 @@ let updateStudentTimeGraph = function () {
     return;
   }
 
-  let data = createStudentTimeData(
-    selectedEnvironment.get(),
-    selectedObservations.get(),
-    selectedStudent.get(),
-    dimension,
-    getDiscourseOptionsForDimension(selectedEnvironment.get(), dimension)
-  );
+  let student_time_params = {
+    envId: selectedEnvironment.get(),
+    obsIds: selectedObservations.get(),
+    student: selectedStudent.get(),
+    dimension: dimension,
+    disc_opts: getDiscourseOptionsForDimension(selectedEnvironment.get(), dimension),
+  }
 
-  studentTimeGraph(data, selector, selectedEnvironment.get(), dimension)
+  loadingData.set(true)
+  Meteor.call('getStudentTimeData', student_time_params, refresh, function(err, result) {
+    if (err) {
+      console_log_conditional('error', err);
+      return;
+    }
+
+    studentTimeGraph(result.data, selector, selectedEnvironment.get(), dimension)
+
+    cacheInfoStudentTime.set({createdAt: result.createdAt.toLocaleString(), timeToGenerate: result.timeToGenerate, timeToFetch: result.timeToFetch});
+    loadingData.set(false);
+    console_log_conditional('result.createdAt.toLocaleString()', result.createdAt.toLocaleString());
+  });
 }
 

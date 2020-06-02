@@ -61,9 +61,7 @@
                     </div>
                 </div>
             </div>
-            {{#if cache_info }}
-                <span class="cache-info">Stats generated last at {{cache_info.createdAt}} in {{cache_info.timeToGenerate}}ms{{#if cache_info.timeToFetch}} and fetched from cache in {{cache_info.timeToFetch}}ms{{/if}}. They will be automatically updated every hour, or you can <a class="refresh-report">refresh</a> them now.</span>
-            {{/if}}
+            {{>cacheInfoBlock cache_info=cache_info}}
         </section>
             <!--</div>-->
         <!--</div>-->

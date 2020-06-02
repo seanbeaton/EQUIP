@@ -125,6 +125,7 @@
                 <h4>Contributions</h4>
                 <div class="student-contributions-graph__graph-key"></div>
                 <div class="student-contributions-graph__graph"></div>
+                {{>cacheInfoBlock cache_info=cache_info_student_contrib}}
             </div>
             <div class="student-spotlight__student-participation-time">
 
@@ -132,6 +133,7 @@
                 {{#if multipleObservationsChosen }}
                     <div class="student-participation-time__graph-key"></div>
                     <div class="student-participation-time__graph"></div>
+                    {{>cacheInfoBlock cache_info=cache_info_student_time}}
                 {{ else }}
                     <div class="student-participation-time__no-data">
                         You need to select at least two observations to see this student's participation over time.

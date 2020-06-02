@@ -8,8 +8,6 @@ import {heatmapReportSortDemoChosen, heatmapReportSortType} from "../selection_e
 import {setupVis} from '../../../../helpers/timeline';
 import {clone_object} from "../../../../helpers/objects";
 import {
-  createStudentContribData,
-  createStudentTimeData,
   getDiscourseDimensions,
   getDiscourseOptionsForDimension,
   getObservations, studentContribGraph, studentTimeGraph
@@ -30,6 +28,8 @@ const totalContributions = new ReactiveVar(0);
 const currentDemoFilters = new ReactiveVar(false);
 
 const cacheInfo = new ReactiveVar();
+const cacheInfoStudentContrib = new ReactiveVar();
+const cacheInfoStudentTime = new ReactiveVar();
 const loadingData = new ReactiveVar(false);
 
 
@@ -170,6 +170,12 @@ Template.heatmapReport.helpers({
   cache_info: function() {
     return cacheInfo.get();
   },
+  cache_info_student_time: function() {
+    return cacheInfoStudentTime.get();
+  },
+  cache_info_student_contrib: function() {
+    return cacheInfoStudentContrib.get();
+  },
   loadingDataClass: function() {
     return loadingData.get();
   },
@@ -257,6 +263,14 @@ Template.heatmapReport.events({
   'click .refresh-report': function(e) {
     e.preventDefault();
     updateGraph(true)
+  },
+  'click .refresh-report-student-contrib': function(e) {
+    e.preventDefault();
+    updateStudentContribGraph(true)
+  },
+  'click .refresh-report-student-time': function(e) {
+    e.preventDefault();
+    updateStudentTimeGraph(true)
   },
 })
 
@@ -579,11 +593,16 @@ let getObsOptions = function(envId) {
 // (students, selected student, env, observations) to the spotlight somehow.
 //
 
-let updateStudentContribGraph = function() {
+let updateStudentContribGraph = function(refresh) {
   let selector = '.student-contributions-graph__graph';
+  let $selector = $(selector);
+  // Wait till the graph exists.
+  if ($selector.length === 0) {
+    setTimeout(function() {updateStudentContribGraph(refresh)}, 50);
+    return;
+  }
 
   let dimension = selectedSpotlightDimension.get();
-
   if (dimension === false) {
     return;
   }
@@ -591,26 +610,36 @@ let updateStudentContribGraph = function() {
     return;
   }
 
-  let data = createStudentContribData(
-    selectedEnvironment.get(),
-    selectedObservations.get(),
-    selectedStudent.get(),
-    dimension,
-    getDiscourseOptionsForDimension(selectedEnvironment.get(), dimension),
-    students.get()
-  );
+  let student_contrib_params = {
+    envId: selectedEnvironment.get(),
+    obsIds: selectedObservations.get(),
+    student: selectedStudent.get(),
+    dimension: dimension,
+    disc_opts: getDiscourseOptionsForDimension(selectedEnvironment.get(), dimension),
+    students: students.get(),
+  }
 
-  studentContribGraph(data, selector)
+  loadingData.set(true)
+  Meteor.call('getStudentContribData', student_contrib_params, refresh, function(err, result) {
+    if (err) {
+      console_log_conditional('error', err);
+      return;
+    }
+
+    studentContribGraph(result.data, selector)
+
+    cacheInfoStudentContrib.set({createdAt: result.createdAt.toLocaleString(), timeToGenerate: result.timeToGenerate, timeToFetch: result.timeToFetch});
+    loadingData.set(false);
+    console_log_conditional('result.createdAt.toLocaleString()', result.createdAt.toLocaleString());
+  });
 };
 
-let updateStudentTimeGraph = function () {
+let updateStudentTimeGraph = function (refresh) {
   let selector = '.student-participation-time__graph';
-
   let $selector = $(selector);
-
   // Wait till the graph exists.
   if ($selector.length === 0) {
-    setTimeout(updateStudentTimeGraph, 50);
+    setTimeout(function() {updateStudentTimeGraph(refresh)}, 50);
     return;
   }
 
@@ -623,14 +652,26 @@ let updateStudentTimeGraph = function () {
     return;
   }
 
-  let data = createStudentTimeData(
-    selectedEnvironment.get(),
-    selectedObservations.get(),
-    selectedStudent.get(),
-    dimension,
-    getDiscourseOptionsForDimension(selectedEnvironment.get(), dimension)
-  );
+  let student_time_params = {
+    envId: selectedEnvironment.get(),
+    obsIds: selectedObservations.get(),
+    student: selectedStudent.get(),
+    dimension: dimension,
+    disc_opts: getDiscourseOptionsForDimension(selectedEnvironment.get(), dimension),
+  }
 
-  studentTimeGraph(data, selector, selectedEnvironment.get(), dimension)
+  loadingData.set(true)
+  Meteor.call('getStudentTimeData', student_time_params, refresh, function(err, result) {
+    if (err) {
+      console_log_conditional('error', err);
+      return;
+    }
+
+    studentTimeGraph(result.data, selector, selectedEnvironment.get(), dimension)
+
+    cacheInfoStudentTime.set({createdAt: result.createdAt.toLocaleString(), timeToGenerate: result.timeToGenerate, timeToFetch: result.timeToFetch});
+    loadingData.set(false);
+    console_log_conditional('result.createdAt.toLocaleString()', result.createdAt.toLocaleString());
+  });
 }
 

@@ -42,7 +42,8 @@ let getLabelColors = function(labels) {
   return label_colors
 }
 
-let createStudentTimeData = function(envId, obsIds, student, dimension, disc_opts) {
+let createStudentTimeData = function(params) {
+  let {envId, obsIds, student, dimension, disc_opts} = params
 
   let ret = {
     contributions_dataset: []
@@ -218,7 +219,8 @@ let updateStudentTimeKey = function(key_wrapper, y_values, color_axis) {
   $(key_wrapper).html(html)
 }
 
-let createStudentContribData = function(envId, obsIds, student, dimension, disc_opts, students) {
+let createStudentContribData = function(params) {
+  let {envId, obsIds, student, dimension, disc_opts, students} = params
   let ret = [];
 
   ret = disc_opts.map(function(opt) {
