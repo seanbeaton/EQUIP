@@ -10,6 +10,7 @@ import {
   getDiscourseOptionsForDimension, getObservations,
   studentTimeGraph
 } from "../../../../helpers/graphs";
+import {heatmapReportSortDemoChosen, heatmapReportSortType} from "../selection_elements";
 
 const obsOptions = new ReactiveVar([]);
 const selectedEnvironment = new ReactiveVar(false);
@@ -168,7 +169,7 @@ Template.groupWorkReport.helpers({
     return getDemographics()
   },
   discourseparams: function() {
-    return getDiscourseDimensions();
+    return getDiscourseDimensions(selectedEnvironment.get());
   },
   cache_info: function() {
     return cacheInfo.get();
@@ -186,7 +187,7 @@ Template.groupWorkReport.helpers({
 
 
 
-let updateGraph = function() {
+let updateGraph = function(refresh) {
   let wrapper = $('.group-work-report-wrapper');
   let selector = '#group-work-d3-wrapper';
 
@@ -194,18 +195,32 @@ let updateGraph = function() {
     return;
   }
 
-  let data = createData();
-
-  if (!wrapper.hasClass('group-work-created')) {
-    wrapper.addClass('group-work-created');
-
-    initGroups(data, selector)
+  let heatmap_params = {
+    obsIds: selectedObservations.get(),
+    envId: selectedEnvironment.get(),
   }
-  else {
-    $('#heatmap-d3-wrapper').html('');
-    updateGroups(data, selector)
-  }
-  // updateFilteredStudents()
+
+  loadingData.set(true)
+  Meteor.call('getGroupWorkData', heatmap_params, refresh, function(err, result) {
+    if (err) {
+      console_log_conditional('error', err);
+      return;
+    }
+
+    if (!wrapper.hasClass('group-work-created')) {
+      wrapper.addClass('group-work-created');
+
+      initGroups(result.data, selector)
+    }
+    else {
+      $('#heatmap-d3-wrapper').html('');
+      updateGroups(result.data, selector)
+    }
+
+    cacheInfo.set({createdAt: result.createdAt.toLocaleString(), timeToGenerate: result.timeToGenerate, timeToFetch: result.timeToFetch});
+    loadingData.set(false);
+    console_log_conditional('result.createdAt.toLocaleString()', result.createdAt.toLocaleString());
+  });
 }
 
 let getStudentPadding = function(count, max) {
@@ -474,101 +489,6 @@ let updateGroups = function(data, selector) {
   initGroups(data, selector);
 }
 
-let createData = function() {
-  let ret = {
-    groups: [],
-  };
-
-  let envId = selectedEnvironment.get();
-  let observations = getObservations(selectedObservations.get());
-  let obsIds = selectedObservations.get();
-  let allStudents = getStudents(envId);
-
-  ret.groups = observations.map(function(observation) {
-    console_log_conditional('observation', observation);
-    observation.sequences = getSequences(observation._id, envId);
-    // let obs = getObs
-    observation.students = observation.small_group.map(function(studId) {
-      let student = getStudent(studId, envId);
-      student.sequences = observation.sequences.filter(seq => seq.info.student.studentId === student._id);
-      student.total_contributions = student.sequences.length;
-      student.sorted_contributions = getDiscourseDimensions().map(function(dim) {
-        // let sequences = student.sequences.filter(seq => console_log_conditional(seq));
-        return {
-          dim: dim.name,
-          option_counts: dim.options.split(',')
-            .map(function(opt) {return {name: opt.trim()}})
-            .map(function(opt) {
-              let filtered_seqs = student.sequences.filter(seq => seq.info.parameters[dim.name] === opt.name);
-              console_log_conditional(opt, filtered_seqs);
-              return {
-                option: opt.name,
-                count: filtered_seqs.length,
-                sequences: filtered_seqs
-              }
-            })
-        }
-      });
-      return student
-    });
-    return observation
-  });
-
-  return ret;
-
-  //
-  // ret.students = allStudents.map(function(student) {
-  //   return {
-  //     name: student.info.name,
-  //     studentId: student._id,
-  //     class: '',
-  //     student: student,
-  //     count: 0,
-  //     show_count: true,
-  //     sort_first: false,
-  //   }
-  // });
-  //
-  //
-  // allStudents.map(function(student) {
-  //   for (let obsId_k in obsIds) {
-  //
-  //     if (!obsIds.hasOwnProperty(obsId_k)) continue;
-  //     let obsId = obsIds[obsId_k];
-  //
-  //     let sequences = getSequences(obsId, envId);
-  //     for (let sequence_k in sequences) {
-  //       if (!sequences.hasOwnProperty(sequence_k)) continue;
-  //       let sequence = sequences[sequence_k];
-  //       let ds_index = ret.students.findIndex(datapoint => datapoint.studentId === student._id);
-  //       if (sequence.info.student.studentId === student._id) {
-  //         ret.students[ds_index].count += 1;
-  //       }
-  //     }
-  //   }
-  // });
-  //
-  //
-  // let all_counts = ret.students.map(d => d.count);
-  // ret.median = get_median(all_counts);
-  // ret.average = (all_counts);
-  // ret.quartiles = get_n_groups(all_counts, 4, true, 'Group'); //quartiles
-  // ret.students.forEach(function(student) {
-  //   student.median = get_median(all_counts);
-  //   student.average = get_average(all_counts);
-  // })
-  //
-  // ret.quartiles.forEach(function(quartile) {
-  //   quartile.students = ret.students.filter(function(student) {
-  //     return quartile.min_exclusive < student.count && student.count <= quartile.max_inclusive
-  //   }).sort((a, b) => b.count - a.count)
-  // })
-  //
-  // console_table_conditional(ret.students);
-  // console_table_conditional(ret.quartiles);
-  //
-  // return ret
-}
 
 let getDemographics = function() {
   let envId = selectedEnvironment.get();
