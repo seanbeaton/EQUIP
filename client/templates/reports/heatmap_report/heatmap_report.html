@@ -31,7 +31,7 @@
             {{/if}}
         </section>
         <section class="report-section report-section__graph">
-            <div class="heatmap-report-wrapper">
+            <div class="heatmap-report-wrapper report-wrapper {{#if loadingDataClass}}report-wrapper--loading{{/if}}">
                 <div class="heatmap-report">
                     <div class="heatmap-report__graph">
                         {{#if students }}
@@ -61,6 +61,9 @@
                     </div>
                 </div>
             </div>
+            {{#if cache_info }}
+                <span class="cache-info">Stats generated last at {{cache_info.createdAt}} in {{cache_info.timeToGenerate}}ms{{#if cache_info.timeToFetch}} and fetched from cache in {{cache_info.timeToFetch}}ms{{/if}}. They will be automatically updated every hour, or you can <a class="refresh-report">refresh</a> them now.</span>
+            {{/if}}
         </section>
             <!--</div>-->
         <!--</div>-->

@@ -19,7 +19,9 @@ const selectedDemographic = new ReactiveVar(false);
 const selectedDiscourseDimension = new ReactiveVar(false);
 const selectedDiscourseOption = new ReactiveVar(false);
 const selectedDatasetType = new ReactiveVar('contributions');
+
 const cacheInfo = new ReactiveVar();
+const loadingData = new ReactiveVar(false);
 
 Template.timelineReport.onCreated(function created() {
   this.autorun(() => {
@@ -126,7 +128,10 @@ Template.timelineReport.helpers({
   },
   cache_info: function() {
     return cacheInfo.get();
-  }
+  },
+  loadingDataClass: function() {
+    return loadingData.get();
+  },
 });
 
 
@@ -212,10 +217,6 @@ Template.timelineReport.events({
   }
 })
 
-
-let createTimelineData = async function() {
-};
-
 let sidebar;
 
 let clearGraph = function() {
@@ -255,6 +256,7 @@ let updateGraph = async function(refresh) {
     selectedObservations: selectedObservations.get(),
   }
 
+  loadingData.set(true);
   Meteor.call('getTimelineData', timeline_params, refresh, function(err, result) {
     if (err) {
       console_log_conditional('error', err);
@@ -275,7 +277,8 @@ let updateGraph = async function(refresh) {
       sidebar.setCurrentPanel('start');
       updateTimelineGraph(result.data, timeline_selector)
     }
-    cacheInfo.set(result.createdAt.toLocaleString());
+    cacheInfo.set({createdAt: result.createdAt.toLocaleString(), timeToGenerate: result.timeToGenerate, timeToFetch: result.timeToFetch});
+loadingData.set(false);
     console_log_conditional('result.createdAt.toLocaleString()', result.createdAt.toLocaleString());
   });
 }

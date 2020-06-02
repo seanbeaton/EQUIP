@@ -17,7 +17,7 @@
             {{#if observationNames}} <h3>Observations: {{ observationNames }}</h3> {{/if }}
         </section>
         <section class="report-section report-section__graph">
-            <div class="group-work-report-wrapper">
+            <div class="group-work-report-wrapper report-wrapper {{#if loadingDataClass}}report-wrapper--loading{{/if}}">
                 <div class="group-work-report">
                     <div class="group-work-report__graph">
                         {{#if students }}

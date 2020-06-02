@@ -2,10 +2,12 @@ import {getStudents} from "../../helpers/students";
 import {getSequences} from "../../helpers/sequences";
 import {getObservations} from "../../helpers/graphs";
 import {console_log_conditional} from "/helpers/logging"
+import {checkAccess} from "../../helpers/access";
 
 
 Meteor.methods({
   getTimelineData: function(parameters, refresh) {
+    checkAccess(parameters.envId, 'environment', 'view');
     if (typeof refresh === 'undefined') {
       refresh = false;
     }
@@ -14,7 +16,7 @@ Meteor.methods({
     const parameters_cache_key = JSON.stringify(parameters);
     const one_hour = 1*60*60*1000;
     const search_time_limit = refresh ? 0 : one_hour;
-
+    let fetch_start = new Date().getTime();
     let report_data = CachedReportData.findOne({
       createdAt: {$gte: new Date(new Date().getTime()-search_time_limit)},
       reportType: 'getTimelineData',
@@ -24,14 +26,20 @@ Meteor.methods({
     });
 
     if (!report_data) {
+      let start = new Date().getTime();
       report_data = {
         data: createTimelineData(parameters),
         createdAt: new Date(),
         reportType: 'getTimelineData',
         parameters_cache_key: parameters_cache_key,
-        cached: false
+        cached: false,
+        timeTofetch: false,
       };
+      report_data['timeToGenerate'] = new Date().getTime() - start;
       CachedReportData.insert(Object.assign({}, report_data, {cached: true}))
+    }
+    else {
+      report_data['timeToFetch'] = new Date().getTime() - fetch_start;
     }
     console_log_conditional('report data', report_data);
     return report_data

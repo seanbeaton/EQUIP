@@ -11,7 +11,9 @@ const selectedObservations = new ReactiveVar([]);
 const selectedXParameter = new ReactiveVar(false);
 const selectedYParameter = new ReactiveVar(false);
 const selectedDatasetType = new ReactiveVar('contributions');
+
 const cacheInfo = new ReactiveVar();
+const loadingData = new ReactiveVar(false);
 
 Template.interactiveReport.onCreated(function created() {
   this.autorun(() => {
@@ -87,7 +89,10 @@ Template.interactiveReport.helpers({
   },
   cache_info: function() {
     return cacheInfo.get();
-  }
+  },
+  loadingDataClass: function() {
+    return loadingData.get();
+  },
 });
 
 
@@ -364,16 +369,15 @@ let updateGraph = async function(refresh) {
     currentDemo: getCurrentDemographicSelection(),
   }
 
+  loadingData.set(true);
   Meteor.call('getInteractiveReportData', dataParams, refresh, function(err, result) {
     if (err) {
       console_log_conditional('error', err);
       return;
     }
-    cacheInfo.set(result.createdAt.toLocaleString());
-    console_log_conditional('result.createdAt.toLocaleString()', result.createdAt.toLocaleString());
-
+    cacheInfo.set({createdAt: result.createdAt.toLocaleString(), timeToGenerate: result.timeToGenerate, timeToFetch: result.timeToFetch});
+loadingData.set(false);
     createGraph(result.data, '.interactive-report__graph', selectedDatasetType.get())
-
   })
 };
 

@@ -17,6 +17,9 @@ const selectedStudent = new ReactiveVar(false);
 const selectedSpotlightDimension = new ReactiveVar(false);
 const groupDisplayType = new ReactiveVar('blocks');
 
+const cacheInfo = new ReactiveVar();
+const loadingData = new ReactiveVar(false);
+
 Template.groupWorkReport.onCreated(function created() {
   this.autorun(() => {
     this.subscribe('subjects');
@@ -147,6 +150,12 @@ Template.groupWorkReport.helpers({
   },
   discourseparams: function() {
     return getDiscourseDimensions();
+  },
+  cache_info: function() {
+    return cacheInfo.get();
+  },
+  loadingDataClass: function() {
+    return loadingData.get();
   },
 })
 

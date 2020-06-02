@@ -33,7 +33,7 @@
     </section>
     <section class="report-section report-section__graph">
 
-        <div class="interactive-report-wrapper">
+        <div class="interactive-report-wrapper report-wrapper {{#if loadingDataClass}}report-wrapper--loading{{/if}}">
             <div class="interactive-report">
                 <div class="interactive-report__top-left"></div>
                 <div class="interactive-report__y-scale"></div>
@@ -66,7 +66,7 @@
                 </div>
         </div>
         {{#if cache_info }}
-            <span class="cache-info">Stats generated last at {{cache_info}}. They will be automatically updated every hour, or you can <a class="refresh-report">refresh</a> them now.</span>
+            <span class="cache-info">Stats generated last at {{cache_info.createdAt}} in {{cache_info.timeToGenerate}}ms{{#if cache_info.timeToFetch}} and fetched from cache in {{cache_info.timeToFetch}}ms{{/if}}. They will be automatically updated every hour, or you can <a class="refresh-report">refresh</a> them now.</span>
         {{/if}}
     </section>
     </div>

@@ -22,6 +22,9 @@ const students = new ReactiveVar([]);
 const selectedStudent = new ReactiveVar(false);
 const selectedSpotlightDimension = new ReactiveVar(false);
 
+const cacheInfo = new ReactiveVar();
+const loadingData = new ReactiveVar(false);
+
 Template.histogramReport.onCreated(function created() {
   this.autorun(() => {
     this.subscribe('subjects');
@@ -121,6 +124,12 @@ Template.histogramReport.helpers({
   },
   discourseparams: function() {
     return getDiscourseDimensions(selectedEnvironment.get());
+  },
+  cache_info: function() {
+    return cacheInfo.get();
+  },
+  loadingDataClass: function() {
+    return loadingData.get();
   },
 })
 

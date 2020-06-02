@@ -14,6 +14,7 @@ import {
   getDiscourseOptionsForDimension,
   getObservations, studentContribGraph, studentTimeGraph
 } from "../../../../helpers/graphs";
+import {Sidebar} from "../../../../helpers/graph_sidebar";
 
 // const envSet = new ReactiveVar(false);
 const obsOptions = new ReactiveVar([]);
@@ -28,11 +29,14 @@ const totalContributions = new ReactiveVar(0);
 
 const currentDemoFilters = new ReactiveVar(false);
 
+const cacheInfo = new ReactiveVar();
+const loadingData = new ReactiveVar(false);
+
+
 Template.heatmapReport.onCreated(function created() {
   this.autorun(() => {
-    this.subscribe('subjects');
     this.subscribe('observations');
-    this.subscribe('sequences');
+    this.subscribe('subjects');
     this.subscribe('subjectParameters');
     this.subscribe('sequenceParameters');
     this.subscribe('environments');
@@ -162,7 +166,13 @@ Template.heatmapReport.helpers({
   },
   selectedObservations: function() {
     return selectedObservations.get();
-  }
+  },
+  cache_info: function() {
+    return cacheInfo.get();
+  },
+  loadingDataClass: function() {
+    return loadingData.get();
+  },
 });
 
 let getDemographics = function() {
@@ -244,6 +254,10 @@ Template.heatmapReport.events({
     $('.students').html('');
     updateGraph()
   },
+  'click .refresh-report': function(e) {
+    e.preventDefault();
+    updateGraph(true)
+  },
 })
 
 $(window).on('heatmap_student_sort_updated', function(e, sort_type) {
@@ -255,129 +269,6 @@ $(window).on('heatmap_student_sort_demo_updated', function(e, sort_buckets_demo)
   updateGraph();
   console_log_conditional('demo val', sort_buckets_demo, heatmapReportSortDemoChosen.get());
 })
-
-let createHeatmapData = function() {
-  let ret = {
-    contributions_dataset: []
-  };
-
-  let envId = selectedEnvironment.get();
-  let obsIds = selectedObservations.get();
-  // let demo = selectedDemographic.get();
-  // let dimension = selectedDiscourseDimension.get();
-  // let option = selectedDiscourseOption.get();
-  let allStudents = getStudents(envId);
-  // let demo_opts = getDemographicOptions();
-
-  ret.limit_x = 0;
-  ret.limit_y = 0;
-  ret.contributions_dataset = allStudents.map(function(student) {
-    if (ret.limit_y > student.data_y) {
-      ret.limit_y = student.data_y
-    }
-    if (ret.limit_x > student.data_x) {
-      ret.limit_x = student.data_x
-    }
-    return {
-      name: student.info.name,
-      studentId: student._id,
-      class: '',
-      student: student,
-      data_x: student.data_x,
-      data_y: student.data_y,
-      count: 0,
-      show_count: true,
-      sort_first: false,
-    }
-  });
-
-  allStudents.map(function(student) {
-    for (let obsId_k in obsIds) {
-
-      if (!obsIds.hasOwnProperty(obsId_k)) continue;
-      let obsId = obsIds[obsId_k];
-
-      let sequences = getSequences(obsId, envId);
-      for (let sequence_k in sequences) {
-        if (!sequences.hasOwnProperty(sequence_k)) continue;
-        let sequence = sequences[sequence_k];
-        let ds_index = ret.contributions_dataset.findIndex(datapoint => datapoint.studentId === student._id);
-        if (sequence.info.student.studentId === student._id) {
-          ret.contributions_dataset[ds_index].count += 1;
-        }
-      }
-    }
-  });
-
-
-  let highest_count = ret.contributions_dataset.reduce((acc, student) => student.count > acc ? student.count : acc, 1);
-  // let highest_count = ret.contributions_dataset.map(student => student.count).reduce((acc, student) => student > acc ? student : acc, 0)
-  ret.contributions_dataset = ret.contributions_dataset.map(function(datum) {
-    datum.quintile = Math.ceil(datum.count * 4 / highest_count);
-    return datum
-  });
-
-  // if (heatmapReportSortType.get() === 'quintiles') {
-  //   let sortQuintiles = function(a, b) {
-  //     return a.quintile - b.quintile;
-  //   }
-  //   ret.contributions_dataset.sort(sortQuintiles)
-  // }
-  // else
-  if (heatmapReportSortType.get() === 'buckets') {
-    let selectedDemo = heatmapReportSortDemoChosen.get();
-    let selected_demo_options = getDemographics().filter(d => d.name === selectedDemo)[0];
-    let opts;
-    if (selected_demo_options) {
-      opts = selected_demo_options.options.split(',').map(function(opt) {return {name: opt.trim()}});
-    }
-    else {
-      opts = [];
-    }
-    ret.contributions_dataset = ret.contributions_dataset.map(datum => {datum.selected_demo_value = datum.student.info.demographics[selectedDemo]; return datum})
-
-    opts.map(opt => ret.contributions_dataset.push({
-      name: opt.name,
-      studentId: opt.name + '-label',
-      selected_demo_value: opt.name,
-      class: opt.name + '-label demo-label',
-      student: {},
-      data_x: 0,
-      data_y: 0,
-      count: 0,
-      show_count: false,
-      sort_first: true,
-    }));
-
-
-
-    let sortDemo = function(a, b) {
-      let a_demo = a.selected_demo_value;
-      let b_demo = b.selected_demo_value;
-      if (a_demo > b_demo) {
-        return 1
-      }
-      else if (a_demo === b_demo) {
-        // return b.sort_first - a.sort_first;
-        if (a.sort_first) {
-          return -1;
-        }
-        else if (b.sort_first) {
-          return 1
-        }
-        else {
-          return b.count - a.count;
-        }
-      }
-      else {
-        return -1
-      }
-    };
-    ret.contributions_dataset = ret.contributions_dataset.sort(sortDemo);
-  }
-
-  return ret
-};
 
 let clearGraph = function() {
   students.set([])
@@ -391,7 +282,7 @@ let clearGraph = function() {
   // $(timeline_selector + ' svg').remove();
 }
 
-let updateGraph = function() {
+let updateGraph = async function(refresh) {
   let heatmap_wrapper = $('.heatmap-report-wrapper');
   let heatmap_selector = '.heatmap-report__graph';
 
@@ -401,19 +292,37 @@ let updateGraph = function() {
     return;
   }
 
-  let data = createHeatmapData();
-  updateTotalContribs(data.contributions_dataset);
-  $('.heatmap-report-wrapper').removeClass('filters-active');
-  if (!heatmap_wrapper.hasClass('heatmap-created')) {
-    heatmap_wrapper.addClass('heatmap-created');
+  let heatmap_params = {
+    obsIds: selectedObservations.get(),
+    envId: selectedEnvironment.get(),
+    selectedDemo: heatmapReportSortDemoChosen.get(),
+    heatmapReportSortType: heatmapReportSortType.get(),
+  }
+  loadingData.set(true)
+  Meteor.call('getHeatmapData', heatmap_params, refresh, function(err, result) {
+    if (err) {
+      console_log_conditional('error', err);
+      return;
+    }
 
-    initHeatmapGraph(data, heatmap_selector)
-  }
-  else {
-    $('#heatmap-d3-wrapper').html('');
-    updateHeatmapGraph(data, heatmap_selector)
-  }
-  updateFilteredStudents()
+    updateTotalContribs(result.data.contributions_dataset);
+    $('.heatmap-report-wrapper').removeClass('filters-active');
+    if (!heatmap_wrapper.hasClass('heatmap-created')) {
+      heatmap_wrapper.addClass('heatmap-created');
+
+      initHeatmapGraph(result.data, heatmap_selector)
+    }
+    else {
+      $('#heatmap-d3-wrapper').html('');
+      updateHeatmapGraph(result.data, heatmap_selector)
+    }
+    updateFilteredStudents()
+    cacheInfo.set({createdAt: result.createdAt.toLocaleString(), timeToGenerate: result.timeToGenerate, timeToFetch: result.timeToFetch});
+    loadingData.set(false);
+    console_log_conditional('result.createdAt.toLocaleString()', result.createdAt.toLocaleString());
+  });
+
+
 }
 
 let updateFilteredStudents = function() {
