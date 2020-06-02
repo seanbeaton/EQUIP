@@ -20,7 +20,7 @@ Feature: Heatmap report page
     And I click on the item with the selector ".vis-item-content=Observation #2 - 9/6 (2018-09-06 - WC)"
     And I click on the item with the selector ".vis-item-content=Observation #3 - 9/13 (2018-09-13 - WC)"
     And I see a ".report-section--select h3:nth-of-type(3)" with the text "Observations: "
-    And I wait "2000" ms
+    And I wait "10000" ms
     Then I see 32 ".student-box"
     # spot checks
     And I see a ".c--observation__student-box=Jalen (13)" in the wrapper ".student-box:not(.disabled-student)"
@@ -52,7 +52,7 @@ Feature: Heatmap report page
     And I click on the item with the selector ".vis-item-content=Observation #1 - 9/4 (2018-09-04 - WC)"
     And I click on the item with the selector ".vis-item-content=Observation #2 - 9/6 (2018-09-06 - WC)"
     And I click on the item with the selector ".vis-item-content=Observation #3 - 9/13 (2018-09-13 - WC)"
-    And I wait "4000" ms
+    And I wait "10000" ms
     And I see a "#Boy-label=Boy"
     And I see a "#Girl-label=Girl"
     And I see a ".c--observation__student-box=Rick (17)" in the wrapper ".student-box:nth-of-type(2)[data-contrib-count='17']"
@@ -65,7 +65,7 @@ Feature: Heatmap report page
     And I wait "4000" ms
     And I click on the item with the selector ".vis-item-content=Observation #1 - 9/4 (2018-09-04 - WC)"
     And I click on the item with the selector ".vis-item-content=Observation #2 - 9/6 (2018-09-06 - WC)"
-    And I wait "4000" ms
+    And I wait "10000" ms
     And I see a ".c--observation__student-box=Rick (8)" in the wrapper ".student-box:not(.disabled-student)"
     And I click on the item with the selector ".vis-item-content=Observation #3 - 9/13 (2018-09-13 - WC)"
     And I see a ".c--observation__student-box=Rick (17)" in the wrapper ".student-box:not(.disabled-student)"
@@ -77,7 +77,7 @@ Feature: Heatmap report page
     And I wait "4000" ms
     And I click on the item with the selector ".vis-item-content=Observation #1 - 9/4 (2018-09-04 - WC)"
     And I click on the item with the selector ".vis-item-content=Observation #2 - 9/6 (2018-09-06 - WC)"
-    And I wait "4000" ms
+    And I wait "10000" ms
     And I click on the item with the selector ".c--observation__student-box=Rick (8)"
     And I see a ".demo-label=Gender:" in the wrapper ".student-spotlight__demographics li:nth-child(1)"
     And I see a ".demo-value=Boy" in the wrapper ".student-spotlight__demographics li:nth-child(1)"

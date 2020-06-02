@@ -13,7 +13,9 @@ Feature: Static report page
     When I don't see an ".obs-selection .option-selectors"
     And I don't see an ".dparam-selection .option-selectors"
     And I don't see an ".sparam-selection .option-selectors"
+    And I wait "3000" ms
     And I click on the item with the selector ".classroom-selection:first-child"
+    And I wait "3000" ms
     Then I see 4 ".obs-selection .option-selectors"
     And I see 6 ".dparam-selection .option-selectors"
     And I see 6 ".sparam-selection .option-selectors"
@@ -24,7 +26,9 @@ Feature: Static report page
     And I see an ".sparam-selection .option-selectors[data_id='Student Talk (Type)']"
 
   Scenario: Clicking on boxes makes them chosen
+    And I wait "3000" ms
     When I click on the item with the selector ".classroom-selection:first-child"
+    And I wait "3000" ms
     Then I see an ".classroom-selection.chosen"
     And I click on the item with the selector ".dparam-selection .option-selectors[data_id='Gender']"
     And I see an ".dparam-selection .option-selectors[data_id='Gender'].chosen"
@@ -32,7 +36,9 @@ Feature: Static report page
     And I see an ".sparam-selection .option-selectors[data_id='Student Talk (Type)'].chosen"
 
   Scenario: I can generate a report with all parameters
+    And I wait "3000" ms
     When I click on the item with the selector ".classroom-selection:first-child"
+    And I wait "3000" ms
     And I click on the item with the selector ".obs-selection .option-selectors[data_id='999']"
     And I click on the item with the selector ".dparam-selection .option-selectors[data_id='999']"
     And I click on the item with the selector ".sparam-selection .option-selectors[data_id='999']"
@@ -40,7 +46,9 @@ Feature: Static report page
     Then I see a ".report-description" with the text "Details about the classroom"
 
   Scenario: I can see the classroom statistics
+    And I wait "3000" ms
     When I click on the item with the selector ".classroom-selection:first-child"
+    And I wait "3000" ms
     And I click on the item with the selector ".obs-selection .option-selectors[data_id='999']"
     And I click on the item with the selector ".dparam-selection .option-selectors[data_id='999']"
     And I click on the item with the selector ".sparam-selection .option-selectors[data_id='999']"
@@ -70,7 +78,9 @@ Feature: Static report page
     And I see a ".category-list:nth-child(6) .single-stat:nth-child(3)" with the text "Dismissive: 14 / 10.07%"
 
   Scenario: One of the demographic pie graphs is correct
+    And I wait "3000" ms
     When I click on the item with the selector ".classroom-selection:first-child"
+    And I wait "3000" ms
     And I click on the item with the selector ".obs-selection .option-selectors[data_id='999']"
     And I click on the item with the selector ".dparam-selection .option-selectors[data_id='999']"
     And I click on the item with the selector ".sparam-selection .option-selectors[data_id='999']"
