@@ -24,7 +24,6 @@ const cacheInfo = new ReactiveVar();
 Template.timelineReport.onCreated(function created() {
   this.autorun(() => {
     this.subscribe('observations');
-    // this.subscribe('sequences');
     this.subscribe('subjects');
     this.subscribe('subjectParameters');
     this.subscribe('sequenceParameters');
