@@ -1,7 +1,7 @@
 // Meteor.siteStats.events({
 //
 // });
-import {console_log_conditional} from "/helpers/logging"
+import {console_log_conditional} from "/helpers/logging";
 
 const stats = new ReactiveVar([]);
 const statsLoaded = new ReactiveVar(false);
