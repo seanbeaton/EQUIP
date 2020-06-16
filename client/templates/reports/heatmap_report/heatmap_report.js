@@ -32,6 +32,9 @@ const cacheInfoStudentContrib = new ReactiveVar();
 const cacheInfoStudentTime = new ReactiveVar();
 const loadingData = new ReactiveVar(false);
 
+const latestDataRequest = new ReactiveVar();
+const cachedDataRequests = new ReactiveVar({})
+
 
 Template.heatmapReport.onCreated(function created() {
   this.autorun(() => {
@@ -47,6 +50,11 @@ Template.heatmapReport.helpers({
   environments: function() {
     let envs = Environments.find().fetch();
     envs = envs.map(function(env) {
+      if (typeof env.envName === 'undefined') {
+        env.envName = 'Loading...';
+        env.disabled = 'disabled';
+        return env;
+      }
       let obsOpts = getObsOptions(env._id);
       //console_log_conditional('obs_opts', obsOpts);
       if (obsOpts.length === 0) {
@@ -242,6 +250,8 @@ Template.heatmapReport.events({
   },
   'click .student-spotlight__close': function() {
     selectedStudent.set(false);
+    latestDataRequest.set(false)
+    loadingData.set(false)
   },
   'change .filters__wrapper .filter': function() {
     let selected_filters = getDemographics().map(function(demo) {
@@ -262,6 +272,7 @@ Template.heatmapReport.events({
   },
   'click .refresh-report': function(e) {
     e.preventDefault();
+    cachedDataRequests.set({});
     updateGraph(true)
   },
   'click .refresh-report-student-contrib': function(e) {
@@ -297,12 +308,8 @@ let clearGraph = function() {
 }
 
 let updateGraph = async function(refresh) {
-  let heatmap_wrapper = $('.heatmap-report-wrapper');
-  let heatmap_selector = '.heatmap-report__graph';
 
   if (selectedObservations.get().length < 1) {
-    // heatmap_wrapper.html('');
-    // heatmap_wrapper.removeClass('heatmap-created')
     return;
   }
 
@@ -313,31 +320,71 @@ let updateGraph = async function(refresh) {
     heatmapReportSortType: heatmapReportSortType.get(),
   }
   loadingData.set(true)
-  Meteor.call('getHeatmapData', heatmap_params, refresh, function(err, result) {
-    if (err) {
-      console_log_conditional('error', err);
-      return;
-    }
 
-    updateTotalContribs(result.data.contributions_dataset);
-    $('.heatmap-report-wrapper').removeClass('filters-active');
-    if (!heatmap_wrapper.hasClass('heatmap-created')) {
-      heatmap_wrapper.addClass('heatmap-created');
+  let cachedData = cachedDataRequests.get();
+  let cachedResult = cachedData;
 
-      initHeatmapGraph(result.data, heatmap_selector)
-    }
-    else {
-      $('#heatmap-d3-wrapper').html('');
-      updateHeatmapGraph(result.data, heatmap_selector)
-    }
-    updateFilteredStudents()
-    cacheInfo.set({createdAt: result.createdAt.toLocaleString(), timeToGenerate: result.timeToGenerate, timeToFetch: result.timeToFetch});
-    loadingData.set(false);
-    console_log_conditional('result.createdAt.toLocaleString()', result.createdAt.toLocaleString());
-  });
+  if (typeof cachedResult[JSON.stringify(heatmap_params)] !== 'undefined') {
+    showData(cachedResult[JSON.stringify(heatmap_params)]);
+    cacheInfo.set({...cacheInfo.get(), ...{localCache: true}});
+  }
+  else {
 
+    let currentDataRequest = Math.random()
+    latestDataRequest.set(currentDataRequest)
+    console.log(new Error().stack);
+    console.log('setting latest data req', currentDataRequest)
+
+    Meteor.call('getHeatmapData', heatmap_params, refresh, function(err, result) {
+      if (err) {
+        console_log_conditional('error', err);
+        return;
+      }
+
+      let cachedData = cachedDataRequests.get()
+      cachedData[JSON.stringify(heatmap_params)] = result
+      cachedDataRequests.set(cachedData);
+
+      if (currentDataRequest !== latestDataRequest.get()) {
+        console.log('currentDataRequest', currentDataRequest)
+        console.log('latestDataRequest', latestDataRequest.get())
+        console.log('current cachedDataRequests.get()', cachedDataRequests.get())
+        return;
+      }
+      else {
+        console.log('data req matches')
+        latestDataRequest.set(null)
+      }
+
+
+      showData(result)
+    });
+
+  }
 
 }
+
+let showData = function(result) {
+  let heatmap_wrapper = $('.heatmap-report-wrapper');
+  let heatmap_selector = '.heatmap-report__graph';
+
+  updateTotalContribs(result.data.contributions_dataset);
+  $('.heatmap-report-wrapper').removeClass('filters-active');
+  if (!heatmap_wrapper.hasClass('heatmap-created')) {
+    heatmap_wrapper.addClass('heatmap-created');
+
+    initHeatmapGraph(result.data, heatmap_selector)
+  }
+  else {
+    $('#heatmap-d3-wrapper').html('');
+    updateHeatmapGraph(result.data, heatmap_selector)
+  }
+  updateFilteredStudents()
+  cacheInfo.set({createdAt: result.createdAt.toLocaleString(), timeToGenerate: result.timeToGenerate, timeToFetch: result.timeToFetch});
+  loadingData.set(false);
+  console_log_conditional('result.createdAt.toLocaleString()', result.createdAt.toLocaleString());
+}
+
 
 let updateFilteredStudents = function() {
   let selected_filters = currentDemoFilters.get();
@@ -661,9 +708,17 @@ let updateStudentTimeGraph = function (refresh) {
   }
 
   loadingData.set(true)
+  let currentDataRequest = Math.random()
+  latestDataRequest.set(currentDataRequest)
+
   Meteor.call('getStudentTimeData', student_time_params, refresh, function(err, result) {
     if (err) {
       console_log_conditional('error', err);
+      return;
+    }
+    if (currentDataRequest === latestDataRequest.get()) {
+      latestDataRequest.set(null)
+      console.log('cancelling data publishing for out of date request')
       return;
     }
 

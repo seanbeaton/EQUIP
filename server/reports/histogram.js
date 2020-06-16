@@ -56,7 +56,6 @@ let createHistogramData = function(params) {
   };
 
   let allStudents = getStudents(envId);
-
   ret.students = allStudents.map(function(student) {
     return {
       name: student.info.name,
@@ -69,29 +68,26 @@ let createHistogramData = function(params) {
     }
   });
 
+  for (let obsId_k in obsIds) {
+    if (!obsIds.hasOwnProperty(obsId_k)) continue;
+    let obsId = obsIds[obsId_k];
 
-  allStudents.map(function(student) {
-    for (let obsId_k in obsIds) {
-
-      if (!obsIds.hasOwnProperty(obsId_k)) continue;
-      let obsId = obsIds[obsId_k];
-
-      let sequences = getSequences(obsId, envId);
-      for (let sequence_k in sequences) {
-        if (!sequences.hasOwnProperty(sequence_k)) continue;
-        let sequence = sequences[sequence_k];
-        let ds_index = ret.students.findIndex(datapoint => datapoint.studentId === student._id);
+    let sequences = getSequences(obsId, envId);
+    for (let sequence_k in sequences) {
+      if (!sequences.hasOwnProperty(sequence_k)) continue;
+      let sequence = sequences[sequence_k];
+      allStudents.map(function(student) {
         if (sequence.info.student.studentId === student._id) {
+          let ds_index = ret.students.findIndex(datapoint => datapoint.studentId === student._id);
           ret.students[ds_index].count += 1;
         }
-      }
+      });
     }
-  });
-
+  }
 
   let all_counts = ret.students.map(d => d.count);
   ret.median = get_median(all_counts);
-  ret.average = (all_counts);
+  ret.average = get_average(all_counts);
   ret.quartiles = get_n_groups(all_counts, 4, true, 'Group'); //quartiles
   ret.students.forEach(function(student) {
     student.median = get_median(all_counts);

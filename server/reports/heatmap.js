@@ -55,7 +55,12 @@ let createHeatmapData = function(params) {
     contributions_dataset: []
   };
 
+  // let start_1 = new Date().getTime();
+
   let allStudents = getStudents(envId);
+
+  // console.log(new Date().getTime() - start_1, 'start_1')
+  // let start_2 = new Date().getTime();
 
   ret.limit_x = 0;
   ret.limit_y = 0;
@@ -79,39 +84,43 @@ let createHeatmapData = function(params) {
     }
   });
 
-  allStudents.map(function(student) {
-    for (let obsId_k in obsIds) {
+  // console.log(new Date().getTime() - start_2, 'start_2')
+  // let start_3 = new Date().getTime();
 
-      if (!obsIds.hasOwnProperty(obsId_k)) continue;
-      let obsId = obsIds[obsId_k];
-
-      let sequences = getSequences(obsId, envId);
-      for (let sequence_k in sequences) {
-        if (!sequences.hasOwnProperty(sequence_k)) continue;
-        let sequence = sequences[sequence_k];
-        let ds_index = ret.contributions_dataset.findIndex(datapoint => datapoint.studentId === student._id);
+  // get contrib numbers for each student.
+  for (let obsId_k in obsIds) {
+    if (!obsIds.hasOwnProperty(obsId_k)) continue;
+    let obsId = obsIds[obsId_k];
+    let sequences = getSequences(obsId, envId);
+    for (let sequence_k in sequences) {
+      if (!sequences.hasOwnProperty(sequence_k)) continue;
+      let sequence = sequences[sequence_k];
+      allStudents.map(function(student) {
         if (sequence.info.student.studentId === student._id) {
+          let ds_index = ret.contributions_dataset.findIndex(datapoint => datapoint.studentId === student._id);
           ret.contributions_dataset[ds_index].count += 1;
         }
-      }
+      });
     }
-  });
+  }
 
+  // console.log(new Date().getTime() - start_3, 'start_3')
+  // let start_4 = new Date().getTime();
 
   let highest_count = ret.contributions_dataset.reduce((acc, student) => student.count > acc ? student.count : acc, 1);
   // let highest_count = ret.contributions_dataset.map(student => student.count).reduce((acc, student) => student > acc ? student : acc, 0)
+
+  // console.log(new Date().getTime() - start_4, 'start_4')
+  // let start_5 = new Date().getTime();
+
   ret.contributions_dataset = ret.contributions_dataset.map(function(datum) {
     datum.quintile = Math.ceil(datum.count * 4 / highest_count);
     return datum
   });
 
-  // if (heatmapReportSortType.get() === 'quintiles') {
-  //   let sortQuintiles = function(a, b) {
-  //     return a.quintile - b.quintile;
-  //   }
-  //   ret.contributions_dataset.sort(sortQuintiles)
-  // }
-  // else
+  // console.log(new Date().getTime() - start_5, 'start_5')
+  // let start_6 = new Date().getTime();
+
   if (heatmapReportSortType === 'buckets') {
     let selected_demo_options = setupSubjectParameters(envId).filter(d => d.name === selectedDemo)[0];
     let opts;
@@ -135,8 +144,6 @@ let createHeatmapData = function(params) {
       show_count: false,
       sort_first: true,
     }));
-
-
 
     let sortDemo = function(a, b) {
       let a_demo = a.selected_demo_value;
@@ -162,6 +169,8 @@ let createHeatmapData = function(params) {
     };
     ret.contributions_dataset = ret.contributions_dataset.sort(sortDemo);
   }
+
+  // console.log(new Date().getTime() - start_6, 'start_6')
 
   return ret
 };

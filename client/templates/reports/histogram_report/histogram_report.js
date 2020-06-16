@@ -93,6 +93,11 @@ Template.histogramReport.helpers({
   environments: function() {
     let envs = Environments.find().fetch();
     envs = envs.map(function(env) {
+      if (typeof env.envName === 'undefined') {
+        env.envName = 'Loading...';
+        env.disabled = 'disabled';
+        return env;
+      }
       let obsOpts = getObsOptions(env._id);
       //console_log_conditional('obs_opts', obsOpts);
       if (obsOpts.length === 0) {

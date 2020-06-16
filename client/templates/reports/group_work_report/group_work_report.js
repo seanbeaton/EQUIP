@@ -22,6 +22,8 @@ const students = new ReactiveVar([]);
 const selectedStudent = new ReactiveVar(false);
 const selectedSpotlightDimension = new ReactiveVar(false);
 const groupDisplayType = new ReactiveVar('blocks');
+const latestDataRequest = new ReactiveVar();
+const cachedDataRequests = new ReactiveVar({})
 
 const cacheInfo = new ReactiveVar();
 const cacheInfoStudentContrib = new ReactiveVar();
@@ -54,6 +56,7 @@ Template.groupWorkReport.events({
           selectedStudent.set(false);
         }
         updateStudentContribGraph();
+        updateStudentTimeGraph();
         setTimeout(updateGraph, 200);
       }, obsOptions, selectedObservations, 'small_group');
     }, 50);
@@ -74,6 +77,8 @@ Template.groupWorkReport.events({
   },
   'click .student-spotlight__close': function() {
     selectedStudent.set(false);
+    latestDataRequest.set(false)
+    loadingData.set(false)
   },
   'change #disc-select': function(e) {
     let selected = $('option:selected', e.target);
@@ -113,6 +118,11 @@ Template.groupWorkReport.helpers({
   environments: function() {
     let envs = Environments.find().fetch();
     envs = envs.map(function(env) {
+      if (typeof env.envName === 'undefined') {
+        env.envName = 'Loading...';
+        env.disabled = 'disabled';
+        return env;
+      }
       let obsOpts = getObsOptions(env._id);
       console_log_conditional('obs_opts', obsOpts);
       if (obsOpts.length === 0) {
@@ -188,9 +198,6 @@ Template.groupWorkReport.helpers({
 
 
 let updateGraph = function(refresh) {
-  let wrapper = $('.group-work-report-wrapper');
-  let selector = '#group-work-d3-wrapper';
-
   if (selectedObservations.get().length < 1) {
     return;
   }
@@ -201,26 +208,43 @@ let updateGraph = function(refresh) {
   }
 
   loadingData.set(true)
+  let currentDataRequest = Math.random()
+  latestDataRequest.set(currentDataRequest)
+  console.log(new Error().stack);
+  console.log('setting latest data req', currentDataRequest)
+
   Meteor.call('getGroupWorkData', heatmap_params, refresh, function(err, result) {
     if (err) {
       console_log_conditional('error', err);
       return;
     }
-
-    if (!wrapper.hasClass('group-work-created')) {
-      wrapper.addClass('group-work-created');
-
-      initGroups(result.data, selector)
+    if (currentDataRequest !== latestDataRequest.get()) {
+      latestDataRequest.set(null)
+      console.log('currentDataRequest', currentDataRequest)
+      console.log('latestDataRequest', latestDataRequest)
+      console.log('cancelling data publishing for out of date request')
+      return;
     }
-    else {
-      $('#heatmap-d3-wrapper').html('');
-      updateGroups(result.data, selector)
-    }
-
-    cacheInfo.set({createdAt: result.createdAt.toLocaleString(), timeToGenerate: result.timeToGenerate, timeToFetch: result.timeToFetch});
-    loadingData.set(false);
-    console_log_conditional('result.createdAt.toLocaleString()', result.createdAt.toLocaleString());
+    showData(result);
   });
+}
+
+let showData = function(result) {
+  let wrapper = $('.group-work-report-wrapper');
+  let selector = '#group-work-d3-wrapper';
+
+  if (!wrapper.hasClass('group-work-created')) {
+    wrapper.addClass('group-work-created');
+    initGroups(result.data, selector)
+  }
+  else {
+    $('#heatmap-d3-wrapper').html('');
+    updateGroups(result.data, selector)
+  }
+
+  cacheInfo.set({createdAt: result.createdAt.toLocaleString(), timeToGenerate: result.timeToGenerate, timeToFetch: result.timeToFetch});
+  loadingData.set(false);
+  console_log_conditional('result.createdAt.toLocaleString()', result.createdAt.toLocaleString());
 }
 
 let getStudentPadding = function(count, max) {
@@ -559,9 +583,18 @@ let updateStudentContribGraph = function(refresh) {
   }
 
   loadingData.set(true)
+  let currentDataRequest = Math.random()
+  latestDataRequest.set(currentDataRequest)
+
   Meteor.call('getStudentContribData', student_contrib_params, refresh, function(err, result) {
     if (err) {
       console_log_conditional('error', err);
+      return;
+    }
+    if (currentDataRequest !== latestDataRequest.get()) {
+      console.log('currentDataRequest', currentDataRequest)
+      console.log('latestDataRequest', latestDataRequest)
+      latestDataRequest.set(null)
       return;
     }
 
@@ -600,9 +633,18 @@ let updateStudentTimeGraph = function (refresh) {
   }
 
   loadingData.set(true)
+  let currentDataRequest = Math.random()
+  latestDataRequest.set(currentDataRequest)
+
   Meteor.call('getStudentTimeData', student_time_params, refresh, function(err, result) {
     if (err) {
       console_log_conditional('error', err);
+      return;
+    }
+    if (currentDataRequest !== latestDataRequest.get()) {
+      latestDataRequest.set(null)
+      console.log('currentDataRequest', currentDataRequest)
+      console.log('latestDataRequest', latestDataRequest)
       return;
     }
 
