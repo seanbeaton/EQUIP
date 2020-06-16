@@ -71,14 +71,26 @@ let createTimelineData = function(params) {
     };
   });
 
+
+  let start_1 = new Date().getTime();
+
   allStudents.forEach(function(student) {
     let demoCountIndex = students_by_demo.findIndex(demoopt => demoopt.name === student.info.demographics[demo])
     students_by_demo[demoCountIndex].count++;
   });
 
+  console.log(new Date().getTime() - start_1, 'start_1')
+  let start_2 = new Date().getTime();
+
   students_by_demo.forEach(function(demographic) {
     demographic.percent = demographic.count / students_by_demo.reduce((t, d) => d.count + t, 0)
   });
+
+
+  console.log(new Date().getTime() - start_2, 'start_2')
+  let start_3 = new Date().getTime();
+
+  let obsers = getObservations(selectedObservations);
 
   for (let obsId_k in obsIds) {
 
@@ -92,8 +104,6 @@ let createTimelineData = function(params) {
 
       if (!ret.contributions_dataset.find(datapoint => datapoint.obsId === obsId)) {
         // If it wasn't there:
-        let obsers = getObservations(selectedObservations);
-
         let obs = obsers.find(obs => obs._id === obsId);
         let parseTime = d3.timeParse('%Y-%m-%d');
         let datapoint = {
@@ -123,6 +133,10 @@ let createTimelineData = function(params) {
 
     }
   }
+
+
+  console.log(new Date().getTime() - start_3, 'start_3')
+  let start_4 = new Date().getTime();
 
   ret.equity_dataset = [];
 
@@ -164,6 +178,9 @@ let createTimelineData = function(params) {
     return obs_equity
   })
 
+  console.log(new Date().getTime() - start_4, 'start_4')
+  let start_5 = new Date().getTime();
+
   ret.contributions_dataset.forEach(function(obs) {
     let vals = demo_opts.map(demo_opt => obs[demo_opt.name]);
     obs.max = Math.max.apply(null, vals);
@@ -172,6 +189,8 @@ let createTimelineData = function(params) {
     let vals = demo_opts.map(demo_opt => obs[demo_opt.name]);
     obs.max = Math.max.apply(null, vals);
   })
+
+  console.log(new Date().getTime() - start_5, 'start_5')
 
   return ret
 }

@@ -55,6 +55,7 @@ let createGroupWorkData = function(params) {
   let ret = {
     groups: [],
   };
+  let discDims = getDiscourseDimensions(envId);
 
   ret.groups = observations.map(function(observation) {
     console_log_conditional('observation', observation);
@@ -64,7 +65,7 @@ let createGroupWorkData = function(params) {
       let student = getStudent(studId, envId);
       student.sequences = observation.sequences.filter(seq => seq.info.student.studentId === student._id);
       student.total_contributions = student.sequences.length;
-      student.sorted_contributions = getDiscourseDimensions(envId).map(function(dim) {
+      student.sorted_contributions = discDims.map(function(dim) {
         // let sequences = student.sequences.filter(seq => console_log_conditional(seq));
         return {
           dim: dim.name,
@@ -72,7 +73,7 @@ let createGroupWorkData = function(params) {
             .map(function(opt) {return {name: opt.trim()}})
             .map(function(opt) {
               let filtered_seqs = student.sequences.filter(seq => seq.info.parameters[dim.name] === opt.name);
-              console_log_conditional(opt, filtered_seqs);
+              // console_log_conditional(opt, filtered_seqs);
               return {
                 option: opt.name,
                 count: filtered_seqs.length,
