@@ -187,8 +187,10 @@ Template.editSubjectParameters.events({
         }
         Command: toastr["success"]("NOTE: After the first observation is created, you will not be able to edit discourse dimensions or demographics.","Save Successful","Demographic Parameters");
       }
+      let envId = Router.current().params._envId;
       setTimeout(() => {
-          Router.go('environmentList')
+        window.jumpToEnv = envId
+        Router.go('environmentList')
       },1000)
     });
   } else {

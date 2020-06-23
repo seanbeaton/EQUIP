@@ -35,6 +35,26 @@ Template.environmentList.rendered = function() {
       $('#onboarding-modal').removeClass("is-active");
       $('#env-create-modal').addClass("is-active");
   }
+  console.log('rendered');
+  if (!this._rendered) {
+    console.log('not rendered yet')
+    this._rendered = true;
+    if (window.jumpToEnv) {
+      console.log('jumping')
+      let $acc = $('.environmentList[data-env-id="' + window.jumpToEnv + '"]');
+      let $toggle = $acc.find('.toggle-accordion')
+
+      $toggle.next().toggleClass('show');
+      $toggle.next().slideToggle(0);
+      $toggle.find(".carat").toggleClass("carat-show");
+      setTimeout(function() {
+        $([document.documentElement, document.body]).animate({
+          scrollTop: $acc.offset().top - 50
+        }, 500);
+        window.jumpToEnv = undefined;
+      }, 300)
+    }
+  }
 }
 
 Template.obsCreationModal.rendered = function() {
