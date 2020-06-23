@@ -332,8 +332,8 @@ let updateGraph = async function(refresh) {
 
     let currentDataRequest = Math.random()
     latestDataRequest.set(currentDataRequest)
-    console.log(new Error().stack);
-    console.log('setting latest data req', currentDataRequest)
+    console_log_conditional(new Error().stack);
+    console_log_conditional('setting latest data req', currentDataRequest)
 
     Meteor.call('getHeatmapData', heatmap_params, refresh, function(err, result) {
       if (err) {
@@ -346,13 +346,13 @@ let updateGraph = async function(refresh) {
       cachedDataRequests.set(cachedData);
 
       if (currentDataRequest !== latestDataRequest.get()) {
-        console.log('currentDataRequest', currentDataRequest)
-        console.log('latestDataRequest', latestDataRequest.get())
-        console.log('current cachedDataRequests.get()', cachedDataRequests.get())
+        console_log_conditional('currentDataRequest', currentDataRequest)
+        console_log_conditional('latestDataRequest', latestDataRequest.get())
+        console_log_conditional('current cachedDataRequests.get()', cachedDataRequests.get())
         return;
       }
       else {
-        console.log('data req matches')
+        console_log_conditional('data req matches')
         latestDataRequest.set(null)
       }
 
@@ -718,7 +718,7 @@ let updateStudentTimeGraph = function (refresh) {
     }
     if (currentDataRequest === latestDataRequest.get()) {
       latestDataRequest.set(null)
-      console.log('cancelling data publishing for out of date request')
+      console_log_conditional('cancelling data publishing for out of date request')
       return;
     }
 

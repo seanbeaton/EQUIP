@@ -59,7 +59,7 @@ let createHeatmapData = function(params) {
 
   let allStudents = getStudents(envId);
 
-  // console.log(new Date().getTime() - start_1, 'start_1')
+  // console_log_conditional(new Date().getTime() - start_1, 'start_1')
   // let start_2 = new Date().getTime();
 
   ret.limit_x = 0;

@@ -220,8 +220,8 @@ let updateGraph = function(refresh) {
 
     let currentDataRequest = Math.random()
     latestDataRequest.set(currentDataRequest)
-    console.log(new Error().stack);
-    console.log('setting latest data req', currentDataRequest)
+    console_log_conditional(new Error().stack);
+    console_log_conditional('setting latest data req', currentDataRequest)
 
     Meteor.call('getGroupWorkData', heatmap_params, refresh, function(err, result) {
       if (err) {
@@ -234,13 +234,13 @@ let updateGraph = function(refresh) {
       cachedDataRequests.set(cachedData);
 
       if (currentDataRequest !== latestDataRequest.get()) {
-        console.log('currentDataRequest', currentDataRequest)
-        console.log('latestDataRequest', latestDataRequest.get())
-        console.log('current cachedDataRequests.get()', cachedDataRequests.get())
+        console_log_conditional('currentDataRequest', currentDataRequest)
+        console_log_conditional('latestDataRequest', latestDataRequest.get())
+        console_log_conditional('current cachedDataRequests.get()', cachedDataRequests.get())
         return;
       }
       else {
-        console.log('data req matches')
+        console_log_conditional('data req matches')
         latestDataRequest.set(null)
       }
 
@@ -248,26 +248,6 @@ let updateGraph = function(refresh) {
     });
 
   }
-  //
-  //
-  // let currentDataRequest = Math.random()
-  // latestDataRequest.set(currentDataRequest)
-  // console.log(new Error().stack);
-  // console.log('setting latest data req', currentDataRequest)
-  //
-  // Meteor.call('getGroupWorkData', heatmap_params, refresh, function(err, result) {
-  //   if (err) {
-  //     console_log_conditional('error', err);
-  //     return;
-  //   }
-  //   if (currentDataRequest !== latestDataRequest.get()) {
-  //     latestDataRequest.set(null)
-  //     console.log('currentDataRequest', currentDataRequest)
-  //     console.log('latestDataRequest', latestDataRequest)
-  //     console.log('cancelling data publishing for out of date request')
-  //     return;
-  //   }
-  // });
 }
 
 let showData = function(result) {
@@ -633,8 +613,8 @@ let updateStudentContribGraph = function(refresh) {
       return;
     }
     if (currentDataRequest !== latestDataRequest.get()) {
-      console.log('currentDataRequest', currentDataRequest)
-      console.log('latestDataRequest', latestDataRequest)
+      console_log_conditional('currentDataRequest', currentDataRequest)
+      console_log_conditional('latestDataRequest', latestDataRequest)
       latestDataRequest.set(null)
       return;
     }
@@ -684,8 +664,8 @@ let updateStudentTimeGraph = function (refresh) {
     }
     if (currentDataRequest !== latestDataRequest.get()) {
       latestDataRequest.set(null)
-      console.log('currentDataRequest', currentDataRequest)
-      console.log('latestDataRequest', latestDataRequest)
+      console_log_conditional('currentDataRequest', currentDataRequest)
+      console_log_conditional('latestDataRequest', latestDataRequest)
       return;
     }
 
