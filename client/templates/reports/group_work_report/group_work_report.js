@@ -22,13 +22,14 @@ const students = new ReactiveVar([]);
 const selectedStudent = new ReactiveVar(false);
 const selectedSpotlightDimension = new ReactiveVar(false);
 const groupDisplayType = new ReactiveVar('blocks');
-const latestDataRequest = new ReactiveVar();
-const cachedDataRequests = new ReactiveVar({})
 
 const cacheInfo = new ReactiveVar();
 const cacheInfoStudentContrib = new ReactiveVar();
 const cacheInfoStudentTime = new ReactiveVar();
 const loadingData = new ReactiveVar(false);
+
+const latestDataRequest = new ReactiveVar();
+const cachedDataRequests = new ReactiveVar({})
 
 Template.groupWorkReport.onCreated(function created() {
   this.autorun(() => {
@@ -208,25 +209,65 @@ let updateGraph = function(refresh) {
   }
 
   loadingData.set(true)
-  let currentDataRequest = Math.random()
-  latestDataRequest.set(currentDataRequest)
-  console.log(new Error().stack);
-  console.log('setting latest data req', currentDataRequest)
 
-  Meteor.call('getGroupWorkData', heatmap_params, refresh, function(err, result) {
-    if (err) {
-      console_log_conditional('error', err);
-      return;
-    }
-    if (currentDataRequest !== latestDataRequest.get()) {
-      latestDataRequest.set(null)
-      console.log('currentDataRequest', currentDataRequest)
-      console.log('latestDataRequest', latestDataRequest)
-      console.log('cancelling data publishing for out of date request')
-      return;
-    }
-    showData(result);
-  });
+  let cachedResult = cachedDataRequests.get();
+
+  if (typeof cachedResult[JSON.stringify(heatmap_params)] !== 'undefined') {
+    showData(cachedResult[JSON.stringify(heatmap_params)]);
+    cacheInfo.set({...cacheInfo.get(), ...{localCache: true}});
+  }
+  else {
+
+    let currentDataRequest = Math.random()
+    latestDataRequest.set(currentDataRequest)
+    console.log(new Error().stack);
+    console.log('setting latest data req', currentDataRequest)
+
+    Meteor.call('getGroupWorkData', heatmap_params, refresh, function(err, result) {
+      if (err) {
+        console_log_conditional('error', err);
+        return;
+      }
+
+      let cachedData = cachedDataRequests.get()
+      cachedData[JSON.stringify(heatmap_params)] = result
+      cachedDataRequests.set(cachedData);
+
+      if (currentDataRequest !== latestDataRequest.get()) {
+        console.log('currentDataRequest', currentDataRequest)
+        console.log('latestDataRequest', latestDataRequest.get())
+        console.log('current cachedDataRequests.get()', cachedDataRequests.get())
+        return;
+      }
+      else {
+        console.log('data req matches')
+        latestDataRequest.set(null)
+      }
+
+      showData(result)
+    });
+
+  }
+  //
+  //
+  // let currentDataRequest = Math.random()
+  // latestDataRequest.set(currentDataRequest)
+  // console.log(new Error().stack);
+  // console.log('setting latest data req', currentDataRequest)
+  //
+  // Meteor.call('getGroupWorkData', heatmap_params, refresh, function(err, result) {
+  //   if (err) {
+  //     console_log_conditional('error', err);
+  //     return;
+  //   }
+  //   if (currentDataRequest !== latestDataRequest.get()) {
+  //     latestDataRequest.set(null)
+  //     console.log('currentDataRequest', currentDataRequest)
+  //     console.log('latestDataRequest', latestDataRequest)
+  //     console.log('cancelling data publishing for out of date request')
+  //     return;
+  //   }
+  // });
 }
 
 let showData = function(result) {
