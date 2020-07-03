@@ -67,7 +67,7 @@
         <select id="disc-select" {{disc_available}} class="group-work-disc-param-select discourse chosen-select">
             <option disabled selected value="">- Select -</option>
             {{#each discourseparams}}
-                <option data-options="{{options}}" value="{{name}}">{{name}}</option>
+                <option data-options="{{options}}" value="{{label}}">{{label}}</option>
             {{/each}}
         </select>
     </div>
@@ -75,8 +75,8 @@
         <label for="disc-opt-select">Option</label>
         <select id="disc-opt-select" {{disc_options_available}} class="group-work-disc-opt-param-select discourse-option chosen-select">
             <option selected value="">- All -</option>
-            {{#each selected_discourse_options }}
-                <option value="{{name}}">{{name}}</option>
+            {{#each label in selected_discourse_options }}
+                <option value="{{label}}">{{label}}</option>
             {{/each }}
         </select>
     </div>

@@ -145,17 +145,16 @@ let getDemographics = function() {
   if (!envId) {
     return []
   }
-  return setupSubjectParameters(envId);
+  return SubjectParameters.findOne({envId: envId}).parameters;
 };
 
 
 let getDemographicOptions = function() {
   let options = getDemographics();
   let selected_demo = selectedDemographic.get();
-  let opt =  options.find(opt => opt.name === selected_demo);
+  let opt =  options.find(opt => opt.label === selected_demo);
   //console_log_conditional('opt', opt);
-  return opt
-    .options.split(',').map(function(opt) {return {name: opt.trim()}})
+  return opt.options
 };
 
 
@@ -283,7 +282,7 @@ let updateGraph = async function(refresh) {
       updateTimelineGraph(result.data, timeline_selector)
     }
     cacheInfo.set({createdAt: result.createdAt.toLocaleString(), timeToGenerate: result.timeToGenerate, timeToFetch: result.timeToFetch});
-loadingData.set(false);
+    loadingData.set(false);
     console_log_conditional('result.createdAt.toLocaleString()', result.createdAt.toLocaleString());
   });
 }
@@ -342,7 +341,7 @@ let initTimelineGraph = function(full_data, containerSelector) {
   let lines = demos.map(function(demo) {
     let line = d3.line()
       .x(d => x(d.d3date))
-      .y(d => y(d[demo.name]));
+      .y(d => y(d[demo]));
     //console_log_conditional('demo', demo.name);
     // let line = d3.line()
     //   .x(function(d) { return x(d.d3date)})
@@ -350,7 +349,6 @@ let initTimelineGraph = function(full_data, containerSelector) {
 
     return {line: line, demo: demo};
   });
-
 
   //
   // let valLine = d3.line()
@@ -364,7 +362,7 @@ let initTimelineGraph = function(full_data, containerSelector) {
   //   .style("stroke-width", 2)
   //   .attr('d', total_line);
 
-  let key_colors = getLabelColors(getDemographicOptions().map(demo_opt => demo_opt.name));
+  let key_colors = getLabelColors(getDemographicOptions());
   let z = d3.scaleOrdinal()
     .range(Object.values(key_colors));
 
@@ -373,14 +371,10 @@ let initTimelineGraph = function(full_data, containerSelector) {
   //console_log_conditional('key_colors', key_colors);
 
   lines.forEach(function(line) {
-    //console_log_conditional('data is', data);
-    //console_log_conditional('z(line.demo)', z(line.demo.name), line.demo.name);
-
-
     g.append('path')
       .data([data])
       .attr('class', 'line line--demo')
-      .style("stroke", z(line.demo.name))
+      .style("stroke", z(line.demo))
       .style("stroke-width", 4)
       .attr('d', line.line);
 
@@ -393,13 +387,13 @@ let initTimelineGraph = function(full_data, containerSelector) {
       .attr('r', 6)
       .attr('class', 'dot')
       .attr('cx', d => x(d.d3date))
-      .attr('cy', d => y(d[line.demo.name]))
-      .attr('data-demo-name', line.demo.name)
-      .style("fill", z(line.demo.name))
+      .attr('cy', d => y(d[line.demo]))
+      .attr('data-demo-name', line.demo)
+      .style("fill", z(line.demo))
       .on('mouseover', function(d) {
-        d['line_name'] = line.demo.name;
+        d['line_name'] = line.demo;
         let data = [];
-        let circles = g.selectAll('circle[cx="' + x(d.d3date) + '"][cy="' + y(d[line.demo.name]) + '"]');
+        let circles = g.selectAll('circle[cx="' + x(d.d3date) + '"][cy="' + y(d[line.demo]) + '"]');
         if (circles.size() > 1) {
           //console_log_conditional('more than one circle');
           //console_log_conditional('d', d);
@@ -499,8 +493,8 @@ let updateTimelineGraph = function(full_data, containerSelector) {
 
 let updateKey = function(key_wrapper, y_values, color_axis) {
   let key_chunks = y_values.map(function(label) {
-    let color = color_axis(label.name)
-    return `<span class="key--label"><span class="key--color" style="background-color: ${color}"></span><span class="key--text">${label.name}</span></span>`
+    let color = color_axis(label)
+    return `<span class="key--label"><span class="key--color" style="background-color: ${color}"></span><span class="key--text">${label}</span></span>`
   })
 
   let html = `${key_chunks.join('')}`;
@@ -552,13 +546,13 @@ let buildBarTooltipSlide = function(data, demo_color_axis) {
         </div>
         <div class="stat stat--double">
         <div class="stat-group stat-group--vert-centered">
-        <div class="stat stat--val stat--percent">${(datum.contribsByDemo.find(d => d.name === datum.line_name).percent * 100).toFixed(2)}%</div>
+        <div class="stat stat--val stat--percent">${(datum.contribsByDemo.find(d => d.label === datum.line_name).percent * 100).toFixed(2)}%</div>
           <div class="stat-leadin--small">of all contribs</div>
         <div class="stat-leadin">Actual</div>
       </div>
       <div class="stat-separator">/</div>
         <div class="stat-group stat-group--vert-centered">
-        <div class="stat stat--val stat--percent">${(datum.studentsByDemo.find(d => d.name === datum.line_name).percent * 100).toFixed(2)}%</div>
+        <div class="stat stat--val stat--percent">${(datum.studentsByDemo.find(d => d.label === datum.line_name).percent * 100).toFixed(2)}%</div>
         <div class="stat-leadin--small">of all students</div>
         <div class="stat-leadin">Expected</div>
       </div>

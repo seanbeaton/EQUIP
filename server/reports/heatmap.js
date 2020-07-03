@@ -122,10 +122,10 @@ let createHeatmapData = function(params) {
   // let start_6 = new Date().getTime();
 
   if (heatmapReportSortType === 'buckets') {
-    let selected_demo_options = setupSubjectParameters(envId).filter(d => d.name === selectedDemo)[0];
+    let selected_demo_options = SubjectParameters.findOne({envId: envId}).parameters.filter(d => d.label === selectedDemo)[0];
     let opts;
     if (selected_demo_options) {
-      opts = selected_demo_options.options.split(',').map(function(opt) {return {name: opt.trim()}});
+      opts = selected_demo_options.options
     }
     else {
       opts = [];
@@ -133,10 +133,10 @@ let createHeatmapData = function(params) {
     ret.contributions_dataset = ret.contributions_dataset.map(datum => {datum.selected_demo_value = datum.student.info.demographics[selectedDemo]; return datum})
 
     opts.map(opt => ret.contributions_dataset.push({
-      name: opt.name,
-      studentId: opt.name + '-label',
-      selected_demo_value: opt.name,
-      class: opt.name + '-label demo-label',
+      name: opt,
+      studentId: opt + '-label',
+      selected_demo_value: opt,
+      class: opt + '-label demo-label',
       student: {},
       data_x: 0,
       data_y: 0,

@@ -24,7 +24,10 @@ const selectedSpotlightDimension = new ReactiveVar(false);
 
 const cacheInfo = new ReactiveVar();
 const cacheInfoStudentContrib = new ReactiveVar();
+const latestDataRequestStudentContrib = new ReactiveVar();
+
 const cacheInfoStudentTime = new ReactiveVar();
+const latestDataRequestStudentTime = new ReactiveVar();
 const loadingData = new ReactiveVar(false);
 
 Template.histogramReport.onCreated(function created() {
@@ -252,7 +255,7 @@ let initHistogram = function(data, selector) {
   });
 
   // let dim = selectedDemographic.get();
-  let key_options = getDemographicOptions().map(demo_opt => demo_opt.name);
+  let key_options = getDemographicOptions().map(demo_opt => demo_opt);
 
   if (key_options.length > 0) {
     let key_colors = getLabelColors(key_options);
@@ -298,7 +301,7 @@ let getDemographics = function() {
   if (!envId) {
     return []
   }
-  return setupSubjectParameters(envId);
+  return SubjectParameters.find({envId: envId}).parameters;
 };
 
 let getDemographicOptions = function() {
@@ -307,9 +310,8 @@ let getDemographicOptions = function() {
   if (!selected_demo) {
     return [];
   }
-  let opt = options.find(opt => opt.name === selected_demo);
-  return opt
-    .options.split(',').map(function(opt) {return {name: opt.trim()}})
+  let opt = options.find(opt => opt.label === selected_demo);
+  return opt.options
 };
 
 let avail_colors_viridis = [
@@ -385,15 +387,23 @@ let updateStudentContribGraph = function(refresh) {
   }
 
   loadingData.set(true)
+  let currentDataRequest = Math.random()
+  latestDataRequestStudentContrib.set(currentDataRequest)
+
   Meteor.call('getStudentContribData', student_contrib_params, refresh, function(err, result) {
     if (err) {
       console_log_conditional('error', err);
       return;
     }
 
+    if (currentDataRequest !== latestDataRequestStudentContrib.get()) {
+      return;
+    }
+    latestDataRequestStudentContrib.set(null)
+
     studentContribGraph(result.data, selector)
 
-    cacheInfoStudentContrib.set({createdAt: result.createdAt.toLocaleString(), timeToGenerate: result.timeToGenerate, timeToFetch: result.timeToFetch});
+    cacheInfoStudentContrib.set({createdAt: result.createdAt.toLocaleString(), timeToGenerate: result.timeToGenerate, timeToFetch: result.timeToFetch, refresh_class_suffix: '-student-contrib'});
     loadingData.set(false);
     console_log_conditional('result.createdAt.toLocaleString()', result.createdAt.toLocaleString());
   });
@@ -426,15 +436,22 @@ let updateStudentTimeGraph = function (refresh) {
   }
 
   loadingData.set(true)
+  let currentDataRequest = Math.random()
+  latestDataRequestStudentTime.set(currentDataRequest)
+
   Meteor.call('getStudentTimeData', student_time_params, refresh, function(err, result) {
     if (err) {
       console_log_conditional('error', err);
       return;
     }
+    if (currentDataRequest !== latestDataRequestStudentTime.get()) {
+      return;
+    }
+    latestDataRequestStudentTime.set(null)
 
     studentTimeGraph(result.data, selector, selectedEnvironment.get(), dimension)
 
-    cacheInfoStudentTime.set({createdAt: result.createdAt.toLocaleString(), timeToGenerate: result.timeToGenerate, timeToFetch: result.timeToFetch});
+    cacheInfoStudentTime.set({createdAt: result.createdAt.toLocaleString(), timeToGenerate: result.timeToGenerate, timeToFetch: result.timeToFetch, refresh_class_suffix: '-student-time'});
     loadingData.set(false);
     console_log_conditional('result.createdAt.toLocaleString()', result.createdAt.toLocaleString());
   });

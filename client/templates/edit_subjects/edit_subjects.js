@@ -143,7 +143,7 @@ Template.editSubjects.events({
   },
   'click #add-student': function(e) {
     var envId = Router.current().params._envId;
-    var subjParams = SubjectParameters.findOne({'children.envId':envId});
+    var subjParams = SubjectParameters.findOne({'envId':envId});
 
     if ($.isEmptyObject(subjParams)) {
       alert("You must add demographic parameters before you can add a student!");
@@ -152,7 +152,7 @@ Template.editSubjects.events({
 
     $('#param-modal-content').children().remove();
     $('#stud-param-modal').addClass('is-active');
-    populateParamBoxes();
+    populateParamBoxes(envId);
  },
 
   'click #save-subj-params': function(e) {
@@ -382,7 +382,7 @@ function createTableOfStudents() {
   $('#data-modal-content').children().remove();
   let envId = Router.current().params._envId;
   let students = getStudents(envId);
-  let allParams = setupSubjectParameters();
+  let allParams = SubjectParameters.findOne({envId: envId}).parameters;
 
   var modal = document.getElementById("data-modal-content");
   modal.innerHTML += contributionTableTemplate(students, allParams);
@@ -526,12 +526,12 @@ function contributionRowTemplate(student, params) {
   console_log_conditional(student, params);
     let paramTemplate = params.map((param) => {
         return `
-            <p class="o--modal-label contributions-grid-item">${param.name}</p>
+            <p class="o--modal-label contributions-grid-item">${param.label}</p>
         `
     }).join("");
 
     let paramValues = params.map((param) => {
-        let data = student.info.demographics[param.name] ? student.info.demographics[param.name] : 'Not Specified';
+        let data = student.info.demographics[param.label] ? student.info.demographics[param.label] : 'Not Specified';
         return `
             <p class="o--modal-label contributions-grid-item">${data}</p>
         `
@@ -553,10 +553,10 @@ function contributionRowTemplate(student, params) {
 }
 
 // Saves a new student
-function populateParamBoxes() {
+function populateParamBoxes(envId) {
     var modal = document.getElementById("param-modal-content");
 
-    let allParams = setupSubjectParameters();
+    let allParams = SubjectParameters.findOne({envId: envId}).parameters;
 
     modal.innerHTML += studentHeaderTemplate("Add a Student");
     modal.innerHTML += studentInputTemplate();
@@ -571,7 +571,7 @@ function editParamBoxes(subjId) {
     let modal = document.getElementById("param-modal-content");
 
     let subj = getStudent(subjId);
-    let allParams = setupSubjectParameters();
+    let allParams = SubjectParameters.findOne({envId: subj.envId}).parameters;
     let student = subj.info.name;
 
     modal.innerHTML += studentHeaderTemplate(`Edit ${student}`, student);
@@ -607,16 +607,10 @@ function studentParameterTemplate(allParams, student, type) {
     console_log_conditional(allParams);
     let boxes = allParams.map((param) => {
       console_log_conditional('param', param);
-        // let params = subjects['children']['parameter' + param];
-        let options = param.options.split(',').map(function(item) { return item.trim() });
-
-        // let field = allParams['children']['label' + param];
-
-
-        let optionNodes = options.map((opt) => {
+        let optionNodes = param.options.map((opt) => {
             let selected = "";
 
-            if (student) { selected = student.info.demographics[param.name] === opt ? "chosen" : "" }
+            if (student) { selected = student.info.demographics[param.label] === opt ? "chosen" : "" }
             console_log_conditional('creating options for student, ', student);
 
             return `
@@ -627,8 +621,8 @@ function studentParameterTemplate(allParams, student, type) {
         }).join("");
 
         return `
-            <div class="c--modal-student-header js-subject-labels">${param.name}</div>
-            <div class="c--modal-student-options-container" data-parameter-name="${param.name}">
+            <div class="c--modal-student-header js-subject-labels">${param.label}</div>
+            <div class="c--modal-student-options-container" data-parameter-name="${param.label}">
                 ${optionNodes}
             </div>
         `

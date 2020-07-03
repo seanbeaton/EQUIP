@@ -44,7 +44,7 @@
                             <select id="disc-select" {{disc_available}} class="param-select-form-item discourse chosen-select" name="parameter-select" data-param-type="discourse">
                                 <option disabled selected value="">- Select -</option>
                                 {{#each discourseparams}}
-                                    <option data-options="{{options}}" value="{{name}}">{{name}}</option>
+                                    <option data-options="{{options}}" value="{{label}}">{{label}}</option>
                                 {{/each}}
                             </select>
                         </div>
@@ -54,7 +54,7 @@
                             <select id="demo-select" {{demo_available}} class="param-select-form-item demographic chosen-select" name="demographic-select" data-param-type="demographics">
                                 <option disabled selected value="">- Select -</option>
                                 {{#each demographics}}
-                                    <option value="{{name}}">{{name}}</option>
+                                    <option data-options="{{options}}" value="{{label}}">{{label}}</option>
                                 {{/each}}
                             </select>
                         </div>

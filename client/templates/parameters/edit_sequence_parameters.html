@@ -3,15 +3,15 @@
 <template name="editSequenceParameters">
     <section class="c--discourse-header__container">
         <h1 class="c--discourse-header__title">Discourse Dimensions</h1>
-        {{ #if hasObsMade }}
-        <div class="c--discourse-header__links-container">
-            <p id="load-default-seq" class="u--header-links c--student-discourse__links c--discourse-header__links">Load Defaults</p>
-            <p class="u--header-links c--discourse-header__links export-button">Export</p>
-            <p class="u--header-links c--discourse-header__links import-button">Import</p>
-        </div>
-        {{ else }}
+        {{#if hasObsMade }}
             <div id="obsMade"></div>
-        {{ /if }}
+        {{ else }}
+            <div class="c--discourse-header__links-container">
+                <p id="load-default-seq" class="u--header-links c--student-discourse__links c--discourse-header__links">Load Defaults</p>
+                <p class="u--header-links c--discourse-header__links export-button">Export</p>
+                <p class="u--header-links c--discourse-header__links import-button">Import</p>
+            </div>
+        {{/if }}
     </section>
     <div class="c--discourse-body__container">
         <div>
@@ -30,13 +30,36 @@
         </div>
 
         <div>
-            <div id="paramsSection"></div>
-            {{ #if hasObsMade }}
+        <div class="newParamsSection">
+
+            {{#if hasObsMade}}
+                {{#each param in params.parameters }}
+                    <article class="single-param control myParam{{@index}}">
+                        <h3>{{param.label}}</h3>
+                        <p style="margin-bottom: .25em">{{joined param.options}}</p>
+                    </article>
+                {{/each}}
+            {{else}}
+                {{#each param in params.parameters }}
+                    <div class="single-param control myParam{{@index}}">
+                        <label class="o--form-labels">Social Marker:</label>
+                        <input class="parameter__label parameter__field o--form-input" type="text" data-param-index="{{@index}}" name="label{{@index}}" value="{{param.label}}">
+                        <label class="o--form-labels">Options:</label>
+                        <input class="parameter__options parameter__field o--form-input" type="text" data-param-index="{{@index}}" style="margin-bottom: .25em" name="parameter{{@index}}" value="{{joined param.options}}">
+                        <div class="param-action-wrapper"><span class="o--toggle-links c--discourse-form__remove-button remove-param" data-remove-index="{{@index}}">Remove</span></div>
+                    </div>
+                {{/each}}
+            {{/if}}
+        </div>
+
+                {{#if hasObsMade }}
+
+                {{else}}
                 <div class="c--discourse-form__button-container">
                     <button id="add-seq-param" class="o--standard-button c--discourse-form__save-button">Add</button>
                     <button id="save-seq-params" class="o--standard-button c--discourse-form__save-button">Save</button>
                 </div>
-            {{ /if }}
+            {{/if }}
         </div>
     </div>
 

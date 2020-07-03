@@ -5,22 +5,25 @@
 import {console_log_conditional} from "/helpers/logging"
 
 import {envHasObservations} from "../../../helpers/environments";
+import {upgradeParams} from "../../../helpers/migration_transforms";
 
-var serialize = require('form-serialize');
 
+const localParams = ReactiveVar({});
 
 Template.editSequenceParameters.onCreated(function created() {
-  this.autorun(() => {
-    Meteor.subscribe('environment', this.data.environment._id);
-    Meteor.subscribe('envObservations', this.data.environment._id);
-    Meteor.subscribe('envSequenceParameters', this.data.environment._id);
-    //
-    // Meteor.subscribe('environment', this._id);
-    // Meteor.subscribe('envObservations', this._id);
-    // Meteor.subscribe('envSubjects', this._id);
-    // Meteor.subscribe('envSubjectParameters', this._id);
-    // Meteor.subscribe('envSequenceParameters', this._id);
-  })
+  // this.autorun(() => {
+  // })
+  let params = SequenceParameters.findOne({envId: Router.current().params._envId});
+  if (!params) {
+    localParams.set({parameters: [{
+        label: "",
+        options: []
+      }]}
+    )
+  }
+  else {
+    localParams.set(params)
+  }
 });
 
 
@@ -40,10 +43,42 @@ Template.editSequenceParameters.helpers({
   },
   hasObsMade: function() {
     return envHasObservations(this.environment._id)
-  }
+  },
+  params: function() {
+    return localParams.get();
+  },
+  joined: function(list) {
+    return list.join(', ');
+  },
 });
 
 Template.editSequenceParameters.events({
+  'click #load-default-seq': function (e) {
+    e.preventDefault();
+    const defaultSeqData = [
+      {
+        label: "Teacher Solicitation",
+        options: ["How","What","Why","Other","None"]
+      },
+      {
+        label: "Wait Time",
+        options: ["Less than 3 seconds","3 or more seconds","N/A"]
+      },
+      {
+        label: "Solicitation Method",
+        options: ["Called On","Not Called On"]
+      },
+      {
+        label: "Length of Talk",
+        options: ["1-4 words","5-20","21 or more"]
+      },
+      {
+        label: "Student Talk",
+        options: ["How","What","Why","Other"]
+      }
+    ];
+    localParams.set({parameters: defaultSeqData});
+  },
  'click .import-button': function (e) {
     var envId = Router.current().params._envId;
     var element = document.createElement('div');
@@ -61,8 +96,20 @@ Template.editSequenceParameters.events({
                 var contents = reader.result;
                 jsonImport = JSON.parse(contents);
                 if ('label0' in jsonImport) {
-                  jsonImport['envId'] = envId;
 
+                  // allow old json imports to work.
+                  let import_params = {
+                    children: jsonImport,
+                  }
+                  import_params.children.envId = envId;
+                  let params = upgradeParams(import_params)
+
+                  Meteor.call('importSeqParameters', params, function(error, result) {
+                    setDefaultSeqParams();
+                    return 0;
+                  });
+                } else if ('parameters' in jsonImport) {
+                  jsonImport.envId = envId;
                   Meteor.call('importSeqParameters', jsonImport, function(error, result) {
                     setDefaultSeqParams();
                     return 0;
@@ -80,6 +127,32 @@ Template.editSequenceParameters.events({
     fileInput.click(); // opening dialog
 
  },
+  'click .remove-param': function(e) {
+    let pms = localParams.get();
+    let target_index = $(e.target).attr('data-remove-index');
+    pms.parameters.splice(target_index, 1)
+    localParams.set(pms)
+  },
+  'click #add-seq-param': function(e) {
+    let pms = localParams.get();
+    pms.parameters.push({
+      label: "",
+      options: []
+    })
+    localParams.set(pms)
+  },
+  'blur .parameter__label': function(e) {
+    let target_index = $(e.target).attr('data-param-index');
+    let pms = localParams.get();
+    pms.parameters[target_index].label = $(e.target).val();
+    localParams.set(pms)
+  },
+  'blur .parameter__options': function(e) {
+    let target_index = $(e.target).attr('data-param-index');
+    let pms = localParams.get();
+    pms.parameters[target_index].options = $(e.target).val() ? $(e.target).val().split(',').map(function (item) {return item.trim();}) : []
+    localParams.set(pms)
+  },
  'click .export-button': function (e) {
     e.preventDefault();
     var envId = Router.current().params._envId;
@@ -108,54 +181,33 @@ Template.editSequenceParameters.events({
   },
   'click #save-seq-params': function(e) {
     e.preventDefault();
-    var parameterPairs = 0;
+    let envId = Router.current().params._envId;
     let formValidated = true;
-    var form = document.querySelector('#paramForm');
-    var obj = serialize(form, { hash: true, empty: false });
-    for (key in obj) {
-      if (key.includes('label')){
-        num = key.split('label')[1];
-        if (obj['parameter'+num]){
-          parameterPairs++;
-        } else {
-          alert('One of your parameters has a label but no options. Please fix this issue and try saving again.')
-          return;
-        }
-      } else {
-        obj[key] = obj[key].split(",").filter(function(o) { return o }).join(",");
-        const sequenceKeys = obj[key].split(",");
 
-        sequenceKeys.forEach((key) => {
-            if (key.trim().length === 0) {
-                alert("One of your options are blank. Please enter with the correct format.");
-                formValidated = false;
-            }
-        });
+    let params = localParams.get()
+    params.parameters = params.parameters.filter(function(param) {
+      if (!param.label && param.options.length === 0) {
+        return false;
       }
-    }
+      if (!param.label) {
+        alert('One of your parameters has a label but no options. Please fix this issue and try saving again.')
+        formValidated = false;
+      }
+      if (param.options.length === 0) {
+        alert('One of your parameters has no options. Please fix this issue and try saving again.')
+        formValidated = false;
+      }
+      return true;
+    });
 
     if (!formValidated) return;
-
-    var clean_obj = {}
-    var count = 0;
-    for (key in obj) {
-      if (key.includes('label')){
-        var n = key.split('label')[1];
-        clean_obj['label'+count] = obj[key];
-        clean_obj['parameter'+count] = obj['parameter'+n];
-        if (obj['toggle'+n]){
-          clean_obj['toggle'+count] = obj['toggle'+n];
-        }
-        count++;
-      }
+    gtag('event', 'save', {'event_category': 'sequence_params', 'event_label': JSON.stringify(params)});
+    let method = 'updateSeqParameters'
+    if ($.isEmptyObject(SequenceParameters.findOne({envId:envId})) === true) {
+      method = 'importSeqParameters'
     }
-    var extendObj = _.extend(clean_obj, {
-      envId: Router.current().params._envId,
-      parameterPairs: parameterPairs
-    });
-    gtag('event', 'save', {'event_category': 'sequence_params', 'event_label': JSON.stringify(clean_obj)});
 
-    Meteor.call('updateSeqParameters', clean_obj, function(error, result) {
+    Meteor.call(method, {envId: envId, parameters: params.parameters}, function(error, result) {
       if (error){
         alert(error.reason);
       } else {
@@ -178,7 +230,6 @@ Template.editSequenceParameters.events({
         }
         Command: toastr["success"]("NOTE: After the first observation is created, you will not be able to edit discourse dimensions or demographics.","Save Successful","Observation Parameters");
       }
-      let envId = Router.current().params._envId;
       setTimeout(() => {
         window.jumpToEnv = envId
         Router.go('environmentList')
@@ -187,211 +238,3 @@ Template.editSequenceParameters.events({
   }
 });
 
-Template.editSequenceParameters.rendered = function() {
-    let editSequence = new EditSequence();
-
-    editSequence.init();
-    editSequence.hideRemoveButtons();
-}
-
-const EditSequence = function() {
-    function hideRemoveButtons() {
-        var obsMade = document.getElementById('obsMade');
-
-        if (obsMade) {
-            var allRemoveButtons = document.querySelectorAll('.removeSeq');
-
-            [...allRemoveButtons].forEach((button)=> { button.style.display = "none"; });
-        }
-    }
-    function addRemoveButtonEvents() {
-        let removeButtons = document.querySelectorAll(".removeSeq");
-        [...removeButtons].forEach((button) => {
-            $(button).unbind("click").click(function(){
-                var result = confirm("Are you sure you want to delete?");
-                if (result) {
-                    event.target.parentElement.remove();
-                }
-            });
-        });
-    }
-    function addParamButtonEvent() {
-        let addButton = document.getElementById("add-seq-param");
-        if (addButton) {
-            addButton.addEventListener("click", addParamRowTemplate);
-        }
-    }
-    function addLoadDefaultEvent() {
-        let loadDefaultButton = document.getElementById("load-default-seq");
-
-        if (loadDefaultButton) {
-            loadDefaultButton.addEventListener("click", loadDefaultParamTemplate);
-            addRemoveButtonEvents();
-        }
-    }
-    function addParamRowTemplate() {
-        let container = document.getElementById("paramForm");
-        let lastIndex = document.querySelectorAll(".single-param").length;
-        container.insertAdjacentHTML('beforeend', oneParamRowTemplate(lastIndex));
-        addRemoveButtonEvents();
-    }
-
-    function loadDefaultParamTemplate() {
-        let container = document.getElementById("paramForm");
-        container.innerHTML = loadParamTemplate();
-        addRemoveButtonEvents();
-    }
-    function loadParamTemplate() {
-        const defaultSequenceData = [
-            {
-                name: "Teacher Solicitation",
-                input: "How,What,Why,Other,None"
-            },
-            {
-                name: "Wait Time",
-                input: "Less than 3 seconds,3 or more seconds,N/A"
-            },
-            {
-                name: "Solicitation Method",
-                input: "Called On,Not Called On"
-            },
-            {
-                name: "Length of Talk",
-                input: "1-4 words,5-20,21 or more"
-            },
-            {
-                name: "Student Talk",
-                input: "How,What,Why,Other"
-            }
-        ]
-
-        let defaultNodes = defaultSequenceData.map((data,idx) => {
-            return oneResultTemplate(data,idx)
-        }).join("");
-
-        return `
-            <form id="paramForm">
-                ${defaultNodes}
-            </form>
-        `
-    }
-
-    function oneResultTemplate(data,idx) {
-        return `
-            <div class="single-param control myParam${idx}">
-                <label class="o--form-labels">Name:</label>
-                <input class="o--form-input" type="text" name="label${idx}" value="${data.name}">
-                <label class="o--form-labels">Options:</label>
-                <input class="o--form-input" type="text" style="margin-bottom: .25em" name="parameter${idx}" value="${data.input}">
-                <p class="o--toggle-links c--discourse-form__remove-button removeSeq">Remove</p>
-            </div>
-        `
-    }
-
-    function oneParamRowTemplate(index) {
-        return `
-            <div class="single-param control myParam0">
-                <label class="o--form-labels">Name:</label>
-                <input class="o--form-input" type="text" name="label${index}" placeholder="Name">
-                <label class="o--form-labels">Options:</label>
-                <input class="o--form-input" type="text" style="margin-bottom: .25em" name="parameter${index}" placeholder="List the options for selection separated by commas (e.g. male, female, unspecificied).">
-                <p class="o--toggle-links c--discourse-form__remove-button removeSeq">Remove</p>
-            </div>
-        `
-    }
-    // Template for no parameters
-    function noParamFormTemplate() {
-        return `
-            <form id="paramForm">
-                <div class="single-param control myParam0">
-                    <label class="o--form-labels">Name:</label>
-                    <input class="o--form-input" type="text" name="label0" placeholder="Name">
-                    <label class="o--form-labels">Options:</label>
-                    <input class="o--form-input" type="text" style="margin-bottom: .25em" name="parameter0" placeholder="List the options for selection separated by commas (e.g. male, female, unspecificied).">
-                    <p class="o--toggle-links c--discourse-form__remove-button removeSeq">Remove</p>
-                </div>
-            </form>
-        `
-    }
-    // Template for form with parameters set
-    function hasParamFormTemplate(paramObj, paramPair) {
-        let numberOfParams = Array.apply(null, {length: paramPair}).map(Number.call, Number);
-        let paramNodes = numberOfParams.map((index)=> {
-            let label = paramObj[0]["children"]["label" + index];
-            let parameter = paramObj[0]["children"]["parameter" + index];
-            let lastRow = paramPair === index + 1 ? oneParamRowTemplate(index + 1) : "";
-
-            return `
-                <div class="single-param control myParam${index}">
-                    <div class="c--discourse-form__label-container">
-                        <label class="o--form-labels">Name:</label>
-                    </div>
-                    <input class="o--form-input" type="text" name="label${index}" value="${label}">
-                    <label class="o--form-labels">Options:</label>
-                    <input class="o--form-input" type="text" style="margin-bottom: .25em" name="parameter${index}" value="${parameter}">
-                    <p class="removeSeq c--discourse-form__remove-button o--toggle-links">Remove</p>
-                </div>
-                ${lastRow}
-            `
-        }).join("");
-
-        return `
-            <form id="paramForm">
-                ${paramNodes}
-            </form>
-        `
-    }
-
-    function hasParamWithObservationTemplate(paramObj, paramPair) {
-        let numberOfParams = Array.apply(null, {length: paramPair}).map(Number.call, Number);
-        let paramNodes = numberOfParams.map((index)=> {
-            let label = paramObj[0]["children"]["label" + index];
-            let parameter = paramObj[0]["children"]["parameter" + index];
-            let lastRow = paramPair === index + 1 ? oneParamRowTemplate(index + 1) : "";
-
-            return `
-                <article class="single-param control myParam${index}">
-                    <h3>${label}</h3>
-                    <p style="margin-bottom: .25em">${parameter}</p>
-                </article>
-            `
-        }).join("");
-
-        return `
-            <div>
-                ${paramNodes}
-            </div>
-        `
-    }
-
-    function setDefaultSeqParams() {
-        let env = Environments.find({_id:Router.current().params._envId}).fetch();
-        let envId = Router.current().params._envId;
-        let parametersObj = SequenceParameters.find({'children.envId':envId}).fetch();
-        let obs = Observations.find({envId:env[0]._id}, {sort: {lastModified: -1}}).fetch();
-        let paramSection = document.getElementById("paramsSection");
-        let parameterPairs;
-
-        if (obs.length > 0 ) {
-             parameterPairs = parametersObj[0]["children"]["parameterPairs"];
-             paramSection.innerHTML += hasParamWithObservationTemplate(parametersObj, parameterPairs);
-        } else {
-            $.isEmptyObject(parametersObj)
-                ? parameterPairs = 0
-                : parameterPairs = parametersObj[0]["children"]["parameterPairs"];
-
-            parameterPairs === 0
-                ? paramSection.innerHTML += noParamFormTemplate()
-                : paramSection.innerHTML += hasParamFormTemplate(parametersObj, parameterPairs);
-
-            addRemoveButtonEvents();
-            addParamButtonEvent();
-            addLoadDefaultEvent();
-        }
-    }
-
-    return {
-        init: setDefaultSeqParams,
-        hideRemoveButtons: hideRemoveButtons
-    }
-}

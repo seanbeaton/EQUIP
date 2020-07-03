@@ -2,7 +2,7 @@
 import {console_log_conditional} from "/helpers/logging"
 
 
-CachedStats = new Mongo.Collection('cached_stats');
+const CachedStats = new Mongo.Collection('cached_stats');
 
 const total_color = "#F25F3D";
 const month_color = "#999999";

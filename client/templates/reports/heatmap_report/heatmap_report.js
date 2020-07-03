@@ -29,7 +29,11 @@ const currentDemoFilters = new ReactiveVar(false);
 
 const cacheInfo = new ReactiveVar();
 const cacheInfoStudentContrib = new ReactiveVar();
+const latestDataRequestStudentContrib = new ReactiveVar();
+
 const cacheInfoStudentTime = new ReactiveVar();
+const latestDataRequestStudentTime = new ReactiveVar();
+
 const loadingData = new ReactiveVar(false);
 
 const latestDataRequest = new ReactiveVar();
@@ -94,7 +98,7 @@ Template.heatmapReport.helpers({
     return obsOptions.get();
   },
   observationNames: function() {
-    let observations = getObservations(selectedObservations.get());;
+    let observations = getObservations(selectedObservations.get());
     let obsNames = observations.map(obs => obs.name);
 
     if (obsNames.length >= 3) {
@@ -113,7 +117,6 @@ Template.heatmapReport.helpers({
   demographic_filters: function() {
     let demo_options = getDemographics();
     demo_options = demo_options.map(function(demo_opt) {
-      demo_opt.options = demo_opt.options.split(',').map(function(item) { return item.trim() });
       demo_opt.default = '';
       return demo_opt;
     });
@@ -194,7 +197,7 @@ let getDemographics = function() {
   if (!envId) {
     return []
   }
-  return setupSubjectParameters(envId);
+  return SubjectParameters.findOne({envId: envId}).parameters;
 };
 
 let getEnvironment = function() {
@@ -229,7 +232,7 @@ Template.heatmapReport.events({
 
     let blank_filters = getDemographics().map(function(demo) {
       return {
-        name: demo.name,
+        label: demo.label,
         selected: []
       }
     })
@@ -251,17 +254,19 @@ Template.heatmapReport.events({
   'click .student-spotlight__close': function() {
     selectedStudent.set(false);
     latestDataRequest.set(false)
+    latestDataRequestStudentContrib.set(false)
+    latestDataRequestStudentTime.set(false)
     loadingData.set(false)
   },
   'change .filters__wrapper .filter': function() {
     let selected_filters = getDemographics().map(function(demo) {
-      let selected_options = $('.filters__wrapper .filter[data-filter-demo-name="' + demo.name + '"] option:selected');
+      let selected_options = $('.filters__wrapper .filter[data-filter-demo-name="' + demo.label + '"] option:selected');
       let opts = []
       selected_options.each(function(key) {
         opts.push($(selected_options[key]).val());
       })
       return {
-        name: demo.name,
+        label: demo.label,
         selected: opts
       }
     })
@@ -324,7 +329,7 @@ let updateGraph = async function(refresh) {
   let cachedData = cachedDataRequests.get();
   let cachedResult = cachedData;
 
-  if (typeof cachedResult[JSON.stringify(heatmap_params)] !== 'undefined') {
+  if (typeof cachedResult[JSON.stringify(heatmap_params)] !== 'undefined' && !refresh) {
     showData(cachedResult[JSON.stringify(heatmap_params)]);
     cacheInfo.set({...cacheInfo.get(), ...{localCache: true}});
   }
@@ -408,7 +413,7 @@ let updateFilteredStudents = function() {
       if (!student_data) {
         return false;
       }
-      return (filter.selected.indexOf(student_data.info.demographics[filter.name]) >= 0)
+      return (filter.selected.indexOf(student_data.info.demographics[filter.label]) >= 0)
     }).reduce((a,b) => a && b);
 
     $student.removeClass('disabled-student');
@@ -442,7 +447,7 @@ let updateTotalContribs = function(data) {
       if (filter.selected.length === 0) {
         return true;
       }
-      return (filter.selected.indexOf(student_data.info.demographics[filter.name]) >= 0)
+      return (filter.selected.indexOf(student_data.info.demographics[filter.label]) >= 0)
     }).reduce((a,b) => a && b);
 
     // $student.removeClass('disabled-student');
@@ -667,15 +672,23 @@ let updateStudentContribGraph = function(refresh) {
   }
 
   loadingData.set(true)
+  let currentDataRequest = Math.random()
+  latestDataRequestStudentContrib.set(currentDataRequest)
+
   Meteor.call('getStudentContribData', student_contrib_params, refresh, function(err, result) {
     if (err) {
       console_log_conditional('error', err);
       return;
     }
 
+    if (currentDataRequest !== latestDataRequestStudentContrib.get()) {
+      return;
+    }
+    latestDataRequestStudentContrib.set(null)
+
     studentContribGraph(result.data, selector)
 
-    cacheInfoStudentContrib.set({createdAt: result.createdAt.toLocaleString(), timeToGenerate: result.timeToGenerate, timeToFetch: result.timeToFetch});
+    cacheInfoStudentContrib.set({createdAt: result.createdAt.toLocaleString(), timeToGenerate: result.timeToGenerate, timeToFetch: result.timeToFetch, refresh_class_suffix: '-student-contrib'});
     loadingData.set(false);
     console_log_conditional('result.createdAt.toLocaleString()', result.createdAt.toLocaleString());
   });
@@ -709,22 +722,22 @@ let updateStudentTimeGraph = function (refresh) {
 
   loadingData.set(true)
   let currentDataRequest = Math.random()
-  latestDataRequest.set(currentDataRequest)
+  latestDataRequestStudentTime.set(currentDataRequest)
 
   Meteor.call('getStudentTimeData', student_time_params, refresh, function(err, result) {
     if (err) {
       console_log_conditional('error', err);
       return;
     }
-    if (currentDataRequest === latestDataRequest.get()) {
-      latestDataRequest.set(null)
-      console_log_conditional('cancelling data publishing for out of date request')
+
+    if (currentDataRequest !== latestDataRequestStudentTime.get()) {
       return;
     }
+    latestDataRequestStudentTime.set(null)
 
     studentTimeGraph(result.data, selector, selectedEnvironment.get(), dimension)
 
-    cacheInfoStudentTime.set({createdAt: result.createdAt.toLocaleString(), timeToGenerate: result.timeToGenerate, timeToFetch: result.timeToFetch});
+    cacheInfoStudentTime.set({createdAt: result.createdAt.toLocaleString(), timeToGenerate: result.timeToGenerate, timeToFetch: result.timeToFetch, refresh_class_suffix: '-student-time'});
     loadingData.set(false);
     console_log_conditional('result.createdAt.toLocaleString()', result.createdAt.toLocaleString());
   });

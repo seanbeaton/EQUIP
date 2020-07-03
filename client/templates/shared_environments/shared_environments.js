@@ -27,31 +27,30 @@ Template.sharedEnvSave.rendered = function() {
 Template.sharedEnv.helpers({
   sequenceParams: function() {
     var sharedEnv = SharedEnvironments.findOne({_id:Router.current().params._shareId});
-    let params = [];
-    for (let i = 0; i < sharedEnv.sequenceParameters.children.parameterPairs; i++) {
-      params.push({
-        'label': sharedEnv.sequenceParameters.children[`label${i}`],
-        'parameter': sharedEnv.sequenceParameters.children[`parameter${i}`]
-      })
-    }
-    return params;
+    return sharedEnv.sequenceParameters.parameters;
   },
   subjectParams: function() {
     var sharedEnv = SharedEnvironments.findOne({_id:Router.current().params._shareId});
-    let params = [];
-    for (let i = 0; i < sharedEnv.subjectParameters.children.parameterPairs; i++) {
-      params.push({
-        'label': sharedEnv.subjectParameters.children[`label${i}`],
-        'parameter': sharedEnv.subjectParameters.children[`parameter${i}`]
-      })
-    }
-    return params;
+    return sharedEnv.subjectParameters.parameters;
+
   },
   students: function() {
     let sharedEnv = SharedEnvironments.findOne({_id:Router.current().params._shareId});
     return sharedEnv.students;
-  }
+  },
 });
+
+Template.sequenceParam.helpers({
+  joined: function(list) {
+    return list.join(', ');
+  },
+})
+
+Template.subjectParam.helpers({
+  joined: function(list) {
+    return list.join(', ');
+  },
+})
 
 
 function copySharedClassroom(shareId) {

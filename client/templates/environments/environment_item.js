@@ -6,7 +6,6 @@ import { createModal } from '/helpers/modals.js'
 import {getSequences} from "/helpers/sequences";
 import {envHasObservations} from "../../../helpers/environments";
 import {activeEnvId, obsCreateModal} from './environment_list'
-import {setupSequenceParameters, setupSubjectParameters} from "../../../helpers/parameters";
 import {console_log_conditional} from "/helpers/logging"
 
 let share_window_timeout;
@@ -186,35 +185,39 @@ Template.environmentItem.helpers({
         return this._id;
     },
     getSubjectParameters: function() {
-      let params = setupSubjectParameters(this._id, true);
-      return params.map((p) => p.name).join(", ")
+      let params = SubjectParameters.findOne({envId:this._id});
+      try {
+        return params.parameterNames();
+      }
+      catch (error) {
+        console.log('error', error);
+      }
     },
     getDiscourseParameters: function() {
-      let params = setupSequenceParameters(this._id, true);
-      return params.map((p) => p.name).join(", ")
+      let params = SequenceParameters.findOne({envId:this._id});
+      try {
+        return params.parameterNames();
+      }
+      catch (error) {
+        console.log('error', error);
+      }
     },
     noSubjectParametersEntered: function() {
-        let subjectParameters =  SubjectParameters.find({'children.envId': this._id}).fetch();
+      let subjectParameters = SubjectParameters.findOne({'envId': this._id})
 
-        if (subjectParameters.length === 0 || subjectParameters[0].children.parameterPairs === 0 ) {
-            return true;
-        } else {
-            return false;
-        }
+      return (subjectParameters.length === 0 || typeof subjectParameters.parameters === 'undefined' || subjectParameters.parameters.length === 0)
     },
     noDiscourseParametersEntered: function() {
-        let sequenceParameters = SequenceParameters.find({'children.envId': this._id}).fetch();
+      let sequenceParameters = SequenceParameters.findOne({'envId': this._id});
 
-        if (sequenceParameters.length === 0 || sequenceParameters[0].children.parameterPairs === 0) {
-            return true;
-        } else {
-            return false;
-        }
+      return (sequenceParameters.length === 0 || typeof sequenceParameters.parameters === 'undefined' || sequenceParameters.parameters.length === 0)
     },
     isClassValidated: function() {
       let hasStudents = Subjects.find({envId: this._id}).count() > 0;
-      let hasSeqParams = setupSequenceParameters(this._id, true).length > 0;
-      let hasSubjParams = setupSubjectParameters(this._id, true).length > 0;
+      let hasSeqParams = !!SequenceParameters.findOne({envId:this._id});
+      let hasSubjParams = !!SubjectParameters.findOne({envId:this._id});
+      console.log(hasStudents, hasSeqParams, hasSubjParams)
+
       return hasStudents && hasSeqParams && hasSubjParams;
     },
     getStudents: function() {

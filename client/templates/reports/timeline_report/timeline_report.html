@@ -41,7 +41,7 @@
                                         <select id="demo-select" {{demo_available}} class="timeline-param-select demographic chosen-select">
                                             <option disabled selected value="">- Select -</option>
                                             {{#each demographics}}
-                                                <option value="{{name}}">{{name}}</option>
+                                                <option value="{{label}}">{{label}}</option>
                                             {{/each}}
                                         </select>
                                     </div>
@@ -50,7 +50,7 @@
                                         <select id="disc-select" {{disc_available}} class="timeline-param-select discourse chosen-select">
                                             <option disabled selected value="">- Select -</option>
                                             {{#each discourseparams}}
-                                                <option data-options="{{options}}" value="{{name}}">{{name}}</option>
+                                                <option data-options="{{options}}" value="{{label}}">{{label}}</option>
                                             {{/each}}
                                         </select>
                                     </div>
@@ -58,8 +58,8 @@
                                         <label for="disc-opt-select">Option</label>
                                         <select id="disc-opt-select" {{disc_options_available}} class="timeline-param-select discourse-option chosen-select">
                                             <option disabled selected value="">- Select -</option>
-                                            {{#each selected_discourse_options }}
-                                                <option value="{{name}}">{{name}}</option>
+                                            {{#each label in selected_discourse_options }}
+                                                <option value="{{label}}">{{label}}</option>
                                             {{/each }}
                                         </select>
                                     </div>

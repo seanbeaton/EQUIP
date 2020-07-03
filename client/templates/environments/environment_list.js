@@ -12,16 +12,11 @@ export const activeEnvId = new ReactiveVar(false);
 export const currentNewObservation = new ReactiveVar(false);
 
 
-Template.environmentList.onCreated(function created() {
-  this.autorun(() => {
-    this.subscribe('environments');
-    this.subscribe('observations');
-    this.subscribe('subjects');
-    // this.subscribe('sequences');
-    this.subscribe('subjectParameters');
-    this.subscribe('sequenceParameters');
-  })
-});
+// Template.environmentList.onCreated(function created() {
+//   this.autorun(() => {
+//
+//   })
+// });
 
 
 Template.environmentList.rendered = function() {
@@ -35,12 +30,9 @@ Template.environmentList.rendered = function() {
       $('#onboarding-modal').removeClass("is-active");
       $('#env-create-modal').addClass("is-active");
   }
-  console.log('rendered');
   if (!this._rendered) {
-    console.log('not rendered yet')
     this._rendered = true;
     if (window.jumpToEnv) {
-      console.log('jumping')
       let $acc = $('.environmentList[data-env-id="' + window.jumpToEnv + '"]');
       let $toggle = $acc.find('.toggle-accordion')
 
@@ -97,8 +89,8 @@ Template.obsCreationModal.helpers({
 Template.obsCreationModal.events({
   'click #save-obs-name': function(e) {
     var id = $('#obs-create-modal').attr("data-id");
-    var sequenceParams = SequenceParameters.findOne({'children.envId': id}, {reactive: false});
-    var demographicParams = SubjectParameters.findOne({'children.envId': id}, {reactive: false});
+    var sequenceParams = SequenceParameters.findOne({'envId': id}, {reactive: false});
+    var demographicParams = SubjectParameters.findOne({'envId': id}, {reactive: false});
     var observations = Observations.find({"envId": id}, {reactive: false}).fetch();
     var obsAccordion = $(`.c--accordion-item__inner[data-id=${id}]`);
 

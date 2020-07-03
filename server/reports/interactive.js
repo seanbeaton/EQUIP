@@ -190,9 +190,8 @@ let compileContributionData = function(parameters) {
   // all equity ratios across all observations would then need to be averaged.
 
   // Students were already created earlier.
-  let demographics = setupSubjectParameters(envId);
-  let currentDemoOptions = demographics.filter(demo => demo.name === currentDemo)[0]
-    .options.split(',').map(opt => opt.trim());
+  let demographics = SubjectParameters.findOne({envId: envId}).parameters;
+  let currentDemoOptions = demographics.filter(demo => demo.label === currentDemo)[0].options
 
   contrib_data.student_body_demographic_ratios = {}
 

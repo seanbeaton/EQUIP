@@ -1,4 +1,4 @@
-import {setupSequenceParameters, setupSubjectParameters} from "/helpers/parameters";
+
 import {console_log_conditional, console_table_conditional} from "/helpers/logging"
 
 import {getSequences} from "/helpers/sequences";
@@ -97,7 +97,8 @@ Template.groupWorkReport.events({
   },
   'click .graph-display-type__option': function(e) {
     e.preventDefault();
-    groupDisplayType.set($(e.target).attr('data-display-graph-type'))
+    groupDisplayType.set($(e.target).attr('data-d' +
+      'isplay-graph-type'))
     updateGraph()
   },
   'click .refresh-report': function(e) {
@@ -212,7 +213,7 @@ let updateGraph = function(refresh) {
 
   let cachedResult = cachedDataRequests.get();
 
-  if (typeof cachedResult[JSON.stringify(heatmap_params)] !== 'undefined') {
+  if (typeof cachedResult[JSON.stringify(heatmap_params)] !== 'undefined' && !refresh) {
     showData(cachedResult[JSON.stringify(heatmap_params)]);
     cacheInfo.set({...cacheInfo.get(), ...{localCache: true}});
   }
@@ -355,7 +356,7 @@ let initGroups = function(data, selector) {
   }).join('');
   container.html(markup);
   // let dim = selectedDemographic.get();
-  let key_options = getDemographicOptions().map(demo_opt => demo_opt.name);
+  let key_options = getDemographicOptions()
 
   let color_scale = function() {
     return '#898989'
@@ -540,7 +541,7 @@ let getDemographics = function() {
   if (!envId) {
     return []
   }
-  return setupSubjectParameters(envId);
+  return SubjectParameters.findOne({envId: envId}).parameters;
 };
 
 let getDemographicOptions = function() {
@@ -549,9 +550,8 @@ let getDemographicOptions = function() {
   if (!selected_demo) {
     return [];
   }
-  let opt = options.find(opt => opt.name === selected_demo);
-  return opt
-    .options.split(',').map(function(opt) {return {name: opt.trim()}})
+  let opt = options.find(opt => opt.label === selected_demo);
+  return opt.options
 };
 
 

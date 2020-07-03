@@ -1,5 +1,4 @@
 import {getSequences} from "/helpers/sequences";
-import {setupSequenceParameters} from "./parameters";
 let d3 = require('d3');
 
 
@@ -75,7 +74,7 @@ let createStudentTimeData = function(params) {
         };
 
         disc_opts.forEach(function (opt) {
-          datapoint[opt.name] = 0
+          datapoint[opt] = 0
         });
 
         ret.contributions_dataset.push(datapoint)
@@ -143,7 +142,7 @@ let studentTimeGraph = function(data, selector, envId, dim) {
   let lines = discdims.map(function(dim) {
     let line = d3.line()
       .x(d => x(d.d3date))
-      .y(d => y(d[dim.name]));
+      .y(d => y(d[dim]));
 
     return {line: line, dim: dim};
   });
@@ -163,7 +162,7 @@ let studentTimeGraph = function(data, selector, envId, dim) {
     .style('stroke', total_color)
     .attr('d', total_line);
 
-  let key_colors = getLabelColors(discdims.map(demo_opt => demo_opt.name));
+  let key_colors = getLabelColors(discdims);
 
   key_colors.Total = total_color;
 
@@ -177,7 +176,7 @@ let studentTimeGraph = function(data, selector, envId, dim) {
     g.append('path')
       .data([data])
       .attr('class', 'line line--discdim')
-      .style("stroke", z(line.dim.name))
+      .style("stroke", z(line.dim))
       .style("stroke-width", 2)
       .attr('d', line.line);
 
@@ -190,9 +189,9 @@ let studentTimeGraph = function(data, selector, envId, dim) {
       .attr('r', 3)
       .attr('class', 'dot')
       .attr('cx', d => x(d.d3date))
-      .attr('cy', d => y(d[line.dim.name]))
-      .attr('data-dim-name', line.dim.name)
-      .style("fill", z(line.dim.name))
+      .attr('cy', d => y(d[line.dim]))
+      .attr('data-dim-name', line.dim)
+      .style("fill", z(line.dim))
   });
 
   let ticks = data.map(datum => datum.d3date);
@@ -225,7 +224,7 @@ let createStudentContribData = function(params) {
 
   ret = disc_opts.map(function(opt) {
     return {
-      name: opt.name,
+      label: opt,
       count: 0,
       all_students: students.map(stud => ({id: stud._id, count: 0})),
       class_total: 0,
@@ -242,8 +241,8 @@ let createStudentContribData = function(params) {
       if (!sequences.hasOwnProperty(sequence_k)) continue;
       let sequence = sequences[sequence_k];
       disc_opts.map(function(opt) {
-        if (sequence.info.parameters[dimension] === opt.name) {
-          let ds_index = ret.findIndex(datapoint => datapoint.name === opt.name);
+        if (sequence.info.parameters[dimension] === opt) {
+          let ds_index = ret.findIndex(datapoint => datapoint.label === opt);
           ret[ds_index].class_total += 1;
           ret[ds_index].all_students.filter(stud => stud.id === sequence.info.student.studentId)[0].count += 1;
           all_students.filter(stud => stud.id === sequence.info.student.studentId)[0].count += 1;
@@ -307,14 +306,14 @@ let studentContribGraph = function(data, selector) {
     .rangeRound([0, width])
     .paddingInner(0.1);
 
-  x_group.domain(data.map(d => d.name));
+  x_group.domain(data.map(d => d.label));
   x.domain(['value', 'median']).rangeRound([0, x_group.bandwidth()]);
   y.domain([0, d3.max(data, d => Math.max(d.count, d.median))]);
 
   let median_color = '#c8c8c8ff';
   let total_color = '#555555ff';
 
-  let key_colors = getLabelColors(data.map(d => d.name));
+  let key_colors = getLabelColors(data.map(d => d.label));
   key_colors["__BREAK__"] = '#ffffffff';
   delete key_colors["Total (Student)"];
   key_colors["Total (Student)"] = total_color;
@@ -328,17 +327,17 @@ let studentContribGraph = function(data, selector) {
     .data(data)
     .enter().append('g')
     .attr("transform", function(d) {
-      return "translate(" + x_group(d.name) + ",0)"
+      return "translate(" + x_group(d.label) + ",0)"
     })
     .attr("class", 'bar-group')
     .selectAll('rect')
     .data(function(d) {
-      return data.filter(i => i.name === d.name)
+      return data.filter(i => i.label === d.label)
     })
     .enter();
 
   groups.append("rect")
-    .style("fill", d => z(d.name))
+    .style("fill", d => z(d.label))
     .attr("x", x("value"))
     .attr("width", x.bandwidth())
     .attr("y", function(d) { return y(d.count); })
@@ -426,7 +425,7 @@ let getDiscourseDimensions = function(envId) {
   if (typeof envId === 'undefined' || !envId) {
     return []
   }
-  return setupSequenceParameters(envId);
+  return SequenceParameters.findOne({envId:envId}).parameters;
 };
 
 let getDiscourseOptionsForDimension = function(envId, dimension) {
@@ -434,12 +433,12 @@ let getDiscourseOptionsForDimension = function(envId, dimension) {
   if (dimension === false) {
     return [];
   }
-  let opt = options.find(opt => opt.name === dimension);
+  let opt = options.find(opt => opt.label === dimension);
+
   if (typeof opt === 'undefined') {
     return [];
   }
-  return opt
-    .options.split(',').map(function(opt) {return {name: opt.trim()}})
+  return opt.options
 };
 
 function get_median(values) {

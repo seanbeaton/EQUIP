@@ -9745,29 +9745,90 @@ export let import_data = {
 
     }],
   subjectParameters: {
-    label0: 'Gender',
-    parameter0: 'Boy, Girl, Nonbinary',
-    label1: 'SES',
-    parameter1: 'Higher, Lower',
-    label2: 'Race',
-    parameter2: 'Asian, Black, Latinx, Native, White, Mixed, Other',
-    label3: 'Language Proficiency',
-    parameter3: 'English Dominant, Emergent Multilingual',
-    label4: 'Popularity',
-    parameter4: 'Very Popular, Not-As-Popular',
-    parameterPairs: 5
+    "parameters": [
+      {
+        "label": "Gender",
+        "options": [
+          "Boy",
+          "Girl",
+          "Nonbinary"
+        ]
+      },
+      {
+        "label": "SES",
+        "options": [
+          "Higher",
+          "Lower"
+        ]
+      },
+      {
+        "label": "Race",
+        "options": [
+          "Asian",
+          "Black",
+          "Latinx",
+          "Native",
+          "White",
+          "Mixed",
+          "Other"
+        ]
+      },
+      {
+        "label": "Language Proficiency",
+        "options": [
+          "English Dominant",
+          "Emergent Multilingual"
+        ]
+      },
+      {
+        "label": "Popularity",
+        "options": [
+          "Very Popular",
+          "Not-As-Popular"
+        ]
+      }
+    ]
   },
   sequenceParameters: {
-    label0: 'Student Talk (Type)',
-    parameter0: 'Explanation, Procedural, Factual/Recall',
-    label1: 'Student Talk (Length)',
-    parameter1: 'Extended Contribution, Brief Contribution',
-    label2: 'Teacher Question (Type)',
-    parameter2: 'Explanation, Procedural, Factual/Recall',
-    label3: 'Teacher Wait Time',
-    parameter3: 'Long, Short',
-    label4: 'Teacher Tone',
-    parameter4: 'Enthusiastic, Neutral, Dismissive',
-    parameterPairs: 5
+    "parameters": [
+      {
+        "label": "Student Talk (Type)",
+        "options": [
+          "Explanation",
+          "Procedural",
+          "Factual/Recall"
+        ]
+      },
+      {
+        "label": "Student Talk (Length)",
+        "options": [
+          "Extended Contribution",
+          "Brief Contribution"
+        ]
+      },
+      {
+        "label": "Teacher Question (Type)",
+        "options": [
+          "Explanation",
+          "Procedural",
+          "Factual/Recall"
+        ]
+      },
+      {
+        "label": "Teacher Wait Time",
+        "options": [
+          "Long",
+          "Short"
+        ]
+      },
+      {
+        "label": "Teacher Tone",
+        "options": [
+          "Enthusiastic",
+          "Neutral",
+          "Dismissive"
+        ]
+      }
+    ]
   }
 };

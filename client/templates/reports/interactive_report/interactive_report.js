@@ -221,7 +221,7 @@ let getDemographics = function() {
   if (!envId) {
     return []
   }
-  return setupSubjectParameters(envId);
+  return SubjectParameters.findOne({envId: envId}).parameters;
 };
 
 let getDiscourseDimensions = function() {
@@ -229,7 +229,7 @@ let getDiscourseDimensions = function() {
   if (!envId) {
     return []
   }
-  return setupSequenceParameters(envId);
+  return SequenceParameters.findOne({envId:envId}).parameters;
 };
 
 let getEnvironment = function() {
@@ -297,9 +297,9 @@ let getAxisSelection = function(axis) {
   let selected_value = selected.val();
   let param_type = select_list.attr('data-param-type');
   let options = getParamOptions(param_type);
-  let selected_option = options.filter(opt => opt.name === selected_value)[0];
+  let selected_option = options.filter(opt => opt.label === selected_value)[0];
 
-  selected_option.option_list = selected_option.options.split(',').map(function(i) {return i.trim()})
+  selected_option.option_list = selected_option.options
 
   let ret = {
     selected_value: selected_value,

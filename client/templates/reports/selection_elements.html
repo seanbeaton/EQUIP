@@ -42,8 +42,8 @@
 
 <template name="demographicHeatmapFilter">
     <span class="select__wrapper">
-        <label class="explanation-text">{{filter.name}}</label>
-        <select multiple class="filter chosen-select" data-filter-demo-name="{{filter.name}}">
+        <label class="explanation-text">{{filter.label}}</label>
+        <select multiple class="filter chosen-select" data-filter-demo-name="{{filter.label}}">
             <!--<option selected value="">All</option>-->
             {{#each opt in filter.options}}
                 <option value="{{opt}}">{{opt}}</option>
@@ -58,7 +58,7 @@
     <select id="student-spotlight__discourse-select" class="discourse disc-select-chosen">
         <option disabled selected value="">- Select -</option>
         {{#each discourseparams}}
-            <option data-options="{{options}}" value="{{name}}">{{name}}</option>
+            <option data-options="{{options}}" value="{{label}}">{{label}}</option>
         {{/each}}
     </select>
 </template>
@@ -96,7 +96,7 @@
     <select id="{{class_prefix}}-demographic" class="demographic {{class_prefix}}-demographic-chosen">
         <option selected value="">{{default}}</option>
         {{#each demographics}}
-            <option data-options="{{options}}" value="{{name}}">{{name}}</option>
+            <option data-options="{{options}}" value="{{label}}">{{label}}</option>
         {{/each}}
     </select>
     </div>

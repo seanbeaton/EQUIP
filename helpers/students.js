@@ -6,7 +6,7 @@ function getStudents(envId, reactive) {
     reactive = false;
   }
   let students = Subjects.find({envId:envId}, {reactive: reactive}).fetch();
-  let allParams = setupSubjectParameters(envId);
+  let allParams = SubjectParameters.findOne({envId: envId}).parameters;
   return updateStudents(students, allParams);
 }
 
@@ -15,7 +15,7 @@ function getStudent(subjId, envId, reactive) {
     reactive = false;
   }
   let student = Subjects.findOne({_id: subjId}, {reactive: reactive});
-  let allParams = setupSubjectParameters(envId);
+  let allParams = SubjectParameters.findOne({envId: envId}).parameters;
   return updateStudent(student, allParams);
 
 }
@@ -36,7 +36,7 @@ function updateStudent(student, allParams) {
     for (let param_k in allParams) {
       if (!allParams.hasOwnProperty(param_k)) continue;
       let param = allParams[param_k];
-      student.info.demographics[param.name] = student.info[param.name]
+      student.info.demographics[param.label] = student.info[param.label]
     }
   }
   return student

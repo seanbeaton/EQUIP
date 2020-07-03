@@ -4,7 +4,7 @@ import {console_log_conditional} from "./logging"
 
 function getSequence(seqId, envId) {
   let sequence = Sequences.findOne({_id:seqId}, {reactive: false});
-  let allParams = setupSequenceParameters(envId);
+  let allParams = SequenceParameters.findOne({envId: envId}).parameters;
   return updateSequence(sequence, allParams);
 }
 function getSequences(obsId, envId) {
@@ -16,7 +16,7 @@ function getSequences(obsId, envId) {
   else {
     sequences = Sequences.find({obsId:obsId}, {reactive: false}).fetch();
   }
-  let allParams = setupSequenceParameters(envId);
+  let allParams = SequenceParameters.findOne({envId: envId}).parameters;
   return updateSequences(sequences, allParams);
 }
 
@@ -36,7 +36,7 @@ function updateSequence(sequence, allParams) {
     for (let param_k in allParams) {
       if (!allParams.hasOwnProperty(param_k)) continue;
       let param = allParams[param_k];
-      sequence.info.parameters[param.name] = sequence.info[param.name]
+      sequence.info.parameters[param.label] = sequence.info[param.label]
     }
   }
   if (typeof sequence.info.student === 'undefined') {

@@ -14,6 +14,6 @@ Meteor.startup(function() {
 
   Subjects.rawCollection().createIndex({"envId": 1})
 
-  SequenceParameters.rawCollection().createIndex({userId: 1, 'children.envId': 1})
-  SubjectParameters.rawCollection().createIndex({userId: 1, 'children.envId': 1})
+  SequenceParameters.rawCollection().createIndex({userId: 1, 'envId': 1})
+  SubjectParameters.rawCollection().createIndex({userId: 1, 'envId': 1})
 })

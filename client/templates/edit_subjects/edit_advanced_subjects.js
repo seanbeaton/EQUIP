@@ -37,7 +37,7 @@ Template.editSubjectsAdvanced.helpers({
     return Subjects.find({envId: this.environment._id})
   },
   subject_parameters: function() {
-    let subj_params = setupSubjectParameters(this.environment._id);
+    let subj_params = SubjectParameters.findOne({envId: this.environment._id}).parameters;
     return subj_params
   },
   className: function(text) {
@@ -45,7 +45,7 @@ Template.editSubjectsAdvanced.helpers({
   },
   student_rows: function() {
     let students = getStudents(this.environment._id);
-    let subj_params = setupSubjectParameters(this.environment._id);
+    let subj_params = SubjectParameters.findOne({envId: this.environment._id});
 
     let student_rows = [];
 
@@ -59,14 +59,14 @@ Template.editSubjectsAdvanced.helpers({
         data_student_type: 'existing',
         value: student.info.name,
       });
-      subj_params.forEach(function(param) {
+      subj_params.parameters.forEach(function(param) {
         columns.push({
-          id: 'student--' + getClassName(param.name) + '--' + student._id,
+          id: 'student--' + getClassName(param.label) + '--' + student._id,
           data_student_id: student._id,
           data_field_type: 'param',
-          data_field: param.name,
+          data_field: param.label,
           data_student_type: 'existing',
-          value: student.info.demographics[param.name],
+          value: student.info.demographics[param.label],
         })
       })
 
@@ -91,11 +91,11 @@ Template.editSubjectsAdvanced.helpers({
 
 let examinePartialRows = function(envId) {
   let rows = partial_rows.get();
-  let subj_params = setupSubjectParameters(envId);
+  let subj_params = SubjectParameters.findOne({envId: envId});
 
   if (rows.length === 0 ||
     !(rows[rows.length - 1].columns.map(field => field.value).every(value => !value || value.length === 0))) {
-    addNewRow(subj_params);
+    addNewRow(subj_params.parameters);
   }
 };
 
@@ -109,7 +109,7 @@ Template.editSubjectsAdvanced.events({
       new_rows.splice(row_to_remove, 1);
       partial_rows.set(new_rows);
       setTimeout(function() {
-        checkTableValues(setupSubjectParameters(template.data.environment._id))
+        checkTableValues(SubjectParameters.findOne({envId: template.data.environment._id}).parameters)
       }, 500)
     }
     else {
@@ -135,7 +135,7 @@ Template.editSubjectsAdvanced.events({
   },
   'focusout .student-data-input': function(e, template) {
     let target = $(e.target);
-    if (checkCellValue(target, setupSubjectParameters(template.data.environment._id))) {
+    if (checkTableValues(SubjectParameters.findOne({envId: template.data.environment._id}).parameters)) {
       target.removeClass('invalid-param-value')
     }
     else {
@@ -173,8 +173,8 @@ Template.editSubjectsAdvanced.events({
       return;
     }
     let rows = data.split(/(\r\n|[\n\r])/g);
-    let params = setupSubjectParameters(template.data.environment._id);
-    let param_names = params.map(param => param.name);
+    let params = SubjectParameters.findOne({envId: template.data.environment._id}).parameters
+    let param_names = params.map(param => param.label);
     param_names.push('name');
     let headers = {};
 
@@ -237,7 +237,7 @@ Template.editSubjectsAdvanced.events({
     }, 500)
   },
   'click .save-all-students': function(e, template) {
-    let params = setupSubjectParameters(template.data.environment._id);
+    let params = SubjectParameters.findOne({envId: template.data.environment._id}).parameters;
     if (!checkTableValues(params)) {
       alert('Errors found, not saving. Please review your input for any highlighted issues.');
       return;
@@ -245,7 +245,7 @@ Template.editSubjectsAdvanced.events({
     saveStudentsTable(template.data.environment._id, params)
   },
   'click .check-all-students': function(e, template) {
-    let params = setupSubjectParameters(template.data.environment._id);
+    let params = SubjectParameters.findOne({envId: template.data.environment._id}).parameters;
     checkTableValues(params);
     if (!checkTableValues(params)) {
       alert('Errors found. Please review your input for any highlighted issues.');
@@ -276,7 +276,7 @@ let saveStudentsTable = function(envId, params) {
     // create demos obj.
     let demos = {};
     params.forEach(function(param) {
-      demos[param.name] = $row.find('input[data-field="' + param.name + '"][data-field-type="param"]').val();
+      demos[param.label] = $row.find('input[data-field="' + param.label + '"][data-field-type="param"]').val();
     })
 
 
@@ -350,12 +350,12 @@ let addNewRow = function(params, values) {
   }]
   params.forEach(function(param) {
     new_row_columns.push({
-      id: 'student--' + getClassName(param.name) + '--new-row-' + new_row_id,
+      id: 'student--' + getClassName(param.label) + '--new-row-' + new_row_id,
       data_student_id: 'new-row--' + new_row_id,
       data_field_type: 'param',
-      data_field: param.name,
+      data_field: param.label,
       data_student_type: 'new',
-      value: (typeof values[param.name] !== 'undefined') ? values[param.name] : '',
+      value: (typeof values[param.label] !== 'undefined') ? values[param.label] : '',
     });
   });
 
@@ -380,7 +380,7 @@ let checkCellValue = function(cell, parameters) {
   if (cell.attr('data-field-type') === 'base' && cell.attr('data-field') === 'name') {
     return true;
   }
-  let options = parameters.find(param => param.name === cell.attr('data-field')).options.split(',').map(function(item) { return item.trim() });
+  let options = parameters.find(param => param.label === cell.attr('data-field')).options
   return !!options.find(opt => opt === cell.val())
 };
 

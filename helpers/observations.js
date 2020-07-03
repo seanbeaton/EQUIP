@@ -1,4 +1,3 @@
-import {setupSequenceParameters} from './parameters.js'
 import {getStudent, getStudents} from "./students.js";
 import {getSequence, getSequences} from "./sequences.js";
 import {userHasEnvEditAccess} from "./environments";
@@ -15,7 +14,7 @@ function createTableOfContributions(obsId) {
   let seqs = getSequences(obsId, env._id);
 
   let modal = document.getElementById("data-modal-content");
-  let allParams = setupSequenceParameters();
+  let allParams = SequenceParameters.findOne({envId:obs.envId}).parameters;
   modal.innerHTML += contributionTableTemplate(seqs, allParams, env);
 }
 
@@ -38,12 +37,12 @@ function contributionTableTemplate(sequences, parameters, env) {
 function contributionRowTemplate(seqItem, params, env) {
   let paramTemplate = params.map((param) => {
     return `
-            <p class="o--modal-label contributions-grid-item">${param.name}</p>
+            <p class="o--modal-label contributions-grid-item">${param.label}</p>
         `
   }).join("");
 
   let paramValues = params.map((param) => {
-    let data = seqItem.info.parameters[param.name] ? seqItem.info.parameters[param.name] : "n/a"
+    let data = seqItem.info.parameters[param.label] ? seqItem.info.parameters[param.label] : "n/a"
     return `
             <p class="o--modal-label contributions-grid-item">${data}</p>
         `
@@ -77,7 +76,7 @@ function populateParamBoxes(subjId, seqId) {
   let subj = getStudent(subjId, envId);
   var modal = document.getElementById("param-modal-content");
 
-  let allParams = setupSequenceParameters(subj.envId);
+  let allParams = SequenceParameters.findOne({envId: subj.envId}).parameters;
 
   modal.innerHTML += contributionHeaderTemplate("Enter a contribution for " + subj.info.name, subj.info.name, subjId);
   modal.innerHTML += contributionParameterTemplate(allParams, null, "Save Contribution");
@@ -94,7 +93,7 @@ function editParamBoxes(seqId, subjId, envId) {
 
   var modal = document.getElementById('param-modal-content');
 
-  let allParams = setupSequenceParameters(envId);
+  let allParams = SequenceParameters.findOne({envId:envId});
   modal.innerHTML += contributionHeaderTemplate(`Edit contribution for ${subj.info.name}`, subj.info.name, subjId);
   modal.innerHTML += contributionParameterTemplate(allParams, seq, "Save Changes");
   attachOptionSelection()
@@ -114,27 +113,23 @@ function contributionParameterTemplate(allParams, sequence, type) {
 
   let boxes = allParams.map((param) => {
 
-    let options = param.options.split(',').map(function (item) {
-      return item.trim()
-    });
-
-    let optionNodes = options.map((opt) => {
+    let optionNodes = param.options.map((opt) => {
       let selected = "";
 
       if (sequence) {
-        selected = sequence.info.parameters[param.name] === opt ? "checked" : ""
+        selected = sequence.info.parameters[param.label] === opt ? "checked" : ""
       }
       // console_log_conditional('creating options for student, ', student);
       return `
-<input class="column has-text-centered subj-box-params optionSelection" type="radio" name="${param.name}" value="${opt}" id="${htmlClass(param.name + "__" + opt)}"${selected}>
-<label for="${htmlClass(param.name + "__" + opt)}">${opt}</label>
+<input class="column has-text-centered subj-box-params optionSelection" type="radio" name="${param.label}" value="${opt}" id="${htmlClass(param.label + "__" + opt)}"${selected}>
+<label for="${htmlClass(param.label + "__" + opt)}">${opt}</label>
             `
     }).join("");
 
     return `
 
-            <div class="c--modal-student-header js-subject-labels">${param.name}</div>
-            <div class="c--modal-student-options-container" data-parameter-name="${param.name}">
+            <div class="c--modal-student-header js-subject-labels">${param.label}</div>
+            <div class="c--modal-student-options-container" data-parameter-name="${param.label}">
                 ${optionNodes}
             </div>
         `

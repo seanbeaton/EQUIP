@@ -11,7 +11,6 @@ import * as observation_helpers from '/helpers/observations.js'
 import {updateStudent, updateStudents} from '/helpers/students.js'
 import {convertISODateToUS} from '/helpers/dates.js'
 import {userHasEnvEditAccess} from "../../../helpers/environments";
-import {setupSequenceParameters} from "../../../helpers/parameters";
 import {console_log_conditional} from "/helpers/logging"
 
 const classroomMode = new ReactiveVar('code');
@@ -27,21 +26,13 @@ Template.observatory.created = function() {
 
 Template.observatory.onCreated(function created() {
   this.autorun(() => {
-    Meteor.subscribe('envSubjectParameters', this.data.envId);
-    Meteor.subscribe('envSequenceParameters', this.data.envId);
-    Meteor.subscribe('observation', this.data.obsId);
-    Meteor.subscribe('envSubjects', this.data.envId);
-    Meteor.subscribe('obsSequences', this.data.obsId);
-    Meteor.subscribe('environment', this.data.envId);
-
-
     this.data.environment = Environments.findOne(this.data.envId, {reactive: true});
     environment.set(this.data.environment);
 
     this.data.observation = Observations.findOne(this.data.obsId, {reactive: true});
     observation.set(this.data.observation);
 
-    this.data.sequenceParameters = setupSequenceParameters(this.data.envId, true);
+    this.data.sequenceParameters = SequenceParameters.findOne({envId:this.data.envId}).parameters;
     let that = this;
     let subjects = Subjects.find({
       envId: that.data.observation.envId,
@@ -433,11 +424,11 @@ Template.observatory.events({
 
     let missing_params = [];
     this.sequenceParameters.forEach(function(param) {
-      let param_value = $('input[name="' + param.name + '"]:checked').attr('value');
+      let param_value = $('input[name="' + param.label + '"]:checked').attr('value');
       if (typeof param_value === 'undefined') {
-        missing_params.push(param.name);
+        missing_params.push(param.label);
       }
-      sequence.info.parameters[param.name] = param_value;
+      sequence.info.parameters[param.label] = param_value;
     });
 
     if (missing_params.length > 1) {
@@ -477,11 +468,11 @@ Template.observatory.events({
     let missing_params = [];
     sequence.info = {parameters: {}};
     this.sequenceParameters.forEach(function(param) {
-      let param_value = $('input[name="' + param.name + '"]:checked').attr('value');
+      let param_value = $('input[name="' + param.label + '"]:checked').attr('value');
       if (typeof param_value === 'undefined') {
-        missing_params.push(param.name);
+        missing_params.push(param.label);
       }
-      sequence.info.parameters[param.name] = param_value;
+      sequence.info.parameters[param.label] = param_value;
     });
 
     if (missing_params.length > 1) {
