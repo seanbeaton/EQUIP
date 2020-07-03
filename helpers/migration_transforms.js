@@ -5,9 +5,10 @@ export const upgradeSequence = function(sequence) {
     studentId: sequence.info.studentId,
     parameters: []
   };
-  let allParams = SequenceParameters.findOne({envId:subj.envId});
 
   if (sequence.info['parameters'] === undefined || !sequence.info['parameters']) {
+    let allParams = SequenceParameters.findOne({envId:sequence.envId});
+
     for (let param_k in allParams) {
       if (!allParams.hasOwnProperty(param_k)) continue;
       let param = allParams[param_k];
@@ -31,7 +32,11 @@ export const upgradeSequence = function(sequence) {
 
 export const upgradeParams = function (params) {
   params['parameters'] = [];
+  // console.log('params', params)
 
+  if (typeof params["children"] === "undefined") {
+    return params;
+  }
   for (let p = 0; p < params["children"]["parameterPairs"]; p++) {
     params['parameters'].push({
       'label': params['children']['label' + p],
@@ -46,13 +51,16 @@ export const upgradeParams = function (params) {
 }
 
 export const upgradeSubject = function(subj) {
-  let allParams = SubjectParameters.findOne({envId:subj.envId});
   if (subj.info['demographics'] === undefined || Object.keys(subj.info['demographics']).length === 0) {
-
-    subj.info.demographics = {};
-    allParams.forEach(function(param) {
-      subj.info.demographics[param.label] = subj.info[param.label];
+    let allParams = SubjectParameters.findOne({envId:subj.envId});
+    let new_demos = {};
+    allParams.parameters.forEach(function(param) {
+      new_demos[param.label] = subj.info[param.label];
     })
+    subj.info = {
+      demographics: new_demos,
+      name: subj.info.name,
+    }
   }
   return subj;
 }

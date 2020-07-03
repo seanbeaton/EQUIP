@@ -83,6 +83,9 @@ Migrations.add({
     SequenceParameters.find().forEach(function (params) {
       params = upgradeParams(params);
       oldFormatSequenceParametersUpdated++;
+      if (oldFormatSequenceParametersUpdated % 1000 === 0) {
+        console.log('Updating Subject Parameters, ' + oldFormatSequenceParametersUpdated + ' completed so far...')
+      }
       SequenceParameters.update({'_id': params._id}, {$set: params, $unset: {children: 1}});
     });
     console.log('Updated ' + oldFormatSequenceParametersUpdated + ' old format Sequence Parameters.');
@@ -91,6 +94,9 @@ Migrations.add({
     SubjectParameters.find().forEach(function (params) {
       params = upgradeParams(params);
       oldFormatSubjectParametersUpdated++;
+      if (oldFormatSubjectParametersUpdated % 1000 === 0) {
+        console.log('Updating Subject Parameters, ' + oldFormatSubjectParametersUpdated + ' completed so far...')
+      }
       SubjectParameters.update({'_id': params._id}, {$set: params, $unset: {children: 1}});
     });
     console.log('Updated ' + oldFormatSubjectParametersUpdated + ' old format Subject Parameters.');
@@ -104,16 +110,20 @@ Migrations.add({
       }
       subj = upgradeSubject(subj)
       oldFormatStudentsUpdated++;
+      if (oldFormatStudentsUpdated % 1000 === 0) {
+        console.log('Updating subjects, ' + oldFormatStudentsUpdated + ' completed so far...')
+      }
       Subjects.update({'_id': subj._id}, {$set: {info: subj.info}});
     });
     console.log('Updated ' + oldFormatStudentsUpdated + ' old format subjects.')
-    console.log('Removed ' + studentsWithoutEnv + ' stranded subjects without envids.')
-
 
     let oldFormatSequencesUpdated = 0;
     Sequences.find().forEach(function (sequence) {
       sequence = upgradeSequence(sequence);
       oldFormatSequencesUpdated++
+      if (oldFormatSequencesUpdated % 1000 === 0) {
+        console.log('Updating sequences, ' + oldFormatSequencesUpdated + ' completed so far...')
+      }
       Sequences.update({'_id': sequence._id}, {$set: sequence});
     });
     console.log('Updated ' + oldFormatSequencesUpdated + ' old format Sequences.')
