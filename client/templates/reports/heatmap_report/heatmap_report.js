@@ -1,8 +1,5 @@
-import {setupSequenceParameters, setupSubjectParameters} from "../../../../helpers/parameters";
 import {console_log_conditional} from "/helpers/logging"
 
-
-import {getSequences} from "../../../../helpers/sequences";
 import {getStudents, getStudent} from "../../../../helpers/students";
 import {heatmapReportSortDemoChosen, heatmapReportSortType} from "../selection_elements";
 import {setupVis} from '../../../../helpers/timeline';

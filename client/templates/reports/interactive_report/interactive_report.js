@@ -1,6 +1,4 @@
-import {setupSequenceParameters, setupSubjectParameters} from "../../../../helpers/parameters";
-import {getSequences} from "../../../../helpers/sequences";
-import {getStudent, getStudents} from "../../../../helpers/students";
+
 import {Sidebar} from '../../../../helpers/graph_sidebar';
 import {setupVis} from '../../../../helpers/timeline';
 import {console_log_conditional} from "/helpers/logging"

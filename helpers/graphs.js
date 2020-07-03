@@ -1,4 +1,3 @@
-import {getSequences} from "/helpers/sequences";
 let d3 = require('d3');
 
 
@@ -53,12 +52,10 @@ let createStudentTimeData = function(params) {
     if (!obsIds.hasOwnProperty(obsId_k)) continue;
     let obsId = obsIds[obsId_k];
 
-    let sequences = getSequences(obsId, envId);
+    // let sequences = .fetch()
     let selected_observations = getObservations(obsIds);
 
-    for (let sequence_k in sequences) {
-      if (!sequences.hasOwnProperty(sequence_k)) continue;
-      let sequence = sequences[sequence_k];
+    Sequences.find({obsId: obsId}).forEach(function(sequence) {
 
       if (!ret.contributions_dataset.find(datapoint => datapoint.obsId === obsId)) {
         // If it wasn't there:
@@ -81,7 +78,7 @@ let createStudentTimeData = function(params) {
       }
 
       if (sequence.info.student.studentId !== student._id) {
-        continue;
+        return;
       }
 
       let seq_disc_opt = sequence.info.parameters[dimension];
@@ -89,8 +86,7 @@ let createStudentTimeData = function(params) {
 
       ret.contributions_dataset[ds_index]._total += 1;
       ret.contributions_dataset[ds_index][seq_disc_opt] += 1;
-
-    }
+    })
   }
 
   ret.contributions_dataset.forEach(function(obs) {
@@ -236,10 +232,8 @@ let createStudentContribData = function(params) {
   for (let obsId_k in obsIds) {
     if (!obsIds.hasOwnProperty(obsId_k)) continue;
     let obsId = obsIds[obsId_k];
-    let sequences = getSequences(obsId, envId);
-    for (let sequence_k in sequences) {
-      if (!sequences.hasOwnProperty(sequence_k)) continue;
-      let sequence = sequences[sequence_k];
+    // let sequences = Sequences.find({obsId: obsId}).fetch();
+    Sequences.find({obsId: obsId}).forEach(function(sequence) {
       disc_opts.map(function(opt) {
         if (sequence.info.parameters[dimension] === opt) {
           let ds_index = ret.findIndex(datapoint => datapoint.label === opt);
@@ -251,7 +245,7 @@ let createStudentContribData = function(params) {
           }
         }
       });
-    }
+    })
   }
 
   let total = ret.map(d => d.count).reduce((a, b) => a + b, 0);
@@ -266,7 +260,7 @@ let createStudentContribData = function(params) {
   });
 
   ret.push({
-    name: 'Total (Student)',
+    label: 'Total (Student)',
     count: total,
     class_total: class_total,
     average: class_total / num_students,
@@ -318,6 +312,8 @@ let studentContribGraph = function(data, selector) {
   delete key_colors["Total (Student)"];
   key_colors["Total (Student)"] = total_color;
   key_colors["Median (Class)"] = median_color;
+  console.log('key colors', key_colors)
+  console.log('data', data)
   let z = d3.scaleOrdinal()
     .range(Object.values(key_colors));
   updateStudentContribKey('.student-contributions-graph__graph-key', Object.keys(key_colors), z)

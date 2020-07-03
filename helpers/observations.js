@@ -1,5 +1,4 @@
 import {getStudent, getStudents} from "./students.js";
-import {getSequence, getSequences} from "./sequences.js";
 import {userHasEnvEditAccess} from "./environments";
 import {htmlClass} from "./html";
 import {console_log_conditional} from "./logging"
@@ -11,7 +10,7 @@ function createTableOfContributions(obsId) {
   let obs = Observations.findOne({_id: obsId}, {reactive: false});
   let env = Environments.findOne({_id: obs.envId}, {reactive: false});
   $('#data-modal-content').children().remove();
-  let seqs = getSequences(obsId, env._id);
+  let seqs = Sequences.find({obsId: obsId})
 
   let modal = document.getElementById("data-modal-content");
   let allParams = SequenceParameters.findOne({envId:obs.envId}).parameters;
@@ -89,11 +88,11 @@ function editParamBoxes(seqId, subjId, envId) {
   $('#param-modal-content').children().remove();
 
   var subj = getStudent(subjId, envId);
-  var seq = getSequence(seqId, envId);
+  var seq = Sequences.findOne({_id: seqId});
 
   var modal = document.getElementById('param-modal-content');
 
-  let allParams = SequenceParameters.findOne({envId:envId});
+  let allParams = SequenceParameters.findOne({envId:envId}).parameters;
   modal.innerHTML += contributionHeaderTemplate(`Edit contribution for ${subj.info.name}`, subj.info.name, subjId);
   modal.innerHTML += contributionParameterTemplate(allParams, seq, "Save Changes");
   attachOptionSelection()

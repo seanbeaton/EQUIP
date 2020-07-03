@@ -1,8 +1,6 @@
 import {getStudents} from "../../helpers/students";
-import {getSequences} from "../../helpers/sequences";
-import {get_average, get_median, getObservations} from "../../helpers/graphs";
+import {get_average, get_median} from "../../helpers/graphs";
 import {console_log_conditional, console_table_conditional} from "/helpers/logging"
-import {setupSubjectParameters} from "../../helpers/parameters";
 import {checkAccess} from "../../helpers/access";
 
 
@@ -72,17 +70,14 @@ let createHistogramData = function(params) {
     if (!obsIds.hasOwnProperty(obsId_k)) continue;
     let obsId = obsIds[obsId_k];
 
-    let sequences = getSequences(obsId, envId);
-    for (let sequence_k in sequences) {
-      if (!sequences.hasOwnProperty(sequence_k)) continue;
-      let sequence = sequences[sequence_k];
+    Sequences.find({obsId: obsId}).forEach(function(sequence) {
       allStudents.map(function(student) {
         if (sequence.info.student.studentId === student._id) {
           let ds_index = ret.students.findIndex(datapoint => datapoint.studentId === student._id);
           ret.students[ds_index].count += 1;
         }
       });
-    }
+    });
   }
 
   let all_counts = ret.students.map(d => d.count);

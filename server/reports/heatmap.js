@@ -1,8 +1,5 @@
 import {getStudents} from "../../helpers/students";
-import {getSequences} from "../../helpers/sequences";
-import {getObservations} from "../../helpers/graphs";
 import {console_log_conditional} from "/helpers/logging"
-import {setupSubjectParameters} from "../../helpers/parameters";
 import {checkAccess} from "../../helpers/access";
 
 
@@ -91,17 +88,15 @@ let createHeatmapData = function(params) {
   for (let obsId_k in obsIds) {
     if (!obsIds.hasOwnProperty(obsId_k)) continue;
     let obsId = obsIds[obsId_k];
-    let sequences = getSequences(obsId, envId);
-    for (let sequence_k in sequences) {
-      if (!sequences.hasOwnProperty(sequence_k)) continue;
-      let sequence = sequences[sequence_k];
+
+    Sequences.find({obsId: obsId}).forEach(function(sequence) {
       allStudents.map(function(student) {
         if (sequence.info.student.studentId === student._id) {
           let ds_index = ret.contributions_dataset.findIndex(datapoint => datapoint.studentId === student._id);
           ret.contributions_dataset[ds_index].count += 1;
         }
       });
-    }
+    });
   }
 
   // console.log(new Date().getTime() - start_3, 'start_3')

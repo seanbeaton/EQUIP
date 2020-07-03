@@ -1,8 +1,5 @@
 import {getStudents} from "../../helpers/students";
-import {getSequences} from "../../helpers/sequences";
-import {getObservations} from "../../helpers/graphs";
 import {console_log_conditional} from "/helpers/logging"
-import {setupSubjectParameters} from "../../helpers/parameters";
 import {checkAccess} from "../../helpers/access";
 
 
@@ -108,12 +105,7 @@ let compileContributionData = function(parameters) {
     if (!obsIds.hasOwnProperty(obsId_k)) continue;
     let obsId = obsIds[obsId_k];
 
-    let sequences = getSequences(obsId, envId);
-    for (let sequence_k in sequences) {
-      if (!sequences.hasOwnProperty(sequence_k)) continue;
-      let sequence = sequences[sequence_k];
-      // //console_log_conditional('sequence', sequence);
-
+    Sequences.find({obsId: obsId}).forEach(function(sequence) {
       let sequence_y;
       if (yParams.param_type === 'demographics') {
         sequence_y = sequence.info.student.demographics[yParams.selected_value];
@@ -136,7 +128,7 @@ let compileContributionData = function(parameters) {
       increaseValueForAxes(contrib_data.y_axis, sequence_y, sequence_x);
       increaseValueForStudent(contrib_data.y_axis, sequence_y, sequence_x, sequence.info.student);
 
-    }
+    })
   }
 
   // Set up columns

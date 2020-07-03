@@ -12,7 +12,6 @@
  */
 
 let setupVis = function(visContainerId, selectionCallback, obsOptions, selectedObservations, class_type) {
-  import {getSequences} from "/helpers/sequences";
   import vis from "vis";
 
   let observations = obsOptions.get();

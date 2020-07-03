@@ -1,6 +1,5 @@
 import {getDiscourseDimensions, getObservations} from "../../helpers/graphs";
 import {getStudent, getStudents} from "../../helpers/students";
-import {getSequences} from "../../helpers/sequences";
 import {console_log_conditional, console_table_conditional} from "/helpers/logging"
 import {checkAccess} from "../../helpers/access";
 
@@ -59,7 +58,7 @@ let createGroupWorkData = function(params) {
 
   ret.groups = observations.map(function(observation) {
     console_log_conditional('observation', observation);
-    observation.sequences = getSequences(observation._id, envId);
+    observation.sequences = Sequences.find({obsId: observation._id}).fetch();
     // let obs = getObs
     observation.students = observation.small_group.map(function(studId) {
       let student = getStudent(studId, envId);

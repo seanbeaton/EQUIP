@@ -1,5 +1,3 @@
-import {getStudents} from "../../helpers/students";
-import {getSequences} from "../../helpers/sequences";
 import {getObservations} from "../../helpers/graphs";
 import {console_log_conditional} from "/helpers/logging"
 import {checkAccess} from "../../helpers/access";
@@ -98,11 +96,7 @@ let createTimelineData = function(params) {
     if (!obsIds.hasOwnProperty(obsId_k)) continue;
     let obsId = obsIds[obsId_k];
 
-    let sequences = getSequences(obsId, envId);
-    for (let sequence_k in sequences) {
-      if (!sequences.hasOwnProperty(sequence_k)) continue;
-      let sequence = sequences[sequence_k];
-
+    Sequences.find({obsId: obsId}).forEach(function(sequence) {
       if (!ret.contributions_dataset.find(datapoint => datapoint.obsId === obsId)) {
         // If it wasn't there:
         let obs = obsers.find(obs => obs._id === obsId);
@@ -132,7 +126,7 @@ let createTimelineData = function(params) {
         ret.contributions_dataset[ds_index][seqDemoOption] += 1;
       }
 
-    }
+    });
   }
 
 

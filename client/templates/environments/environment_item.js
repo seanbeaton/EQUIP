@@ -3,7 +3,6 @@
 */
 
 import { createModal } from '/helpers/modals.js'
-import {getSequences} from "/helpers/sequences";
 import {envHasObservations} from "../../../helpers/environments";
 import {activeEnvId, obsCreateModal} from './environment_list'
 import {console_log_conditional} from "/helpers/logging"
@@ -109,8 +108,8 @@ Template.environmentItem.events({
     if (envId) {
       var environment = Environments.findOne({"_id": envId});
       var envName = environment['envName'];
-      // var sequences=Sequences.find({"envId":envId}).fetch();
-      var sequences = getSequences(null, envId);
+      var sequences= Sequences.find({"envId":envId}).fetch();
+      // var sequences = getSequences(null, envId);
 
       var export_data = []
       sequences.sort(function(a, b) {

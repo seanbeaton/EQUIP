@@ -1,7 +1,6 @@
 
 import {console_log_conditional, console_table_conditional} from "/helpers/logging"
 
-import {getSequences} from "/helpers/sequences";
 import {getStudents, getStudent} from "/helpers/students";
 import {setupVis} from "/helpers/timeline";
 // import {getDiscourseOptionsForDimension, getObservations} from "/helpers/graphs";
