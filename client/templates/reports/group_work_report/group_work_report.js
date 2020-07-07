@@ -34,7 +34,7 @@ Template.groupWorkReport.onCreated(function created() {
   this.autorun(() => {
     this.subscribe('subjects');
     this.subscribe('observations');
-    this.subscribe('sequences');
+    // this.subscribe('sequences');
     this.subscribe('subjectParameters');
     this.subscribe('sequenceParameters');
     this.subscribe('environments');
