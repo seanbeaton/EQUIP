@@ -52,12 +52,12 @@ let createHeatmapData = function(params) {
     contributions_dataset: []
   };
 
-  // let start_1 = new Date().getTime();
+  let start_1 = new Date().getTime();
 
   let allStudents = getStudents(envId);
 
-  // console_log_conditional(new Date().getTime() - start_1, 'start_1')
-  // let start_2 = new Date().getTime();
+  console_log_conditional(new Date().getTime() - start_1, 'start_1')
+  let start_2 = new Date().getTime();
 
   ret.limit_x = 0;
   ret.limit_y = 0;
@@ -81,40 +81,31 @@ let createHeatmapData = function(params) {
     }
   });
 
-  // console.log(new Date().getTime() - start_2, 'start_2')
-  // let start_3 = new Date().getTime();
+  ret.contributions_dataset_obj = {};
 
-  // get contrib numbers for each student.
-  for (let obsId_k in obsIds) {
-    if (!obsIds.hasOwnProperty(obsId_k)) continue;
-    let obsId = obsIds[obsId_k];
+  console.log(new Date().getTime() - start_2, 'start_2')
+  let start_3 = new Date().getTime();
 
-    Sequences.find({obsId: obsId}).forEach(function(sequence) {
-      allStudents.map(function(student) {
-        if (sequence.info.student.studentId === student._id) {
-          let ds_index = ret.contributions_dataset.findIndex(datapoint => datapoint.studentId === student._id);
-          ret.contributions_dataset[ds_index].count += 1;
-        }
-      });
-    });
-  }
+  Sequences.find({obsId: {$in: obsIds}}).forEach(function(sequence) {
+    let ds_index = ret.contributions_dataset.findIndex(datapoint => datapoint.studentId === sequence.info.student.studentId);
+    ret.contributions_dataset[ds_index].count += 1;
+  });
 
-  // console.log(new Date().getTime() - start_3, 'start_3')
-  // let start_4 = new Date().getTime();
+  console.log(new Date().getTime() - start_3, 'start_3')
+  let start_4 = new Date().getTime();
 
   let highest_count = ret.contributions_dataset.reduce((acc, student) => student.count > acc ? student.count : acc, 1);
-  // let highest_count = ret.contributions_dataset.map(student => student.count).reduce((acc, student) => student > acc ? student : acc, 0)
 
-  // console.log(new Date().getTime() - start_4, 'start_4')
-  // let start_5 = new Date().getTime();
+  console.log(new Date().getTime() - start_4, 'start_4')
+  let start_5 = new Date().getTime();
 
   ret.contributions_dataset = ret.contributions_dataset.map(function(datum) {
     datum.quintile = Math.ceil(datum.count * 4 / highest_count);
     return datum
   });
 
-  // console.log(new Date().getTime() - start_5, 'start_5')
-  // let start_6 = new Date().getTime();
+  console.log(new Date().getTime() - start_5, 'start_5')
+  let start_6 = new Date().getTime();
 
   if (heatmapReportSortType === 'buckets') {
     let selected_demo_options = SubjectParameters.findOne({envId: envId}).parameters.filter(d => d.label === selectedDemo)[0];
@@ -165,7 +156,7 @@ let createHeatmapData = function(params) {
     ret.contributions_dataset = ret.contributions_dataset.sort(sortDemo);
   }
 
-  // console.log(new Date().getTime() - start_6, 'start_6')
+  console.log(new Date().getTime() - start_6, 'start_6')
 
   return ret
 };
