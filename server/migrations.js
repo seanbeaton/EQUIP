@@ -2,7 +2,7 @@ import {console_log_conditional} from "/helpers/logging"
 import {upgradeParams, upgradeSequence, upgradeSubject, downgradeParams, downgradeSequence} from "../helpers/migration_transforms";
 
 Meteor.startup(function () {
-  Migrations.migrateTo('5');
+  Migrations.migrateTo('6');
 });
 
 
@@ -103,30 +103,24 @@ Migrations.add({
 
 
     let oldFormatStudentsUpdated = 0;
+    let subjEnvCache = {}
+    let subjEnvMemoStats = {'new': 0, 'memo': 0}
     Subjects.find().forEach(function (subj) {
       if (typeof subj.envId === 'undefined') {
         Subjects.remove({'_id': subj._id});
         return;
       }
-      subj = upgradeSubject(subj)
+      subj = upgradeSubject(subj, subjEnvCache, subjEnvMemoStats)
       oldFormatStudentsUpdated++;
       if (oldFormatStudentsUpdated % 1000 === 0) {
         console.log('Updating subjects, ' + oldFormatStudentsUpdated + ' completed so far...')
       }
       Subjects.update({'_id': subj._id}, {$set: {info: subj.info}});
     });
+    console.log('subjEnvMemoStats new', subjEnvMemoStats.new, 'memod', subjEnvMemoStats.memo)
+
     console.log('Updated ' + oldFormatStudentsUpdated + ' old format subjects.')
 
-    let oldFormatSequencesUpdated = 0;
-    Sequences.find().forEach(function (sequence) {
-      sequence = upgradeSequence(sequence);
-      oldFormatSequencesUpdated++
-      if (oldFormatSequencesUpdated % 1000 === 0) {
-        console.log('Updating sequences, ' + oldFormatSequencesUpdated + ' completed so far...')
-      }
-      Sequences.update({'_id': sequence._id}, {$set: sequence});
-    });
-    console.log('Updated ' + oldFormatSequencesUpdated + ' old format Sequences.')
     console.log('Removing all Shared Environments')
     SharedEnvironments.remove({});
   },
@@ -141,7 +135,42 @@ Migrations.add({
       params = downgradeParams(params)
       SubjectParameters.update({'_id': params._id}, {$set: params, $unset: {parameters: 1, envId: 1}})
     })
+  }
+});
 
+Migrations.add({
+  version: 6,
+  name: 'Update all sequences to use new format.',
+  up: function () {
+    let oldFormatSequencesUpdated = 0;
+    let cachedEnvsParams = {};
+    let cachedEnvsMemoStats = {'new': 0, 'memo': 0}
+    let failure_reasons = {};
+
+    Sequences.find().forEach(function (sequence) {
+      sequence = upgradeSequence(sequence, cachedEnvsParams, cachedEnvsMemoStats);
+      oldFormatSequencesUpdated++
+      if (oldFormatSequencesUpdated % 1000 === 0) {
+        console.log('Updating sequences, ' + oldFormatSequencesUpdated + ' completed so far...')
+      }
+      if (typeof sequence.info.delete_seq !== 'undefined') {
+        console.log('deleting sequence for reason:', sequence.info.reason)
+        console.log('sequence to be removed:', sequence)
+        if (typeof failure_reasons[sequence.info.reason] === 'undefined') { failure_reasons[sequence.info.reason] = 0};
+        failure_reasons[sequence.info.reason]++;
+
+        Sequences.remove({'_id': sequence._id});
+        return;
+      }
+      Sequences.update({'_id': sequence._id}, {$set: sequence});
+    });
+    console.log('cachedEnvsMemoStats new', cachedEnvsMemoStats.new, 'memod', cachedEnvsMemoStats.memo)
+    console.log('Updated ' + oldFormatSequencesUpdated + ' old format Sequences.')
+    console.log('Removed sequences for the following reasons')
+    console.log(Object.keys(failure_reasons).map((k)=>k + ' #: ' + failure_reasons[k]).join('\n'))
+
+  },
+  down: function () {
     Sequences.find().forEach(function (sequence) {
       sequence = downgradeSequence(sequence);
       Sequences.update({'_id': sequence._id}, {$set: {'sequence.info': sequence.info}});

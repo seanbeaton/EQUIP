@@ -98,13 +98,9 @@ let compileContributionData = function(parameters) {
   });
 
   // Record contributions
-  // //console_log_conditional('obsIds', obsIds);
+  console.log('obsIds', obsIds);
 
-  for (let obsId_k in obsIds) {
-
-    if (!obsIds.hasOwnProperty(obsId_k)) continue;
-    let obsId = obsIds[obsId_k];
-
+  obsIds.forEach(function(obsId) {
     Sequences.find({obsId: obsId}).forEach(function(sequence) {
       let sequence_y;
       if (yParams.param_type === 'demographics') {
@@ -122,6 +118,9 @@ let compileContributionData = function(parameters) {
         sequence_x = sequence.info.parameters[xParams.selected_value];
       }
 
+      console.log('seq x and y',sequence_x, sequence_y)
+      console.log('stud',sequence.info.parameters)
+
       let student_index = contrib_data.students.findIndex(function(student) { return student._id === sequence.info.student.studentId });
       contrib_data.students[student_index].contributions.push(sequence.info.parameters);
 
@@ -129,7 +128,7 @@ let compileContributionData = function(parameters) {
       increaseValueForStudent(contrib_data.y_axis, sequence_y, sequence_x, sequence.info.student);
 
     })
-  }
+  })
 
   // Set up columns
   contrib_data.column_keys = yParams.selected_option.option_list;

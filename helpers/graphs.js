@@ -312,8 +312,6 @@ let studentContribGraph = function(data, selector) {
   delete key_colors["Total (Student)"];
   key_colors["Total (Student)"] = total_color;
   key_colors["Median (Class)"] = median_color;
-  console.log('key colors', key_colors)
-  console.log('data', data)
   let z = d3.scaleOrdinal()
     .range(Object.values(key_colors));
   updateStudentContribKey('.student-contributions-graph__graph-key', Object.keys(key_colors), z)

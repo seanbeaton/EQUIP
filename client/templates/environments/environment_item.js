@@ -189,7 +189,7 @@ Template.environmentItem.helpers({
         return params.parameterNames();
       }
       catch (error) {
-        console.log('error', error);
+        // console.log('error', error);
       }
     },
     getDiscourseParameters: function() {
@@ -198,24 +198,21 @@ Template.environmentItem.helpers({
         return params.parameterNames();
       }
       catch (error) {
-        console.log('error', error);
+        // console.log('error', error);
       }
     },
     noSubjectParametersEntered: function() {
       let subjectParameters = SubjectParameters.findOne({'envId': this._id})
-
-      return (subjectParameters.length === 0 || typeof subjectParameters.parameters === 'undefined' || subjectParameters.parameters.length === 0)
+      return (!subjectParameters || subjectParameters.length === 0 || typeof subjectParameters.parameters === 'undefined' || subjectParameters.parameters.length === 0)
     },
     noDiscourseParametersEntered: function() {
       let sequenceParameters = SequenceParameters.findOne({'envId': this._id});
-
-      return (sequenceParameters.length === 0 || typeof sequenceParameters.parameters === 'undefined' || sequenceParameters.parameters.length === 0)
+      return (!sequenceParameters || sequenceParameters.length === 0 || typeof sequenceParameters.parameters === 'undefined' || sequenceParameters.parameters.length === 0)
     },
     isClassValidated: function() {
       let hasStudents = Subjects.find({envId: this._id}).count() > 0;
       let hasSeqParams = !!SequenceParameters.findOne({envId:this._id});
       let hasSubjParams = !!SubjectParameters.findOne({envId:this._id});
-      console.log(hasStudents, hasSeqParams, hasSubjParams)
 
       return hasStudents && hasSeqParams && hasSubjParams;
     },
