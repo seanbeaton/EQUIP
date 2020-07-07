@@ -5,6 +5,7 @@ import {heatmapReportSortDemoChosen, heatmapReportSortType} from "../selection_e
 import {setupVis} from '../../../../helpers/timeline';
 import {clone_object} from "../../../../helpers/objects";
 import {
+  createHeatmapData,
   getDiscourseDimensions,
   getDiscourseOptionsForDimension,
   getObservations, studentContribGraph, studentTimeGraph
@@ -337,7 +338,35 @@ let updateGraph = async function(refresh) {
     console_log_conditional(new Error().stack);
     console_log_conditional('setting latest data req', currentDataRequest)
 
-    Meteor.call('getHeatmapData', heatmap_params, refresh, function(err, result) {
+    // Meteor.call('getHeatmapData', heatmap_params, refresh, function(err, result) {
+    //   if (err) {
+    //     console_log_conditional('error', err);
+    //     return;
+    //   }
+    //
+    //   let cachedData = cachedDataRequests.get()
+    //   cachedData[JSON.stringify(heatmap_params)] = result
+    //   cachedDataRequests.set(cachedData);
+    //
+    //   if (currentDataRequest !== latestDataRequest.get()) {
+    //     console_log_conditional('currentDataRequest', currentDataRequest)
+    //     console_log_conditional('latestDataRequest', latestDataRequest.get())
+    //     console_log_conditional('current cachedDataRequests.get()', cachedDataRequests.get())
+    //     return;
+    //   }
+    //   else {
+    //     console_log_conditional('data req matches')
+    //     latestDataRequest.set(null)
+    //   }
+    //
+    //
+    //   showData(result)
+    // });
+
+    Meteor.call('getObsSequences', {
+      obsIds: selectedObservations.get(),
+      envId: selectedEnvironment.get()
+    }, refresh, function (err, result) {
       if (err) {
         console_log_conditional('error', err);
         return;
@@ -357,7 +386,7 @@ let updateGraph = async function(refresh) {
         console_log_conditional('data req matches')
         latestDataRequest.set(null)
       }
-
+      result.data = createHeatmapData(heatmap_params, result.data.sequences)
 
       showData(result)
     });

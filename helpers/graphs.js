@@ -1,3 +1,6 @@
+import {getStudents} from "./students";
+import {console_log_conditional} from "./logging";
+
 let d3 = require('d3');
 
 
@@ -459,4 +462,127 @@ function get_average(values) {
   return values.reduce((a, b) => a + b, 0) / values.length
 }
 
-export {createStudentTimeData, createStudentContribData, getObservations, getDiscourseOptionsForDimension, getDiscourseDimensions, studentTimeGraph, studentContribGraph, get_average, get_median}
+
+const createHeatmapData = function(params, sequences) {
+  let {envId, obsIds, selectedDemo, heatmapReportSortType} = params
+
+  if (typeof sequences === 'undefined') {
+    sequences = Sequences.find({obsId: {$in: obsIds}})
+  }
+
+  let ret = {
+    contributions_dataset: []
+  };
+
+  let start_1 = new Date().getTime();
+
+  let allStudents = getStudents(envId);
+
+  console_log_conditional(new Date().getTime() - start_1, 'start_1')
+  let start_2 = new Date().getTime();
+
+  ret.limit_x = 0;
+  ret.limit_y = 0;
+  ret.contributions_dataset = allStudents.map(function(student) {
+    if (ret.limit_y > student.data_y) {
+      ret.limit_y = student.data_y
+    }
+    if (ret.limit_x > student.data_x) {
+      ret.limit_x = student.data_x
+    }
+    return {
+      name: student.info.name,
+      studentId: student._id,
+      class: '',
+      student: student,
+      data_x: student.data_x,
+      data_y: student.data_y,
+      count: 0,
+      show_count: true,
+      sort_first: false,
+    }
+  });
+
+  ret.contributions_dataset_obj = {};
+
+  console.log(new Date().getTime() - start_2, 'start_2')
+  let start_3 = new Date().getTime();
+
+  sequences.forEach(function(sequence) {
+    let ds_index = ret.contributions_dataset.findIndex(datapoint => datapoint.studentId === sequence.info.student.studentId);
+    ret.contributions_dataset[ds_index].count += 1;
+  });
+
+  console.log(new Date().getTime() - start_3, 'start_3')
+  let start_4 = new Date().getTime();
+
+  let highest_count = ret.contributions_dataset.reduce((acc, student) => student.count > acc ? student.count : acc, 1);
+
+  console.log(new Date().getTime() - start_4, 'start_4')
+  let start_5 = new Date().getTime();
+
+  ret.contributions_dataset = ret.contributions_dataset.map(function(datum) {
+    datum.quintile = Math.ceil(datum.count * 4 / highest_count);
+    return datum
+  });
+
+  console.log(new Date().getTime() - start_5, 'start_5')
+  let start_6 = new Date().getTime();
+
+  if (heatmapReportSortType === 'buckets') {
+    let selected_demo_options = SubjectParameters.findOne({envId: envId}).parameters.filter(d => d.label === selectedDemo)[0];
+    let opts;
+    if (selected_demo_options) {
+      opts = selected_demo_options.options
+    }
+    else {
+      opts = [];
+    }
+    ret.contributions_dataset = ret.contributions_dataset.map(datum => {datum.selected_demo_value = datum.student.info.demographics[selectedDemo]; return datum})
+
+    opts.map(opt => ret.contributions_dataset.push({
+      name: opt,
+      studentId: opt + '-label',
+      selected_demo_value: opt,
+      class: opt + '-label demo-label',
+      student: {},
+      data_x: 0,
+      data_y: 0,
+      count: 0,
+      show_count: false,
+      sort_first: true,
+    }));
+
+    let sortDemo = function(a, b) {
+      let a_demo = a.selected_demo_value;
+      let b_demo = b.selected_demo_value;
+      if (a_demo > b_demo) {
+        return 1
+      }
+      else if (a_demo === b_demo) {
+        // return b.sort_first - a.sort_first;
+        if (a.sort_first) {
+          return -1;
+        }
+        else if (b.sort_first) {
+          return 1
+        }
+        else {
+          return b.count - a.count;
+        }
+      }
+      else {
+        return -1
+      }
+    };
+    ret.contributions_dataset = ret.contributions_dataset.sort(sortDemo);
+  }
+
+  console.log(new Date().getTime() - start_6, 'start_6')
+
+  return ret
+};
+
+
+
+export {createStudentTimeData, createHeatmapData, createStudentContribData, getObservations, getDiscourseOptionsForDimension, getDiscourseDimensions, studentTimeGraph, studentContribGraph, get_average, get_median}
