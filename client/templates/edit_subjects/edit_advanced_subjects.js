@@ -44,7 +44,7 @@ Template.editSubjectsAdvanced.helpers({
     return getClassName(text);
   },
   student_rows: function() {
-    let students = getStudents(this.environment._id);
+    let students = Subjects.find({envId:this.environment._id});
     let subj_params = SubjectParameters.findOne({envId: this.environment._id});
 
     let student_rows = [];

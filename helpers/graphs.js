@@ -232,10 +232,7 @@ let createStudentContribData = function(params) {
 
   let all_students = students.map(stud => ({id: stud._id, count: 0}));
 
-  for (let obsId_k in obsIds) {
-    if (!obsIds.hasOwnProperty(obsId_k)) continue;
-    let obsId = obsIds[obsId_k];
-    // let sequences = Sequences.find({obsId: obsId}).fetch();
+  obsIds.forEach(function(obsId) {
     Sequences.find({obsId: obsId}).forEach(function(sequence) {
       disc_opts.map(function(opt) {
         if (sequence.info.parameters[dimension] === opt) {
@@ -249,7 +246,7 @@ let createStudentContribData = function(params) {
         }
       });
     })
-  }
+  })
 
   let total = ret.map(d => d.count).reduce((a, b) => a + b, 0);
 
@@ -476,7 +473,7 @@ const createHeatmapData = function(params, sequences) {
 
   let start_1 = new Date().getTime();
 
-  let allStudents = getStudents(envId);
+  let allStudents = Subjects.find({envId: envId}).fetch()
 
   console_log_conditional(new Date().getTime() - start_1, 'start_1')
   let start_2 = new Date().getTime();

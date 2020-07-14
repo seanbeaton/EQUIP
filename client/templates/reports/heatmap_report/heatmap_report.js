@@ -211,7 +211,7 @@ Template.heatmapReport.events({
 
     selectedEnvironment.set(selected.val());
     obsOptions.set(getObsOptions());
-    students.set(getStudents(selectedEnvironment.get()));
+    students.set(Subjects.find({envId: selectedEnvironment.get()}).fetch());
     setTimeout(function() {
       setupVis('vis-container', function() {
         if (selectedObservations.get().length === 0) {
@@ -219,7 +219,8 @@ Template.heatmapReport.events({
         }
         updateStudentContribGraph();
         updateStudentTimeGraph();
-        setTimeout(updateGraph, 200);
+        updateGraph();
+        // setTimeout(updateGraph, 10);
       }, obsOptions, selectedObservations, 'whole_class');
     }, 50);
 
@@ -538,7 +539,7 @@ let initHeatmapGraph = function(full_data, containerSelector) {
 };
 
 let selectStudentForModal = function(studentId) {
-  selectedStudent.set(getStudent(studentId, selectedEnvironment.get()));
+  selectedStudent.set(Subjects.findOne({_id: studentId}));
 }
 
 let updateHeatmapGraph = function(full_data, containerSelector) {

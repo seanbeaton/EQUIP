@@ -381,7 +381,8 @@ function moveStudent(subId, x, y) {
 function createTableOfStudents() {
   $('#data-modal-content').children().remove();
   let envId = Router.current().params._envId;
-  let students = getStudents(envId);
+  let students = Subjects.find({envId: envId}).fetch();
+
   let allParams = SubjectParameters.findOne({envId: envId}).parameters;
 
   var modal = document.getElementById("data-modal-content");
@@ -570,7 +571,7 @@ function editParamBoxes(subjId) {
     $('#param-modal-content').children().remove();
     let modal = document.getElementById("param-modal-content");
 
-    let subj = getStudent(subjId);
+    let subj = Subjects.findOne({_id: subjId});
     let allParams = SubjectParameters.findOne({envId: subj.envId}).parameters;
     let student = subj.info.name;
 

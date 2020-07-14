@@ -91,7 +91,8 @@ let compileContributionData = function(parameters) {
   }
 
   // Create by-student data structure
-  let students = getStudents(envId);
+  let students = Subjects.find({envId: envId}).fetch()
+
   contrib_data.students = students.map(function(student) {
     student.contributions = [];
     return student;

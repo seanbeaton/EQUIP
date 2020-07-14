@@ -86,7 +86,7 @@ var myStepDefinitionsWrapper = function () {
   });
 
 
-  this.Then(/^I( don't | )see (a|an|[\d]+) "([^"]*)"( with( out| )the text "([^"]*)"|)$/, function (see_negation, number, selector, needs_text, text_negation, text, callback) {
+  this.Then(/^I( don't | )see (a|an|[\d]+) "([^"]*)"( with(out | )the text "([^"]*)"|)$/, function (see_negation, number, selector, needs_text, text_negation, text, callback) {
     see_negation = see_negation === " don't ";
     text_negation = text_negation === "out ";
     if (number === "a" || number === "an") {
@@ -132,7 +132,7 @@ var myStepDefinitionsWrapper = function () {
     }
   });
 
-  this.Then(/^I( don't | )see (a|an|[\d]+) "([^"]*)"( with( out| )the text "([^"]*)"|) in the wrapper "([^"]*)"$/, function (see_negation, number, selector, needs_text, text_negation, text, wrapper_sel, callback) {
+  this.Then(/^I( don't | )see (a|an|[\d]+) "([^"]*)"( with(out | )the text "([^"]*)"|) in the wrapper "([^"]*)"$/, function (see_negation, number, selector, needs_text, text_negation, text, wrapper_sel, callback) {
     see_negation = see_negation === " don't ";
     text_negation = text_negation === "out ";
     let wrapper = browser.$(wrapper_sel);

@@ -55,7 +55,7 @@ Template.obsCreationModal.rendered = function() {
 
 Template.obsCreationModal.helpers({
   subjects: function() {
-    return getStudents(activeEnvId.get());
+    return Subjects.find({envId: activeEnvId.get()}).fetch();
   },
   activeEnvId: function() {
     return activeEnvId.get();
@@ -179,7 +179,7 @@ Template.obsCreationModal.events({
 
 Template.obsAbsentModal.helpers({
   subjects: function() {
-    return getStudents(activeEnvId.get());
+    return Subjects.find({envId: activeEnvId.get()}).fetch();
   },
   activeEnvId: function() {
     return activeEnvId.get();
@@ -217,7 +217,7 @@ Template.obsAbsentModal.events({
 
 Template.obsSmallGroupModal.helpers({
   subjects: function() {
-    return getStudents(activeEnvId.get());
+    return Subjects.find({envId: activeEnvId.get()}).fetch();
   },
   activeEnvId: function() {
     return activeEnvId.get();
@@ -272,7 +272,7 @@ Template.environmentList.helpers({
     return activeEnvId.get();
   },
   subjects: function() {
-    return getStudents(activeEnvId.get());
+    return Subjects.find({envId: activeEnvId.get()}).fetch();
   },
   environment: function() {
     var envs = this.environments;

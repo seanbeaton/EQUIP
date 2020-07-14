@@ -92,7 +92,7 @@ Feature: Heatmap report page
     And I see a ".student-contributions-graph__graph .bar-group:nth-child(2) rect[y='218'][height='72']"
     And I see a ".student-contributions-graph__graph .bar-group:nth-child(3) rect[y='218'][height='72']"
     And I see a ".student-contributions-graph__graph .bar-group:nth-child(4) rect[y='0'][height='290']"
-    And I see a ".student-contributions-graph__graph .bar-group:nth-child(4) rect[y='218'][height='72']"
+    And I see a ".student-contributions-graph__graph .bar-group:nth-child(4) rect[y='181'][height='109']"
 
     # Participation over time
     And I see a ".line--total[d='M0,0L648,172']" in the wrapper ".student-participation-time__graph"

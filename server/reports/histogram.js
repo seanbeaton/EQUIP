@@ -53,7 +53,8 @@ let createHistogramData = function(params) {
     // groups: []
   };
 
-  let allStudents = getStudents(envId);
+  let allStudents = Subjects.find({envId: envId}).fetch()
+
   ret.students = allStudents.map(function(student) {
     return {
       name: student.info.name,

@@ -10,6 +10,7 @@ import {
   studentTimeGraph
 } from "../../../../helpers/graphs";
 import {heatmapReportSortDemoChosen, heatmapReportSortType} from "../selection_elements";
+import {activeEnvId} from "../../environments/environment_list";
 
 const obsOptions = new ReactiveVar([]);
 const selectedEnvironment = new ReactiveVar(false);
@@ -48,7 +49,7 @@ Template.groupWorkReport.events({
 
     selectedEnvironment.set(selected.val());
     obsOptions.set(getObsOptions());
-    students.set(getStudents(selectedEnvironment.get(), true));
+    students.set(Subjects.find({envId: selectedEnvironment.get()}).fetch());
     console_log_conditional('students', students.get());
     setTimeout(function() {
       setupVis('vis-container', function() {
@@ -57,7 +58,7 @@ Template.groupWorkReport.events({
         }
         updateStudentContribGraph();
         updateStudentTimeGraph();
-        setTimeout(updateGraph, 200);
+        updateGraph();
       }, obsOptions, selectedObservations, 'small_group');
     }, 50);
 

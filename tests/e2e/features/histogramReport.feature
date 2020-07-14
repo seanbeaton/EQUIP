@@ -15,6 +15,7 @@ Feature: Student histogram report page
     And I click on the item with the selector ".active-result=Example Classroom" in the wrapper "#env_select_chosen"
     And I wait "2000" ms
     And I click on the item with the selector ".vis-item-content=Observation #1 - 9/4 (2018-09-04 - WC)"
+    And I wait "2000" ms
 #    And I click on the item with the selector ".vis-item-content=Observation #2 - 9/6 (2018-09-06 - WC)"
 #    And I click on the item with the selector ".vis-item-content=Observation #3 - 9/13 (2018-09-13 - WC)"
     And I see a ".student-group:nth-child(3) .student-group__title" with the text "2nd Group (n = 3)"
@@ -40,7 +41,9 @@ Feature: Student histogram report page
     And I click on the item with the selector ".vis-item-content=Observation #1 - 9/4 (2018-09-04 - WC)"
     And I wait "4000" ms
     And I click on the item with the selector "#histogram_demographic_chosen"
+    And I wait "2000" ms
     And I click on the item with the selector ".active-result=Gender" in the wrapper "#histogram_demographic_chosen"
+    And I wait "2000" ms
     Then The values of css property "background-color" on elements ".key--label:nth-child(1) .key--color" and ".student-box=Carlos (2)" are the same
     And The values of css property "background-color" on elements ".key--label:nth-child(2) .key--color" and ".student-box=Lark (1)" are the same
     And The values of css property "background-color" on elements ".key--label:nth-child(3) .key--color" and ".student-box=Lark (1)" are different

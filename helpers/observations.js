@@ -72,7 +72,7 @@ function populateParamBoxes(subjId, seqId) {
   $('#param-modal-content').children().remove();
   var envId = Router.current().params._envId;
 
-  let subj = getStudent(subjId, envId);
+  let subj = Subjects.findOne({_id: subjId});
   var modal = document.getElementById("param-modal-content");
 
   let allParams = SequenceParameters.findOne({envId: subj.envId}).parameters;
@@ -87,7 +87,7 @@ function populateParamBoxes(subjId, seqId) {
 function editParamBoxes(seqId, subjId, envId) {
   $('#param-modal-content').children().remove();
 
-  var subj = getStudent(subjId, envId);
+  let subj = Subjects.findOne({_id: subjId});
   var seq = Sequences.findOne({_id: seqId});
 
   var modal = document.getElementById('param-modal-content');

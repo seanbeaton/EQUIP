@@ -49,7 +49,7 @@ let createGroupWorkData = function(params) {
   let {envId, obsIds} = params
 
   let observations = getObservations(obsIds);
-  let allStudents = getStudents(envId);
+  // let allStudents = Subjects.findOne({_id: sid})
 
   let ret = {
     groups: [],
@@ -61,7 +61,7 @@ let createGroupWorkData = function(params) {
     observation.sequences = Sequences.find({obsId: observation._id}).fetch();
     // let obs = getObs
     observation.students = observation.small_group.map(function(studId) {
-      let student = getStudent(studId, envId);
+      let student = Subjects.findOne({_id: studId});
       student.sequences = observation.sequences.filter(seq => seq.info.student.studentId === student._id);
       student.total_contributions = student.sequences.length;
       student.sorted_contributions = discDims.map(function(dim) {

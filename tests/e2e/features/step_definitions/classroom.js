@@ -1,3 +1,5 @@
+// import {upgradeParams} from "../../../../helpers/migration_transforms";
+
 const assert = require('assert');
 import {console_log_conditional} from "../../../../helpers/logging";
 
@@ -33,61 +35,49 @@ var myStepDefinitionsWrapper = function () {
         const default_demo_parameters = [
           {
             name: "Race",
-            input: "Asian, Black, Latinx, Native, White, Mixed Race"
+            options: [
+              "Asian",
+              "Black",
+              "Latinx",
+              "Native",
+              "White",
+              "Mixed"
+            ]
           },
           {
             name: "Gender",
-            input: "Girl, Boy, Nonbinary"
+            options: [
+              "Boy",
+              "Girl",
+              "Nonbinary"
+            ]
           }
         ];
         const default_seq_parameters = [
           {
             name: "Teacher Solicitation",
-            input: "How,What,Why,Other,None"
+            options: ['How','What','Why','Other','None']
           },
           {
             name: "Wait Time",
-            input: "Less than 3 seconds,3 or more seconds,N/A"
+            options: ["Less than 3 seconds","3 or more seconds","N/A"]
           },
           {
             name: "Solicitation Method",
-            input: "Called On,Not Called On"
+            options: ["Called On","Not Called On"]
           },
           {
             name: "Length of Talk",
-            input: "1-4 words,5-20,21 or more"
+            options: ["1-4 words","5-20","21 or more"]
           },
           {
             name: "Student Talk",
-            input: "How,What,Why,Other"
+            options: ["How","What","Why","Other"]
           }
         ];
-        // demo params
-        let subj_params = {};
-        let demoParamCount = 0;
-        default_demo_parameters.forEach(function(param_set, idx) {
-          subj_params['label' + idx] = param_set['name'];
-          subj_params['parameter' + idx] = param_set['input'];
-          demoParamCount++
-        });
 
-        subj_params['envId'] = envId;
-        subj_params['parameterPairs'] = demoParamCount;
-
-        // seq params
-        let seq_params = {};
-        let seqParamCount = 0;
-        default_seq_parameters.forEach(function(param_set, idx) {
-          seq_params['label' + idx] = param_set['name'];
-          seq_params['parameter' + idx] = param_set['input'];
-          seqParamCount++
-        });
-
-        seq_params['envId'] = envId;
-        seq_params['parameterPairs'] = seqParamCount;
-
-        Meteor.call('updateSubjParameters', subj_params);
-        Meteor.call('updateSeqParameters', seq_params);
+        Meteor.call('updateSubjParameters', {parameters: default_demo_parameters, envId: envId});
+        Meteor.call('updateSeqParameters', {parameters: default_seq_parameters, envId: envId});
         cb()
       });
     }, classroom);
@@ -108,33 +98,44 @@ var myStepDefinitionsWrapper = function () {
         const default_demo_parameters = [
           {
             name: "Race",
-            input: "Asian, Black, Latinx, Native, White, Mixed Race"
+            options: [
+              "Asian",
+              "Black",
+              "Latinx",
+              "Native",
+              "White",
+              "Mixed"
+            ]
           },
           {
             name: "Gender",
-            input: "Girl, Boy, Nonbinary"
+            options: [
+              "Boy",
+              "Girl",
+              "Nonbinary"
+            ]
           }
         ];
         const default_seq_parameters = [
           {
             name: "Teacher Solicitation",
-            input: "How,What,Why,Other,None"
+            options: ['How','What','Why','Other','None']
           },
           {
             name: "Wait Time",
-            input: "Less than 3 seconds,3 or more seconds,N/A"
+            options: ["Less than 3 seconds","3 or more seconds","N/A"]
           },
           {
             name: "Solicitation Method",
-            input: "Called On,Not Called On"
+            options: ["Called On","Not Called On"]
           },
           {
             name: "Length of Talk",
-            input: "1-4 words,5-20,21 or more"
+            options: ["1-4 words","5-20","21 or more"]
           },
           {
             name: "Student Talk",
-            input: "How,What,Why,Other"
+            options: ["How","What","Why","Other"]
           }
         ];
 
@@ -196,32 +197,9 @@ var myStepDefinitionsWrapper = function () {
             }
           },
         ];
-        // demo params
-        let subj_params = {};
-        let demoParamCount = 0;
-        default_demo_parameters.forEach(function(param_set, idx) {
-          subj_params['label' + idx] = param_set['name'];
-          subj_params['parameter' + idx] = param_set['input'];
-          demoParamCount++
-        });
 
-        subj_params['envId'] = envId;
-        subj_params['parameterPairs'] = demoParamCount;
-
-        // seq params
-        let seq_params = {};
-        let seqParamCount = 0;
-        default_seq_parameters.forEach(function(param_set, idx) {
-          seq_params['label' + idx] = param_set['name'];
-          seq_params['parameter' + idx] = param_set['input'];
-          seqParamCount++
-        });
-
-        seq_params['envId'] = envId;
-        seq_params['parameterPairs'] = seqParamCount;
-
-        Meteor.call('updateSubjParameters',   subj_params);
-        Meteor.call('updateSeqParameters', seq_params);
+        Meteor.call('updateSubjParameters', {parameters: default_demo_parameters, envId: envId});
+        Meteor.call('updateSeqParameters', {parameters: default_seq_parameters, envId: envId});
         default_students.forEach(function(subj) {
           Meteor.call('subjectInsert', subj);
         });

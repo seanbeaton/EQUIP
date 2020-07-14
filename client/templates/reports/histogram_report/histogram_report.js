@@ -45,7 +45,7 @@ Template.histogramReport.events({
 
     selectedEnvironment.set(selected.val());
     obsOptions.set(getObsOptions());
-    students.set(getStudents(selectedEnvironment.get()));
+    students.set(Subjects.find({envId: selectedEnvironment.get()}).fetch());
     console_log_conditional('students', students.get());
     setTimeout(function() {
       setupVis('vis-container', function() {
@@ -54,7 +54,7 @@ Template.histogramReport.events({
         }
         updateStudentContribGraph();
         updateStudentTimeGraph();
-        setTimeout(updateGraph, 200);
+        updateGraph()
       }, obsOptions, selectedObservations, 'whole_class');
     }, 50);
 
@@ -227,7 +227,7 @@ let updateGraph = function(refresh) {
 }
 
 let selectStudentForModal = function(studentId) {
-  selectedStudent.set(getStudent(studentId, selectedEnvironment.get()));
+  selectedStudent.set(Subjects.findOne({_id: studentId}));
 }
 
 let initHistogram = function(data, selector) {
@@ -271,7 +271,8 @@ let initHistogram = function(data, selector) {
       console_log_conditional('getting students');
       let student = all_students.filter(stud => stud._id === $box.attr('id'))[0]
       console_log_conditional('student', student);
-      $box.css('background-color', color_scale(student.info.demographics[demo]));
+      console.log('color_scale(student.info.demographics[demo])', color_scale(student.info.demographics[demo]));
+      $box.attr('style',`background-color: ${color_scale(student.info.demographics[demo])}`);
     })
   }
   else {

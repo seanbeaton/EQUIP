@@ -47,6 +47,7 @@ Feature: Group work report page
     And I click on the item with the selector ".vis-item-content=Small group #1 - 9/15 (2018-09-15 - SG)"
     And I wait "4000" ms
     And I click on the item with the selector "#group_work_demographic_chosen"
+    And I wait "2000" ms
     And I click on the item with the selector ".active-result=Gender" in the wrapper "#group_work_demographic_chosen"
     And The values of css property "background-color" on elements ".key--label:nth-child(1) .key--color" and ".student-group__students > .student-box:nth-child(1) > .student-box__wrapper" are the same
     And The values of css property "background-color" on elements ".key--label:nth-child(2) .key--color" and ".student-group__students > .student-box:nth-child(1) > .student-box__wrapper" are different
@@ -61,6 +62,7 @@ Feature: Group work report page
     And I click on the item with the selector ".vis-item-content=Small group #1 - 9/15 (2018-09-15 - SG)"
     And I wait "4000" ms
     And I click on the item with the selector "#group_work_demographic_chosen"
+    And I wait "2000" ms
     And I click on the item with the selector ".active-result=Gender" in the wrapper "#group_work_demographic_chosen"
     And I click on the item with the selector "#disc_select_chosen"
     And I click on the item with the selector ".active-result=Student Talk (Type)" in the wrapper "#disc_select_chosen"

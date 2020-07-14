@@ -255,7 +255,7 @@ let updateGraph = async function(refresh) {
     demo: selectedDemographic.get(),
     dimension: selectedDiscourseDimension.get(),
     option: selectedDiscourseOption.get(),
-    allStudents: getStudents(selectedEnvironment.get()),
+    allStudents: Subjects.find({envId: selectedEnvironment.get()}).fetch(),
     demo_opts: getDemographicOptions(),
     selectedObservations: selectedObservations.get(),
   }

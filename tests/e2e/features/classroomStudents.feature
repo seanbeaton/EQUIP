@@ -38,6 +38,7 @@ Feature: Classroom students
     And I click on the item with the selector ".c-dashboard__accordion > .environment:first-child #edit-class-studs"
     And I click on the item with the selector "a=advanced student entry page"
     And a student named "Jim" with the demographics "Race": "White" and "Gender": "Boy" exists
+    And I wait "4000" ms
     And I click on the item with the selector ".subjects-table tbody tr:nth-child(1) .remove-student"
     And I click on the item with the selector ".save-all-students"
     Then a student named "Jim" with the demographics "Race": "White" and "Gender": "Boy" does not exist
