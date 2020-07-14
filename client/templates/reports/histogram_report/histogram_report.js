@@ -299,7 +299,7 @@ let getDemographics = function() {
   if (!envId) {
     return []
   }
-  return SubjectParameters.find({envId: envId}).parameters;
+  return SubjectParameters.findOne({envId: envId}).parameters;
 };
 
 let getDemographicOptions = function() {
