@@ -26,10 +26,15 @@ const loadingData = new ReactiveVar(false);
 Template.timelineReport.onCreated(function created() {
   this.autorun(() => {
     this.subscribe('observations');
+    this.subscribe('groupObservations');
     this.subscribe('subjects');
+    this.subscribe('groupSubjects');
     this.subscribe('subjectParameters');
+    this.subscribe('groupSubjectParameters');
     this.subscribe('sequenceParameters');
+    this.subscribe('groupSequenceParameters');
     this.subscribe('environments');
+    this.subscribe('groupEnvironments');
   })
 });
 

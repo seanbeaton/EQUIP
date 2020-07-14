@@ -744,7 +744,7 @@ Meteor.publishComposite('groupEnvs', function(groupId) {
 
   return {
     find() {
-      return Groups.find({_id: groupId, "members.userId": this.userId}, {fields: {environments: 1}});
+      return Groups.find({_id: groupId, $or: [{"members.userId": this.userId}, {showForAllUsers: true}]}, {fields: {environments: 1}});
     },
     children: [{
       find(group) {

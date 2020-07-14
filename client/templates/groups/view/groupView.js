@@ -88,6 +88,7 @@ Template.envAddForm.helpers({
 Template.groupView.events = {
   'autocompleteselect .environment-add-form__input': function(e, template, doc) {
     let share_type = $('input[name="env-share-type"]:checked').attr('data-share-type')
+    console.log('addenv', doc, doc._id, template.data.group._id)
     Meteor.call('addEnvToGroup', doc._id, template.data.group._id, share_type)
     $('.environment-add-form__input').val('');
     // Meteor.subscribe('groupEnvironments', template.data.group._id);

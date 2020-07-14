@@ -1,8 +1,10 @@
 import {console_log_conditional} from "/helpers/logging"
 import {upgradeParams, upgradeSequence, upgradeSubject, downgradeParams, downgradeSequence} from "../helpers/migration_transforms";
+import {import_data} from "../sample_data/all";
+import {updateSequence} from "../helpers/sequences";
 
 Meteor.startup(function () {
-  Migrations.migrateTo('6');
+  Migrations.migrateTo('7');
 });
 
 
@@ -175,5 +177,166 @@ Migrations.add({
       sequence = downgradeSequence(sequence);
       Sequences.update({'_id': sequence._id}, {$set: {'sequence.info': sequence.info}});
     });
+  }
+});
+
+Migrations.add({
+  version: 7,
+  name: 'Add example classroom.',
+  up: function () {
+    let admin_user_id = Config.findOne({'label': 'admin_user_id'});
+    if (!admin_user_id) {
+      Config.insert({'label': 'admin_user_id', value: process.env.ADMIN_USER_ID});
+      admin_user_id = process.env.ADMIN_USER_ID;
+    }
+    const admin_username = Meteor.users.findOne({_id: admin_user_id}).username;
+    const env_params = {
+      envName: 'Example Classroom',
+      isExample: true,
+      userId: admin_user_id,
+      author: admin_username,
+      submitted: new Date(),
+      lastModifiedParam: new Date(),
+      lastModifiedObs: new Date(),
+      inputStyle: 'box'
+    }
+
+    let envId = Environments.insert(env_params);
+    import {import_data} from '/sample_data/all';
+    let data = JSON.parse(JSON.stringify(import_data));
+    let subjParams = data.subjectParameters;
+    let seqParams = data.sequenceParameters;
+
+    subjParams.envId = envId;
+    seqParams.envId = envId;
+
+    subjParams = _.extend(subjParams, {
+      userId: admin_user_id,
+      author: admin_username,
+      submitted: new Date(),
+    });
+    let subjParamsId = SubjectParameters.insert(subjParams);
+
+    seqParams = _.extend(seqParams, {
+      userId: admin_user_id,
+      author: admin_username,
+      submitted: new Date(),
+    });
+    let seqParamsId = SequenceParameters.insert(seqParams);
+
+    let subject_mapping = {};
+    data.subjects.forEach(function (subj) {
+      subj.envId = envId;
+      let subject = _.extend(subj, {
+        userId: admin_user_id,
+        author: admin_username,
+        submitted: new Date()
+      });
+      subject.data_x = parseInt(subject.data_x);
+      subject.data_y = parseInt(subject.data_y);
+      subject_mapping[subj['origStudId']] = Subjects.insert(subject);
+    });
+
+    let allParams = SequenceParameters.findOne({envId: envId}).parameters;
+    data.observations.forEach(function (obs) {
+      obs.envId = envId;
+      if (typeof obs.small_group !== 'undefined') {
+        obs.small_group = obs.small_group.map(orig_stud_id => subject_mapping[orig_stud_id]);
+      }
+
+      let observation = _.extend(obs, {
+        userId: admin_user_id,
+        author: admin_username,
+        notes: '',
+        submitted: new Date(),
+        lastModified: new Date()
+      })
+
+      const newObsId = Observations.insert(observation);
+      let obsSequences = data.sequences.find(seq => seq.origObsId === obs.origObsId);
+      obsSequences.sequences.forEach(function (sequence) {
+        sequence.envId = envId;
+        sequence.obsId = newObsId;
+        if (typeof sequence.info.studentId === 'undefined') {
+          sequence.info.student.studentId = subject_mapping[sequence.info.student.origStudId];
+        }
+        else {
+          sequence.info.student = {
+            studentId: subject_mapping[sequence.info.studentId]
+          }
+          delete sequence.info.studentId
+        }
+        // console.log('seq before', sequence)
+        sequence = updateSequence(sequence, allParams);
+        // console.log('seq after', sequence)
+        sequence = _.extend(sequence, {
+          userId: admin_user_id,
+          author: admin_username,
+          submitted: new Date()
+        });
+        let sequenceId = Sequences.insert(sequence);
+      })
+    });
+
+    let gid = Groups.insert({
+      groupName: 'Example Classroom',
+      ownerId: admin_user_id,
+      ownerName: admin_username,
+      submitted: new Date(),
+      lastModified: new Date(),
+      showForAllUsers: true,
+      environments: [{
+        envId: envId,
+        share_type: 'view',
+        submitted: new Date(),
+        lastModified: new Date()
+      }],
+      members: [{userId: admin_user_id, roles: ['admin']}],
+    })
+    Config.insert({label: 'example_classroom_gid', value: gid});
+    Config.insert({label: 'example_classroom_envId', value: envId});
+
+    // Meteor.users.find().forEach(function(user) {
+    //   Groups.update({_id: gid}, {
+    //     $addToSet: {
+    //       members: {
+    //         userId: user._id,
+    //         roles: ['view_env'],
+    //         submitted: new Date(),
+    //         lastModified: new Date()
+    //       }
+    //     }
+    //   })
+    // })
+  },
+  down: function () {
+
+    const example_classroom_gid = Config.findOne({label: 'example_classroom_gid'});
+    const example_classroom_envId = Config.findOne({label: 'example_classroom_envId'});
+
+    Environments.remove({
+      _id: example_classroom_envId
+    })
+    Observations.remove({
+      envId: example_classroom_envId
+    })
+    Sequences.remove({
+      envId: example_classroom_envId
+    })
+    Subjects.remove({
+      envId: example_classroom_envId
+    })
+    SubjectParameters.remove({
+      envId: example_classroom_envId
+    })
+    SequenceParameters.remove({
+      envId: example_classroom_envId
+    })
+    Groups.remove({
+      _id: example_classroom_gid
+    })
+
+    Config.remove({label: 'example_classroom_gid'});
+    Config.remove({label: 'example_classroom_envId'});
   }
 });

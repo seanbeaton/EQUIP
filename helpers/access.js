@@ -170,7 +170,8 @@ let checkAccess = function(id, type, access_level) {
     if (access_level === 'view') {
       if (group.members
         .find(m => m.userId === Meteor.userId())
-        .roles.some(r => ['view', 'edit', 'manage', 'admin'].includes(r))) {
+        .roles.some(r => ['view', 'edit', 'manage', 'admin'].includes(r))
+      || group.showForAllUsers) {
         // allowed
         return;
       }

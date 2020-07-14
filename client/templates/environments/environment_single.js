@@ -9,10 +9,15 @@ Template.environmentSingle.events({
 Template.environmentSingle.onCreated(function created() {
   this.autorun(() => {
     Meteor.subscribe('environment', this.data.envId);
+    Meteor.subscribe('groupEnvironment', this.data.envId);
     Meteor.subscribe('envObservations', this.data.envId);
+    Meteor.subscribe('groupEnvObservations', this.data.envId);
     Meteor.subscribe('envSubjects', this.data.envId);
+    Meteor.subscribe('groupEnvSubjects', this.data.envId);
     Meteor.subscribe('envSubjectParameters', this.data.envId);
+    Meteor.subscribe('groupEnvSubjectParameters', this.data.envId);
     Meteor.subscribe('envSequenceParameters', this.data.envId);
+    Meteor.subscribe('groupEnvSequenceParameters', this.data.envId);
   })
 });
 

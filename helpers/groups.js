@@ -58,8 +58,7 @@ let envIsSharedToGroup = function (gid, envId) {
 
 let getUserGroupEnvs = function (userId) {
   let groups = Groups.find({
-    "members.userId": userId
-  }, {reactive: false}).fetch();
+    $or: [{"members.userId": userId}, {showForAllUsers: true}]}, {reactive: false}).fetch();
 
   let env_ids = new Set();
   groups.forEach(function (group) {
