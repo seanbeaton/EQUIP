@@ -58,27 +58,27 @@ let createStudentTimeData = function(params) {
     // let sequences = .fetch()
     let selected_observations = getObservations(obsIds);
 
+    if (!ret.contributions_dataset.find(datapoint => datapoint.obsId === obsId)) {
+      // If it wasn't there:
+      let obs = selected_observations.find(obs => obs._id === obsId);
+      let parseTime = d3.timeParse('%Y-%m-%d');
+      let datapoint = {
+        obsId: obsId,
+        d3date: parseTime(obs.observationDate),
+        obsName: obs.name,
+        date: obs.observationDate,
+        _total: 0,
+      };
+
+      disc_opts.forEach(function (opt) {
+        datapoint[opt] = 0
+      });
+
+      ret.contributions_dataset.push(datapoint)
+    }
+
     Sequences.find({obsId: obsId}).forEach(function(sequence) {
 
-      if (!ret.contributions_dataset.find(datapoint => datapoint.obsId === obsId)) {
-        // If it wasn't there:
-
-        let obs = selected_observations.find(obs => obs._id === obsId);
-        let parseTime = d3.timeParse('%Y-%m-%d');
-        let datapoint = {
-          obsId: obsId,
-          d3date: parseTime(obs.observationDate),
-          obsName: obs.name,
-          date: obs.observationDate,
-          _total: 0,
-        };
-
-        disc_opts.forEach(function (opt) {
-          datapoint[opt] = 0
-        });
-
-        ret.contributions_dataset.push(datapoint)
-      }
 
       if (sequence.info.student.studentId !== student._id) {
         return;
@@ -537,7 +537,7 @@ const createHeatmapData = function(params, sequences) {
     }
     ret.contributions_dataset = ret.contributions_dataset.map(datum => {datum.selected_demo_value = datum.student.info.demographics[selectedDemo]; return datum})
 
-    opts.map(opt => ret.contributions_dataset.push({
+    opts.forEach(opt => ret.contributions_dataset.push({
       name: opt,
       studentId: opt + '-label',
       selected_demo_value: opt,

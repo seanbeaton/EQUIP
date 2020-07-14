@@ -90,33 +90,28 @@ let createTimelineData = function(params) {
   // let start_3 = new Date().getTime();
 
   let obsers = getObservations(selectedObservations);
+  obsIds.forEach(function(obsId) {
+    if (!ret.contributions_dataset.find(datapoint => datapoint.obsId === obsId)) {
+      // If it wasn't there:
+      let obs = obsers.find(obs => obs._id === obsId);
+      let parseTime = d3.timeParse('%Y-%m-%d');
+      let datapoint = {
+        obsId: obsId,
+        d3date: parseTime(obs.observationDate),
+        obsName: obs.name,
+        date: obs.observationDate,
+        studentsByDemo: students_by_demo,
+        _total: 0,
+      };
 
-  for (let obsId_k in obsIds) {
+      demo_opts.forEach(function (opt) {
+        datapoint[opt] = 0
+      });
 
-    if (!obsIds.hasOwnProperty(obsId_k)) continue;
-    let obsId = obsIds[obsId_k];
+      ret.contributions_dataset.push(datapoint)
+    }
 
     Sequences.find({obsId: obsId}).forEach(function(sequence) {
-      if (!ret.contributions_dataset.find(datapoint => datapoint.obsId === obsId)) {
-        // If it wasn't there:
-        let obs = obsers.find(obs => obs._id === obsId);
-        let parseTime = d3.timeParse('%Y-%m-%d');
-        let datapoint = {
-          obsId: obsId,
-          d3date: parseTime(obs.observationDate),
-          obsName: obs.name,
-          date: obs.observationDate,
-          studentsByDemo: students_by_demo,
-          _total: 0,
-        };
-
-        demo_opts.forEach(function (opt) {
-          datapoint[opt] = 0
-        });
-
-        ret.contributions_dataset.push(datapoint)
-      }
-
       let seqDemoOption = sequence.info.student.demographics[demo];
 
       let ds_index = ret.contributions_dataset.findIndex(datapoint => datapoint.obsId === obsId);
@@ -127,7 +122,7 @@ let createTimelineData = function(params) {
       }
 
     });
-  }
+  });
 
 
   // console.log(new Date().getTime() - start_3, 'start_3')
