@@ -190,6 +190,16 @@ var myStepDefinitionsWrapper = function () {
     callback();
   });
 
+  this.When(/^I click on a random item with the selector "([^"]*)"$/, function (sel, callback) {
+    browser.pause(250);
+    let items = browser.elements(sel);
+    let idx = Math.floor(Math.random() * items.value.length)
+    let item_sel = items.value[idx];
+    item_sel.waitForExist(2000);
+    item_sel.click();
+    callback();
+  });
+
   this.When(/^I hover over the item with the selector "([^"]*)"$/, function (sel, callback) {
     let item = browser.$(sel);
     item.waitForExist(2000);
@@ -208,6 +218,17 @@ var myStepDefinitionsWrapper = function () {
     let item = wrapper.$(sel);
     item.waitForExist(2000);
     item.click();
+    callback();
+  });
+
+  this.When(/^I click on a random item with the selector "([^"]*)" in the wrapper "([^"]*)"$/, function (sel, wrapper_sel, callback) {
+    let wrapper = browser.$(wrapper_sel);
+    wrapper.waitForExist(2000);
+    let items = wrapper.elements(sel);
+    let idx = Math.floor(Math.random() * items.value.length)
+    let item_sel = items.value[idx];
+    item_sel.waitForExist(2000);
+    item_sel.click();
     callback();
   });
 

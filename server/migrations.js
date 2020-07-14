@@ -188,8 +188,17 @@ Migrations.add({
     if (!admin_user_id) {
       Config.insert({'label': 'admin_user_id', value: process.env.ADMIN_USER_ID});
       admin_user_id = process.env.ADMIN_USER_ID;
+
     }
-    const admin_username = Meteor.users.findOne({_id: admin_user_id}).username;
+    let admin_username;
+    let admin_user = Meteor.users.findOne({_id: admin_user_id})
+    if (!admin_user) {
+      admin_username = 'admin';
+    }
+    else {
+      admin_username = admin_user.username;
+    }
+
     const env_params = {
       envName: 'Example Classroom',
       isExample: true,

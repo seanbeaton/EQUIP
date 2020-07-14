@@ -8,6 +8,10 @@ var myStepDefinitionsWrapper = function () {
     browser.url('https://data-obs-staging.herokuapp.com/');
     callback()
   });
+  this.Given(/^I am on the local site$/, function(callback) {
+    browser.url('http://localhost:3005');
+    callback()
+  });
 
   this.When(/^If I'm not logged in, I create an account with username prefix "([^"]*)" and password "([^"]*)"$/, function(user, pass, callback) {
 
