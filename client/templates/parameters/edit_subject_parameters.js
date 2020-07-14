@@ -189,6 +189,10 @@ Template.editSubjectParameters.events({
       alert('One of your parameters has a label but no options. Please fix this issue and try saving again.')
       formValidated = false;
     }
+    if (param.label.search(/[$.\/]/i) > 0) {
+      alert('One of your parameters has a label with an invalid character. Please do not use the following characters: . $ /')
+      formValidated = false;
+    }
     if (param.options.length === 0) {
       alert('One of your parameters has no options. Please fix this issue and try saving again.')
       formValidated = false;
