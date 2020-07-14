@@ -245,7 +245,6 @@ Template.environmentItem.helpers({
         return envHasObservations(this._id)
     },
     isShared: function() {
-      console.log('Environments.findOne({_id: this._id})', Environments.findOne({_id: this._id}));
       return Environments.findOne({_id: this._id}).userId !== Meteor.userId();
     },
 });
