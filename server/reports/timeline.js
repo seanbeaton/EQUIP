@@ -152,7 +152,7 @@ let createTimelineData = function(params) {
       }
 
       obs_equity.contribsByDemo.push({
-        name: demo_opt,
+        label: demo_opt,
         percent: percent_of_contribs,
         count: observation[demo_opt],
         total: observation._total
