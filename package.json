@@ -9,7 +9,6 @@
     "chimp-watch": "chimp --ddp=http://localhost:3005 --watch --path=tests/e2e/features",
     "chimp-test": "chimp --ddp=http://localhost:3005 --path=tests/e2e/features",
     "chimp-stress-stage": "chimp --path=tests/stress/features/",
-    "chimp-stress-stage-analytics": "chimp --path=tests/stress/features",
     "chimp-stress-stage-analytics-watch": "chimp --path=tests/stress/features",
     "chimp-stress-analytics-watch": "chimp --ddp=http://localhost:3005 --watch --path=tests/stress/features"
   },

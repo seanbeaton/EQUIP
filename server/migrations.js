@@ -188,7 +188,9 @@ Migrations.add({
     if (!admin_user_id) {
       Config.insert({'label': 'admin_user_id', value: process.env.ADMIN_USER_ID});
       admin_user_id = process.env.ADMIN_USER_ID;
-
+    }
+    else {
+      admin_user_id = admin_user_id.value
     }
     let admin_username;
     let admin_user = Meteor.users.findOne({_id: admin_user_id})
