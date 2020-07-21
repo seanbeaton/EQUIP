@@ -370,10 +370,21 @@ function duplicateClassroom(orig_env) {
     type: 'checkbox',
     checked: true
   }));
+  modal_content.append(form_el);
 
+  form_el = $('<label>/', {
+    class: "form-label checkbox spaced-checkbox",
+    text: " Observations and sequences",
+    for: 'copy-obs-seqs',
+  }).prepend($('<input/>', {
+    id: "copy-obs-seqs",
+    type: 'checkbox',
+    checked: false
+  }));
   modal_content.append(form_el);
 
   const students_checkbox = modal_content.find('#copy-students');
+  const obs_seqs_checkbox = modal_content.find('#copy-obs-seqs');
   // const parameters_checkbox = modal_content.find('#copy-parameters');
   //
   // parameters_checkbox.on('change', function() {
@@ -393,13 +404,13 @@ function duplicateClassroom(orig_env) {
   }));
 
   $('#submit-duplicate-form').on('click', function(e) {
-    const import_students = students_checkbox.is(':checked');
 
     const new_env_name = $('#new-env-name').val();
 
     const import_values = {
       sourceEnvId: orig_env._id,
-      import_students: import_students,
+      import_students: students_checkbox.is(':checked'),
+      import_obs_seqs: obs_seqs_checkbox.is(':checked'),
       // import_parameters: import_parameters,
       envName: new_env_name,
     };
