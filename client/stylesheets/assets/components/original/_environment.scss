@@ -78,6 +78,16 @@
     top: 7px;
 }
 
+.shared-badge {
+    font-size: 12px;
+    background: white;
+    color: #333;
+    border-radius: 2px;
+    padding: 3px 4px;
+    display: inline-block;
+    transform: translateY(-5px);
+}
+
 .c--accordion-item {
     display: block;
     width: 100%;

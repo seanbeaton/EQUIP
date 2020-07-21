@@ -3,9 +3,10 @@
 */
 
 import { createModal } from '/helpers/modals.js'
-import {envHasObservations} from "../../../helpers/environments";
+import {envHasObservations, userHasEnvEditAccess} from "../../../helpers/environments";
 import {activeEnvId, obsCreateModal} from './environment_list'
 import {console_log_conditional} from "/helpers/logging"
+import {getHumanEnvPermission} from "../../../helpers/groups";
 
 let share_window_timeout;
 
@@ -246,6 +247,13 @@ Template.environmentItem.helpers({
     },
     isShared: function() {
       return Environments.findOne({_id: this._id}).userId !== Meteor.userId();
+    },
+    shareLevelText: function() {
+      let access_type = 'view';
+      if (userHasEnvEditAccess(Environments.findOne({_id: this._id}))) {
+        access_type = 'edit'
+      }
+      return ": " + getHumanEnvPermission(access_type)
     },
 });
 
