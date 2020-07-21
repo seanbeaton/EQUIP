@@ -12,8 +12,8 @@
                     <p class="o--toggle-links share-tab">Share</p>
                 </span>
                 <p class="o--toggle-links dupe-tab" id="env-duplicate">Duplicate</p>
-                <p class="o--toggle-links edit-classroom-name">Rename</p>
-                <p class="o--toggle-links" id="env-delete">Delete</p>
+                {{#if userCanEditEnv }}<p class="o--toggle-links edit-classroom-name">Rename</p>{{/if}}
+                {{#if userCanEditEnv }}<p class="o--toggle-links" id="env-delete">Delete</p>{{/if}}
             </div>
         </div>
         <!-- accordion contents -->
@@ -29,9 +29,11 @@
                         {{/if}}
                     </h3>
                     <div class="c--accordion-item__edit-container">
+                        {{#if userCanEditEnv }}
                         <p class="o--toggle-links c--accordion-item__edit" id="edit-class-params">
                             Edit
                         </p>
+                        {{/if}}
                         <span class="icon-container"><i style="color:gray;" class="far fa-question-circle c--accordion-item__icon"></i><span class="tooltiptext">Demographics are social markers like race, gender, etc.</span></span>
                     </div>
                 </div>
@@ -50,9 +52,11 @@
                         {{/if}}
                     </h3>
                     <div class="c--accordion-item__edit-container">
+                        {{#if userCanEditEnv }}
                         <p class="o--toggle-links c--accordion-item__edit" id="edit-sequence-params">
                             Edit
                         </p>
+                        {{/if}}
                         <span class="icon-container"><i style="color:gray;" class="far fa-question-circle c--accordion-item__icon"></i><span class="tooltiptext">Discourse dimensions are the aspects of classroom talk that you wish to track, like the type of questions teachers ask or the length of student contributions.</span></span>
                     </div>
                 </div>
@@ -71,9 +75,11 @@
                         {{/if}}
                     </h3>
                     <div class="c--accordion-item__edit-container">
+                        {{#if userCanEditEnv }}
                         <p class="o--toggle-links c--accordion-item__edit" id="edit-class-studs">
                             Edit
                         </p>
+                        {{/if}}
                         <span class="icon-container"><i style="color:gray;" class="far fa-question-circle c--accordion-item__icon"></i><span class="tooltiptext">Your student roster contains the names of your students and a visual layout of where they sit in the classroom.</span></span>
                     </div>
                 </div>
@@ -88,9 +94,9 @@
             <li class="c--accordion-item">
                 <div class="c--accordion-item__inner toggle-accordion toggle-nested" data-id={{getEnvironmentId}}>
                     <h3 class="o--header-link c--accordion-item__title-observation">Observations ({{getObservationsCount}}) <p class="carat" id="carat-obs"> &#9660;</p></h3>
-                    {{#if isClassValidated}}
+                    {{#if isClassValidated }}{{#if userCanEditEnv }}
                         <p class="o--toggle-links c--accordion-item__create-new-classroom" id="obs-create-button" data-id={{getEnvironmentId}}>Create New Observation</p>
-                    {{/if}}
+                    {{/if}}{{/if}}
                 </div>
                 <ul class="inner-container">
                     <li>

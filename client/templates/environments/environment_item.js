@@ -255,6 +255,9 @@ Template.environmentItem.helpers({
       }
       return ": " + getHumanEnvPermission(access_type)
     },
+    userCanEditEnv: function() {
+      return userHasEnvEditAccess(Environments.findOne({_id: this._id}));
+    }
 });
 
 
