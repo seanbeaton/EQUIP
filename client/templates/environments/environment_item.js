@@ -104,51 +104,32 @@ Template.environmentItem.events({
       $ele.find(".carat").toggleClass("carat-show");
     },
   'click .export-data-button': function (e) {
-    var envId = this._id;
+    const envId = this._id;
 
     if (envId) {
-      var environment = Environments.findOne({"_id": envId});
-      var envName = environment['envName'];
-      var sequences= Sequences.find({"envId":envId}).fetch();
-      // var sequences = getSequences(null, envId);
-
-      var export_data = []
-      sequences.sort(function(a, b) {
-        let a_name = a.obsName.toLowerCase();
-        let b_name = b.obsName.toLowerCase();
-        if (a_name < b_name) {
-          return -1;
+      Meteor.call('exportEnvData', envId, function(err, res) {
+        if (err) {
+          alert('Error!' + err)
+          return;
         }
-        if (a_name > b_name) {
-          return 1
-        }
-        return 0;
-      }).forEach(function(sequence) {
-        let new_seq = {};
-        new_seq['name'] = sequence.info.student.studentName;
-        Object.keys(sequence['info'].parameters).forEach(function(param_key) {
-          new_seq[param_key] = sequence['info'].parameters[param_key]
-        });
-        new_seq['obsName'] = sequence['obsName'];
-        export_data.push(new_seq);
-      });
 
-      var csv = Papa.unparse({
-        data: export_data,
-      });
-      var csvData = new Blob([csv], {type: 'text/csv;charset=utf-8;'});
-      var csvURL = null;
-      //IE download API for saving files client side
-      if (navigator.msSaveBlob) {
-        csvURL = navigator.msSaveBlob(csvData, 'download.csv');
-      } else {
-        //Everything else
-        csvURL = window.URL.createObjectURL(csvData);
-      }
-      var tempLink = document.createElement('a');
-      tempLink.href = csvURL;
-      tempLink.setAttribute('download', envName + '_sequence_export.csv');
-      tempLink.click();
+        const csvData = new Blob([res.csv], {type: 'text/csv;charset=utf-8;'});
+        let csvURL = null;
+        //IE download API for saving files client side
+        if (navigator.msSaveBlob) {
+          csvURL = navigator.msSaveBlob(csvData, 'download.csv');
+        } else {
+          //Everything else
+          csvURL = window.URL.createObjectURL(csvData);
+        }
+        let tempLink = document.createElement('a');
+        tempLink.href = csvURL;
+
+        const environment = Environments.findOne({"_id": envId});
+
+        tempLink.setAttribute('download', environment['envName'] + '_sequence_export.csv');
+        tempLink.click();
+      })
     } else {
       alert("Please select a classroom to export!")
     }
