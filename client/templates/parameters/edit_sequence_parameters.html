@@ -42,7 +42,7 @@
             {{else}}
                 {{#each param in params.parameters }}
                     <div class="single-param control myParam{{@index}}">
-                        <label class="o--form-labels">Social Marker:</label>
+                        <label class="o--form-labels">Discourse Dimension:</label>
                         <input class="parameter__label parameter__field o--form-input" type="text" data-param-index="{{@index}}" name="label{{@index}}" value="{{param.label}}">
                         <label class="o--form-labels">Options:</label>
                         <input class="parameter__options parameter__field o--form-input" type="text" data-param-index="{{@index}}" style="margin-bottom: .25em" name="parameter{{@index}}" value="{{joined param.options}}">
