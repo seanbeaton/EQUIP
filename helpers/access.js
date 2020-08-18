@@ -1,8 +1,7 @@
-
 import SimpleSchema from 'simpl-schema';
-import {getUserGroupEnvs, userCanGroupEditEnv, userCanGroupViewEnv} from "./groups";
+import {userCanGroupEditEnv, userCanGroupViewEnv} from "./groups";
 
-let checkAccess = function(id, type, access_level) {
+let checkAccess = function (id, type, access_level) {
   const schema = new SimpleSchema({
     id: String,
     type: {
@@ -55,7 +54,7 @@ let checkAccess = function(id, type, access_level) {
   }
   else if (type === 'observation') {
     let obs = Observations.findOne({_id: id}, {reactive: false});
-    let env = Environments.findOne({_id: obs.envId}, {reactive: false}) ;
+    let env = Environments.findOne({_id: obs.envId}, {reactive: false});
     if (!env) {
       throw new Meteor.Error('403', `${access_level} access not allowed to this ${type}`);
     }
@@ -77,7 +76,7 @@ let checkAccess = function(id, type, access_level) {
   }
   else if (type === 'sequence') {
     let seq = Sequences.findOne({_id: id}, {reactive: false});
-    let env = Environments.findOne({_id: seq.envId}, {reactive: false}) ;
+    let env = Environments.findOne({_id: seq.envId}, {reactive: false});
     if (!env) {
       throw new Meteor.Error('403', `${access_level} access not allowed to this ${type}`);
     }
@@ -105,7 +104,7 @@ let checkAccess = function(id, type, access_level) {
   }
   else if (type === 'subject') {
     let subj = Subjects.findOne({_id: id}, {reactive: false});
-    let env = Environments.findOne({_id: subj.envId}, {reactive: false}) ;
+    let env = Environments.findOne({_id: subj.envId}, {reactive: false});
     if (!env) {
       throw new Meteor.Error('403', `${access_level} access not allowed to this ${type}`);
     }
@@ -169,9 +168,9 @@ let checkAccess = function(id, type, access_level) {
     }
     if (access_level === 'view') {
       if (group.members
-        .find(m => m.userId === Meteor.userId())
-        .roles.some(r => ['view', 'edit', 'manage', 'admin'].includes(r))
-      || group.showForAllUsers) {
+          .find(m => m.userId === Meteor.userId())
+          .roles.some(r => ['view', 'edit', 'manage', 'admin'].includes(r))
+        || group.showForAllUsers) {
         // allowed
         return;
       }

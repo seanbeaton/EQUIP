@@ -2,7 +2,7 @@
 * JS file for environment_item.html
 */
 
-import { createModal } from '/helpers/modals.js'
+import {createModal} from '/helpers/modals.js'
 import {envHasObservations, userHasEnvEditAccess} from "../../../helpers/environments";
 import {activeEnvId, obsCreateModal} from './environment_list'
 import {console_log_conditional} from "/helpers/logging"
@@ -10,7 +10,7 @@ import {getHumanEnvPermission} from "../../../helpers/groups";
 
 let share_window_timeout;
 
-Template.environmentItem.rendered = function() {
+Template.environmentItem.rendered = function () {
   if ($('.c-dashboard__accordion').attr('data-expand-children') === 'true') {
     $('.toggle-accordion').trigger('click')
   }
@@ -18,96 +18,97 @@ Template.environmentItem.rendered = function() {
 
 Template.environmentItem.events({
   'click .share-tab': function (e) {
-      clearTimeout(share_window_timeout);
-      removeAllShareDialogs();
-      var envId = this._id;
-      e.stopPropagation();
-      e.preventDefault();
-      console_log_conditional('envId', envId);
+    clearTimeout(share_window_timeout);
+    removeAllShareDialogs();
+    var envId = this._id;
+    e.stopPropagation();
+    e.preventDefault();
+    console_log_conditional('envId', envId);
 
 
-      Meteor.call('exportAllParams', envId, function(error, result){
-        if (error){
-          alert(error.reason);
-        } else {
-          // Prompt save file dialogue
-          if ($.isEmptyObject(result)) {
-            alert("There are no parameters created for this classroom. Add some before sharing it.");
-            return;
+    Meteor.call('exportAllParams', envId, function (error, result) {
+      if (error) {
+        alert(error.reason);
+      }
+      else {
+        // Prompt save file dialogue
+        if ($.isEmptyObject(result)) {
+          alert("There are no parameters created for this classroom. Add some before sharing it.");
+          return;
+        }
+
+        Meteor.call('shareEnvironment', envId, function (error, result) {
+          if (error) {
+            alert(error)
           }
-
-          Meteor.call('shareEnvironment', envId, function(error, result) {
-            if (error) {
-              alert(error)
-            }
-            else {
-              let share_link = Router.routes['sharedEnv'].url({_shareId: result._id});
-              let share_link_students = Router.routes['sharedEnv'].url({_shareId: result._id_with_students});
-              let share_button = $(e.target).parents('.share-tab-wrapper');
-              let platform_modifier_key = (window.navigator.userAgent.indexOf("Mac") !== -1) ? '⌘' : 'ctrl';
-              share_button
-                .append(`<div class="shared-env-dialog">
+          else {
+            let share_link = Router.routes['sharedEnv'].url({_shareId: result._id});
+            let share_link_students = Router.routes['sharedEnv'].url({_shareId: result._id_with_students});
+            let share_button = $(e.target).parents('.share-tab-wrapper');
+            let platform_modifier_key = (window.navigator.userAgent.indexOf("Mac") !== -1) ? '⌘' : 'ctrl';
+            share_button
+              .append(`<div class="shared-env-dialog">
                 <span>Press ${platform_modifier_key}+c to copy the share link, or <a href="mailto:?subject=Try%20this%20classroom%20setup%20on%20EQUIP&body=${encodeURIComponent(share_link)}">share by email</a></span>
                 <input class="share-link-field" readonly value="${share_link}">
                 <span>Copy this link to include the students, or <a href="mailto:?subject=Try%20this%20classroom%20setup%20on%20EQUIP&body=${encodeURIComponent(share_link_students)}">share by email</a></span>
                 <input class="share-link-field-with-students" readonly value="${share_link_students}"></div>`);
-              let share_link_field = $('.share-link-field', share_button);
-              share_link_field.select();
-              share_window_timeout = setTimeout(removeAllShareDialogs, 15000);
-            }
-          })
-        }
-      });
+            let share_link_field = $('.share-link-field', share_button);
+            share_link_field.select();
+            share_window_timeout = setTimeout(removeAllShareDialogs, 15000);
+          }
+        })
+      }
+    });
   },
-  'click #obs-create-button': function(e) {
+  'click #obs-create-button': function (e) {
     console_log_conditional('starting');
     var id = e.target.getAttribute('data-id');
     obsCreateModal.set(true);
     activeEnvId.set(id);
   },
-  'click #edit-sequence-params': function(e) {
-     e.preventDefault();
-     Router.go('editSequenceParameters', {_envId:this._id});
+  'click #edit-sequence-params': function (e) {
+    e.preventDefault();
+    Router.go('editSequenceParameters', {_envId: this._id});
   },
-  'click #edit-class-params': function(e) {
-     e.preventDefault();
-     Router.go('editSubjectParameters', {_envId:this._id});
+  'click #edit-class-params': function (e) {
+    e.preventDefault();
+    Router.go('editSubjectParameters', {_envId: this._id});
   },
-  'click #edit-class-studs': function(e) {
-     e.preventDefault();
-     Router.go('editSubjects', {_envId:this._id});
+  'click #edit-class-studs': function (e) {
+    e.preventDefault();
+    Router.go('editSubjects', {_envId: this._id});
   },
-  'click .edit-classroom-name': function(e) {
+  'click .edit-classroom-name': function (e) {
     e.preventDefault();
     e.stopPropagation();
     editClassroomName(this._id);
   },
-  'click #env-duplicate': function(e) {
+  'click #env-duplicate': function (e) {
     e.preventDefault();
     e.stopPropagation();
     duplicateClassroom(this);
   },
-  'click .toggle-accordion': function(e) {
-      var ele = e.target;
-      var $ele = $(e.target);
-      // Bubble up to parent element so accordion toggles correctly
-      if (!$ele.is('.toggle-accordion') && !$ele.is('.environment-name') && !$ele.is('.carat')) {
-        return
-      }
+  'click .toggle-accordion': function (e) {
+    var ele = e.target;
+    var $ele = $(e.target);
+    // Bubble up to parent element so accordion toggles correctly
+    if (!$ele.is('.toggle-accordion') && !$ele.is('.environment-name') && !$ele.is('.carat')) {
+      return
+    }
     e.preventDefault();
     if (!$ele.is('.toggle-accordion')) {
-        $ele = $ele.parents('.toggle-accordion');
-      }
+      $ele = $ele.parents('.toggle-accordion');
+    }
 
-      $ele.next().toggleClass('show');
-      $ele.next().slideToggle(350);
-      $ele.find(".carat").toggleClass("carat-show");
-    },
+    $ele.next().toggleClass('show');
+    $ele.next().slideToggle(350);
+    $ele.find(".carat").toggleClass("carat-show");
+  },
   'click .export-data-button': function (e) {
     const envId = this._id;
 
     if (envId) {
-      Meteor.call('exportEnvData', envId, function(err, res) {
+      Meteor.call('exportEnvData', envId, function (err, res) {
         if (err) {
           alert('Error!' + err)
           return;
@@ -118,7 +119,8 @@ Template.environmentItem.events({
         //IE download API for saving files client side
         if (navigator.msSaveBlob) {
           csvURL = navigator.msSaveBlob(csvData, 'download.csv');
-        } else {
+        }
+        else {
           //Everything else
           csvURL = window.URL.createObjectURL(csvData);
         }
@@ -130,115 +132,114 @@ Template.environmentItem.events({
         tempLink.setAttribute('download', environment['envName'] + '_sequence_export.csv');
         tempLink.click();
       })
-    } else {
+    }
+    else {
       alert("Please select a classroom to export!")
     }
   }
 });
 
 Template.environmentItem.events({
-   'click #env-delete': function(e) {
-     e.stopPropagation();
-     var result = confirm("Deleting an environment will also delete all observation, subject, and sequence data. Press 'OK' to continue.");
-     var envId = this._id
+  'click #env-delete': function (e) {
+    e.stopPropagation();
+    var result = confirm("Deleting an environment will also delete all observation, subject, and sequence data. Press 'OK' to continue.");
+    var envId = this._id
     if (result) {
-      Meteor.call('environmentDelete', envId, function(error, result) {
+      Meteor.call('environmentDelete', envId, function (error, result) {
         return 0;
       });
     }
   }
- });
+});
 
 
 Template.environmentItem.helpers({
-    getClassTypeAbbreviation: function(class_name) {
-        if (class_name === 'whole_class') {
-          return 'WC';
-        }
-        else if (class_name === 'small_group') {
-          return "SG";
-        }
-    },
-    incrementIndex: function(index) {
-        return index + 1;
-    },
-    getEnvironmentId: function() {
-        return this._id;
-    },
-    getSubjectParameters: function() {
-      let params = SubjectParameters.findOne({envId:this._id});
-      try {
-        return params.parameterNames();
-      }
-      catch (error) {
-        // console.log('error', error);
-      }
-    },
-    getDiscourseParameters: function() {
-      let params = SequenceParameters.findOne({envId:this._id});
-      try {
-        return params.parameterNames();
-      }
-      catch (error) {
-        // console.log('error', error);
-      }
-    },
-    noSubjectParametersEntered: function() {
-      let subjectParameters = SubjectParameters.findOne({'envId': this._id})
-      return (!subjectParameters || subjectParameters.length === 0 || typeof subjectParameters.parameters === 'undefined' || subjectParameters.parameters.length === 0)
-    },
-    noDiscourseParametersEntered: function() {
-      let sequenceParameters = SequenceParameters.findOne({'envId': this._id});
-      return (!sequenceParameters || sequenceParameters.length === 0 || typeof sequenceParameters.parameters === 'undefined' || sequenceParameters.parameters.length === 0)
-    },
-    isClassValidated: function() {
-      let hasStudents = Subjects.find({envId: this._id}).count() > 0;
-      let hasSeqParams = !!SequenceParameters.findOne({envId:this._id});
-      let hasSubjParams = !!SubjectParameters.findOne({envId:this._id});
-
-      return hasStudents && hasSeqParams && hasSubjParams;
-    },
-    getStudents: function() {
-        var user = Meteor.user();
-        if (!user) {
-          return;
-        }
-        let students = Subjects.find({envId: this._id}).fetch();
-
-        return {
-            names: students.map(student => student.info.name).join(", "),
-            count: students.length
-        }
-    },
-    noStudentsAdded: function() {
-        let user = Meteor.user();
-
-        let students = Subjects.find({envId: this._id}).fetch();
-
-        return students.length === 0;
-    },
-    getObservations: function() {
-        return Observations.find({envId:this._id}, {sort: {datefield: 1}}).fetch();
-    },
-    getObservationsCount: function() {
-        return Observations.find({envId:this._id}, {sort: {lastModified: -1}}).count();
-    },
-    hasObsMade: function() {
-        return envHasObservations(this._id)
-    },
-    isShared: function() {
-      return Environments.findOne({_id: this._id}).userId !== Meteor.userId();
-    },
-    shareLevelText: function() {
-      let access_type = 'view';
-      if (userHasEnvEditAccess(Environments.findOne({_id: this._id}))) {
-        access_type = 'edit'
-      }
-      return ": " + getHumanEnvPermission(access_type)
-    },
-    userCanEditEnv: function() {
-      return userHasEnvEditAccess(Environments.findOne({_id: this._id}));
+  getClassTypeAbbreviation: function (class_name) {
+    if (class_name === 'whole_class') {
+      return 'WC';
     }
+    else if (class_name === 'small_group') {
+      return "SG";
+    }
+  },
+  incrementIndex: function (index) {
+    return index + 1;
+  },
+  getEnvironmentId: function () {
+    return this._id;
+  },
+  getSubjectParameters: function () {
+    let params = SubjectParameters.findOne({envId: this._id});
+    try {
+      return params.parameterNames();
+    } catch (error) {
+      // console.log('error', error);
+    }
+  },
+  getDiscourseParameters: function () {
+    let params = SequenceParameters.findOne({envId: this._id});
+    try {
+      return params.parameterNames();
+    } catch (error) {
+      // console.log('error', error);
+    }
+  },
+  noSubjectParametersEntered: function () {
+    let subjectParameters = SubjectParameters.findOne({'envId': this._id})
+    return (!subjectParameters || subjectParameters.length === 0 || typeof subjectParameters.parameters === 'undefined' || subjectParameters.parameters.length === 0)
+  },
+  noDiscourseParametersEntered: function () {
+    let sequenceParameters = SequenceParameters.findOne({'envId': this._id});
+    return (!sequenceParameters || sequenceParameters.length === 0 || typeof sequenceParameters.parameters === 'undefined' || sequenceParameters.parameters.length === 0)
+  },
+  isClassValidated: function () {
+    let hasStudents = Subjects.find({envId: this._id}).count() > 0;
+    let hasSeqParams = !!SequenceParameters.findOne({envId: this._id});
+    let hasSubjParams = !!SubjectParameters.findOne({envId: this._id});
+
+    return hasStudents && hasSeqParams && hasSubjParams;
+  },
+  getStudents: function () {
+    var user = Meteor.user();
+    if (!user) {
+      return;
+    }
+    let students = Subjects.find({envId: this._id}).fetch();
+
+    return {
+      names: students.map(student => student.info.name).join(", "),
+      count: students.length
+    }
+  },
+  noStudentsAdded: function () {
+    let user = Meteor.user();
+
+    let students = Subjects.find({envId: this._id}).fetch();
+
+    return students.length === 0;
+  },
+  getObservations: function () {
+    return Observations.find({envId: this._id}, {sort: {datefield: 1}}).fetch();
+  },
+  getObservationsCount: function () {
+    return Observations.find({envId: this._id}, {sort: {lastModified: -1}}).count();
+  },
+  hasObsMade: function () {
+    return envHasObservations(this._id)
+  },
+  isShared: function () {
+    return Environments.findOne({_id: this._id}).userId !== Meteor.userId();
+  },
+  shareLevelText: function () {
+    let access_type = 'view';
+    if (userHasEnvEditAccess(Environments.findOne({_id: this._id}))) {
+      access_type = 'edit'
+    }
+    return ": " + getHumanEnvPermission(access_type)
+  },
+  userCanEditEnv: function () {
+    return userHasEnvEditAccess(Environments.findOne({_id: this._id}));
+  }
 });
 
 
@@ -265,7 +266,7 @@ function editClassroomName(envId) {
     env_name.hide();
     save_button.show();
 
-    $('.edit-env-name', context).on('keyup', function(e) {
+    $('.edit-env-name', context).on('keyup', function (e) {
       if (e.keyCode === 13) {
         save_button.click()
       }
@@ -282,7 +283,7 @@ function editClassroomName(envId) {
       'envName': new_name,
     };
 
-    Meteor.call('environmentRename', args, function(error, result) {
+    Meteor.call('environmentRename', args, function (error, result) {
       var message;
       if (result) {
         message = $('<span/>', {
@@ -300,7 +301,7 @@ function editClassroomName(envId) {
       }
       env_name_wrapper.append(message);
 
-      setTimeout(function() {
+      setTimeout(function () {
         message.remove();
       }, 3000);
 
@@ -384,7 +385,7 @@ function duplicateClassroom(orig_env) {
     text: 'Duplicate Classroom'
   }));
 
-  $('#submit-duplicate-form').on('click', function(e) {
+  $('#submit-duplicate-form').on('click', function (e) {
 
     const new_env_name = $('#new-env-name').val();
 
@@ -396,7 +397,7 @@ function duplicateClassroom(orig_env) {
       envName: new_env_name,
     };
 
-    Meteor.call('environmentDuplicate', import_values, function(error, result) {
+    Meteor.call('environmentDuplicate', import_values, function (error, result) {
       if (error && error.error === 'duplicate_error') {
         showDuplicationWarning(error.reason)
       }
@@ -407,7 +408,7 @@ function duplicateClassroom(orig_env) {
 
   function showDuplicationWarning(message) {
     $('.obs-dash-list').append('<div class="duplication-warning notification is-warning">' + message + '</div>');
-    setTimeout(function() {
+    setTimeout(function () {
       $('.duplication-warning').remove()
     }, 5000);
   }

@@ -8,7 +8,7 @@ import {console_log_conditional} from "/helpers/logging"
 
 import {getUserGroupEnvs} from "../helpers/groups";
 
-Meteor.publish('groups', function(groupId) {
+Meteor.publish('groups', function (groupId) {
   if (!this.userId) {
     return this.ready();
   }
@@ -30,7 +30,7 @@ Meteor.publish('groups', function(groupId) {
   }
 });
 
-Meteor.publish('environments', function() {
+Meteor.publish('environments', function () {
   if (!this.userId) {
     return this.ready();
   }
@@ -38,7 +38,7 @@ Meteor.publish('environments', function() {
   return Environments.find({userId: this.userId});
 });
 
-Meteor.publish('environment', function(envId) {
+Meteor.publish('environment', function (envId) {
   if (!this.userId) {
     return this.ready();
   }
@@ -46,9 +46,9 @@ Meteor.publish('environment', function(envId) {
   return Environments.find({userId: this.userId, _id: envId});
 });
 
-Meteor.publish('groupEnvironments', function() {
+Meteor.publish('groupEnvironments', function () {
   if (!this.userId) {
-      return this.ready();
+    return this.ready();
   }
 
   let env_ids = getUserGroupEnvs(this.userId);
@@ -62,9 +62,9 @@ Meteor.publish('groupEnvironments', function() {
   );
 });
 
-Meteor.publish('groupEnvironment', function(envId) {
+Meteor.publish('groupEnvironment', function (envId) {
   if (!this.userId) {
-      return this.ready();
+    return this.ready();
   }
 
   let env_ids = getUserGroupEnvs(this.userId);
@@ -81,9 +81,9 @@ Meteor.publish('groupEnvironment', function(envId) {
   return this.ready()
 });
 
-Meteor.publish('groupObservations', function() {
+Meteor.publish('groupObservations', function () {
   if (!this.userId) {
-      return this.ready();
+    return this.ready();
   }
 
   let env_ids = getUserGroupEnvs(this.userId);
@@ -97,9 +97,9 @@ Meteor.publish('groupObservations', function() {
   );
 });
 
-Meteor.publish('groupEnvObservations', function(envId) {
+Meteor.publish('groupEnvObservations', function (envId) {
   if (!this.userId) {
-      return this.ready();
+    return this.ready();
   }
 
   let env_ids = getUserGroupEnvs(this.userId);
@@ -116,9 +116,9 @@ Meteor.publish('groupEnvObservations', function(envId) {
   return this.ready()
 });
 
-Meteor.publish('groupObservation', function(obsId) {
+Meteor.publish('groupObservation', function (obsId) {
   if (!this.userId) {
-      return this.ready();
+    return this.ready();
   }
 
   let env_ids = getUserGroupEnvs(this.userId);
@@ -132,7 +132,7 @@ Meteor.publish('groupObservation', function(obsId) {
   );
 });
 
-Meteor.publishComposite('observations', function() {
+Meteor.publishComposite('observations', function () {
   if (!this.userId) {
     return this.ready();
   }
@@ -150,7 +150,7 @@ Meteor.publishComposite('observations', function() {
 })
 
 
-Meteor.publish('ownObservations', function() {
+Meteor.publish('ownObservations', function () {
   if (!this.userId) {
     return this.ready();
   }
@@ -159,9 +159,7 @@ Meteor.publish('ownObservations', function() {
 });
 
 
-
-
-Meteor.publish('envObservations', function(envId) {
+Meteor.publish('envObservations', function (envId) {
   if (!this.userId) {
     return this.ready();
   }
@@ -176,7 +174,7 @@ Meteor.publish('envObservations', function(envId) {
   return this.ready()
 });
 
-Meteor.publish('observation', function(obsId) {
+Meteor.publish('observation', function (obsId) {
   if (!this.userId) {
     return this.ready();
   }
@@ -201,16 +199,16 @@ Meteor.publish('observation', function(obsId) {
 //   return Observations.find({userId: this.userId, _id: obsId});
 // });
 
-Meteor.publish('ownSubjects', function() {
+Meteor.publish('ownSubjects', function () {
   if (!this.userId) {
-      return this.ready();
+    return this.ready();
   }
 
   return Subjects.find({userId: this.userId});
 });
 
 
-Meteor.publishComposite('subjects', function() {
+Meteor.publishComposite('subjects', function () {
   if (!this.userId) {
     return this.ready();
   }
@@ -229,7 +227,7 @@ Meteor.publishComposite('subjects', function() {
 })
 
 
-Meteor.publish('groupSubjects', function() {
+Meteor.publish('groupSubjects', function () {
   if (!this.userId) {
     return this.ready();
   }
@@ -246,7 +244,7 @@ Meteor.publish('groupSubjects', function() {
 });
 
 
-Meteor.publish('envSubjects', function(envId) {
+Meteor.publish('envSubjects', function (envId) {
   if (!this.userId) {
     return this.ready();
   }
@@ -274,7 +272,7 @@ Meteor.publish('envSubjects', function(envId) {
 //   return Subjects.find({userId: this.userId, envId: envId});
 // });
 
-Meteor.publish('groupEnvSubjects', function(envId) {
+Meteor.publish('groupEnvSubjects', function (envId) {
   if (!this.userId) {
     return this.ready();
   }
@@ -293,7 +291,7 @@ Meteor.publish('groupEnvSubjects', function(envId) {
 });
 
 
-Meteor.publish('ownSequences', function() {
+Meteor.publish('ownSequences', function () {
   if (!this.userId) {
     return this.ready();
   }
@@ -302,7 +300,7 @@ Meteor.publish('ownSequences', function() {
 });
 
 
-Meteor.publishComposite('sequences', function() {
+Meteor.publishComposite('sequences', function () {
   if (!this.userId) {
     return this.ready();
   }
@@ -319,7 +317,7 @@ Meteor.publishComposite('sequences', function() {
   }
 })
 
-Meteor.publish('envSequences', function(envId) {
+Meteor.publish('envSequences', function (envId) {
   if (!this.userId) {
     return this.ready();
   }
@@ -334,7 +332,7 @@ Meteor.publish('envSequences', function(envId) {
   return this.ready()
 });
 
-Meteor.publish('obsSequences', function(obsId) {
+Meteor.publish('obsSequences', function (obsId) {
   if (!this.userId) {
     return this.ready();
   }
@@ -356,7 +354,7 @@ Meteor.publish('obsSequences', function(obsId) {
 // });
 
 
-Meteor.publish('groupEnvSequences', function(envId) {
+Meteor.publish('groupEnvSequences', function (envId) {
   if (!this.userId) {
     return this.ready();
   }
@@ -373,7 +371,7 @@ Meteor.publish('groupEnvSequences', function(envId) {
   return this.ready()
 });
 
-Meteor.publish('groupObsSequences', function(obsId) {
+Meteor.publish('groupObsSequences', function (obsId) {
   if (!this.userId) {
     return this.ready();
   }
@@ -387,7 +385,7 @@ Meteor.publish('groupObsSequences', function(obsId) {
   return Sequences.find({obsId: obsId, envId: {$in: [...env_ids]}});
 });
 
-Meteor.publish('groupSequences', function() {
+Meteor.publish('groupSequences', function () {
   if (!this.userId) {
     return this.ready();
   }
@@ -401,7 +399,7 @@ Meteor.publish('groupSequences', function() {
   return Sequences.find({envId: {$in: [...env_ids]}});
 });
 
-Meteor.publish('ownSubjectParameters', function() {
+Meteor.publish('ownSubjectParameters', function () {
   if (!this.userId) {
     return this.ready();
   }
@@ -409,7 +407,7 @@ Meteor.publish('ownSubjectParameters', function() {
   return SubjectParameters.find({userId: this.userId});
 });
 
-Meteor.publishComposite('subjectParameters', function() {
+Meteor.publishComposite('subjectParameters', function () {
   if (!this.userId) {
     return this.ready();
   }
@@ -427,14 +425,14 @@ Meteor.publishComposite('subjectParameters', function() {
 })
 
 
-Meteor.publish('envSubjectParameters', function(envId) {
+Meteor.publish('envSubjectParameters', function (envId) {
   if (!this.userId) {
     return this.ready();
   }
 
   let env_ids = Environments.find({userId: this.userId}, {fields: {_id: 1}}).fetch().map(e => e._id);
   if (!!env_ids.find(id => id === envId)) {
-      return SubjectParameters.find({'envId': envId});
+    return SubjectParameters.find({'envId': envId});
   }
   return this.ready()
 });
@@ -447,7 +445,7 @@ Meteor.publish('envSubjectParameters', function(envId) {
 //   return SubjectParameters.find({userId: this.userId, 'envId': envId});
 // });
 
-Meteor.publish('groupEnvSubjectParameters', function(envId) {
+Meteor.publish('groupEnvSubjectParameters', function (envId) {
   if (!this.userId) {
     return this.ready();
   }
@@ -465,7 +463,7 @@ Meteor.publish('groupEnvSubjectParameters', function(envId) {
 });
 
 
-Meteor.publish('groupSubjectParameters', function() {
+Meteor.publish('groupSubjectParameters', function () {
   if (!this.userId) {
     return this.ready();
   }
@@ -480,7 +478,7 @@ Meteor.publish('groupSubjectParameters', function() {
 });
 
 
-Meteor.publish('ownSequenceParameters', function() {
+Meteor.publish('ownSequenceParameters', function () {
   if (!this.userId) {
     return this.ready();
   }
@@ -489,8 +487,7 @@ Meteor.publish('ownSequenceParameters', function() {
 });
 
 
-
-Meteor.publishComposite('sequenceParameters', function() {
+Meteor.publishComposite('sequenceParameters', function () {
   if (!this.userId) {
     return this.ready();
   }
@@ -507,7 +504,7 @@ Meteor.publishComposite('sequenceParameters', function() {
   }
 })
 
-Meteor.publish('envSequenceParameters', function(envId) {
+Meteor.publish('envSequenceParameters', function (envId) {
   if (!this.userId) {
     return this.ready();
   }
@@ -527,7 +524,7 @@ Meteor.publish('envSequenceParameters', function(envId) {
 //   return SequenceParameters.find({userId: this.userId, 'envId': envId});
 // });
 
-Meteor.publish('groupEnvSequenceParameters', function(envId) {
+Meteor.publish('groupEnvSequenceParameters', function (envId) {
   if (!this.userId) {
     return this.ready();
   }
@@ -544,7 +541,7 @@ Meteor.publish('groupEnvSequenceParameters', function(envId) {
   return this.ready()
 });
 
-Meteor.publish('groupSequenceParameters', function() {
+Meteor.publish('groupSequenceParameters', function () {
   if (!this.userId) {
     return this.ready();
   }
@@ -558,13 +555,13 @@ Meteor.publish('groupSequenceParameters', function() {
   return SequenceParameters.find({'envId': {$in: [...env_ids]}});
 });
 
-Meteor.publish('shared_environments', function(shareId) {
-   // these are public
-   return SharedEnvironments.find({_id: shareId});
+Meteor.publish('shared_environments', function (shareId) {
+  // these are public
+  return SharedEnvironments.find({_id: shareId});
 });
 
 
-Meteor.publish('allEnvs', function() {
+Meteor.publish('allEnvs', function () {
   if (Roles.userIsInRole(this.userId, ['admin'], 'site')) {
     return Environments.find();
   }
@@ -577,7 +574,7 @@ Meteor.publish('allEnvs', function() {
   // this.stop();
   return;
 });
-Meteor.publish('allObs', function() {
+Meteor.publish('allObs', function () {
   if (Roles.userIsInRole(this.userId, ['admin'], 'site')) {
     return Observations.find();
   }
@@ -590,7 +587,7 @@ Meteor.publish('allObs', function() {
   return;
 });
 
-Meteor.publish('allSeqs', function() {
+Meteor.publish('allSeqs', function () {
   if (Roles.userIsInRole(this.userId, ['admin'], 'site')) {
     return Sequences.find();
   }
@@ -604,7 +601,7 @@ Meteor.publish('allSeqs', function() {
   return;
 });
 
-Meteor.publish('allSubjectsAndParams', function() {
+Meteor.publish('allSubjectsAndParams', function () {
   if (Roles.userIsInRole(this.userId, ['admin'], 'site')) {
     return [
       SequenceParameters.find(),
@@ -623,7 +620,7 @@ Meteor.publish('allSubjectsAndParams', function() {
 });
 
 
-Meteor.publish("autocompleteUsers", function(selector, options) {
+Meteor.publish("autocompleteUsers", function (selector, options) {
   let results = Meteor.users.find({_id: ''}, options);
 
   let min_search_string_length = 6;
@@ -635,7 +632,7 @@ Meteor.publish("autocompleteUsers", function(selector, options) {
   return this.ready();
 });
 
-Meteor.publish("autocompleteEnvironments", function(selector, options) {
+Meteor.publish("autocompleteEnvironments", function (selector, options) {
   if (selector && typeof selector['$or'] !== 'undefined') {
     selector['userId'] = this.userId;
   }
@@ -698,7 +695,7 @@ Meteor.publish('allUsers', function () {
 //   });
 // });
 
-Meteor.publishComposite('groupUsers', function(groupId) {
+Meteor.publishComposite('groupUsers', function (groupId) {
   if (!this.userId) {
     return this.ready();
   }
@@ -737,14 +734,17 @@ Meteor.publishComposite('groupUsers', function(groupId) {
 //   return Environments.find({_id: {$in: envIds}});
 // });
 
-Meteor.publishComposite('groupEnvs', function(groupId) {
+Meteor.publishComposite('groupEnvs', function (groupId) {
   if (!this.userId) {
     return this.ready();
   }
 
   return {
     find() {
-      return Groups.find({_id: groupId, $or: [{"members.userId": this.userId}, {showForAllUsers: true}]}, {fields: {environments: 1}});
+      return Groups.find({
+        _id: groupId,
+        $or: [{"members.userId": this.userId}, {showForAllUsers: true}]
+      }, {fields: {environments: 1}});
     },
     children: [{
       find(group) {

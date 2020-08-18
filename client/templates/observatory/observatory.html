@@ -2,130 +2,150 @@
 
 <template name="observatory">
     {{#if observation}}
-    <section class="c--discourse-header__container">
-        <h1 class="c--discourse-header__title">Live Observation</h1>
-        <div class="c--discourse-header__links-container">
-            <p class="u--header-links show-all-observations" id="show-all-observations">Contribution Log</p>
-        </div>
-    </section>
+        <section class="c--discourse-header__container">
+            <h1 class="c--discourse-header__title">Live Observation</h1>
+            <div class="c--discourse-header__links-container">
+                <p class="u--header-links show-all-observations" id="show-all-observations">Contribution Log</p>
+            </div>
+        </section>
 
-    <section class="c--observation-body__container observation" data-obs-id="{{observation._id}}">
-      <div>
-          <ul class="c--discourse-body__container-list-container">
-              <a href="{{pathFor 'environmentList'}}">
-                  <li class="c--discourse-body__container-list">Dashboard<span> &#62;</span></li>
-              </a>
-              <li class="c--discourse-body__container-list-current">{{environment.envName}} - Live Observation</li>
-          </ul>
-          <p>
-              To add a contribution, click on the student's name. To edit or delete
-              a contribution, click on the contribution log.
-          </p>
-          <p>
-              Observation type: <strong>{{classTypeHuman observation.observationType}}</strong>
-          </p>
-          <form id="obs-desc-form">
-          <details open>
-              <summary><label for="observation__description">Description</label></summary>
-              <div>Write a short (max. 280 characters) description of the observation you're coding.</div>
-              <textarea rows='8' cols="50" maxlength="280" class="observation__description" name="observation__description">{{observation.description}}</textarea>
-              <button type="submit" form="obs-desc-form">Save</button>
-          </details>
-          </form>
-          <form id="obs-notes-form">
-          <details>
-              <summary><label for="observation__notes">Notes</label> <span class="observation__notes__status">{{notes_status}}</span></summary>
-              <div>Take notes about anything at all you want to remember.</div>
-              <textarea rows='10' cols="50" class="observation__notes" name="observation__notes">{{observation.notes}}</textarea>
-              <button type="submit" form="obs-notes-form">Save</button>
-          </details>
-          </form>
-          <br/>
-      </div>
-      <div class="columns c--observation-header__container">
-        <h2 class="column c--observation-header__title">
+        <section class="c--observation-body__container observation" data-obs-id="{{observation._id}}">
+            <div>
+                <ul class="c--discourse-body__container-list-container">
+                    <a href="{{pathFor 'environmentList'}}">
+                        <li class="c--discourse-body__container-list">Dashboard<span> &#62;</span></li>
+                    </a>
+                    <li class="c--discourse-body__container-list-current">{{environment.envName}} - Live Observation
+                    </li>
+                </ul>
+                <p>
+                    To add a contribution, click on the student's name. To edit or delete
+                    a contribution, click on the contribution log.
+                </p>
+                <p>
+                    Observation type: <strong>{{classTypeHuman observation.observationType}}</strong>
+                </p>
+                <form id="obs-desc-form">
+                    <details open>
+                        <summary><label for="observation__description">Description</label></summary>
+                        <div>Write a short (max. 280 characters) description of the observation you're coding.</div>
+                        <textarea rows='8' cols="50" maxlength="280" class="observation__description"
+                                  name="observation__description">{{observation.description}}</textarea>
+                        <button type="submit" form="obs-desc-form">Save</button>
+                    </details>
+                </form>
+                <form id="obs-notes-form">
+                    <details>
+                        <summary><label for="observation__notes">Notes</label> <span
+                                class="observation__notes__status">{{notes_status}}</span></summary>
+                        <div>Take notes about anything at all you want to remember.</div>
+                        <textarea rows='10' cols="50" class="observation__notes"
+                                  name="observation__notes">{{observation.notes}}</textarea>
+                        <button type="submit" form="obs-notes-form">Save</button>
+                    </details>
+                </form>
+                <br/>
+            </div>
+            <div class="columns c--observation-header__container">
+                <h2 class="column c--observation-header__title">
             <span class="observation-name-wrapper">
                 <span class="observation-name">{{observation.name}}</span>
                 <button style="display:none;" class="save-observation-name button is-small spaced-button">Save</button>
             </span>
-           <span>|</span>
-            <span class="observation-date-wrapper">
+                    <span>|</span>
+                    <span class="observation-date-wrapper">
 
-            <span class="observation-date observation-date--iso" style="display: none;">{{observation.observationDate}}</span>
-            <span class="observation-date observation-date--display" >{{convertISODateToUS observation.observationDate}}</span>
+            <span class="observation-date observation-date--iso"
+                  style="display: none;">{{observation.observationDate}}</span>
+            <span class="observation-date observation-date--display">{{convertISODateToUS
+                    observation.observationDate}}</span>
             <button style="display:none;" class="save-observation-date button is-small spaced-button">Save</button>
             </span>
-        </h2>
-          {{#if userHasEditAccess}}
-          <div class="toggle-sub">
-              <p class="o--toggle-links edit-observation-date">Change Date</p>
-              <p class="o--toggle-links edit-observation-name">Rename</p>
-              {{#if wholeClass}}
-                  <p class="o--toggle-links edit-included-students {{#if classroomInEditMode}} toggle-link--active{{/if}}">
+                </h2>
+                {{#if userHasEditAccess}}
+                    <div class="toggle-sub">
+                        <p class="o--toggle-links edit-observation-date">Change Date</p>
+                        <p class="o--toggle-links edit-observation-name">Rename</p>
+                        {{#if wholeClass}}
+                            <p class="o--toggle-links edit-included-students {{#if
+                                    classroomInEditMode}} toggle-link--active{{/if}}">
 
-                      {{#if classroomInEditMode}}
-                          Back to obs.
-                      {{else}}
-                          Absent Students
-                      {{/if}}
-                  </p>
-              {{/if}}
-              <p class="o--toggle-links" id="delete-observation">Delete</p>
-          </div>
-          {{/if}}
-      </div>
-      <div class="c--observation-front__container">
-        <p class="c--observation-front__title">Front Of Classroom</p>
-        <p class="c--observation-front__access-level">{{{accessModeText}}}</p>
-      </div>
-      <!-- @FUTURE: remove hide when feature is more defined. -->
-      <div class="columns c--observation-toggle__container toggle-dash" style="display: none;">
-        <h3 class="column c--observation-toggle__title">Toggles</h3>
-      </div>
-      <div class="subjects observatory {{classroomMode}} {{#if currentSearchExists}} search-active{{/if}}">
-        {{#each subject in subjects}}
-          <div id="{{subject._id}}" style='transform:translate({{subject.data_x}}px, {{subject.data_y}}px);' data-x="{{subject.data_x}}" data-y="{{subject.data_y}}" tabindex="{{#if allowTabbing subject}}0{{else}}-1{{/if}}" class="student-box dragger c--observation__student-box-container {{#if studentActive subject}} enabled{{/if}} {{#if searchEnabled subject}} search-enabled {{else}} search-disabled{{/if}}">
-            <p class="c--observation__student-box">{{subject.info.name}}</p>
-          </div>
-        {{/each}}
-      </div>
-  </section>
+                                {{#if classroomInEditMode}}
+                                    Back to obs.
+                                {{else}}
+                                    Absent Students
+                                {{/if}}
+                            </p>
+                        {{/if}}
+                        <p class="o--toggle-links" id="delete-observation">Delete</p>
+                    </div>
+                {{/if}}
+            </div>
+            <div class="c--observation-front__container">
+                <p class="c--observation-front__title">Front Of Classroom</p>
+                <p class="c--observation-front__access-level">{{{accessModeText}}}</p>
+            </div>
+            <!-- @FUTURE: remove hide when feature is more defined. -->
+            <div class="columns c--observation-toggle__container toggle-dash" style="display: none;">
+                <h3 class="column c--observation-toggle__title">Toggles</h3>
+            </div>
+            <div class="subjects observatory {{classroomMode}} {{#if currentSearchExists}} search-active{{/if}}">
+                {{#each subject in subjects}}
+                    <div id="{{subject._id}}" style='transform:translate({{subject.data_x}}px, {{subject.data_y}}px);'
+                         data-x="{{subject.data_x}}" data-y="{{subject.data_y}}"
+                         tabindex="{{#if allowTabbing subject}}0{{else}}-1{{/if}}"
+                         class="student-box dragger c--observation__student-box-container {{#if studentActive
+                                                                                                subject}} enabled{{/if}} {{#if
+                                 searchEnabled subject}} search-enabled {{else}} search-disabled{{/if}}">
+                        <p class="c--observation__student-box">{{subject.info.name}}</p>
+                    </div>
+                {{/each}}
+            </div>
+        </section>
 
-{{#if currentSearchExists}}<div class="current-search-popup">{{currentSearch}}</div>{{/if}}
+        {{#if currentSearchExists}}
+            <div class="current-search-popup">{{currentSearch}}</div>{{/if}}
 
-  <!-- MODAL FOR SEQ PARAMS -->
-  <div id="seq-param-modal" class="modal">
-    <div class="modal-background"></div>
-      <div id="param-modal-content" class="modal-content">
+        <!-- MODAL FOR SEQ PARAMS -->
+        <div id="seq-param-modal" class="modal">
+            <div class="modal-background"></div>
+            <div id="param-modal-content" class="modal-content">
 
-      </div>
-      <button class="modal-close"></button>
-  </div>
+            </div>
+            <button class="modal-close"></button>
+        </div>
 
 
-  <!-- MODAL FOR CONTRIBUTION LOG -->
-  <div id="seq-data-modal" class="modal">
-    <div class="modal-background"></div>
-      <div id="data-modal-content" class="modal-content">
-      </div>
-      <button class="modal-close"></button>
-  </div>
+        <!-- MODAL FOR CONTRIBUTION LOG -->
+        <div id="seq-data-modal" class="modal">
+            <div class="modal-background"></div>
+            <div id="data-modal-content" class="modal-content">
+            </div>
+            <button class="modal-close"></button>
+        </div>
 
-  <!-- HELP MODAL -->
-  <div id="help-env-modal" class="modal">
-    <div class="modal-background"></div>
-    <div class="modal-card">
-      <header class="modal-card-head">
-        <p class="modal-card-title">How to Perform Observations</p>
-        <button id="help-close-modal" class="delete"></button>
-      </header>
-      <section class="modal-card-body">
-      This is your main observation interface for when you are in the classroom. Each time a student participates, you click on their name and fill out the characteristics of their contribution. By clicking on the "contribution log" you can see what you have already coded, and also edit your codes in case you made a mistake. Each toggle has a dropdown menu that allows you to change its current setting. Whatever value the toggle has will automatically be coded when you click on a student. The special toggle "contribution defaults" is an application setting. If you choose "blank," each time you click on a student you will start from scratch with coding. If you choose "Last Choice," whatever you coded last will already be highlighted.
-      </section>
-      <footer class="modal-card-foot">
-        <a class="button">Cancel</a>
-      </footer>
-    </div>
-  </div>
+        <!-- HELP MODAL -->
+        <div id="help-env-modal" class="modal">
+            <div class="modal-background"></div>
+            <div class="modal-card">
+                <header class="modal-card-head">
+                    <p class="modal-card-title">How to Perform Observations</p>
+                    <button id="help-close-modal" class="delete"></button>
+                </header>
+                <section class="modal-card-body">
+                    This is your main observation interface for when you are in the classroom. Each time a student
+                    participates, you click on their name and fill out the characteristics of their contribution. By
+                    clicking on the "contribution log" you can see what you have already coded, and also edit your codes
+                    in case you made a mistake. Each toggle has a dropdown menu that allows you to change its current
+                    setting. Whatever value the toggle has will automatically be coded when you click on a student. The
+                    special toggle "contribution defaults" is an application setting. If you choose "blank," each time
+                    you click on a student you will start from scratch with coding. If you choose "Last Choice,"
+                    whatever you coded last will already be highlighted.
+                </section>
+                <footer class="modal-card-foot">
+                    <a class="button">Cancel</a>
+                </footer>
+            </div>
+        </div>
     {{/if}}
 </template>

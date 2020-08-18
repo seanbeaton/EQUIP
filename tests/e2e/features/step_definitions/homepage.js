@@ -1,5 +1,4 @@
 const assert = require('assert');
-import {console_log_conditional} from "../../../../helpers/logging";
 
 var myStepDefinitionsWrapper = function () {
 
@@ -14,8 +13,8 @@ var myStepDefinitionsWrapper = function () {
 };
 
 
-let delayedGo = function(loc) {
-  browser.executeAsync(function(route, done) {
+let delayedGo = function (loc) {
+  browser.executeAsync(function (route, done) {
     Router.go(route);
     setTimeout(done, 200)
   }, loc)

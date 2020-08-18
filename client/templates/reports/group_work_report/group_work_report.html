@@ -4,7 +4,8 @@
     <div class="report-section-wrapper">
         <section class="report-section report-section--main">
             <h3>
-                Classroom: <span class="env-select {{#if selectedStudent}} env-select--disabled {{/if}}">{{>environmentSelect environments=environments}}</span>
+                Classroom: <span class="env-select {{#if
+                    selectedStudent}} env-select--disabled {{/if}}">{{>environmentSelect environments=environments}}</span>
             </h3>
             {{#if environmentChosen }}
                 <h2>Choose one or more group work observations.</h2>
@@ -17,7 +18,8 @@
             {{#if observationNames}} <h3>Observations: {{ observationNames }}</h3> {{/if }}
         </section>
         <section class="report-section report-section__graph">
-            <div class="group-work-report-wrapper report-wrapper {{#if loadingDataClass}}report-wrapper--loading{{/if}}">
+            <div class="group-work-report-wrapper report-wrapper {{#if
+                    loadingDataClass}}report-wrapper--loading{{/if}}">
                 <div class="group-work-report">
                     <div class="group-work-report__graph">
                         {{#if students }}
@@ -47,8 +49,10 @@
                         {{#if observationChosen }}
                             <label class="graph-display-type__title">Graph Type</label>
                             <div class="graph-display-type graph-display-type--active-type--{{ groupDisplayType }}">
-                                <button class="graph-display-type__option" data-display-graph-type="blocks">Blocks</button>
-                                <button class="graph-display-type__option" data-display-graph-type="bars">Bar Graph</button>
+                                <button class="graph-display-type__option" data-display-graph-type="blocks">Blocks
+                                </button>
+                                <button class="graph-display-type__option" data-display-graph-type="bars">Bar Graph
+                                </button>
                             </div>
                         {{/if}}
                     </div>
@@ -73,7 +77,8 @@
     </div>
     <div class="discourse-option-select">
         <label for="disc-opt-select">Option</label>
-        <select id="disc-opt-select" {{disc_options_available}} class="group-work-disc-opt-param-select discourse-option chosen-select">
+        <select id="disc-opt-select" {{disc_options_available}}
+                class="group-work-disc-opt-param-select discourse-option chosen-select">
             <option selected value="">- All -</option>
             {{#each label in selected_discourse_options }}
                 <option value="{{label}}">{{label}}</option>

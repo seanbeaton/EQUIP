@@ -1,4 +1,3 @@
-import {getStudent, getStudents} from "./students.js";
 import {userHasEnvEditAccess} from "./environments";
 import {htmlClass} from "./html";
 import {console_log_conditional} from "./logging"
@@ -13,7 +12,7 @@ function createTableOfContributions(obsId) {
   let seqs = Sequences.find({obsId: obsId})
 
   let modal = document.getElementById("data-modal-content");
-  let allParams = SequenceParameters.findOne({envId:obs.envId}).parameters;
+  let allParams = SequenceParameters.findOne({envId: obs.envId}).parameters;
   modal.innerHTML += contributionTableTemplate(seqs, allParams, env);
 }
 
@@ -92,7 +91,7 @@ function editParamBoxes(seqId, subjId, envId) {
 
   var modal = document.getElementById('param-modal-content');
 
-  let allParams = SequenceParameters.findOne({envId:envId}).parameters;
+  let allParams = SequenceParameters.findOne({envId: envId}).parameters;
   modal.innerHTML += contributionHeaderTemplate(`Edit contribution for ${subj.info.name}`, subj.info.name, subjId);
   modal.innerHTML += contributionParameterTemplate(allParams, seq, "Save Changes");
   attachOptionSelection()
@@ -155,15 +154,18 @@ function contributionParameterTemplate(allParams, sequence, type) {
 
 function attachOptionSelection() {
   var allNodes = document.querySelectorAll(".optionSelection");
-  [...allNodes].forEach((node) => { node.addEventListener("click", handleOptionSelect); });
+  [...allNodes].forEach((node) => {
+    node.addEventListener("click", handleOptionSelect);
+  });
 }
 
 
-var handleOptionSelect = function() {
+var handleOptionSelect = function () {
   $(this).siblings().removeClass('chosen');
-  if ( $(this).hasClass('chosen') ){
+  if ($(this).hasClass('chosen')) {
     $(this).removeClass('chosen');
-  } else {
+  }
+  else {
     $(this).addClass('chosen');
   }
 }
@@ -182,7 +184,6 @@ function deleteContribution(e, obs) {
   });
   createTableOfContributions(obs);
 }
-
 
 
 export {editParamBoxes, createTableOfContributions, populateParamBoxes, deleteContribution}

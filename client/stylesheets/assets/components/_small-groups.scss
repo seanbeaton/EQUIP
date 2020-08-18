@@ -5,14 +5,17 @@
     position: relative;
     height: 1200px;
   }
+
   .class-absent-student,
   .small-group-student {
     width: 132px;
     height: 30px;
     cursor: pointer;
+
     p {
       font-size: 16px;
     }
+
     &.selected {
       background-color: #0f81cc;
     }
@@ -25,6 +28,7 @@
   margin: 5px;
   //cursor: pointer;
   text-align: center;
+
   .student-box__inner {
     color: white;
   }
@@ -48,12 +52,14 @@
     flex: 0 1 460px;
     padding: 8px;
   }
+
   .student-group__students {
     display: flex;
     flex-flow: row wrap;
     justify-content: center;
     border: 1px solid #666;
   }
+
   .student-group__title {
     text-align: center;
   }
@@ -74,6 +80,7 @@
   grid-row-end: 2;
   padding: 0 0 16px;
 }
+
 .group-work-report__graph-disc-select {
   grid-column-start: 2;
   grid-column-end: 3;
@@ -121,12 +128,15 @@
   &.graph-display-type--active-type--blocks [data-display-graph-type='blocks'] {
     background: #eeeeee;
   }
+
   display: flex;
+
   button {
     background: white;
     border: 1px solid #ccc;
     display: block;
     padding: 6px 8px;
+
     &:not(:first-child) {
       border-left: 0;
     }

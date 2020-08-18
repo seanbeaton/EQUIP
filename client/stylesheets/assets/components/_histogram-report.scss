@@ -1,6 +1,7 @@
 .histogram-report {
   display: grid;
   margin: 20px 0 0;
+
   div {
     margin: 0;
   }
@@ -11,35 +12,43 @@
     float: left;
     margin: 5px;
     @include nt($prop: opacity);
+
     &:hover {
       opacity: 0.8;
     }
+
     &.demo-label {
       clear: both;
+
       &,
       &[style] {
         background: 0 !important;
       }
+
       p {
         color: #333;
         background: 0;
       }
+
       + .student-box {
         clear: left;
       }
     }
   }
+
   .subjects {
     padding: 7px 20px;
     display: block;
     flex-flow: row wrap;
     min-height: auto;
     height: auto;
+
     &.subjects--fixed-height {
       min-height: 1200px;
       height: 1200px;
     }
   }
+
   grid-template-columns: 50% 50%;
   grid-template-rows: auto auto;
 }
@@ -84,10 +93,11 @@ $light-grid-color: #ddd;
 
 
 .histogram-report__filters {
-  .filters__wrapper  {
+  .filters__wrapper {
     display: flex;
     flex-flow: row wrap;
   }
+
   .select__wrapper {
     margin-right: 10px;
     margin-bottom: 10px;
@@ -129,6 +139,7 @@ $light-grid-color: #ddd;
 #histogram-d3-wrapper {
   display: flex;
   flex-flow: row nowrap;
+
   .student-group:last-child {
     margin-right: auto;
   }
@@ -140,6 +151,7 @@ $light-grid-color: #ddd;
     padding: 0 15px 0 0;
     flex: 0 0 150px;
   }
+
   .student-group__title {
     font-weight: bold;
     border-top: 2px solid #333;
@@ -156,6 +168,7 @@ $light-grid-color: #ddd;
     //display: flex;
     //flex-flow: column-reverse wrap;
   }
+
   .student-box {
     width: 175px;
   }

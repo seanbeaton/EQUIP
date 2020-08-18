@@ -1,9 +1,6 @@
 import {absentStudentSelectActive, obsCreateModal, smallGroupStudentSelectActive} from "./environment_list";
-import {console_log_conditional} from "/helpers/logging"
 
-Template.environmentSingle.events({
-
-})
+Template.environmentSingle.events({})
 
 
 Template.environmentSingle.onCreated(function created() {
@@ -23,16 +20,16 @@ Template.environmentSingle.onCreated(function created() {
 
 
 Template.environmentSingle.helpers({
-  smallGroupStudentSelectActive: function() {
+  smallGroupStudentSelectActive: function () {
     return smallGroupStudentSelectActive.get();
   },
-  absentStudentSelectActive: function() {
+  absentStudentSelectActive: function () {
     return absentStudentSelectActive.get();
   },
-  obsCreateModal: function() {
+  obsCreateModal: function () {
     return obsCreateModal.get()
   },
-  environment_false_list: function() {
-    return [ Environments.findOne({_id: this.envId}) ];
+  environment_false_list: function () {
+    return [Environments.findOne({_id: this.envId})];
   }
 })

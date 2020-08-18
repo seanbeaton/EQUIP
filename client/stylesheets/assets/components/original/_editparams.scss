@@ -1,81 +1,81 @@
 /* NEW STYLES */
 .c--discourse-header__container {
-    display: inline-flex;
-    width: 100%;
-    justify-content: space-between;
-    margin-top: var(--spacer-40);
-    margin-bottom: 0px;
+  display: inline-flex;
+  width: 100%;
+  justify-content: space-between;
+  margin-top: var(--spacer-40);
+  margin-bottom: 0px;
 }
 
 .c--discourse-header__title {
-    font-size: 65px;
+  font-size: 65px;
 }
 
 .c--discourse-body__container-list-container {
-    display: inline-flex;
+  display: inline-flex;
 }
 
 .c--discourse-header__links-container {
-    display: inline-flex;
-    align-items: center;
-    margin-bottom: 0px;
+  display: inline-flex;
+  align-items: center;
+  margin-bottom: 0px;
 }
 
 .c--discourse-body__container-list {
-    font-family: 'Roboto';
-    color: var(--orange);
-    transition: color .4s;
+  font-family: 'Roboto';
+  color: var(--orange);
+  transition: color .4s;
 }
 
 .c--discourse-body__container-list:hover {
-    color: var(--black);
+  color: var(--black);
 }
 
 .c--discourse-body__container-list-current {
-    font-family: 'Roboto';
-    color: var(--black);
+  font-family: 'Roboto';
+  color: var(--black);
 }
 
 .c--discourse-body__container-list span {
-    color: var(--black);
-    margin-right: var(--spacer-10);
+  color: var(--black);
+  margin-right: var(--spacer-10);
 }
 
 .c--discourse-header__links {
-    margin-right: var(--spacer-20);
+  margin-right: var(--spacer-20);
 }
 
 .c--discourse-body__container {
-    max-width: var(--max-inner-container-width);
-    margin: 0 auto;
-    position: relative;
-    overflow-x: scroll;
+  max-width: var(--max-inner-container-width);
+  margin: 0 auto;
+  position: relative;
+  overflow-x: scroll;
 }
 
 .c--discourse-form__label-container {
-    margin-bottom: var(--spacer-10);
-    border-bottom: 1px solid var(--yellow);
+  margin-bottom: var(--spacer-10);
+  border-bottom: 1px solid var(--yellow);
 }
 
 .c--discourse-form__remove-button {
-    text-align: right;
+  text-align: right;
 }
 
 .c--discourse-form__remove-button:hover {
-    color: var(--black) !important;
+  color: var(--black) !important;
 }
 
 .c--discourse-form__save-button {
-    margin: 0 auto;
-    width: 380px !important;
+  margin: 0 auto;
+  width: 380px !important;
 }
 
 .c--discourse-form__button-container {
-    display: inline-flex;
-    width: 100%;
-    justify-content: space-between;
+  display: inline-flex;
+  width: 100%;
+  justify-content: space-between;
 }
 
 .param-action-wrapper {
-    text-align: right;
+  text-align: right;
 }

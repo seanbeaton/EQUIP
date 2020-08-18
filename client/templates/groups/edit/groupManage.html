@@ -6,10 +6,15 @@
             <summary>
                 Role explanation:
             </summary>
-            <br/><strong>Admin:</strong> Can add new group members, change permissions of all members, including adding other group managers.
-            <br/><strong>Manage:</strong> Can add new group members, change permissions of all members without the manage or admin roles, but can't promote other users past edit. Can remove users from the group, as long as they don't have the admin or manage roles. Can remove any classroom from the group.
-            <br/><strong>Edit:</strong> Can edit any classroom shared with the group, as long as the classroom was shared with the edit permissions.
-            <br/><strong>View:</strong> Can view any classroom shared with the group. Can share their own classrooms with the group, and un-share them.
+            <br/><strong>Admin:</strong> Can add new group members, change permissions of all members, including adding
+            other group managers.
+            <br/><strong>Manage:</strong> Can add new group members, change permissions of all members without the
+            manage or admin roles, but can't promote other users past edit. Can remove users from the group, as long as
+            they don't have the admin or manage roles. Can remove any classroom from the group.
+            <br/><strong>Edit:</strong> Can edit any classroom shared with the group, as long as the classroom was
+            shared with the edit permissions.
+            <br/><strong>View:</strong> Can view any classroom shared with the group. Can share their own classrooms
+            with the group, and un-share them.
         </details>
         <table>
             <thead>
@@ -45,7 +50,10 @@
 </template>
 
 <template name="memberPermissionCheckbox">
-    <input type="checkbox" class="permission-checkbox" id="{{member.userId}}__{{checkboxtype}}" data-user-id="{{member.userId}}" data-role="manage" {{getGroupMembershipChecked member checkboxtype}} {{getGroupMembershipCheckDisabled member checkboxtype}}>
+    <input type="checkbox" class="permission-checkbox" id="{{member.userId}}__{{checkboxtype}}"
+           data-user-id="{{member.userId}}" data-role="manage" {{getGroupMembershipChecked member
+                                                                                           checkboxtype}} {{getGroupMembershipCheckDisabled
+            member checkboxtype}}>
 </template>
 
 <template name="userAutocompleteOption">
@@ -75,11 +83,14 @@
 
 <template name="groupNameEditable">
     <span class="group__name group__name--editable">
-    {{#if editing}}
-        <form class="group__name__edit-form"><input class="group__name__edit-field" title="group name" type="text" value="{{group.groupName}}"><input type="submit" value="save"></form>
-    {{else}}
-        {{group.groupName}}<button class="group__name--start-edit">Edit</button>
-    {{/if}}
+        {{#if editing}}
+            <form class="group__name__edit-form"><input class="group__name__edit-field" title="group name" type="text"
+                                                        value="{{group.groupName}}"><input type="submit"
+                                                                                           value="save"></form>
+        {{else}}
+            {{group.groupName}}
+            <button class="group__name--start-edit">Edit</button>
+        {{/if}}
     </span>
 </template>
 

@@ -2,22 +2,19 @@
 * JS file for edit_subjects.html
 */
 
-import {updateStudent, updateStudents, getStudents} from '/helpers/students.js'
-import {setupSubjectParameters} from '/helpers/parameters.js'
-import {getStudent} from "/helpers/students.js";
 import {console_log_conditional} from "/helpers/logging"
 
 Template.editSubjects.helpers({
-    subject: function() {
-        subs = Subjects.find({envId: this._id});
-        return subs;
-    },
-    classRoomName: function() {
-        return this.envName;
-    },
-    envId: function() {
-      return this._id;
-    }
+  subject: function () {
+    subs = Subjects.find({envId: this._id});
+    return subs;
+  },
+  classRoomName: function () {
+    return this.envName;
+  },
+  envId: function () {
+    return this._id;
+  }
 });
 
 const grid_size = {
@@ -39,13 +36,13 @@ Template.editSubjects.created = function () {
       // disable inertial throwing
       snap: {
         targets: [
-          function(xPos, yPos) {
+          function (xPos, yPos) {
             let parent_rect = $('.c--student-body__container')[0].getBoundingClientRect();
             let top_left = {
               x: parent_rect.x + window.scrollX + grid_size.horiz_offset,
               y: parent_rect.y + window.scrollY + grid_size.vert_offset,
             };
-            let f = interact.createSnapGrid({x:grid_size.x, y: grid_size.y, range: Infinity, offset: top_left});
+            let f = interact.createSnapGrid({x: grid_size.x, y: grid_size.y, range: Infinity, offset: top_left});
             return f(xPos, yPos);
           }
         ],
@@ -58,10 +55,10 @@ Template.editSubjects.created = function () {
       onmove: dragMoveListener,
       restrict: {
         restriction: '.drag-bounding-box',
-        elementRect: { left: 0, right: 1, top: 0, bottom: 1 }
+        elementRect: {left: 0, right: 1, top: 0, bottom: 1}
       }
     })
-    .on('dragend', function(e) {
+    .on('dragend', function (e) {
       const students = Subjects.find({envId: Router.current().params._envId}).fetch();
 
       let target = e.target;
@@ -87,18 +84,18 @@ Template.editSubjects.created = function () {
       target.removeAttribute('data-orig-y');
       saveStudentLocations();
     })
-    .on('dragstart', function(e) {
+    .on('dragstart', function (e) {
       let target = e.target;
       target.classList.add('dragging');
       target.setAttribute('data-orig-x', target.getAttribute('data-x'));
       target.setAttribute('data-orig-y', target.getAttribute('data-y'));
     });
 
-  function dragMoveListener (event) {
-    var target = event.target,
-        // keep the dragged position in the data_x/data_y attributes
-        x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx,
-        y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
+  function dragMoveListener(event) {
+    const target = event.target;
+    // keep the dragged position in the data_x/data_y attributes
+    let x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
+    let y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
 
     // get the closest valid coords:
     x = Math.round(x / parseFloat(grid_size.x)) * parseFloat(grid_size.x);
@@ -109,9 +106,9 @@ Template.editSubjects.created = function () {
 };
 
 // On rendering, get students and layout classroom with student boxes
-Template.editSubjects.rendered = function() {
-  $(document).keyup(function(e) {
-     if (e.keyCode === 27) {
+Template.editSubjects.rendered = function () {
+  $(document).keyup(function (e) {
+    if (e.keyCode === 27) {
       $('#stud-param-modal').removeClass('is-active');
       $('#stud-data-modal').removeClass('is-active');
     }
@@ -123,27 +120,27 @@ Template.editSubjects.rendered = function() {
 //
 Template.editSubjects.events({
   //Stuff for student parameters modal
-  'click .modal-close': function(e){
+  'click .modal-close': function (e) {
     $('#stud-param-modal').removeClass('is-active');
     $('#stud-data-modal').removeClass('is-active');
   },
   'click .help-button': function (e) {
     $('#help-env-modal').addClass("is-active");
   },
-  'click #help-close-modal': function(e) {
+  'click #help-close-modal': function (e) {
     $('#help-env-modal').removeClass("is-active");
   },
-  'click .modal-card-foot .button': function(e) {
+  'click .modal-card-foot .button': function (e) {
     $('#help-env-modal').removeClass("is-active");
   },
-  'click .modal-background': function(e){
+  'click .modal-background': function (e) {
     $('#stud-param-modal').removeClass('is-active');
     $('#stud-data-modal').removeClass('is-active');
     $('#help-env-modal').removeClass("is-active");
   },
-  'click #add-student': function(e) {
-    var envId = Router.current().params._envId;
-    var subjParams = SubjectParameters.findOne({'envId':envId});
+  'click #add-student': function (e) {
+    const envId = Router.current().params._envId;
+    const subjParams = SubjectParameters.findOne({'envId': envId});
 
     if ($.isEmptyObject(subjParams)) {
       alert("You must add demographic parameters before you can add a student!");
@@ -153,18 +150,18 @@ Template.editSubjects.events({
     $('#param-modal-content').children().remove();
     $('#stud-param-modal').addClass('is-active');
     populateParamBoxes(envId);
- },
+  },
 
-  'click #save-subj-params': function(e) {
+  'click #save-subj-params': function (e) {
     $('#stud-param-modal').addClass('is-processing');
-    let callback = function() {
-      setTimeout(function() {
+    let callback = function () {
+      setTimeout(function () {
         $('#stud-param-modal').removeClass('is-processing');
       }, 500);
     }
     saveNewSubject(this, callback)
- },
-  'click .edit-stud' : function (e) {
+  },
+  'click .edit-stud': function (e) {
     let target = $(e.target)
     if (!target.hasClass('edit-stud')) {
       target = target.parents('.edit-stud');
@@ -176,44 +173,45 @@ Template.editSubjects.events({
     $('#stud-data-modal').removeClass('is-active');
     $('#stud-param-modal').addClass('is-active');
   },
-  'click #edit-remove-student': function(e) {
+  'click #edit-remove-student': function (e) {
     createTableOfStudents();
     $('#stud-data-modal').addClass('is-active');
   },
-  'click #align-students': function(e) {
+  'click #align-students': function (e) {
     const students = Subjects.find({envId: Router.current().params._envId}).fetch();
     align_all_students(students, false, moveStudent);
     saveStudentLocations()
   },
-  'click #align-students-alpha': function(e) {
+  'click #align-students-alpha': function (e) {
     const students = Subjects.find({envId: Router.current().params._envId}).fetch();
     align_all_students(students, true, moveStudent);
     saveStudentLocations();
   },
-  'click #save-locations': function(e) {
+  'click #save-locations': function (e) {
     saveStudentLocations()
   },
 
-  'click .delete-student': function(e) {
+  'click .delete-student': function (e) {
     var result = confirm("Press 'OK' to delete this Subject.");
 
     if (result === true) {
-        var subjId = $(e.target).attr("data-id");
+      var subjId = $(e.target).attr("data-id");
 
-        Meteor.call('subjectDelete', subjId, function(error, result) {
-            return 0;
-        });
+      Meteor.call('subjectDelete', subjId, function (error, result) {
+        return 0;
+      });
 
-        createTableOfStudents();
-    } else {
-        return;
+      createTableOfStudents();
+    }
+    else {
+      return;
     }
   },
   'click #edit-subj-params': function (e) {
     $('#stud-param-modal').addClass('is-processing');
 
-    let callback = function() {
-      setTimeout(function() {
+    let callback = function () {
+      setTimeout(function () {
         $('#stud-param-modal').removeClass('is-processing');
         $('#stud-data-modal').addClass('is-active');
         createTableOfStudents();
@@ -224,8 +222,8 @@ Template.editSubjects.events({
   },
   'click #edit-subj-params-exit': function (e) {
     $('#stud-param-modal').addClass('is-processing');
-    let callback = function() {
-      setTimeout(function() {
+    let callback = function () {
+      setTimeout(function () {
         $('#stud-param-modal').removeClass('is-processing');
       }, 500);
     }
@@ -249,13 +247,14 @@ function editStudent(e, callback) {
   info.demographics = {};
 
   let incomplete_parameters = [];
-  $('.c--modal-student-options-container').each(function() {
+  $('.c--modal-student-options-container').each(function () {
     let parameter_name = this.getAttribute('data-parameter-name');
     let parameter_choice = $('.chosen', $(this)).text().replace(/\n/ig, '').trim();
     if (parameter_choice.length === 0) {
       incomplete_parameters.push(parameter_name);
       form_incomplete = true;
-    } else {
+    }
+    else {
       info.demographics[parameter_name] = parameter_choice
     }
   });
@@ -273,7 +272,7 @@ function editStudent(e, callback) {
     id: subjId
   };
 
-  Meteor.call('subjectUpdate', subject, function(error, result) {
+  Meteor.call('subjectUpdate', subject, function (error, result) {
     if (error) {
       alert(error.reason);
     }
@@ -285,19 +284,21 @@ function editStudent(e, callback) {
   $('#stud-param-modal').removeClass('is-active');
 }
 
-export let find_open_position = function(students) {
+export let find_open_position = function (students) {
   let x = 0,
-      y = 0;
+    y = 0;
   let complete = false;
   while (!complete) {
     let element_in_location = findStudentAtLocation(students, x, y)
     if (!element_in_location) {
       complete = true;
-    } else {
+    }
+    else {
       if (x + grid_size.x >= grid_size.width) {
         x = 0;
         y += grid_size.y;
-      } else {
+      }
+      else {
         x += grid_size.x
       }
       if (x > 2000) {
@@ -308,16 +309,16 @@ export let find_open_position = function(students) {
   return {x: x, y: y};
 }
 
-export let align_all_students = function(students, alphabetically, callback) {
+export let align_all_students = function (students, alphabetically, callback) {
   console_log_conditional('students', students);
   if (typeof alphabetically === 'undefined') {
     alphabetically = false;
   }
 
-  students.forEach(function(student) {
+  students.forEach(function (student) {
     student.ignoreLocation = true;
   });
-  students = students.sort(function(a, b) {
+  students = students.sort(function (a, b) {
     if (!alphabetically) {
       if (a.data_y != b.data_y) {
         return a.data_y - b.data_y;
@@ -344,7 +345,9 @@ export let align_all_students = function(students, alphabetically, callback) {
     return 0
   });
   for (let s_key in students) {
-    if (!students.hasOwnProperty(s_key)) continue;
+    if (!students.hasOwnProperty(s_key)) {
+      continue;
+    }
 
     let open_pos = find_open_position(students);
     if (typeof callback === 'function') {
@@ -399,10 +402,11 @@ function saveStudentLocations() {
     subjects.push(subject);
   });
 
-  Meteor.call('subjectPositionUpdate', subjects, function(error, result) {
+  Meteor.call('subjectPositionUpdate', subjects, function (error, result) {
     if (error) {
       alert(error.reason);
-    } else {
+    }
+    else {
       toastr.options = {
         "closeButton": false,
         "debug": false,
@@ -426,7 +430,7 @@ function saveStudentLocations() {
 }
 
 function findStudentAtLocation(students, x, y) {
-  return students.find(function(el) {
+  return students.find(function (el) {
     if (el.ignoreLocation) {
       return false
     }
@@ -443,7 +447,8 @@ function saveNewSubject(env, callback) {
   if (numberOfStudents === 0) {
     newStudentPositionY = 0;
     newStudentPositionX = 0;
-  } else {
+  }
+  else {
     let open_position = find_open_position(students);
     // let yPosition = students[numberOfStudents - 1].data_y;
     // let xPosition = students[numberOfStudents - 1].data_x;
@@ -455,7 +460,7 @@ function saveNewSubject(env, callback) {
 
   let form_incomplete = false;
 
-  if (name.length === 0 ) {
+  if (name.length === 0) {
     alert("Please enter a name");
     form_incomplete = true;
   }
@@ -467,13 +472,14 @@ function saveNewSubject(env, callback) {
   info.demographics = {};
 
   let incomplete_parameters = [];
-  $('.c--modal-student-options-container').each(function() {
+  $('.c--modal-student-options-container').each(function () {
     let parameter_name = this.getAttribute('data-parameter-name');
     let parameter_choice = $('.chosen', $(this)).text().replace(/\n/ig, '').trim();
     if (parameter_choice.length === 0) {
       incomplete_parameters.push(parameter_name);
       form_incomplete = true;
-    } else {
+    }
+    else {
       info.demographics[parameter_name] = parameter_choice
     }
   });
@@ -493,12 +499,13 @@ function saveNewSubject(env, callback) {
     info: info
   };
 
-  Meteor.call('subjectInsert', subject, function(error, result) {
+  Meteor.call('subjectInsert', subject, function (error, result) {
     if (error) {
       alert(error.reason);
-    } else {
+    }
+    else {
       $('.o--box-item#' + result._id).addClass('just-added');
-      setTimeout(function() {
+      setTimeout(function () {
         $('.o--box-item#' + result._id).removeClass('just-added');
       }, 5000);
     }
@@ -511,11 +518,11 @@ function saveNewSubject(env, callback) {
 }
 
 function contributionTableTemplate(students, parameters) {
-    var contributionRows = students.map((student) => {
-        return contributionRowTemplate(student, parameters)
-    }).join("");
+  var contributionRows = students.map((student) => {
+    return contributionRowTemplate(student, parameters)
+  }).join("");
 
-    return `
+  return `
         <div class="c--modal-header-container">
             <h3 class="c--modal-header-title">Student Roster</h3>
         </div>
@@ -525,20 +532,20 @@ function contributionTableTemplate(students, parameters) {
 
 function contributionRowTemplate(student, params) {
   console_log_conditional(student, params);
-    let paramTemplate = params.map((param) => {
-        return `
+  let paramTemplate = params.map((param) => {
+    return `
             <p class="o--modal-label contributions-grid-item">${param.label}</p>
         `
-    }).join("");
+  }).join("");
 
-    let paramValues = params.map((param) => {
-        let data = student.info.demographics[param.label] ? student.info.demographics[param.label] : 'Not Specified';
-        return `
+  let paramValues = params.map((param) => {
+    let data = student.info.demographics[param.label] ? student.info.demographics[param.label] : 'Not Specified';
+    return `
             <p class="o--modal-label contributions-grid-item">${data}</p>
         `
-    }).join("");
+  }).join("");
 
-    return `
+  return `
         <div class="contributions-grid-container-student">
             <h3 class="contributions-modal-header">${student.info.name}</h3>
             <p class="o--toggle-links contributions-modal-link edit-stud" data-id="${student._id}" data-student-id="${student.info.studentId}">Edit</p>
@@ -555,35 +562,35 @@ function contributionRowTemplate(student, params) {
 
 // Saves a new student
 function populateParamBoxes(envId) {
-    var modal = document.getElementById("param-modal-content");
+  var modal = document.getElementById("param-modal-content");
 
-    let allParams = SubjectParameters.findOne({envId: envId}).parameters;
+  let allParams = SubjectParameters.findOne({envId: envId}).parameters;
 
-    modal.innerHTML += studentHeaderTemplate("Add a Student");
-    modal.innerHTML += studentInputTemplate();
-    modal.innerHTML += studentParameterTemplate(allParams, null, "Add Student");
-    attachOptionSelection()
-    $('.student-name-field').focus()
+  modal.innerHTML += studentHeaderTemplate("Add a Student");
+  modal.innerHTML += studentInputTemplate();
+  modal.innerHTML += studentParameterTemplate(allParams, null, "Add Student");
+  attachOptionSelection()
+  $('.student-name-field').focus()
 }
 
 // Edits student
 function editParamBoxes(subjId) {
-    $('#param-modal-content').children().remove();
-    let modal = document.getElementById("param-modal-content");
+  $('#param-modal-content').children().remove();
+  let modal = document.getElementById("param-modal-content");
 
-    let subj = Subjects.findOne({_id: subjId});
-    let allParams = SubjectParameters.findOne({envId: subj.envId}).parameters;
-    let student = subj.info.name;
+  let subj = Subjects.findOne({_id: subjId});
+  let allParams = SubjectParameters.findOne({envId: subj.envId}).parameters;
+  let student = subj.info.name;
 
-    modal.innerHTML += studentHeaderTemplate(`Edit ${student}`, student);
-    modal.innerHTML += studentInputTemplate(student);
-    modal.innerHTML += studentParameterTemplate(allParams, subj, "Save Student");
-    attachOptionSelection()
+  modal.innerHTML += studentHeaderTemplate(`Edit ${student}`, student);
+  modal.innerHTML += studentInputTemplate(student);
+  modal.innerHTML += studentParameterTemplate(allParams, subj, "Save Student");
+  attachOptionSelection()
 }
 
 function studentHeaderTemplate(type, student) {
-    let studentName = student ? student : "";
-    return `
+  let studentName = student ? student : "";
+  return `
         <div class="c--modal-header-container js-modal-header" data-name="${studentName}">
             <h3 class="c--modal-header-title">${type}</h3>
         </div>
@@ -591,7 +598,7 @@ function studentHeaderTemplate(type, student) {
 }
 
 function studentInputTemplate(name) {
-    return `
+  return `
         <div class="boxes-wrapper">
             <div class="c--modal-student-header">
                 <p>Name / Identifier for Student</p>
@@ -602,32 +609,34 @@ function studentInputTemplate(name) {
 }
 
 function studentParameterTemplate(allParams, student, type) {
-    let saveBtn = type === "Add Student" ? "save-subj-params" : "edit-subj-params";
-    let studentId = student ? student._id.trim() : "";
+  let saveBtn = type === "Add Student" ? "save-subj-params" : "edit-subj-params";
+  let studentId = student ? student._id.trim() : "";
 
-    console_log_conditional(allParams);
-    let boxes = allParams.map((param) => {
-      console_log_conditional('param', param);
-        let optionNodes = param.options.map((opt) => {
-            let selected = "";
+  console_log_conditional(allParams);
+  let boxes = allParams.map((param) => {
+    console_log_conditional('param', param);
+    let optionNodes = param.options.map((opt) => {
+      let selected = "";
 
-            if (student) { selected = student.info.demographics[param.label] === opt ? "chosen" : "" }
-            console_log_conditional('creating options for student, ', student);
+      if (student) {
+        selected = student.info.demographics[param.label] === opt ? "chosen" : ""
+      }
+      console_log_conditional('creating options for student, ', student);
 
-            return `
+      return `
                 <div class="column has-text-centered subj-box-params ${selected} optionSelection">
                     ${opt}
                 </div>
             `
-        }).join("");
+    }).join("");
 
-        return `
+    return `
             <div class="c--modal-student-header js-subject-labels">${param.label}</div>
             <div class="c--modal-student-options-container" data-parameter-name="${param.label}">
                 ${optionNodes}
             </div>
         `
-    }).join("");
+  }).join("");
 
   let exit_save_button = '';
   if (saveBtn === 'edit-subj-params') {
@@ -651,15 +660,18 @@ function studentParameterTemplate(allParams, student, type) {
 }
 
 function attachOptionSelection() {
-    var allNodes = document.querySelectorAll(".optionSelection");
-    [...allNodes].forEach((node) => { node.addEventListener("click", handleOptionSelect); });
+  var allNodes = document.querySelectorAll(".optionSelection");
+  [...allNodes].forEach((node) => {
+    node.addEventListener("click", handleOptionSelect);
+  });
 }
 
-var handleOptionSelect = function() {
-    $(this).siblings().removeClass('chosen');
-    if ( $(this).hasClass('chosen') ){
-      $(this).removeClass('chosen');
-    } else {
-      $(this).addClass('chosen');
-    }
+var handleOptionSelect = function () {
+  $(this).siblings().removeClass('chosen');
+  if ($(this).hasClass('chosen')) {
+    $(this).removeClass('chosen');
+  }
+  else {
+    $(this).addClass('chosen');
+  }
 }

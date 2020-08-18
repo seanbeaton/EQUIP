@@ -5,6 +5,7 @@
 
 tr.deleted-student {
   background-color: #ddd;
+
   input[type="text"] {
     opacity: 0.4;
 
@@ -27,6 +28,7 @@ tr[data-row-status="new"] {
     padding: 0;
     margin: 0;
   }
+
   td.text-content {
     padding: 5px 8px 3px;
     line-height: 1em;

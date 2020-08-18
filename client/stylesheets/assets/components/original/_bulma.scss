@@ -2,21 +2,22 @@
 @-webkit-keyframes spinAround {
   from {
     -webkit-transform: rotate(0deg);
-            transform: rotate(0deg);
+    transform: rotate(0deg);
   }
   to {
     -webkit-transform: rotate(359deg);
-            transform: rotate(359deg);
+    transform: rotate(359deg);
   }
 }
+
 @keyframes spinAround {
   from {
     -webkit-transform: rotate(0deg);
-            transform: rotate(0deg);
+    transform: rotate(0deg);
   }
   to {
     -webkit-transform: rotate(359deg);
-            transform: rotate(359deg);
+    transform: rotate(359deg);
   }
 }
 
@@ -44,9 +45,9 @@
   position: absolute;
   top: 50%;
   -webkit-transform: rotate(-45deg);
-          transform: rotate(-45deg);
+  transform: rotate(-45deg);
   -webkit-transform-origin: center;
-          transform-origin: center;
+  transform-origin: center;
   width: 0.625em;
 }
 
@@ -85,9 +86,9 @@
   position: absolute;
   top: 50%;
   -webkit-transform: translateX(-50%) translateY(-50%) rotate(45deg);
-          transform: translateX(-50%) translateY(-50%) rotate(45deg);
+  transform: translateX(-50%) translateY(-50%) rotate(45deg);
   -webkit-transform-origin: center center;
-          transform-origin: center center;
+  transform-origin: center center;
 }
 
 .delete::before, .modal-close::before {
@@ -137,7 +138,7 @@
 
 .button.is-loading::after, .select.is-loading::after, .control.is-loading::after, .loader {
   -webkit-animation: spinAround 500ms infinite linear;
-          animation: spinAround 500ms infinite linear;
+  animation: spinAround 500ms infinite linear;
   border: 2px solid #dbdbdb;
   border-radius: 290486px;
   border-right-color: transparent;
@@ -304,9 +305,9 @@ html {
   overflow-y: scroll;
   text-rendering: optimizeLegibility;
   -webkit-text-size-adjust: 100%;
-     -moz-text-size-adjust: 100%;
-      -ms-text-size-adjust: 100%;
-          text-size-adjust: 100%;
+  -moz-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 article,
@@ -3463,7 +3464,7 @@ a.box:active {
   right: 0.625em;
   top: 0.625em;
   -webkit-transform: none;
-          transform: none;
+  transform: none;
 }
 
 .select.is-loading.is-small:after {
@@ -5018,9 +5019,9 @@ a.box:active {
   position: absolute;
   top: 50%;
   -webkit-transform: translateX(-50%) translateY(-50%) rotate(45deg);
-          transform: translateX(-50%) translateY(-50%) rotate(45deg);
+  transform: translateX(-50%) translateY(-50%) rotate(45deg);
   -webkit-transform-origin: center center;
-          transform-origin: center center;
+  transform-origin: center center;
 }
 
 .tag:not(body).is-delete::before {
@@ -6589,7 +6590,7 @@ body.has-navbar-fixed-bottom {
   left: calc(50% - 8px);
   position: absolute;
   -webkit-transform-origin: center;
-          transform-origin: center;
+  transform-origin: center;
   transition-duration: 86ms;
   transition-property: background-color, opacity, -webkit-transform;
   transition-property: background-color, opacity, transform;
@@ -6616,7 +6617,7 @@ body.has-navbar-fixed-bottom {
 
 .navbar-burger.is-active span:nth-child(1) {
   -webkit-transform: translateY(5px) rotate(45deg);
-          transform: translateY(5px) rotate(45deg);
+  transform: translateY(5px) rotate(45deg);
 }
 
 .navbar-burger.is-active span:nth-child(2) {
@@ -6625,7 +6626,7 @@ body.has-navbar-fixed-bottom {
 
 .navbar-burger.is-active span:nth-child(3) {
   -webkit-transform: translateY(-5px) rotate(-45deg);
-          transform: translateY(-5px) rotate(-45deg);
+  transform: translateY(-5px) rotate(-45deg);
 }
 
 .navbar-menu {
@@ -6836,7 +6837,7 @@ a.navbar-item:hover, a.navbar-item.is-active,
   }
   .navbar-item.has-dropdown-up .navbar-link::after {
     -webkit-transform: rotate(135deg) translate(0.25em, -0.25em);
-            transform: rotate(135deg) translate(0.25em, -0.25em);
+    transform: rotate(135deg) translate(0.25em, -0.25em);
   }
   .navbar-item.has-dropdown-up .navbar-dropdown {
     border-bottom: 2px solid #dbdbdb;
@@ -6853,7 +6854,7 @@ a.navbar-item:hover, a.navbar-item.is-active,
     opacity: 1;
     pointer-events: auto;
     -webkit-transform: translateY(0);
-            transform: translateY(0);
+    transform: translateY(0);
   }
   .navbar-menu {
     flex-grow: 1;
@@ -6905,7 +6906,7 @@ a.navbar-item:hover, a.navbar-item.is-active,
     pointer-events: none;
     top: calc(100% + (-4px));
     -webkit-transform: translateY(-5px);
-            transform: translateY(-5px);
+    transform: translateY(-5px);
     transition-duration: 86ms;
     transition-property: opacity, -webkit-transform;
     transition-property: opacity, transform;
@@ -9603,7 +9604,7 @@ label.panel-block:hover {
   position: absolute;
   top: 50%;
   -webkit-transform: translate3d(-50%, -50%, 0);
-          transform: translate3d(-50%, -50%, 0);
+  transform: translate3d(-50%, -50%, 0);
 }
 
 .hero-video.is-transparent {

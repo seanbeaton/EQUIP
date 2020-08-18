@@ -5,7 +5,7 @@ function createModal(title, content, id, active) {
     active = false
   }
 
-  let modal = $('<div/>',{
+  let modal = $('<div/>', {
     class: 'modal',
   })
 
@@ -37,7 +37,7 @@ function createModal(title, content, id, active) {
   ))
 
 
-  modal.find('.delete, .cancel').on('click', function(e) {
+  modal.find('.delete, .cancel').on('click', function (e) {
     e.stopPropagation();
     console_log_conditional('closing modal');
     modal.remove();

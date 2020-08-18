@@ -1,6 +1,7 @@
 .timeline-report {
   display: grid;
   margin: 20px 0 0;
+
   div {
     margin: 0;
   }
@@ -12,6 +13,7 @@
 .dataset-type-select-inline,
 .environment-select {
   display: inline-block;
+
   select {
     //height: 29px;
     height: 1.2em;
@@ -105,13 +107,16 @@ $light-grid-color: #ddd;
 
 .parameter-options {
   display: flex;
+
   > div {
     padding: 0 6px;
   }
+
   label {
     display: block;
     font-size: 14px;
   }
+
   select {
     display: inline-block;
     height: 29px;
@@ -127,6 +132,7 @@ $light-grid-color: #ddd;
     fill: none;
     //stroke: #000;
   }
+
   .line--total {
     stroke: #0e301a;
   }
@@ -138,12 +144,15 @@ $light-grid-color: #ddd;
 
 .stat-group--vert-centered {
   text-align: center;
+
   .stat--percent {
     font-size: 18px;
   }
+
   .stat-leadin {
     font-size: 16px;
   }
+
   .stat-leadin--small {
     opacity: 0.9;
     font-size: 12px;
@@ -169,10 +178,12 @@ $light-grid-color: #ddd;
   display: flex;
   flex-flow: row nowrap;
   justify-content: space-around;
+
   .stat-separator {
     align-self: center;
     font-size: 30px;
     font-weight: 100;
+
     &.stat-separator--small {
       font-size: 15px;
     }

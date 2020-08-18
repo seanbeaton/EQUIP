@@ -1,348 +1,350 @@
 .c--view-data-header__container {
-    display: inline-flex;
-    width: 100%;
-    justify-content: space-between;
-    margin-top: var(--spacer-40);
-    margin-bottom: 0px;
+  display: inline-flex;
+  width: 100%;
+  justify-content: space-between;
+  margin-top: var(--spacer-40);
+  margin-bottom: 0px;
 }
 
 .c--view-data-header__title {
-    font-size: 65px;
+  font-size: 65px;
 }
 
 .c--view-data-header__links-container {
-    display: inline-flex;
-    align-items: center;
-    margin-bottom: 0px;
+  display: inline-flex;
+  align-items: center;
+  margin-bottom: 0px;
 }
 
 .c--view-data-header__links {
-    margin-right: var(--spacer-20);
-    font-size: 24px !important;
+  margin-right: var(--spacer-20);
+  font-size: 24px !important;
 }
 
 .c--view-data__container {
-    max-width: var(--max-inner-container-width);
-    margin: 0 auto;
+  max-width: var(--max-inner-container-width);
+  margin: 0 auto;
 }
 
 .c--view-data__container-title {
-    font-family: 'Roboto Condensed', sans-serif;
-    border-bottom: 1px solid var(--yellow);
-    line-height: 30px;
-    margin-bottom: 20px;
+  font-family: 'Roboto Condensed', sans-serif;
+  border-bottom: 1px solid var(--yellow);
+  line-height: 30px;
+  margin-bottom: 20px;
 }
 
 .classroom-selection {
-    position: inherit !important;
-    margin-right: 20px;
-    margin-bottom: 20px;
-    margin-left: 10px;
+  position: inherit !important;
+  margin-right: 20px;
+  margin-bottom: 20px;
+  margin-left: 10px;
 }
 
 .option-selectors {
-    position: inherit !important;
-    margin-left: 10px;
-    margin-right: 20px;
-    margin-bottom: 20px;
+  position: inherit !important;
+  margin-left: 10px;
+  margin-right: 20px;
+  margin-bottom: 20px;
 }
 
 .generate-button {
-    margin: 60px auto;
+  margin: 60px auto;
 }
 
 .dparam-selection {
-    flex-wrap: wrap;
+  flex-wrap: wrap;
 }
 
 .sparam-selection {
-    flex-wrap: wrap;
+  flex-wrap: wrap;
 }
 
 .demo-plots {
-    flex-flow: row wrap;
+  flex-flow: row wrap;
 }
 
 .contribution-plots {
-    flex-wrap: wrap;
+  flex-wrap: wrap;
 }
 
 .ratio-plots {
-    /*flex-wrap: wrap;*/
+  /*flex-wrap: wrap;*/
 }
 
 .individual-plots {
-    flex-wrap: wrap;
+  flex-wrap: wrap;
 }
 
 .classroom-selection:hover {
-    color: white;
-    opacity: .5;
+  color: white;
+  opacity: .5;
 }
 
 .report-head {
-    margin-right: 1em;
+  margin-right: 1em;
 }
 
 .report-dash-head {
-    border-bottom: 1px solid black;
+  border-bottom: 1px solid black;
 }
 
 .report-body {
-    visibility: hidden;
+  visibility: hidden;
 }
 
 .title.report-label-head {
-    margin-bottom: 1em;
-    font-family: "Roboto Slab";
+  margin-bottom: 1em;
+  font-family: "Roboto Slab";
 }
 
 .report-description {
-    margin-bottom: .5em;
+  margin-bottom: .5em;
 }
 
 .arc text {
-    font: 18px !important;
-    text-anchor: middle;
-    fill: black;
+  font: 18px !important;
+  text-anchor: middle;
+  fill: black;
 }
 
 .arc path {
-    stroke: #fff;
+  stroke: #fff;
 }
 
 .axis .domain {
-    display: none;
+  display: none;
 }
 
 .single-bar {
-    fill: steelblue;
+  fill: steelblue;
 }
 
 .single-bar:hover {
-    fill: brown;
+  fill: brown;
 }
 
 .axis--x path {
-    display: none;
+  display: none;
 }
 
 .stat-head,
 .stat-head:not(:last-child) {
-    margin-top: .5em;
-    margin-bottom: 0.5em;
-    /*text-decoration: underline;*/
+  margin-top: .5em;
+  margin-bottom: 0.5em;
+  /*text-decoration: underline;*/
 }
 
 .plots {
-    /*border-top: 1px solid black;*/
-    /*padding: 2em;*/
-    /*border-bottom: 1px dashed black;*/
-    margin-bottom: 1em;
+  /*border-top: 1px solid black;*/
+  /*padding: 2em;*/
+  /*border-bottom: 1px dashed black;*/
+  margin-bottom: 1em;
 }
 
 .ratio-plot > svg,
 .plots > svg {
-    /*margin: 10px;*/
-    /*box-sizing: border-box;*/
-    /*box-sizing: content-box;*/
-    border: 1px dashed grey;
+  /*margin: 10px;*/
+  /*box-sizing: border-box;*/
+  /*box-sizing: content-box;*/
+  border: 1px dashed grey;
 }
 
 .report {
-    max-width: 1240px;
-    margin: 0 auto;
+  max-width: 1240px;
+  margin: 0 auto;
 }
 
 .report__section {
-    page-break-after: always;
-    page-break-before: always;
-    margin-bottom: 4em;
+  page-break-after: always;
+  page-break-before: always;
+  margin-bottom: 4em;
 }
 
 .report__section-head {
-    margin: 2em 0;
+  margin: 2em 0;
 }
 
 .report__section-body {
-    margin: 1em 0;
+  margin: 1em 0;
 }
 
 .class-stats {
-    margin-bottom: 1em;
-    display: flex;
-    flex-flow: row wrap;
+  margin-bottom: 1em;
+  display: flex;
+  flex-flow: row wrap;
 }
 
 .category-summary {
-    margin-bottom: 1em;
-    flex: 0 0 100%;
+  margin-bottom: 1em;
+  flex: 0 0 100%;
 }
 
 .category-list {
-    flex: 0 1 250px;
-    /*width: 25%;*/
-    float: left;
-    margin-bottom: 1em;
-    height: 100%;
+  flex: 0 1 250px;
+  /*width: 25%;*/
+  float: left;
+  margin-bottom: 1em;
+  height: 100%;
 }
 
 .single-stat {
-    margin: 2px 0;
+  margin: 2px 0;
 }
 
 .demo-plots {
-    display: flex;
-    flex-flow: row wrap;
+  display: flex;
+  flex-flow: row wrap;
 }
 
 .demo-plots svg {
-    flex: 1 1 350px;
-    max-width: 400px;
-    /*max-width: 50%;*/
-    width: 100%;
-    /*height: auto;*/
-    margin: 0 auto;
-    border: 0;
-    display: block;
+  flex: 1 1 350px;
+  max-width: 400px;
+  /*max-width: 50%;*/
+  width: 100%;
+  /*height: auto;*/
+  margin: 0 auto;
+  border: 0;
+  display: block;
 
 }
 
 .vert-ind {
-    position: absolute;
-    top: 0;
-    left: 0;
-    margin: 0;
-    z-index: 100000;
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin: 0;
+  z-index: 100000;
 }
 
 .individual-plots {
-    position: relative;
-    overflow: auto;
+  position: relative;
+  overflow: auto;
 }
 
 .ratio-plot {
-    padding: 10px;
-    margin: 0;
-    display: inline-block;
-    overflow: auto;
-    max-width: 100%;
+  padding: 10px;
+  margin: 0;
+  display: inline-block;
+  overflow: auto;
+  max-width: 100%;
 }
 
 .print-only {
-    display: none;
+  display: none;
 }
 
 .print-report-header {
-    width: 100%;
-    /*background-color: #0a0a0a !important;*/
+  width: 100%;
+  /*background-color: #0a0a0a !important;*/
 }
 
 .equip-text {
-    font-family: 'Fredericka the Great', cursive;
-    color: white;
-    color: black;
-    font-size: 90px;
-    line-height: 100px;
+  font-family: 'Fredericka the Great', cursive;
+  color: white;
+  color: black;
+  font-size: 90px;
+  line-height: 100px;
 }
+
 .beta-text-wrapper {
-    position: relative;
-    height: 100px;
+  position: relative;
+  height: 100px;
 }
+
 .beta-text {
-    position: absolute;
-    left: -20px;
-    bottom: 10px
+  position: absolute;
+  left: -20px;
+  bottom: 10px
 }
 
 .print-report-header .equip-hands {
-    margin-left: 20px;
+  margin-left: 20px;
 }
 
 .report__section--print-first-page .report__section-head {
-    display: flex;
-    flex-flow: column nowrap;
-    margin-top: 3em;
+  display: flex;
+  flex-flow: column nowrap;
+  margin-top: 3em;
 }
 
 .report__section--print-first-page .report-label-head {
-    white-space: nowrap;
-    font-size: 3.5rem;
-    line-height: 5rem;
+  white-space: nowrap;
+  font-size: 3.5rem;
+  line-height: 5rem;
 }
 
 .report__section--print-first-page .report__section-body {
-    /*margin-top: 16rem;*/
-    margin-top: 2rem;
+  /*margin-top: 16rem;*/
+  margin-top: 2rem;
 }
 
 .classroom-summary div {
-    margin: 0;
+  margin: 0;
 }
 
 .classroom-summary li {
-    margin: 2px 0 2px 10px;
+  margin: 2px 0 2px 10px;
 }
 
 .report__section--print-first-page .classroom-summary ul {
-    margin: 0 0 0 8px;
+  margin: 0 0 0 8px;
 }
 
 .report__section--print-first-page .classroom-summary li {
-    margin: 2px 4px 2px 0px;
-    display: inline-block;
+  margin: 2px 4px 2px 0px;
+  display: inline-block;
 }
 
 .report__section--print-first-page .classroom-summary li:not(:last-child):after {
-    content: ',';
+  content: ',';
 }
 
 .report__section--columns {
-    display: flex;
-    flex-flow: row nowrap;
+  display: flex;
+  flex-flow: row nowrap;
 }
 
 @media print {
-    .no-print {
-        display: none;
-    }
-    .print-only {
-        display: block;
-    }
-    .report-body {
-        padding-top: 0;
-    }
-    header, .c--view-data-header__container, footer {
-        display: none !important;
-    }
-    @page {
-        size: landscape;
-    }
+  .no-print {
+    display: none;
+  }
+  .print-only {
+    display: block;
+  }
+  .report-body {
+    padding-top: 0;
+  }
+  header, .c--view-data-header__container, footer {
+    display: none !important;
+  }
+  @page {
+    size: landscape;
+  }
 
-    .print-only {
-        display: block;
-    }
-    .individual-plots {
-        zoom: 0.8;
-    }
-    .ratio-plots {
-        zoom: 0.65;
-    }
-    .demo-plots svg {
-        flex: 1 1 33%;
-        zoom: 0.75;
-    }
-    .demo-plots svg:nth-child(6n){
-        page-break-after: always;
-        margin-bottom: 100px
-    }
+  .print-only {
+    display: block;
+  }
+  .individual-plots {
+    zoom: 0.8;
+  }
+  .ratio-plots {
+    zoom: 0.65;
+  }
+  .demo-plots svg {
+    flex: 1 1 33%;
+    zoom: 0.75;
+  }
+  .demo-plots svg:nth-child(6n) {
+    page-break-after: always;
+    margin-bottom: 100px
+  }
 
-    .report__section--print-first-page .report__section__column:not(.print-only) {
-        padding: 30px 0;
-    }
+  .report__section--print-first-page .report__section__column:not(.print-only) {
+    padding: 30px 0;
+  }
 }
 
 .ratio-plot:nth-child(odd):not(:nth-child(1)) {
-    page-break-before: always;
-    position: relative;
+  page-break-before: always;
+  position: relative;
 }

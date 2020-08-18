@@ -1,4 +1,3 @@
-
 import {Sidebar} from '../../../../helpers/graph_sidebar';
 import {setupVis} from '../../../../helpers/timeline';
 import {console_log_conditional} from "/helpers/logging"
@@ -29,10 +28,10 @@ Template.interactiveReport.onCreated(function created() {
 });
 
 Template.interactiveReport.helpers({
-  environments: function() {
+  environments: function () {
     let envs = Environments.find().fetch();
     // let default_set = false;
-    envs = envs.map(function(env) {
+    envs = envs.map(function (env) {
       if (typeof env.envName === 'undefined') {
         env.envName = 'Loading...';
         env.disabled = 'disabled';
@@ -52,33 +51,37 @@ Template.interactiveReport.helpers({
     });
     return envs;
   },
-  environmentChosen: function() {
+  environmentChosen: function () {
     return !!(selectedEnvironment.get());
   },
-  observations: function() {
+  observations: function () {
     return getSelectedObservations();
   },
-  observationChosen: function() {
+  observationChosen: function () {
     // //console_log_conditional('observationChosen', obsOptions.get(), !!(obsOptions.get()));
 
     return !!(selectedObservations.get().length)
   },
-  demographics: function() {
+  demographics: function () {
     //console_log_conditional('getDemographics', getDemographics());
     return getDemographics();
   },
-  discourseparams: function() {
+  discourseparams: function () {
     return getDiscourseDimensions();
   },
-  demo_available: function() {
-    setTimeout(function(){$(".chosen-select").trigger("chosen:updated");}, 100);  // makes these elements respect the disabled attr on their selects
+  demo_available: function () {
+    setTimeout(function () {
+      $(".chosen-select").trigger("chosen:updated");
+    }, 100);  // makes these elements respect the disabled attr on their selects
     return !!selectedEnvironment.get() && !!(selectedObservations.get().length >= 1) ? '' : 'disabled'
   },
-  disc_available: function() {
-    setTimeout(function(){$(".chosen-select").trigger("chosen:updated");}, 100);  // makes these elements respect the disabled attr on their selects
+  disc_available: function () {
+    setTimeout(function () {
+      $(".chosen-select").trigger("chosen:updated");
+    }, 100);  // makes these elements respect the disabled attr on their selects
     return !!selectedEnvironment.get() && !!(selectedObservations.get().length >= 1) ? '' : 'disabled'
   },
-  dataset_types: function() {
+  dataset_types: function () {
     return [
       {
         id: 'contributions',
@@ -92,26 +95,26 @@ Template.interactiveReport.helpers({
       },
     ]
   },
-  selectedDatasetType: function() {
+  selectedDatasetType: function () {
     return selectedDatasetType.get();
   },
-  cache_info: function() {
+  cache_info: function () {
     return cacheInfo.get();
   },
-  loadingDataClass: function() {
+  loadingDataClass: function () {
     return loadingData.get();
   },
 });
 
 
-let clearGraph = function() {
+let clearGraph = function () {
   //console_log_conditional('clearing-graph');
   let timeline_selector = '.interactive-report__graph';
   $(timeline_selector + ' svg').remove();
 }
 
 
-var clearObservations = function() {
+var clearObservations = function () {
   clearParameters();
   selectedObservations.set([]);
   $('.option--observation').removeClass('selected');
@@ -119,7 +122,7 @@ var clearObservations = function() {
 
 };
 
-var clearParameters = function() {
+var clearParameters = function () {
   selectedXParameter.set(false);
   selectedYParameter.set(false);
   $('.option--discourse').removeClass('selected');
@@ -128,7 +131,7 @@ var clearParameters = function() {
 };
 
 Template.interactiveReport.events({
-  'change #env-select': function(e) {
+  'change #env-select': function (e) {
 
     let selected = $('option:selected', e.target);
     //console_log_conditional('env-select,', selected.val());
@@ -136,8 +139,8 @@ Template.interactiveReport.events({
     clearGraph();
     clearObservations();
     obsOptions.set(getObsOptions());
-    setTimeout(function() {
-      setupVis('vis-container', function() {
+    setTimeout(function () {
+      setupVis('vis-container', function () {
         $(window).trigger('updated-filters');
       }, obsOptions, selectedObservations, 'whole_class');
     }, 50);
@@ -146,48 +149,48 @@ Template.interactiveReport.events({
     $('#demo-select').val('');
     $('#disc-opt-select').val('');
   },
-    // 'click .option--all-observations': function(e) {
-    //   selectedObservations.set([])
-    //   $('.option--observation').removeClass('selected').click()
-    //
-    // },
-    // 'click .option--observation': function(e) {
-    //   // clearParameters();
-    //   let $target = $(e.target);
-    //   if (!$target.hasClass('selected')) {
-    //     // $('.option--observation').removeClass('selected');
-    //     $target.addClass('selected');
-    //   }
-    //   else {
-    //     $target.removeClass('selected');
-    //   }
-    //
-    //   let clickedObservationId = $(e.target).attr('data-obs-id');
-    //
-    //   let currentObsIds = selectedObservations.get();
-    //
-    //   if (currentObsIds.find(id => id === clickedObservationId)) {
-    //     currentObsIds.splice(currentObsIds.indexOf(clickedObservationId), 1);
-    //   }
-    //   else {
-    //     currentObsIds.push(clickedObservationId);
-    //   }
-    //
-    //   selectedObservations.set(currentObsIds);
-    //   updateReport();
-    //   // setTimeout(function(){$(window).trigger('updated-filters')}, 100) // We're also forcing a graph update when you select new observations, not just changing params
-    // },
-  'change #dataset-type-select': function(e) {
+  // 'click .option--all-observations': function(e) {
+  //   selectedObservations.set([])
+  //   $('.option--observation').removeClass('selected').click()
+  //
+  // },
+  // 'click .option--observation': function(e) {
+  //   // clearParameters();
+  //   let $target = $(e.target);
+  //   if (!$target.hasClass('selected')) {
+  //     // $('.option--observation').removeClass('selected');
+  //     $target.addClass('selected');
+  //   }
+  //   else {
+  //     $target.removeClass('selected');
+  //   }
+  //
+  //   let clickedObservationId = $(e.target).attr('data-obs-id');
+  //
+  //   let currentObsIds = selectedObservations.get();
+  //
+  //   if (currentObsIds.find(id => id === clickedObservationId)) {
+  //     currentObsIds.splice(currentObsIds.indexOf(clickedObservationId), 1);
+  //   }
+  //   else {
+  //     currentObsIds.push(clickedObservationId);
+  //   }
+  //
+  //   selectedObservations.set(currentObsIds);
+  //   updateReport();
+  //   // setTimeout(function(){$(window).trigger('updated-filters')}, 100) // We're also forcing a graph update when you select new observations, not just changing params
+  // },
+  'change #dataset-type-select': function (e) {
     let selected = $('option:selected', e.target);
     selectedDatasetType.set(selected.val());
     $(window).trigger('updated-filters') // We're also forcing a graph update when you select new observations, not just changing params
   },
-  'change .select__wrapper select': function(e) {
+  'change .select__wrapper select': function (e) {
     selectedXParameter.set(getXAxisSelection());
     selectedYParameter.set(getYAxisSelection());
     $(window).trigger('updated-filters')
   },
-  'click .swappable__button': function(e) {
+  'click .swappable__button': function (e) {
     let $target = $(e.target);
     if (!$target.hasClass('.swappable__button')) {
       $target = $target.parents('.swappable__button');
@@ -198,14 +201,14 @@ Template.interactiveReport.events({
     selectedYParameter.set(getYAxisSelection());
     $(window).trigger('updated-filters');
   },
-  'click .refresh-report': function(e) {
+  'click .refresh-report': function (e) {
     e.preventDefault();
     updateGraph(true)
   }
 });
 
 
-let getObsOptions = function(envId) {
+let getObsOptions = function (envId) {
   if (typeof envId === 'undefined') {
     envId = selectedEnvironment.get();
   }
@@ -219,7 +222,7 @@ let getObsOptions = function(envId) {
 }
 
 
-let getDemographics = function() {
+let getDemographics = function () {
   let envId = selectedEnvironment.get();
   if (!envId) {
     return []
@@ -227,26 +230,26 @@ let getDemographics = function() {
   return SubjectParameters.findOne({envId: envId}).parameters;
 };
 
-let getDiscourseDimensions = function() {
+let getDiscourseDimensions = function () {
   let envId = selectedEnvironment.get();
   if (!envId) {
     return []
   }
-  return SequenceParameters.findOne({envId:envId}).parameters;
+  return SequenceParameters.findOne({envId: envId}).parameters;
 };
 
-let getEnvironment = function() {
+let getEnvironment = function () {
   let envId = selectedEnvironment.get();
   return Environments.findOne({_id: envId})
 }
 
-let getSelectedObservations = function() {
+let getSelectedObservations = function () {
   let obsIds = selectedObservations.get();
   return Observations.find({_id: {$in: obsIds}}).fetch();
 }
 
 
-let getCurrentDiscourseSelection = function() {
+let getCurrentDiscourseSelection = function () {
   let selected = $('.param-select-form-item[data-param-type="discourse"] option:selected');
   if (selected.val()) {
     return selected.val();
@@ -256,7 +259,7 @@ let getCurrentDiscourseSelection = function() {
   }
 }
 
-let getCurrentDemographicSelection = function() {
+let getCurrentDemographicSelection = function () {
   let selected = $('.param-select-form-item[data-param-type="demographics"] option:selected');
   if (selected.val()) {
     return selected.val();
@@ -266,19 +269,19 @@ let getCurrentDemographicSelection = function() {
   }
 };
 
-let getXAxisSelection = function() {
+let getXAxisSelection = function () {
   return getAxisSelection('X');
 };
 
-let getYAxisSelection = function() {
+let getYAxisSelection = function () {
   return getAxisSelection('Y');
 };
 
-let xor = function(a, b) {
+let xor = function (a, b) {
   return (a || b) && !(a && b);
 };
 
-let getAxisSelection = function(axis) {
+let getAxisSelection = function (axis) {
   let $swappable = $('.swappable');
   let select_list;
 
@@ -315,7 +318,7 @@ let getAxisSelection = function(axis) {
 }
 
 
-let getParamOptions = function(param_type) {
+let getParamOptions = function (param_type) {
   if (param_type === "discourse") {
     return getDiscourseDimensions()
   }
@@ -331,14 +334,14 @@ let allParamsSelected = function () {
 };
 
 
-$(window).on('updated-filters', function() {
+$(window).on('updated-filters', function () {
   if (allParamsSelected()) {
     updateReport()
   }
 });
 
 let sidebar;
-let updateReport = function() {
+let updateReport = function () {
 
   let report_wrapper = $('.interactive-report-wrapper');
   if (!getXAxisSelection() || !getYAxisSelection()) {
@@ -368,7 +371,7 @@ let updateReport = function() {
   // update the report values
 }
 
-let updateGraph = async function(refresh) {
+let updateGraph = async function (refresh) {
   let dataParams = {
     envId: selectedEnvironment.get(),
     obsIds: selectedObservations.get(),
@@ -378,18 +381,22 @@ let updateGraph = async function(refresh) {
   }
 
   loadingData.set(true);
-  Meteor.call('getInteractiveReportData', dataParams, refresh, function(err, result) {
+  Meteor.call('getInteractiveReportData', dataParams, refresh, function (err, result) {
     if (err) {
       console_log_conditional('error', err);
       return;
     }
-    cacheInfo.set({createdAt: result.createdAt.toLocaleString(), timeToGenerate: result.timeToGenerate, timeToFetch: result.timeToFetch});
-loadingData.set(false);
+    cacheInfo.set({
+      createdAt: result.createdAt.toLocaleString(),
+      timeToGenerate: result.timeToGenerate,
+      timeToFetch: result.timeToFetch
+    });
+    loadingData.set(false);
     createGraph(result.data, '.interactive-report__graph', selectedDatasetType.get())
   })
 };
 
-let createGraph = function(contribData, containerSelector, dataset) {
+let createGraph = function (contribData, containerSelector, dataset) {
   var d3 = require('d3');
   let data,
     y_label = '';
@@ -446,30 +453,58 @@ let createGraph = function(contribData, containerSelector, dataset) {
   var z = d3.scaleOrdinal()
     .range(Object.values(key_colors));
 
-  x0.domain(data.map(function(d) { return d.column_name; }));
+  x0.domain(data.map(function (d) {
+    return d.column_name;
+  }));
   x1.domain(keys).rangeRound([0, x0.bandwidth()]);
-  y.domain([0, Math.max(2, d3.max(data, function(d) { return d3.max(keys, function(key) { return d[key]; }); }))]).nice();
+  y.domain([0, Math.max(2, d3.max(data, function (d) {
+    return d3.max(keys, function (key) {
+      return d[key];
+    });
+  }))]).nice();
 
   g.append("g")
     .selectAll("g")
     .data(data)
     .enter().append("g")
-    .attr("transform", function(d) { return "translate(" + x0(d.column_name) + ",0)"; })
+    .attr("transform", function (d) {
+      return "translate(" + x0(d.column_name) + ",0)";
+    })
     .attr("class", 'bar-group')
-    .attr("data-bar-group", function(d) { return d.column_name })
-    .attr("data-bar-group-type", function(d) { return contribData.x_axis_param_type })
+    .attr("data-bar-group", function (d) {
+      return d.column_name
+    })
+    .attr("data-bar-group-type", function (d) {
+      return contribData.x_axis_param_type
+    })
     .selectAll("rect")
-    .data(function(d) { return keys.map(function(key) { return {key: key, value: d[key]}; }); })
+    .data(function (d) {
+      return keys.map(function (key) {
+        return {key: key, value: d[key]};
+      });
+    })
     .enter().append("rect")
-    .attr("x", function(d) { return x1(d.key); })
-    .attr("y", function(d) { return y(d.value); })
+    .attr("x", function (d) {
+      return x1(d.key);
+    })
+    .attr("y", function (d) {
+      return y(d.value);
+    })
     .attr("width", x1.bandwidth())
-    .attr("height", function(d) { return height - y(d.value); })
-    .attr("fill", function(d) { return z(d.key); })
+    .attr("height", function (d) {
+      return height - y(d.value);
+    })
+    .attr("fill", function (d) {
+      return z(d.key);
+    })
     .attr("class", 'hover-bar')
-    .attr("data-bar-x", function(d) { return d.key })
-    .attr("data-bar-x-type", function(d) { return contribData.y_axis_param_type })
-    .on('mouseover', function() {
+    .attr("data-bar-x", function (d) {
+      return d.key
+    })
+    .attr("data-bar-x-type", function (d) {
+      return contribData.y_axis_param_type
+    })
+    .on('mouseover', function () {
       // hover on
       let group = $(this).parent().attr('data-bar-group');
       let group_type = $(this).parent().attr('data-bar-group-type');
@@ -477,28 +512,32 @@ let createGraph = function(contribData, containerSelector, dataset) {
       let bar_type = $(this).attr('data-bar-x-type');
       buildBarTooltipSlide(group, group_type, bar, bar_type, contribData)
     })
-    .on('mouseout', function() {
-        // sidebar.setCurrentPanel('start', 250)
+    .on('mouseout', function () {
+      // sidebar.setCurrentPanel('start', 250)
       // hover out
 
     })
-    // text labels for 0s
+  // text labels for 0s
 
   g.selectAll('g.bar-group')
     .selectAll('text')
-    .data(function(d) { return keys.map(function(key) { return {key: key, value: d[key]}; }); })
+    .data(function (d) {
+      return keys.map(function (key) {
+        return {key: key, value: d[key]};
+      });
+    })
     .enter()
     .append('text')
-    .text(function(d) {
+    .text(function (d) {
       if (d.value === 0) {
         return '0';
       }
     })
     .attr("text-anchor", "middle")
-    .attr("x", function(d) {
+    .attr("x", function (d) {
       return x1(d.key) + x1.bandwidth() / 2;
     })
-    .attr("y", function(d) {
+    .attr("y", function (d) {
       return y(d.value) - 6;
     })
     .attr("font-family", "sans-serif")
@@ -506,7 +545,7 @@ let createGraph = function(contribData, containerSelector, dataset) {
     .attr("fill", "black");
 
   let xAxis = d3.axisBottom(x0)
-    .tickFormat(function(d, i) {
+    .tickFormat(function (d, i) {
       if (contribData.y_axis_param_type === 'demographics') {
         return `${d}(n = ${contribData.x_axis_n_values[d].n})`
       }
@@ -514,7 +553,7 @@ let createGraph = function(contribData, containerSelector, dataset) {
         return `${d}`
       }
     })
-    // .attr('n', function(d) {return contribData.x_axis_n_values[d].n});
+  // .attr('n', function(d) {return contribData.x_axis_n_values[d].n});
 
   g.append("g")
     .attr("class", "axis axis--x")
@@ -522,11 +561,11 @@ let createGraph = function(contribData, containerSelector, dataset) {
     .call(xAxis)
     //
     .selectAll('.tick text')
-    .call(function(text) {
+    .call(function (text) {
       text.each(function () {
         let tick_text = d3.select(this),
-            y = tick_text.attr("y"),
-            dy = parseFloat(tick_text.attr("dy"));
+          y = tick_text.attr("y"),
+          dy = parseFloat(tick_text.attr("dy"));
         let text = tick_text.text();
         let rows = /(^.+)(\(n = \d+\)$)/.exec(text);
 
@@ -536,7 +575,7 @@ let createGraph = function(contribData, containerSelector, dataset) {
           tick_text.append('tspan').attr('x', 0).attr('y', y).attr('dy', dy + 1.1 + 'em').text(rows[2]).attr('class', 'n-value');
         }
       });
-      text.each(function() {
+      text.each(function () {
         let $this = $(this);
         if (x0.bandwidth() < $this[0].getBBox().width) {
           $('.axis--x .tick text').attr('font-size', '14px');
@@ -558,8 +597,8 @@ let createGraph = function(contribData, containerSelector, dataset) {
     y_a =
       g.append("g")
         .attr("class", "axis axis--y")
-        .call(d3.axisLeft(y).tickFormat(function(e){
-            if(Math.floor(e) !== e) {
+        .call(d3.axisLeft(y).tickFormat(function (e) {
+            if (Math.floor(e) !== e) {
               return;
             }
             return e;
@@ -585,7 +624,7 @@ let createGraph = function(contribData, containerSelector, dataset) {
     .attr("transform", "rotate(-90)")
     .text(y_label);
 
-  let toggleTickDirection = function(tick) {
+  let toggleTickDirection = function (tick) {
     if ($(tick).attr('x2') === "-6") {
       $(tick).attr('x2', width)
     }
@@ -597,7 +636,7 @@ let createGraph = function(contribData, containerSelector, dataset) {
   if (selectedDatasetType.get() === 'equity') {
     let center_line = $('.axis--y g').filter((idx, item) => parseFloat($('text', item).text()) === 1.);
     // toggleTickDirection($('line', center_line[0]));
-    $(center_line[0]).on('click', function(tick) {
+    $(center_line[0]).on('click', function (tick) {
       toggleTickDirection($('line', center_line[0]));
     });
     $(center_line[0]).addClass('clickable-tick')
@@ -605,7 +644,7 @@ let createGraph = function(contribData, containerSelector, dataset) {
 }
 
 
-let buildBarTooltipSlide = function(group, group_type, bar, bar_type, contribData) {
+let buildBarTooltipSlide = function (group, group_type, bar, bar_type, contribData) {
   let title = `<span class="group">${group}</span> <span class="deemphasize">x</span> <span class="bar">${bar}</span>`;
 
   let chosen_demo = (group_type === 'demographics') ? group : bar;
@@ -613,7 +652,7 @@ let buildBarTooltipSlide = function(group, group_type, bar, bar_type, contribDat
 
   let students_in_demo = contribData.students.filter(student => student.info.demographics[contribData.selected_demographic] === chosen_demo);
 
-  let students_in_demo_contribs_updated = students_in_demo.map(function(student) {
+  let students_in_demo_contribs_updated = students_in_demo.map(function (student) {
     student.relevant_contributions = student.contributions.filter(contrib => contrib[contribData.selected_discourse_dimension] === chosen_discourse);
     return student;
   });
@@ -623,14 +662,14 @@ let buildBarTooltipSlide = function(group, group_type, bar, bar_type, contribDat
   let non_contributing_students = students_in_demo_contribs_updated.filter(student => student.relevant_contributions.length === 0);
 
   let max_contribs_contributing = Math.max(...contributing_students.map(student => student.relevant_contributions.length));
-  let contributing_students_html = contributing_students.sort((a, b) => b.relevant_contributions.length - a.relevant_contributions.length).map(function(student) {
+  let contributing_students_html = contributing_students.sort((a, b) => b.relevant_contributions.length - a.relevant_contributions.length).map(function (student) {
     let max_contribs_percent = (student.relevant_contributions.length / max_contribs_contributing) * 100 + '%';
     return `<span class="student-bar student-bar--contributor" style="background: linear-gradient(to right, rgba(15,129,204,0.15) 0%, rgba(15,129,204,0.15) ${max_contribs_percent}, rgba(15,129,204,0.02) ${max_contribs_percent}, rgba(15,129,204,0.02) 100%)">
     ${student.info.name} (${student.relevant_contributions.length})
     </span>`
   }).join('');
 
-  let non_contributing_students_html = non_contributing_students.map(function(student) {
+  let non_contributing_students_html = non_contributing_students.map(function (student) {
     return `<span class="student-bar student-bar--non-contributor">${student.info.name} (0)</span>`
   }).join('');
 
@@ -648,7 +687,7 @@ let buildBarTooltipSlide = function(group, group_type, bar, bar_type, contribDat
 //   $('.interactive-report__title').html(title)
 // }
 
-let updateKey = function(key_wrapper) {
+let updateKey = function (key_wrapper) {
   var d3 = require('d3');
   let y_axis = getYAxisSelection();
   let color_function;
@@ -659,7 +698,7 @@ let updateKey = function(key_wrapper) {
     color_function = d3.interpolatePlasma
   }
   let label_colors = getLabelColors(y_axis.selected_option.option_list, color_function);
-  let key_chunks = Object.keys(label_colors).map(function(label) {
+  let key_chunks = Object.keys(label_colors).map(function (label) {
     let color = label_colors[label]
     return `<span class="key--label"><span class="key--color" style="background-color: ${color}"></span><span class="key--text">${label}</span></span>`
   })
@@ -667,7 +706,6 @@ let updateKey = function(key_wrapper) {
   let html = `${key_chunks.join('')}`;
   $(key_wrapper).html(html)
 }
-
 
 
 let available_colors = [
@@ -716,7 +754,7 @@ let avail_colors_viridis = [
 //   });
 //   return label_colors
 // }
-let getLabelColors = function(labels, color_function) {
+let getLabelColors = function (labels, color_function) {
   var d3 = require('d3');
   if (typeof color_function === 'undefined') {
     color_function = d3.interpolateViridis;
@@ -725,7 +763,7 @@ let getLabelColors = function(labels, color_function) {
   let spacing = 1 / labels.length;
 
   let label_colors = {};
-  let _ = labels.map(function(label, index) {
+  let _ = labels.map(function (label, index) {
     if (typeof label_colors[label] === 'undefined') {
       label_colors[label] = color_function(index * spacing);
     }

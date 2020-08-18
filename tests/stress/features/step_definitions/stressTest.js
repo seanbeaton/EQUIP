@@ -4,18 +4,20 @@ import {console_log_conditional} from "../../../../helpers/logging";
 var {Then} = require('cucumber');
 
 var myStepDefinitionsWrapper = function () {
-  this.Given(/^I am on the staging site$/, function(callback) {
+  this.Given(/^I am on the staging site$/, function (callback) {
     browser.url('https://data-obs-staging.herokuapp.com/');
     callback()
   });
-  this.Given(/^I am on the local site$/, function(callback) {
+  this.Given(/^I am on the local site$/, function (callback) {
     browser.url('http://localhost:3005');
     callback()
   });
 
-  this.When(/^If I'm not logged in, I create an account with username prefix "([^"]*)" and password "([^"]*)"$/, function(user, pass, callback) {
+  this.When(/^If I'm not logged in, I create an account with username prefix "([^"]*)" and password "([^"]*)"$/, function (user, pass, callback) {
 
-    let current_user = browser.executeAsync((done) => {done(Meteor.userId())});
+    let current_user = browser.executeAsync((done) => {
+      done(Meteor.userId())
+    });
     console_log_conditional(current_user);
     if (!current_user.value) {
       console_log_conditional('Not logged in, creating account')
@@ -25,7 +27,7 @@ var myStepDefinitionsWrapper = function () {
   });
 
   this.Then(/^A classroom exists with the name "([^"]*)"$/, function (classroom, callback) {
-    let env_found = browser.execute(function(classroom_name) {
+    let env_found = browser.execute(function (classroom_name) {
       return (Environments.findOne({envName: classroom_name}) !== undefined);
     }, classroom);
     assert(env_found);
@@ -72,7 +74,7 @@ var myStepDefinitionsWrapper = function () {
     let student_box = browser.$('.c--student-body__container-drag-label=' + name);
     student_box.waitForExist(2000);
 
-    let res = browser.executeAsync(function(name, demo1, demo1val, demo2, demo2val, cb) {
+    let res = browser.executeAsync(function (name, demo1, demo1val, demo2, demo2val, cb) {
       let student_search = {
         'info.name': name
       }
@@ -89,7 +91,7 @@ var myStepDefinitionsWrapper = function () {
 };
 
 
-let createAccount = function(username, password) {
+let createAccount = function (username, password) {
   delayedGo('signup');
   browser.$('#at-field-username').waitForExist(4000);
   username = username + ("" + Math.floor(Math.random() * Math.floor(99999))).padStart(5, '0');
@@ -109,7 +111,7 @@ let createAccount = function(username, password) {
   browser.pause(2250);
 }
 
-let logInAccount = function(username, password) {
+let logInAccount = function (username, password) {
   browser.$('#at-field-username_and_email').waitForExist(4000);
   browser.$('#at-field-username_and_email').setValue(username);
   browser.$('#at-field-password').setValue(password);
@@ -120,9 +122,8 @@ let logInAccount = function(username, password) {
 }
 
 
-
-let signOut = function() {
-  browser.executeAsync(function(done) {
+let signOut = function () {
+  browser.executeAsync(function (done) {
     Meteor.logout(function () {
       Router.go('landingPage');
       done()
@@ -130,18 +131,17 @@ let signOut = function() {
   })
 }
 
-let delayedGo = function(loc) {
-  browser.executeAsync(function(route, done) {
+let delayedGo = function (loc) {
+  browser.executeAsync(function (route, done) {
     Router.go(route);
     setTimeout(done, 200)
   }, loc)
 }
 
-let getMethods = function(obj)
-{
+let getMethods = function (obj) {
   var res = [];
-  for(var m in obj) {
-    if(typeof obj[m] == "function") {
+  for (var m in obj) {
+    if (typeof obj[m] == "function") {
       res.push(m)
     }
   }
@@ -149,7 +149,7 @@ let getMethods = function(obj)
 }
 
 
-let xor = function(a, b) {
+let xor = function (a, b) {
   return (a && !b) || (!a && b)
 };
 

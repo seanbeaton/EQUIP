@@ -1,8 +1,7 @@
-
 let percent_loaded = new ReactiveVar(0);
 
 Template.loading.helpers({
-  percent_loaded: function() {
+  percent_loaded: function () {
     if (percent_loaded.get()) {
       return percent_loaded.get()
     }
@@ -10,8 +9,8 @@ Template.loading.helpers({
   }
 })
 
-Template.loading.onRendered(function() {
-  setInterval(function() {
+Template.loading.onRendered(function () {
+  setInterval(function () {
     let pct_loaded = percent_loaded.get()
     let added_amount = 2;
     if (pct_loaded > 80) {

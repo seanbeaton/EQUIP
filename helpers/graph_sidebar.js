@@ -1,5 +1,3 @@
-
-
 class Sidebar {
   constructor(selector, levels) {
     this.levels = levels;
@@ -9,14 +7,17 @@ class Sidebar {
     this._currentPanelIndex = 0;
     this._currentPanelID = levels[0];
     let panels = {};
-    Object.keys(this.levels).forEach(index => {panels[levels[index]] = {html: '', title: '', id: levels[index], index: index}});
+    Object.keys(this.levels).forEach(index => {
+      panels[levels[index]] = {html: '', title: '', id: levels[index], index: index}
+    });
     this.panels = panels;
     this.panelChangeTimeout = false;
     let that = this;
-    Object.keys(this.panels).forEach(function(id) {
+    Object.keys(this.panels).forEach(function (id) {
       that.createPanel(that.panels[id])
     })
   }
+
   setCurrentPanel(panel_id, timeout) {
     if (this.panelChangeTimeout) {
       clearTimeout(this.panelChangeTimeout);
@@ -24,7 +25,7 @@ class Sidebar {
     }
     if (typeof timeout !== 'undefined') {
       let that = this;
-      this.panelChangeTimeout = setTimeout(function() {
+      this.panelChangeTimeout = setTimeout(function () {
         that.setCurrentPanel(panel_id)
       }, timeout);
       return;
@@ -34,7 +35,7 @@ class Sidebar {
       return;
     }
     let that = this;
-    Object.keys(this.levels).forEach(function(index) {
+    Object.keys(this.levels).forEach(function (index) {
       if (that.levels[index] === panel_id) {
         that._currentPanelIndex = index
       }
@@ -44,12 +45,14 @@ class Sidebar {
     this._currentPanelID = panel_id;
     this.animateToCurrentPanel()
   }
+
   setSlide(panel_id, html, title) {
     this.panels[panel_id].html = html;
     this.panels[panel_id].title = title;
     this.updatePanelContent(this.panels[panel_id]);
     this.setCurrentPanel(panel_id);
   }
+
   updatePanelContent(panel) {
     let html = `
     <div class="panel__interior">
@@ -59,6 +62,7 @@ class Sidebar {
     `
     $('.sidebar-panel[data-panel-id="' + panel.id + '"]', this.container).html(html)
   }
+
   createPanel(panel) {
     let html = `
     <div class="sidebar-panel" data-panel-id="${panel.id}" style="order: ${panel.index}"></div>
@@ -66,6 +70,7 @@ class Sidebar {
     this.container.append(html);
     this.updatePanelContent(panel);
   }
+
   animateToCurrentPanel() {
     $('.panels-flex').css('margin-left', `-${this._currentPanelIndex}00%`)
   }

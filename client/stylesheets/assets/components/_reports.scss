@@ -6,6 +6,7 @@ $padding: 16px;
   padding: $padding;
   margin: 20px auto;
   background: white;
+
   p {
     font-size: 16px;
   }
@@ -25,6 +26,7 @@ div {
   }
 
 }
+
 .report-select__options {
   display: flex;
   flex-flow: row wrap;
@@ -32,6 +34,7 @@ div {
   width: 100%;
   padding: 16px 0 16px;
 }
+
 .report-select__option {
   display: block;
   margin: 4px;
@@ -55,15 +58,18 @@ div {
     padding: 24px 8px;
 
   }
+
   .option__example-image {
     background-color: var(--light-gray);
     display: block;
     padding: 8px;
+
     img {
       max-width: 100%;
       display: block;
     }
   }
+
   &.report-select__option--spacer {
     cursor: default;
   }
@@ -84,6 +90,7 @@ div {
   font-size: 20px;
   line-height: 1;
   padding: 2px 16px;
+
   .deemphasize {
     opacity: 0.6;
   }
@@ -101,6 +108,7 @@ div {
 .param-select--labelled {
   display: flex;
   align-items: center;
+
   > .report-select__options {
     padding-left: 8px;
     padding-right: 8px;
@@ -141,9 +149,11 @@ div {
 .swappable {
   display: flex;
   flex-flow: row nowrap;
+
   &.swapped {
     flex-flow: row-reverse nowrap;
   }
+
   .swappable__button {
     @include fa-button($size: 20px);
     font-size: 16px;
@@ -165,6 +175,7 @@ div {
   display: flex;
   flex-flow: column nowrap;
 }
+
 //
 //.swappable {
 //  &:not(.swapped) {
@@ -211,6 +222,7 @@ div {
 
 .report-wrapper {
   position: relative;
+
   &.report-wrapper--loading {
     &:before {
       content: '';
@@ -219,10 +231,11 @@ div {
       right: 0;
       top: 0;
       bottom: 0;
-      background-color: rgba(255,255,255,0.7);
+      background-color: rgba(255, 255, 255, 0.7);
       z-index: 9999;
       pointer-events: none;
     }
+
     @include loading-spinner;
   }
 }

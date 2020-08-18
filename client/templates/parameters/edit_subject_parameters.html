@@ -7,7 +7,8 @@
             <div id="obsMade"></div>
         {{ else }}
             <div class="c--discourse-header__links-container">
-                <p id="load-default-demo" class="u--header-links c--student-discourse__links c--discourse-header__links">Load Defaults</p>
+                <p id="load-default-demo"
+                   class="u--header-links c--student-discourse__links c--discourse-header__links">Load Defaults</p>
                 <p class="u--header-links c--discourse-header__links export-button">Export</p>
                 <p class="u--header-links c--discourse-header__links import-button">Import</p>
             </div>
@@ -23,7 +24,9 @@
                 <li class="c--discourse-body__container-list-current">{{environment.envName}} - Demographics</li>
             </ul>
             <p>
-                Demographics are social markers like race, gender, etc. Click on the “load defaults” button to display and use a basic set of demographics commonly used by many EQUIP users. Customize these as appropriate, separating each option with a comma. Click the “Save” button when you are finished.
+                Demographics are social markers like race, gender, etc. Click on the “load defaults” button to display
+                and use a basic set of demographics commonly used by many EQUIP users. Customize these as appropriate,
+                separating each option with a comma. Click the “Save” button when you are finished.
             </p>
             <a href="{{pathFor 'help'}}">
                 <div class="help-icon"></div>
@@ -44,10 +47,15 @@
                     {{#each param in params.parameters }}
                         <div class="single-param control myParam{{@index}}">
                             <label class="o--form-labels">Social Marker:</label>
-                            <input class="parameter__label parameter__field o--form-input" type="text" data-param-index="{{@index}}" name="label{{@index}}" value="{{param.label}}">
+                            <input class="parameter__label parameter__field o--form-input" type="text"
+                                   data-param-index="{{@index}}" name="label{{@index}}" value="{{param.label}}">
                             <label class="o--form-labels">Options:</label>
-                            <input class="parameter__options parameter__field o--form-input" type="text" data-param-index="{{@index}}" style="margin-bottom: .25em" name="parameter{{@index}}" value="{{joined param.options}}">
-                            <div class="param-action-wrapper"><span class="o--toggle-links c--discourse-form__remove-button remove-param" data-remove-index="{{@index}}">Remove</span></div>
+                            <input class="parameter__options parameter__field o--form-input" type="text"
+                                   data-param-index="{{@index}}" style="margin-bottom: .25em" name="parameter{{@index}}"
+                                   value="{{joined param.options}}">
+                            <div class="param-action-wrapper"><span
+                                    class="o--toggle-links c--discourse-form__remove-button remove-param"
+                                    data-remove-index="{{@index}}">Remove</span></div>
                         </div>
                     {{/each}}
                 {{/if}}
@@ -57,7 +65,8 @@
             {{else}}
                 <div class="c--discourse-form__button-container">
                     <button id="add-demo-param" class="o--standard-button c--discourse-form__save-button">Add</button>
-                    <button id="save-demo-params" class="o--standard-button c--discourse-form__save-button">Save</button>
+                    <button id="save-demo-params" class="o--standard-button c--discourse-form__save-button">Save
+                    </button>
                 </div>
             {{/if }}
         </div>
@@ -65,20 +74,30 @@
 
 
     <!-- HELP MODAL -->
-  <div id="help-env-modal" class="modal">
-    <div class="modal-background"></div>
-    <div class="modal-card">
-      <header class="modal-card-head">
-        <p class="modal-card-title">How to Work With Parameters</p>
-        <button id="help-close-modal" class="delete"></button>
-      </header>
-      <section class="modal-card-body">
-      There are two types of parameters to set up. Demographic parameters are social markers like race, gender, etc. Discourse dimensions are the aspects of classroom talk that you wish to track, like the length of talk or types of things students say. For both of these parameter types, you may click on "load defaults" to get a basic set of parameters to work with. Modify these as appropriate, separating each level of the paramter with a comma. Remember, you must click "save parameters" when you are finished for your changes to remain. When you are working with observation parameters, you can create a special type of parameter called a "toggle." This is for something that stays relatively constant throughout a class session. For instance, you might wish to track if the classroom is in "whole class" or "small group" mode. You could make this a toggle, so that you do not need to code this everytime a student contributes. Instead, you can just click on the toggle whenever it changes, and it will be coded automatically.
-      </section>
-      <footer class="modal-card-foot">
-        <a class="button">Cancel</a>
-      </footer>
+    <div id="help-env-modal" class="modal">
+        <div class="modal-background"></div>
+        <div class="modal-card">
+            <header class="modal-card-head">
+                <p class="modal-card-title">How to Work With Parameters</p>
+                <button id="help-close-modal" class="delete"></button>
+            </header>
+            <section class="modal-card-body">
+                There are two types of parameters to set up. Demographic parameters are social markers like race,
+                gender, etc. Discourse dimensions are the aspects of classroom talk that you wish to track, like the
+                length of talk or types of things students say. For both of these parameter types, you may click on
+                "load defaults" to get a basic set of parameters to work with. Modify these as appropriate, separating
+                each level of the paramter with a comma. Remember, you must click "save parameters" when you are
+                finished for your changes to remain. When you are working with observation parameters, you can create a
+                special type of parameter called a "toggle." This is for something that stays relatively constant
+                throughout a class session. For instance, you might wish to track if the classroom is in "whole class"
+                or "small group" mode. You could make this a toggle, so that you do not need to code this everytime a
+                student contributes. Instead, you can just click on the toggle whenever it changes, and it will be coded
+                automatically.
+            </section>
+            <footer class="modal-card-foot">
+                <a class="button">Cancel</a>
+            </footer>
+        </div>
     </div>
-  </div>
 
 </template>

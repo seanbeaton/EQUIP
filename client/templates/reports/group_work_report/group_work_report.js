@@ -1,16 +1,13 @@
-
-import {console_log_conditional, console_table_conditional} from "/helpers/logging"
-
-import {getStudents, getStudent} from "/helpers/students";
+import {console_log_conditional} from "/helpers/logging"
 import {setupVis} from "/helpers/timeline";
 // import {getDiscourseOptionsForDimension, getObservations} from "/helpers/graphs";
 import {
-  getDiscourseDimensions, studentContribGraph,
-  getDiscourseOptionsForDimension, getObservations,
+  getDiscourseDimensions,
+  getDiscourseOptionsForDimension,
+  getObservations,
+  studentContribGraph,
   studentTimeGraph
 } from "../../../../helpers/graphs";
-import {heatmapReportSortDemoChosen, heatmapReportSortType} from "../selection_elements";
-import {activeEnvId} from "../../environments/environment_list";
 
 const obsOptions = new ReactiveVar([]);
 const selectedEnvironment = new ReactiveVar(false);
@@ -47,7 +44,7 @@ Template.groupWorkReport.onCreated(function created() {
 });
 
 Template.groupWorkReport.events({
-  'change #env-select': function(e) {
+  'change #env-select': function (e) {
     let selected = $('option:selected', e.target);
     clearGraph();
 
@@ -55,8 +52,8 @@ Template.groupWorkReport.events({
     obsOptions.set(getObsOptions());
     students.set(Subjects.find({envId: selectedEnvironment.get()}).fetch());
     console_log_conditional('students', students.get());
-    setTimeout(function() {
-      setupVis('vis-container', function() {
+    setTimeout(function () {
+      setupVis('vis-container', function () {
         if (selectedObservations.get().length === 0) {
           selectedStudent.set(false);
         }
@@ -69,23 +66,23 @@ Template.groupWorkReport.events({
 
     $('#group-work-demographic').val('');
   },
-  'change #group-work-demographic': function(e) {
+  'change #group-work-demographic': function (e) {
     let selected = $('option:selected', e.target);
     selectedDemographic.set(selected.val());
     updateGraph();
   },
-  'change #student-spotlight__discourse-select': function(e) {
+  'change #student-spotlight__discourse-select': function (e) {
     let selected = $('option:selected', e.target);
     selectedSpotlightDimension.set(selected.val());
     updateStudentContribGraph();
     // updateStudentTimeGraph();
   },
-  'click .student-spotlight__close': function() {
+  'click .student-spotlight__close': function () {
     selectedStudent.set(false);
     latestDataRequest.set(false)
     loadingData.set(false)
   },
-  'change #disc-select': function(e) {
+  'change #disc-select': function (e) {
     let selected = $('option:selected', e.target);
     selectedDiscourseDimension.set(selected.val());
     $('#disc-opt-select').val('');
@@ -93,27 +90,27 @@ Template.groupWorkReport.events({
     selectedDiscourseOption.set(false);
     updateGraph();
   },
-  'change #disc-opt-select': function(e) {
+  'change #disc-opt-select': function (e) {
     let selected = $('option:selected', e.target);
     //console_log_conditional('disc-opt-select,', selected.val());
     selectedDiscourseOption.set(selected.val());
     updateGraph()
   },
-  'click .graph-display-type__option': function(e) {
+  'click .graph-display-type__option': function (e) {
     e.preventDefault();
     groupDisplayType.set($(e.target).attr('data-d' +
       'isplay-graph-type'))
     updateGraph()
   },
-  'click .refresh-report': function(e) {
+  'click .refresh-report': function (e) {
     e.preventDefault();
     updateGraph(true)
   },
-  'click .refresh-report-student-contrib': function(e) {
+  'click .refresh-report-student-contrib': function (e) {
     e.preventDefault();
     updateStudentContribGraph(true)
   },
-  'click .refresh-report-student-time': function(e) {
+  'click .refresh-report-student-time': function (e) {
     e.preventDefault();
     updateStudentTimeGraph(true)
   },
@@ -121,9 +118,9 @@ Template.groupWorkReport.events({
 
 
 Template.groupWorkReport.helpers({
-  environments: function() {
+  environments: function () {
     let envs = Environments.find().fetch();
-    envs = envs.map(function(env) {
+    envs = envs.map(function (env) {
       if (typeof env.envName === 'undefined') {
         env.envName = 'Loading...';
         env.disabled = 'disabled';
@@ -147,63 +144,64 @@ Template.groupWorkReport.helpers({
     });
     return envs;
   },
-  disc_options_available: function() {
-    setTimeout(function(){$(".chosen-select").trigger("chosen:updated");}, 100);  // makes these elements respect the disabled attr on their selects
+  disc_options_available: function () {
+    setTimeout(function () {
+      $(".chosen-select").trigger("chosen:updated");
+    }, 100);  // makes these elements respect the disabled attr on their selects
     return !!selectedDiscourseDimension.get() && !!selectedEnvironment.get() && !!(selectedObservations.get().length >= 1) ? '' : 'disabled'
   },
-  selected_discourse_options: function() {
+  selected_discourse_options: function () {
     return getDiscourseOptionsForDimension(selectedEnvironment.get(), selectedDiscourseDimension.get());
   },
-  environmentChosen: function() {
+  environmentChosen: function () {
     return !!(selectedEnvironment.get());
   },
-  observationChosen: function() {
+  observationChosen: function () {
     return !!(selectedObservations.get().length >= 1)
   },
-  multipleObservationsChosen: function() {
+  multipleObservationsChosen: function () {
     return !!(selectedObservations.get().length >= 2)
   },
-  groupDisplayType: function() {
+  groupDisplayType: function () {
     return groupDisplayType.get()
   },
-  environment: function() {
+  environment: function () {
     return getEnvironment();
   },
-  observations: function() {
+  observations: function () {
     return getObservations(selectedObservations.get());
   },
-  students: function() {
+  students: function () {
     return students.get();
   },
-  selectedStudent: function() {
+  selectedStudent: function () {
     return selectedStudent.get();
   },
-  histogramDemoOptionSelected: function() {
+  histogramDemoOptionSelected: function () {
     return !!(selectedDemographic.get())
   },
-  demographics: function() {
+  demographics: function () {
     return getDemographics()
   },
-  discourseparams: function() {
+  discourseparams: function () {
     return getDiscourseDimensions(selectedEnvironment.get());
   },
-  cache_info: function() {
+  cache_info: function () {
     return cacheInfo.get();
   },
-  cache_info_student_time: function() {
+  cache_info_student_time: function () {
     return cacheInfoStudentTime.get();
   },
-  cache_info_student_contrib: function() {
+  cache_info_student_contrib: function () {
     return cacheInfoStudentContrib.get();
   },
-  loadingDataClass: function() {
+  loadingDataClass: function () {
     return loadingData.get();
   },
 })
 
 
-
-let updateGraph = function(refresh) {
+let updateGraph = function (refresh) {
   if (selectedObservations.get().length < 1) {
     return;
   }
@@ -228,7 +226,7 @@ let updateGraph = function(refresh) {
     console_log_conditional(new Error().stack);
     console_log_conditional('setting latest data req', currentDataRequest)
 
-    Meteor.call('getGroupWorkData', heatmap_params, refresh, function(err, result) {
+    Meteor.call('getGroupWorkData', heatmap_params, refresh, function (err, result) {
       if (err) {
         console_log_conditional('error', err);
         return;
@@ -255,7 +253,7 @@ let updateGraph = function(refresh) {
   }
 }
 
-let showData = function(result) {
+let showData = function (result) {
   let wrapper = $('.group-work-report-wrapper');
   let selector = '#group-work-d3-wrapper';
 
@@ -268,15 +266,19 @@ let showData = function(result) {
     updateGroups(result.data, selector)
   }
 
-  cacheInfo.set({createdAt: result.createdAt.toLocaleString(), timeToGenerate: result.timeToGenerate, timeToFetch: result.timeToFetch});
+  cacheInfo.set({
+    createdAt: result.createdAt.toLocaleString(),
+    timeToGenerate: result.timeToGenerate,
+    timeToFetch: result.timeToFetch
+  });
   loadingData.set(false);
   console_log_conditional('result.createdAt.toLocaleString()', result.createdAt.toLocaleString());
 }
 
-let getStudentPadding = function(count, max) {
+let getStudentPadding = function (count, max) {
   let max_padding = 12;
   // the higher the count, the smaller the padding. max of 12 px.
-  console_log_conditional('max, count', max ,count);
+  console_log_conditional('max, count', max, count);
   if (max === 0) {
     return max_padding + 'px';
   }
@@ -284,11 +286,11 @@ let getStudentPadding = function(count, max) {
   return padding + 'px ' + (padding * 2) + 'px';
 }
 
-let getStudentTotalContribs = function(student) {
+let getStudentTotalContribs = function (student) {
   let disc_option_active = selectedDiscourseOption.get();
   // false is not set, '' is "- All -"
   if (disc_option_active === false || disc_option_active === '') {
-      return student.total_contributions
+    return student.total_contributions
   }
   else {
     console_log_conditional('student', student);
@@ -300,7 +302,7 @@ let getStudentTotalContribs = function(student) {
       .count;
   }
 };
-let getGroupTotalContribs = function(group) {
+let getGroupTotalContribs = function (group) {
   let disc_option_active = selectedDiscourseOption.get();
   // false is not set, '' is "- All -"
   if (disc_option_active === false || disc_option_active === '') {
@@ -311,18 +313,18 @@ let getGroupTotalContribs = function(group) {
     return group.sequences
       .filter(c => c.info.parameters[selectedDiscourseDimension.get()] === disc_option_active)
       .length
-      // .option_counts
-      // .find(o => o.option === disc_option_active)
-      // .count;
+    // .option_counts
+    // .find(o => o.option === disc_option_active)
+    // .count;
   }
 };
 
-let initGroups = function(data, selector) {
+let initGroups = function (data, selector) {
   let container = $(selector + '');
   let d3 = require('d3');
   console_log_conditional('data', data);
 
-  let markup = data.groups.map(function(group) {
+  let markup = data.groups.map(function (group) {
     let total_group_contribs = getGroupTotalContribs(group);
     let highest_contribs = Math.max(...group.students.map(stud => getStudentTotalContribs(stud)));
     let markup = "";
@@ -332,13 +334,13 @@ let initGroups = function(data, selector) {
       markup = "<div class='student-group'>" +
         "<div class='student-group__title'><strong>" + group.name + "</strong> - " + group.observationDate + " (n = " + total_group_contribs + ")</div>" +
         "<div class='student-group__students'>" +
-        group.students.map(function(student) {
+        group.students.map(function (student) {
           console_log_conditional('student', student);
 
           let student_count = getStudentTotalContribs(student);
           let padding = getStudentPadding(student_count, highest_contribs);
           return '<div id="' + student._id + '" class="dragger student-box student-box--scaling" style="padding: ' + padding + '">' +
-            '<div class="student-box__wrapper"><p class="student-box__inner">' + student.info.name + ' (n=' + student_count + ', ' + Math.round(student_count / total_group_contribs * 1000) / 10 + '%)' +'</div>' +
+            '<div class="student-box__wrapper"><p class="student-box__inner">' + student.info.name + ' (n=' + student_count + ', ' + Math.round(student_count / total_group_contribs * 1000) / 10 + '%)' + '</div>' +
             '</p></div>'
         }).join('') +
         "</div>" +
@@ -362,7 +364,7 @@ let initGroups = function(data, selector) {
   // let dim = selectedDemographic.get();
   let key_options = getDemographicOptions()
 
-  let color_scale = function() {
+  let color_scale = function () {
     return '#898989'
   }
   if (key_options.length > 0) {
@@ -375,7 +377,7 @@ let initGroups = function(data, selector) {
     let all_students = students.get();
     let demo = selectedDemographic.get();
     let student_boxes = $('.student-box');
-    student_boxes.each(function(box_index) {
+    student_boxes.each(function (box_index) {
       let $box = $($('.student-box')[box_index]);
       let student = all_students.filter(stud => stud._id === $box.attr('id'))[0]
       $box.find('.student-box__wrapper').css('background-color', color_scale(student.info.demographics[demo]));
@@ -387,20 +389,20 @@ let initGroups = function(data, selector) {
 
   console_log_conditional('color scale', color_scale);
 
-  data.groups.forEach(function(group) {
+  data.groups.forEach(function (group) {
     if (groupDisplayType.get() === 'bars') {
       d3GroupGraph('#' + group.d3_id, group, color_scale)
     }
   })
 
-  $('.student-box, .student-vbar').on('click', function() {
+  $('.student-box, .student-vbar').on('click', function () {
     selectStudentForModal($(this).attr('id'));
   });
 
 
 }
 
-let d3GroupGraph = function(selector, group, color_scale) {
+let d3GroupGraph = function (selector, group, color_scale) {
   let d3 = require('d3');
   let data = group.students
 
@@ -419,7 +421,9 @@ let d3GroupGraph = function(selector, group, color_scale) {
     g = svg.append("g").attr('class', 'graph-container').attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
   let x = d3.scaleBand()
-    .domain(data.map(function(d) { return d._id; }))
+    .domain(data.map(function (d) {
+      return d._id;
+    }))
     .range([0, width]);
 
   let y = d3.scaleLinear()
@@ -431,7 +435,7 @@ let d3GroupGraph = function(selector, group, color_scale) {
     .attr("transform", "translate(0," + height + ")")
     .append('g')
     .attr("class", "x-axis-labels")
-    .call(d3.axisBottom(x).tickFormat(function(d) {
+    .call(d3.axisBottom(x).tickFormat(function (d) {
       return data.find(s => s._id === d).info.name
     }));
 
@@ -450,13 +454,17 @@ let d3GroupGraph = function(selector, group, color_scale) {
     .enter().append("rect")
     .attr("class", "student-vbar")
     .attr("id", d => d._id)
-    .attr("x", function(d) {
+    .attr("x", function (d) {
       return x(d._id) + x.bandwidth() * 0.1;
     })
-    .attr("y", function(d) { return y(d.count) })
+    .attr("y", function (d) {
+      return y(d.count)
+    })
     .attr("width", x.bandwidth() * 0.8)
-    .attr("height", function(d) { return height - y(d.count); })
-    .attr("fill", function(d) {
+    .attr("height", function (d) {
+      return height - y(d.count);
+    })
+    .attr("fill", function (d) {
       let s = color_scale(d.info.demographics[selected_demo])
       console_log_conditional('color for d ', d.info.demographics, 'v', d.info.demographics[selected_demo], 's', s, 'selected_demo', selected_demo)
       return s;
@@ -467,22 +475,25 @@ let d3GroupGraph = function(selector, group, color_scale) {
     .data(data)
     .enter()
     .append("text")
-    .text(function(d) { return '(n=' + d.count + ', ' + Math.round(d.count / total_group_contribs * 1000) / 10 + '%)'})
+    .text(function (d) {
+      return '(n=' + d.count + ', ' + Math.round(d.count / total_group_contribs * 1000) / 10 + '%)'
+    })
     .attr("text-anchor", "middle")
-    .attr("x", function(d) {
+    .attr("x", function (d) {
       return x(d._id) + (x.bandwidth() / 2);
     })
-    .attr("y", function(d) { return y(d.count) - 8; })
+    .attr("y", function (d) {
+      return y(d.count) - 8;
+    })
     .attr("font-family", "sans-serif")
     .attr("font-size", "12px")
     .attr("fill", "black")
 
 
-
 }
 
-let updateGroupWorkDemoKey = function(key_wrapper, y_values, color_axis) {
-  let key_chunks = y_values.map(function(label) {
+let updateGroupWorkDemoKey = function (key_wrapper, y_values, color_axis) {
+  let key_chunks = y_values.map(function (label) {
     return `<span class="key--label"><span class="key--color" style="background-color: ${color_axis(label)}"></span><span class="key--text">${label}</span></span>`
   })
 
@@ -507,16 +518,16 @@ let avail_colors_viridis = [
 
 
 function shiftArrayToLeft(arr, places) {
-  arr.push.apply(arr, arr.splice(0,places));
+  arr.push.apply(arr, arr.splice(0, places));
 }
 
-let getLabelColors = function(labels) {
+let getLabelColors = function (labels) {
   let local_colors = avail_colors_viridis.slice();
 
   let spacing = Math.max(Math.floor(avail_colors_viridis.length / labels.length), 1);
 
   let label_colors = {};
-  let _ = labels.map(function(label) {
+  let _ = labels.map(function (label) {
     if (typeof label_colors[label] === 'undefined') {
       let new_color = local_colors[0];
       local_colors.push(new_color);
@@ -530,17 +541,17 @@ let getLabelColors = function(labels) {
   return label_colors
 }
 
-let selectStudentForModal = function(studentId) {
+let selectStudentForModal = function (studentId) {
   // Disabling the modal for now.
   // selectedStudent.set(getStudent(studentId, selectedEnvironment.get()));
 }
 
-let updateGroups = function(data, selector) {
+let updateGroups = function (data, selector) {
   initGroups(data, selector);
 }
 
 
-let getDemographics = function() {
+let getDemographics = function () {
   let envId = selectedEnvironment.get();
   if (!envId) {
     return []
@@ -548,7 +559,7 @@ let getDemographics = function() {
   return SubjectParameters.findOne({envId: envId}).parameters;
 };
 
-let getDemographicOptions = function() {
+let getDemographicOptions = function () {
   let options = getDemographics();
   let selected_demo = selectedDemographic.get();
   if (!selected_demo) {
@@ -559,7 +570,7 @@ let getDemographicOptions = function() {
 };
 
 
-let clearGraph = function() {
+let clearGraph = function () {
   students.set([])
   selectedObservations.set([]);
   selectedStudent.set(false);
@@ -568,7 +579,7 @@ let clearGraph = function() {
   $('.group-work-report__graph-key').html('');
 }
 
-let getObsOptions = function(envId) {
+let getObsOptions = function (envId) {
   if (typeof envId === 'undefined') {
     envId = selectedEnvironment.get();
   }
@@ -581,12 +592,14 @@ let getObsOptions = function(envId) {
 };
 
 
-let updateStudentContribGraph = function(refresh) {
+let updateStudentContribGraph = function (refresh) {
   let selector = '.student-contributions-graph__graph';
   let $selector = $(selector);
   // Wait till the graph exists.
   if ($selector.length === 0) {
-    setTimeout(function() {updateStudentContribGraph(refresh)}, 50);
+    setTimeout(function () {
+      updateStudentContribGraph(refresh)
+    }, 50);
     return;
   }
 
@@ -611,7 +624,7 @@ let updateStudentContribGraph = function(refresh) {
   let currentDataRequest = Math.random()
   latestDataRequest.set(currentDataRequest)
 
-  Meteor.call('getStudentContribData', student_contrib_params, refresh, function(err, result) {
+  Meteor.call('getStudentContribData', student_contrib_params, refresh, function (err, result) {
     if (err) {
       console_log_conditional('error', err);
       return;
@@ -625,7 +638,11 @@ let updateStudentContribGraph = function(refresh) {
 
     studentContribGraph(result.data, selector)
 
-    cacheInfoStudentContrib.set({createdAt: result.createdAt.toLocaleString(), timeToGenerate: result.timeToGenerate, timeToFetch: result.timeToFetch});
+    cacheInfoStudentContrib.set({
+      createdAt: result.createdAt.toLocaleString(),
+      timeToGenerate: result.timeToGenerate,
+      timeToFetch: result.timeToFetch
+    });
     loadingData.set(false);
     console_log_conditional('result.createdAt.toLocaleString()', result.createdAt.toLocaleString());
   });
@@ -636,7 +653,9 @@ let updateStudentTimeGraph = function (refresh) {
   let $selector = $(selector);
   // Wait till the graph exists.
   if ($selector.length === 0) {
-    setTimeout(function() {updateStudentTimeGraph(refresh)}, 50);
+    setTimeout(function () {
+      updateStudentTimeGraph(refresh)
+    }, 50);
     return;
   }
 
@@ -661,7 +680,7 @@ let updateStudentTimeGraph = function (refresh) {
   let currentDataRequest = Math.random()
   latestDataRequest.set(currentDataRequest)
 
-  Meteor.call('getStudentTimeData', student_time_params, refresh, function(err, result) {
+  Meteor.call('getStudentTimeData', student_time_params, refresh, function (err, result) {
     if (err) {
       console_log_conditional('error', err);
       return;
@@ -675,7 +694,11 @@ let updateStudentTimeGraph = function (refresh) {
 
     studentTimeGraph(result.data, selector, selectedEnvironment.get(), dimension)
 
-    cacheInfoStudentTime.set({createdAt: result.createdAt.toLocaleString(), timeToGenerate: result.timeToGenerate, timeToFetch: result.timeToFetch});
+    cacheInfoStudentTime.set({
+      createdAt: result.createdAt.toLocaleString(),
+      timeToGenerate: result.timeToGenerate,
+      timeToFetch: result.timeToFetch
+    });
     loadingData.set(false);
     console_log_conditional('result.createdAt.toLocaleString()', result.createdAt.toLocaleString());
   });

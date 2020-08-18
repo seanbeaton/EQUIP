@@ -32,10 +32,10 @@ Template.header.events({
 // });
 
 
-  'click .dropdown-wrapper': function(e) {
+  'click .dropdown-wrapper': function (e) {
     $('.dropdown-wrapper').toggleClass('dropdown-wrapper--open');
 
-    $(document).off('mouseup').on('mouseup', function(e) {
+    $(document).off('mouseup').on('mouseup', function (e) {
 
       let menu_wrapper = $('.dropdown-wrapper');
       if (!menu_wrapper.hasClass('dropdown-wrapper--open')) {
@@ -49,87 +49,88 @@ Template.header.events({
   },
 
 //
-     'mouseenter .dropdown-wrapper': function(e) {
-         // document.querySelector('.dropdown-wrapper .fa-caret-down').classList.add('hide');
-         // document.querySelector('.dropdown-wrapper .fa-caret-up').classList.remove('hide');
-         //
-         // if (Meteor.userId()) {
-         //     var loginLink = document.getElementById('login-name-link');
-         //     loginLink.innerHTML = "";
-         //     loginLink.classList.remove("login-link-text");
-         //     loginLink.classList.add("login-link-text-sign-in");
-         // }
-     },
-     'mouseleave .dropdown-wrapper': function(e) {
-         // document.querySelector('.dropdown-wrapper .fa-caret-up').classList.add('hide');
-         // document.querySelector('.dropdown-wrapper .fa-caret-down').classList.remove('hide');
-     },
-     'click #login-buttons': function(e) {
-         setTimeout(function(){
-             var signInCloseBtn = document.querySelector('.login-close-text');
-             if (signInCloseBtn) {
-                 signInCloseBtn.innerHTML = "X";
-             }
-         }, 0);
-     },
-     'click #login-name-link': function(e) {
-         setTimeout(function(){
-             if (Meteor.userId()) {
-                 var dropDownSignIn = document.getElementById('login-dropdown-list');
-                 dropDownSignIn.classList.add("login-dropdown-list-sign-in");
-             }
-         },0)
-     },
-     'click .modal-background': function(e){
-       $('#seq-param-modal').removeClass('is-active');
-       $('#onboarding-modal').removeClass('is-active');
-       $('#help-env-modal').removeClass("is-active");
-     },
-     'click .modal-close': function(e){
-       $('#seq-param-modal').removeClass('is-active');
-       $('#onboarding-modal').removeClass('is-active');
-     }
+  'mouseenter .dropdown-wrapper': function (e) {
+    // document.querySelector('.dropdown-wrapper .fa-caret-down').classList.add('hide');
+    // document.querySelector('.dropdown-wrapper .fa-caret-up').classList.remove('hide');
+    //
+    // if (Meteor.userId()) {
+    //     var loginLink = document.getElementById('login-name-link');
+    //     loginLink.innerHTML = "";
+    //     loginLink.classList.remove("login-link-text");
+    //     loginLink.classList.add("login-link-text-sign-in");
+    // }
+  },
+  'mouseleave .dropdown-wrapper': function (e) {
+    // document.querySelector('.dropdown-wrapper .fa-caret-up').classList.add('hide');
+    // document.querySelector('.dropdown-wrapper .fa-caret-down').classList.remove('hide');
+  },
+  'click #login-buttons': function (e) {
+    setTimeout(function () {
+      const signInCloseBtn = document.querySelector('.login-close-text');
+      if (signInCloseBtn) {
+        signInCloseBtn.innerHTML = "X";
+      }
+    }, 0);
+  },
+  'click #login-name-link': function (e) {
+    setTimeout(function () {
+      if (Meteor.userId()) {
+        const dropDownSignIn = document.getElementById('login-dropdown-list');
+        dropDownSignIn.classList.add("login-dropdown-list-sign-in");
+      }
+    }, 0)
+  },
+  'click .modal-background': function (e) {
+    $('#seq-param-modal').removeClass('is-active');
+    $('#onboarding-modal').removeClass('is-active');
+    $('#help-env-modal').removeClass("is-active");
+  },
+  'click .modal-close': function (e) {
+    $('#seq-param-modal').removeClass('is-active');
+    $('#onboarding-modal').removeClass('is-active');
+  }
 });
 
 Template.header.helpers({
-    isBetaThankYou: function() {
-        var routerPath = Router.current().route.path();
-        var getLocalStorage = window.localStorage.getItem("firstSession");
+  isBetaThankYou: function () {
+    const routerPath = Router.current().route.path();
+    const getLocalStorage = window.localStorage.getItem("firstSession");
 
-        if (routerPath === "/" && !getLocalStorage) {
-            window.localStorage.setItem("firstSession", true);
-            return true;
-        } else {
-            return false;
-        }
+    if (routerPath === "/" && !getLocalStorage) {
+      window.localStorage.setItem("firstSession", true);
+      return true;
     }
+    else {
+      return false;
+    }
+  }
 });
 
-Template.header.rendered = function() {
-    setTimeout(function(){
-        var loginText = document.getElementById('login-name-link');
-        if (loginText) {
-            loginText.innerHTML = "";
-        }
-    },100)
-    closeModal();
+Template.header.rendered = function () {
+  setTimeout(function () {
+    const loginText = document.getElementById('login-name-link');
+    if (loginText) {
+      loginText.innerHTML = "";
+    }
+  }, 100)
+  closeModal();
 }
 
 function closeModal() {
-    let closeButton = document.querySelector(".modal-close");
-    let modalBackground = document.querySelector(".modal-background");
-    let learnMoreLink = document.querySelector(".c--onboard-modal__body-link");
-    let modal = document.getElementById("onboarding-modal");
+  const closeButton = document.querySelector(".modal-close");
+  const modalBackground = document.querySelector(".modal-background");
+  const learnMoreLink = document.querySelector(".c--onboard-modal__body-link");
+  const modal = document.getElementById("onboarding-modal");
 
-    closeButton.addEventListener("click", (e) => {
-        modal.classList.remove("is-active");
-    });
+  closeButton.addEventListener("click", (e) => {
+    modal.classList.remove("is-active");
+  });
 
-    modalBackground.addEventListener("click", (e) => {
-        modal.classList.remove("is-active");
-    });
+  modalBackground.addEventListener("click", (e) => {
+    modal.classList.remove("is-active");
+  });
 
-    learnMoreLink.addEventListener("click", (e) => {
-        modal.classList.remove("is-active");
-    });
+  learnMoreLink.addEventListener("click", (e) => {
+    modal.classList.remove("is-active");
+  });
 }

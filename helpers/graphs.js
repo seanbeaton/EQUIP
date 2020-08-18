@@ -1,4 +1,3 @@
-import {getStudents} from "./students";
 import {console_log_conditional} from "./logging";
 
 let d3 = require('d3');
@@ -20,16 +19,16 @@ let avail_colors_viridis = [
 ];
 
 function shiftArrayToLeft(arr, places) {
-  arr.push.apply(arr, arr.splice(0,places));
+  arr.push.apply(arr, arr.splice(0, places));
 }
 
-let getLabelColors = function(labels) {
+let getLabelColors = function (labels) {
   let local_colors = avail_colors_viridis.slice();
 
   let spacing = Math.max(Math.floor(avail_colors_viridis.length / labels.length), 1);
 
   let label_colors = {};
-  let _ = labels.map(function(label) {
+  let _ = labels.map(function (label) {
     if (typeof label_colors[label] === 'undefined') {
       let new_color = local_colors[0];
       local_colors.push(new_color);
@@ -43,7 +42,7 @@ let getLabelColors = function(labels) {
   return label_colors
 }
 
-let createStudentTimeData = function(params) {
+let createStudentTimeData = function (params) {
   let {envId, obsIds, student, dimension, disc_opts} = params
 
   let ret = {
@@ -52,7 +51,9 @@ let createStudentTimeData = function(params) {
 
   for (let obsId_k in obsIds) {
 
-    if (!obsIds.hasOwnProperty(obsId_k)) continue;
+    if (!obsIds.hasOwnProperty(obsId_k)) {
+      continue;
+    }
     let obsId = obsIds[obsId_k];
 
     // let sequences = .fetch()
@@ -77,7 +78,7 @@ let createStudentTimeData = function(params) {
       ret.contributions_dataset.push(datapoint)
     }
 
-    Sequences.find({obsId: obsId}).forEach(function(sequence) {
+    Sequences.find({obsId: obsId}).forEach(function (sequence) {
 
 
       if (sequence.info.student.studentId !== student._id) {
@@ -92,7 +93,7 @@ let createStudentTimeData = function(params) {
     })
   }
 
-  ret.contributions_dataset.forEach(function(obs) {
+  ret.contributions_dataset.forEach(function (obs) {
     obs.max = obs._total;
   });
 
@@ -100,9 +101,11 @@ let createStudentTimeData = function(params) {
 
 }
 
-let studentTimeGraph = function(data, selector, envId, dim) {
+let studentTimeGraph = function (data, selector, envId, dim) {
 
-  data = data.sort(function(a, b) {return a.d3date - b.d3date});
+  data = data.sort(function (a, b) {
+    return a.d3date - b.d3date
+  });
 
   let svg_tag = $('<svg width="718" height="500">' +
     '<defs>\n' +
@@ -135,10 +138,14 @@ let studentTimeGraph = function(data, selector, envId, dim) {
   let discdims = getDiscourseOptionsForDimension(envId, dim);
 
   let total_line = d3.line()
-    .x(function(d) { return x(d.d3date)})
-    .y(function(d) { return y(d._total)});
+    .x(function (d) {
+      return x(d.d3date)
+    })
+    .y(function (d) {
+      return y(d._total)
+    });
 
-  let lines = discdims.map(function(dim) {
+  let lines = discdims.map(function (dim) {
     let line = d3.line()
       .x(d => x(d.d3date))
       .y(d => y(d[dim]));
@@ -170,7 +177,7 @@ let studentTimeGraph = function(data, selector, envId, dim) {
 
   updateStudentTimeKey('.student-participation-time__graph-key', Object.keys(key_colors), z)
 
-  lines.forEach(function(line) {
+  lines.forEach(function (line) {
 
     g.append('path')
       .data([data])
@@ -207,8 +214,8 @@ let studentTimeGraph = function(data, selector, envId, dim) {
 
 }
 
-let updateStudentTimeKey = function(key_wrapper, y_values, color_axis) {
-  let key_chunks = y_values.map(function(label) {
+let updateStudentTimeKey = function (key_wrapper, y_values, color_axis) {
+  let key_chunks = y_values.map(function (label) {
     let color = color_axis(label)
     return `<span class="key--label"><span class="key--color" style="background-color: ${color}"></span><span class="key--text">${label}</span></span>`
   })
@@ -217,11 +224,11 @@ let updateStudentTimeKey = function(key_wrapper, y_values, color_axis) {
   $(key_wrapper).html(html)
 }
 
-let createStudentContribData = function(params) {
+let createStudentContribData = function (params) {
   let {envId, obsIds, student, dimension, disc_opts, students} = params
   let ret = [];
 
-  ret = disc_opts.map(function(opt) {
+  ret = disc_opts.map(function (opt) {
     return {
       label: opt,
       count: 0,
@@ -232,9 +239,9 @@ let createStudentContribData = function(params) {
 
   let all_students = students.map(stud => ({id: stud._id, count: 0}));
 
-  obsIds.forEach(function(obsId) {
-    Sequences.find({obsId: obsId}).forEach(function(sequence) {
-      disc_opts.map(function(opt) {
+  obsIds.forEach(function (obsId) {
+    Sequences.find({obsId: obsId}).forEach(function (sequence) {
+      disc_opts.map(function (opt) {
         if (sequence.info.parameters[dimension] === opt) {
           let ds_index = ret.findIndex(datapoint => datapoint.label === opt);
           ret[ds_index].class_total += 1;
@@ -253,7 +260,7 @@ let createStudentContribData = function(params) {
   let class_total = ret.map(d => d.class_total).reduce((a, b) => a + b, 0);
 
   let num_students = students.length;
-  ret.forEach(function(opt) {
+  ret.forEach(function (opt) {
     let all_counts = opt.all_students.map(d => d.count);
     opt.median = get_median(all_counts);
     opt.average = get_average(all_counts);
@@ -270,7 +277,7 @@ let createStudentContribData = function(params) {
   return ret;
 }
 
-let studentContribGraph = function(data, selector) {
+let studentContribGraph = function (data, selector) {
   let svg_tag = $('<svg width="718" height="400">' +
     '<defs>\n' +
     '  <style type="text/css">\n' +
@@ -290,7 +297,7 @@ let studentContribGraph = function(data, selector) {
     g = container.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
   let x = d3.scaleBand() // inside each group
-  // .range([0, width])
+    // .range([0, width])
     .padding(0.10);
 
   let y = d3.scaleLinear()
@@ -320,12 +327,12 @@ let studentContribGraph = function(data, selector) {
     .selectAll("bar")
     .data(data)
     .enter().append('g')
-    .attr("transform", function(d) {
+    .attr("transform", function (d) {
       return "translate(" + x_group(d.label) + ",0)"
     })
     .attr("class", 'bar-group')
     .selectAll('rect')
-    .data(function(d) {
+    .data(function (d) {
       return data.filter(i => i.label === d.label)
     })
     .enter();
@@ -334,28 +341,36 @@ let studentContribGraph = function(data, selector) {
     .style("fill", d => z(d.label))
     .attr("x", x("value"))
     .attr("width", x.bandwidth())
-    .attr("y", function(d) { return y(d.count); })
-    .attr("height", function(d) { return height - y(d.count); });
+    .attr("y", function (d) {
+      return y(d.count);
+    })
+    .attr("height", function (d) {
+      return height - y(d.count);
+    });
 
   groups.append("rect")
     .style("fill", z('Median (Class)'))
     .attr("x", x("median"))
     .attr("width", x.bandwidth())
-    .attr("y", function(d) { return y(d.median); })
-    .attr("height", function(d) { return height - y(d.median); });
+    .attr("y", function (d) {
+      return y(d.median);
+    })
+    .attr("height", function (d) {
+      return height - y(d.median);
+    });
 
   // 0s on 0 values for the counts
   groups.append('text')
-    .text(function(d) {
+    .text(function (d) {
       if (d.count === 0) {
         return '0';
       }
     })
     .attr("text-anchor", "middle")
-    .attr("x", function(d) {
+    .attr("x", function (d) {
       return x('value') + x.bandwidth() / 2;
     })
-    .attr("y", function(d) {
+    .attr("y", function (d) {
       return y(d.count) - 6;
     })
     .attr("font-family", "sans-serif")
@@ -364,16 +379,16 @@ let studentContribGraph = function(data, selector) {
 
   // 0s on 0 values for the medians
   groups.append('text')
-    .text(function(d) {
+    .text(function (d) {
       if (d.median === 0) {
         return '0';
       }
     })
     .attr("text-anchor", "middle")
-    .attr("x", function(d) {
+    .attr("x", function (d) {
       return x('median') + x.bandwidth() / 2;
     })
-    .attr("y", function(d) {
+    .attr("y", function (d) {
       return y(d.median) - 6;
     })
     .attr("font-family", "sans-serif")
@@ -382,14 +397,14 @@ let studentContribGraph = function(data, selector) {
 
 
   g.append('g')
-  // .attr("class", "axis axis--x")
+    // .attr("class", "axis axis--x")
     .attr("transform", "translate(0," + height + ")")
     .call(d3.axisBottom(x_group));
 
   g.append("g")
-  // .attr("class", "axis axis--y")
-    .call(d3.axisLeft(y).tickFormat(function(e){
-        if(Math.floor(e) !== e) {
+    // .attr("class", "axis axis--y")
+    .call(d3.axisLeft(y).tickFormat(function (e) {
+        if (Math.floor(e) !== e) {
           return;
         }
         return e;
@@ -397,8 +412,8 @@ let studentContribGraph = function(data, selector) {
     )
 };
 
-let updateStudentContribKey = function(key_wrapper, y_values, color_axis) {
-  let key_chunks = y_values.map(function(label) {
+let updateStudentContribKey = function (key_wrapper, y_values, color_axis) {
+  let key_chunks = y_values.map(function (label) {
     if (label === '__BREAK__') {
       // it looks like even if the axis value isn't used, it applies it to the next item if you don't call this function.
       let _ = color_axis(label);
@@ -411,18 +426,18 @@ let updateStudentContribKey = function(key_wrapper, y_values, color_axis) {
   $(key_wrapper).html(html)
 }
 
-let getObservations = function(obsIds) {
+let getObservations = function (obsIds) {
   return Observations.find({_id: {$in: obsIds}}, {reactive: false}).fetch();
 }
 
-let getDiscourseDimensions = function(envId) {
+let getDiscourseDimensions = function (envId) {
   if (typeof envId === 'undefined' || !envId) {
     return []
   }
-  return SequenceParameters.findOne({envId:envId}).parameters;
+  return SequenceParameters.findOne({envId: envId}).parameters;
 };
 
-let getDiscourseOptionsForDimension = function(envId, dimension) {
+let getDiscourseOptionsForDimension = function (envId, dimension) {
   let options = getDiscourseDimensions(envId);
   if (dimension === false) {
     return [];
@@ -451,6 +466,7 @@ function get_median(values) {
     return (values[mid_point] + values[mid_point - 1]) / 2.;
   }
 }
+
 function get_average(values) {
   if (values.length === 0) {
     return 0;
@@ -460,7 +476,7 @@ function get_average(values) {
 }
 
 
-const createHeatmapData = function(params, sequences) {
+const createHeatmapData = function (params, sequences) {
   let {envId, obsIds, selectedDemo, heatmapReportSortType} = params
 
   if (typeof sequences === 'undefined') {
@@ -480,7 +496,7 @@ const createHeatmapData = function(params, sequences) {
 
   ret.limit_x = 0;
   ret.limit_y = 0;
-  ret.contributions_dataset = allStudents.map(function(student) {
+  ret.contributions_dataset = allStudents.map(function (student) {
     if (ret.limit_y > student.data_y) {
       ret.limit_y = student.data_y
     }
@@ -505,7 +521,7 @@ const createHeatmapData = function(params, sequences) {
   console.log(new Date().getTime() - start_2, 'start_2')
   let start_3 = new Date().getTime();
 
-  sequences.forEach(function(sequence) {
+  sequences.forEach(function (sequence) {
     let ds_index = ret.contributions_dataset.findIndex(datapoint => datapoint.studentId === sequence.info.student.studentId);
     ret.contributions_dataset[ds_index].count += 1;
   });
@@ -518,7 +534,7 @@ const createHeatmapData = function(params, sequences) {
   console.log(new Date().getTime() - start_4, 'start_4')
   let start_5 = new Date().getTime();
 
-  ret.contributions_dataset = ret.contributions_dataset.map(function(datum) {
+  ret.contributions_dataset = ret.contributions_dataset.map(function (datum) {
     datum.quintile = Math.ceil(datum.count * 4 / highest_count);
     return datum
   });
@@ -535,7 +551,10 @@ const createHeatmapData = function(params, sequences) {
     else {
       opts = [];
     }
-    ret.contributions_dataset = ret.contributions_dataset.map(datum => {datum.selected_demo_value = datum.student.info.demographics[selectedDemo]; return datum})
+    ret.contributions_dataset = ret.contributions_dataset.map(datum => {
+      datum.selected_demo_value = datum.student.info.demographics[selectedDemo];
+      return datum
+    })
 
     opts.forEach(opt => ret.contributions_dataset.push({
       name: opt,
@@ -550,7 +569,7 @@ const createHeatmapData = function(params, sequences) {
       sort_first: true,
     }));
 
-    let sortDemo = function(a, b) {
+    let sortDemo = function (a, b) {
       let a_demo = a.selected_demo_value;
       let b_demo = b.selected_demo_value;
       if (a_demo > b_demo) {
@@ -581,5 +600,15 @@ const createHeatmapData = function(params, sequences) {
 };
 
 
-
-export {createStudentTimeData, createHeatmapData, createStudentContribData, getObservations, getDiscourseOptionsForDimension, getDiscourseDimensions, studentTimeGraph, studentContribGraph, get_average, get_median}
+export {
+  createStudentTimeData,
+  createHeatmapData,
+  createStudentContribData,
+  getObservations,
+  getDiscourseOptionsForDimension,
+  getDiscourseDimensions,
+  studentTimeGraph,
+  studentContribGraph,
+  get_average,
+  get_median
+}

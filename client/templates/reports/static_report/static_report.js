@@ -1,9 +1,6 @@
 /*
 * JS file for static_report.js
 */
-import {getStudent, getStudents, updateStudent, updateStudents} from "/helpers/students";
-import {setupSequenceParameters, setupSubjectParameters} from "/helpers/parameters";
-import {console_log_conditional} from "/helpers/logging"
 
 // //Generate classroom buttons immediately
 // Template.staticReport.rendered = function() {

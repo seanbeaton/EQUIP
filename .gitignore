@@ -5,3 +5,5 @@ sample_data.txt
 .idea/
 node_modules
 db
+dump
+local_scripts

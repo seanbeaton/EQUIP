@@ -1,16 +1,14 @@
 import {console_log_conditional} from "/helpers/logging"
-
-import {getStudents, getStudent} from "../../../../helpers/students";
 import {heatmapReportSortDemoChosen, heatmapReportSortType} from "../selection_elements";
 import {setupVis} from '../../../../helpers/timeline';
-import {clone_object} from "../../../../helpers/objects";
 import {
   createHeatmapData,
   getDiscourseDimensions,
   getDiscourseOptionsForDimension,
-  getObservations, studentContribGraph, studentTimeGraph
+  getObservations,
+  studentContribGraph,
+  studentTimeGraph
 } from "../../../../helpers/graphs";
-import {Sidebar} from "../../../../helpers/graph_sidebar";
 
 // const envSet = new ReactiveVar(false);
 const obsOptions = new ReactiveVar([]);
@@ -54,9 +52,9 @@ Template.heatmapReport.onCreated(function created() {
 });
 
 Template.heatmapReport.helpers({
-  environments: function() {
+  environments: function () {
     let envs = Environments.find().fetch();
-    envs = envs.map(function(env) {
+    envs = envs.map(function (env) {
       if (typeof env.envName === 'undefined') {
         env.envName = 'Loading...';
         env.disabled = 'disabled';
@@ -75,13 +73,13 @@ Template.heatmapReport.helpers({
     });
     return envs;
   },
-  environmentChosen: function() {
+  environmentChosen: function () {
     return !!(selectedEnvironment.get());
   },
-  observationChosen: function() {
+  observationChosen: function () {
     return !!(selectedObservations.get().length >= 1)
   },
-  multipleObservationsChosen: function() {
+  multipleObservationsChosen: function () {
     return !!(selectedObservations.get().length >= 2)
   },
   // discourseDimensions: function() {
@@ -91,21 +89,21 @@ Template.heatmapReport.helpers({
   //   return getDemographics()
   // },
 
-  environment: function() {
+  environment: function () {
     return getEnvironment();
   },
-  observations: function() {
+  observations: function () {
     return getObservations(selectedObservations.get());
   },
-  observationsOptions: function() {
+  observationsOptions: function () {
     return obsOptions.get();
   },
-  observationNames: function() {
+  observationNames: function () {
     let observations = getObservations(selectedObservations.get());
     let obsNames = observations.map(obs => obs.name);
 
     if (obsNames.length >= 3) {
-      return obsNames.slice(0,-1).join(', ') + ', and ' + obsNames[obsNames.length - 1]
+      return obsNames.slice(0, -1).join(', ') + ', and ' + obsNames[obsNames.length - 1]
     }
     else if (obsNames.length === 2) {
       return obsNames.join(' and ');
@@ -114,12 +112,12 @@ Template.heatmapReport.helpers({
       return obsNames[0]
     }
   },
-  demographics: function() {
+  demographics: function () {
     return getDemographics();
   },
-  demographic_filters: function() {
+  demographic_filters: function () {
     let demo_options = getDemographics();
-    demo_options = demo_options.map(function(demo_opt) {
+    demo_options = demo_options.map(function (demo_opt) {
       demo_opt.default = '';
       return demo_opt;
     });
@@ -130,28 +128,34 @@ Template.heatmapReport.helpers({
 
     return demo_options;
   },
-  discourseparams: function() {
+  discourseparams: function () {
     return getDiscourseDimensions(selectedEnvironment.get());
   },
-  showFilters: function() {
+  showFilters: function () {
     return (students.get().length > 0) && (selectedObservations.get().length > 0);
   },
-  demo_available: function() {
-    setTimeout(function(){$(".chosen-select").trigger("chosen:updated");}, 100);  // makes these elements respect the disabled attr on their selects
+  demo_available: function () {
+    setTimeout(function () {
+      $(".chosen-select").trigger("chosen:updated");
+    }, 100);  // makes these elements respect the disabled attr on their selects
     return !!selectedEnvironment.get() && !!(selectedObservations.get().length >= 2) ? '' : 'disabled'
   },
-  disc_available: function() {
-    setTimeout(function(){$(".chosen-select").trigger("chosen:updated");}, 100);  // makes these elements respect the disabled attr on their selects
+  disc_available: function () {
+    setTimeout(function () {
+      $(".chosen-select").trigger("chosen:updated");
+    }, 100);  // makes these elements respect the disabled attr on their selects
     return !!selectedEnvironment.get() && !!(selectedObservations.get().length >= 2) ? '' : 'disabled'
   },
-  disc_options_available: function() {
-    setTimeout(function(){$(".chosen-select").trigger("chosen:updated");}, 100);  // makes these elements respect the disabled attr on their selects
+  disc_options_available: function () {
+    setTimeout(function () {
+      $(".chosen-select").trigger("chosen:updated");
+    }, 100);  // makes these elements respect the disabled attr on their selects
     return !!selectedDiscourseDimension.get() && !!selectedEnvironment.get() && !!(selectedObservations.get().length >= 2) ? '' : 'disabled'
   },
-  selected_discourse_options: function() {
+  selected_discourse_options: function () {
     return getDiscourseOptions();
   },
-  dataset_types: function() {
+  dataset_types: function () {
     return [
       {
         id: 'contributions',
@@ -160,42 +164,42 @@ Template.heatmapReport.helpers({
       }
     ]
   },
-  students: function() {
+  students: function () {
     return students.get();
   },
-  studentsHeatmapSortType: function() {
+  studentsHeatmapSortType: function () {
     heatmapReportSortType.get()
   },
-  studentsHeatmapSortDemoChosen: function() {
+  studentsHeatmapSortDemoChosen: function () {
     heatmapReportSortDemoChosen.get()
   },
-  selectedStudent: function() {
+  selectedStudent: function () {
     return selectedStudent.get();
   },
-  totalContributions: function() {
+  totalContributions: function () {
     return totalContributions.get()
   },
-  selectedEnvironment: function() {
+  selectedEnvironment: function () {
     return selectedEnvironment.get();
   },
-  selectedObservations: function() {
+  selectedObservations: function () {
     return selectedObservations.get();
   },
-  cache_info: function() {
+  cache_info: function () {
     return cacheInfo.get();
   },
-  cache_info_student_time: function() {
+  cache_info_student_time: function () {
     return cacheInfoStudentTime.get();
   },
-  cache_info_student_contrib: function() {
+  cache_info_student_contrib: function () {
     return cacheInfoStudentContrib.get();
   },
-  loadingDataClass: function() {
+  loadingDataClass: function () {
     return loadingData.get();
   },
 });
 
-let getDemographics = function() {
+let getDemographics = function () {
   let envId = selectedEnvironment.get();
   if (!envId) {
     return []
@@ -203,13 +207,13 @@ let getDemographics = function() {
   return SubjectParameters.findOne({envId: envId}).parameters;
 };
 
-let getEnvironment = function() {
+let getEnvironment = function () {
   let envId = selectedEnvironment.get();
   return Environments.findOne({_id: envId})
 }
 
 Template.heatmapReport.events({
-  'change #env-select': function(e) {
+  'change #env-select': function (e) {
 
     let selected = $('option:selected', e.target);
     clearGraph();
@@ -217,8 +221,8 @@ Template.heatmapReport.events({
     selectedEnvironment.set(selected.val());
     obsOptions.set(getObsOptions());
     students.set(Subjects.find({envId: selectedEnvironment.get()}).fetch());
-    setTimeout(function() {
-      setupVis('vis-container', function() {
+    setTimeout(function () {
+      setupVis('vis-container', function () {
         if (selectedObservations.get().length === 0) {
           selectedStudent.set(false);
         }
@@ -234,7 +238,7 @@ Template.heatmapReport.events({
     $('#demo-select').val('');
     $('#disc-opt-select').val('');
 
-    let blank_filters = getDemographics().map(function(demo) {
+    let blank_filters = getDemographics().map(function (demo) {
       return {
         label: demo.label,
         selected: []
@@ -242,31 +246,31 @@ Template.heatmapReport.events({
     })
     currentDemoFilters.set(blank_filters);
   },
-  'change #student-spotlight__discourse-select': function(e) {
+  'change #student-spotlight__discourse-select': function (e) {
     let selected = $('option:selected', e.target);
     selectedSpotlightDimension.set(selected.val());
     updateStudentContribGraph();
     updateStudentTimeGraph();
   },
-  'change #dataset-type-select': function(e) {
+  'change #dataset-type-select': function (e) {
     let selected = $('option:selected', e.target);
     selectedDatasetType.set(selected.val());
     updateGraph();
     updateStudentContribGraph();
     updateStudentTimeGraph();
   },
-  'click .student-spotlight__close': function() {
+  'click .student-spotlight__close': function () {
     selectedStudent.set(false);
     latestDataRequest.set(false)
     latestDataRequestStudentContrib.set(false)
     latestDataRequestStudentTime.set(false)
     loadingData.set(false)
   },
-  'change .filters__wrapper .filter': function() {
-    let selected_filters = getDemographics().map(function(demo) {
+  'change .filters__wrapper .filter': function () {
+    let selected_filters = getDemographics().map(function (demo) {
       let selected_options = $('.filters__wrapper .filter[data-filter-demo-name="' + demo.label + '"] option:selected');
       let opts = []
-      selected_options.each(function(key) {
+      selected_options.each(function (key) {
         opts.push($(selected_options[key]).val());
       })
       return {
@@ -279,32 +283,32 @@ Template.heatmapReport.events({
     $('.students').html('');
     updateGraph()
   },
-  'click .refresh-report': function(e) {
+  'click .refresh-report': function (e) {
     e.preventDefault();
     cachedDataRequests.set({});
     updateGraph(true)
   },
-  'click .refresh-report-student-contrib': function(e) {
+  'click .refresh-report-student-contrib': function (e) {
     e.preventDefault();
     updateStudentContribGraph(true)
   },
-  'click .refresh-report-student-time': function(e) {
+  'click .refresh-report-student-time': function (e) {
     e.preventDefault();
     updateStudentTimeGraph(true)
   },
 })
 
-$(window).on('heatmap_student_sort_updated', function(e, sort_type) {
+$(window).on('heatmap_student_sort_updated', function (e, sort_type) {
   updateGraph();
   console_log_conditional('currentValue sort', sort_type, heatmapReportSortType.get())
 })
 
-$(window).on('heatmap_student_sort_demo_updated', function(e, sort_buckets_demo) {
+$(window).on('heatmap_student_sort_demo_updated', function (e, sort_buckets_demo) {
   updateGraph();
   console_log_conditional('demo val', sort_buckets_demo, heatmapReportSortDemoChosen.get());
 })
 
-let clearGraph = function() {
+let clearGraph = function () {
   students.set([])
   selectedObservations.set([]);
   selectedStudent.set(false);
@@ -316,7 +320,7 @@ let clearGraph = function() {
   // $(timeline_selector + ' svg').remove();
 }
 
-let updateGraph = async function(refresh) {
+let updateGraph = async function (refresh) {
 
   if (selectedObservations.get().length < 1) {
     return;
@@ -401,7 +405,7 @@ let updateGraph = async function(refresh) {
 
 }
 
-let showData = function(result) {
+let showData = function (result) {
   let heatmap_wrapper = $('.heatmap-report-wrapper');
   let heatmap_selector = '.heatmap-report__graph';
 
@@ -417,13 +421,17 @@ let showData = function(result) {
     updateHeatmapGraph(result.data, heatmap_selector)
   }
   updateFilteredStudents()
-  cacheInfo.set({createdAt: result.createdAt.toLocaleString(), timeToGenerate: result.timeToGenerate, timeToFetch: result.timeToFetch});
+  cacheInfo.set({
+    createdAt: result.createdAt.toLocaleString(),
+    timeToGenerate: result.timeToGenerate,
+    timeToFetch: result.timeToFetch
+  });
   loadingData.set(false);
   console_log_conditional('result.createdAt.toLocaleString()', result.createdAt.toLocaleString());
 }
 
 
-let updateFilteredStudents = function() {
+let updateFilteredStudents = function () {
   let selected_filters = currentDemoFilters.get();
   let active_filters = !!selected_filters.map(filter => filter.selected.length).reduce((a, b) => a + b);
   console_log_conditional('active filteres', active_filters)
@@ -434,10 +442,10 @@ let updateFilteredStudents = function() {
     $('.heatmap-report-wrapper').removeClass('filters-active');
   }
   let student_boxes = $('.student-box');
-  student_boxes.each(function(student_key) {
+  student_boxes.each(function (student_key) {
     let $student = $(student_boxes[student_key]);
     let student_data = students.get().find(student => student._id === $student.attr('id'))
-    let allowed = selected_filters.map(function(filter) {
+    let allowed = selected_filters.map(function (filter) {
       if (filter.selected.length === 0) {
         return true;
       }
@@ -446,7 +454,7 @@ let updateFilteredStudents = function() {
         return false;
       }
       return (filter.selected.indexOf(student_data.info.demographics[filter.label]) >= 0)
-    }).reduce((a,b) => a && b);
+    }).reduce((a, b) => a && b);
 
     $student.removeClass('disabled-student');
     if (!allowed) {
@@ -455,11 +463,11 @@ let updateFilteredStudents = function() {
   });
 }
 
-let updateTotalContribs = function(data) {
+let updateTotalContribs = function (data) {
   let student_boxes = $('.student-box');
 
   if (student_boxes.length === 0) {
-    setTimeout(function() {
+    setTimeout(function () {
       updateTotalContribs(data);
     }, 100);
     return;
@@ -468,19 +476,19 @@ let updateTotalContribs = function(data) {
 
   let allowed_students = [];
 
-  student_boxes.each(function(student_key) {
+  student_boxes.each(function (student_key) {
     let $student = $(student_boxes[student_key]);
     let student_data = students.get().find(student => student._id === $student.attr('id'))
     if (!student_data) {
       return false;
     }
     // creates an array of boolean values for if the student matches each filter, then reduces it.
-    let allowed = filters.map(function(filter) {
+    let allowed = filters.map(function (filter) {
       if (filter.selected.length === 0) {
         return true;
       }
       return (filter.selected.indexOf(student_data.info.demographics[filter.label]) >= 0)
-    }).reduce((a,b) => a && b);
+    }).reduce((a, b) => a && b);
 
     // $student.removeClass('disabled-student');
     if (!allowed) {
@@ -495,7 +503,7 @@ let updateTotalContribs = function(data) {
   totalContributions.set(full_count);
 };
 
-let initHeatmapGraph = function(full_data, containerSelector) {
+let initHeatmapGraph = function (full_data, containerSelector) {
   let data;
   let d3 = require('d3');
   let d3Interpolate = require("d3-interpolate");
@@ -519,14 +527,16 @@ let initHeatmapGraph = function(full_data, containerSelector) {
     .attr('data-quintile', d => d.quintile)
     .attr('data-contrib-count', d => d.count)
     .attr('class', d => 'dragger student-box c--observation__student-box-container ' + d.class)
-    .html(function(d) {
+    .html(function (d) {
       let count = d.show_count ? ' (' + d.count + ')' : '';
-      return '<p class="c--observation__student-box">' + d.name + count +'</p>'
+      return '<p class="c--observation__student-box">' + d.name + count + '</p>'
     });
 
   $('#heatmap-d3-wrapper').removeClass('subjects--fixed-height');
   if (heatmapReportSortType.get() === 'classroom') {
-    new_boxes.style('transform', function(d) { return "translate(" + d.student.data_x + "px, " + d.student.data_y + "px)" })
+    new_boxes.style('transform', function (d) {
+      return "translate(" + d.student.data_x + "px, " + d.student.data_y + "px)"
+    })
     new_boxes.style('position', "absolute");
     $('#heatmap-d3-wrapper').addClass('subjects--fixed-height');
   }
@@ -536,18 +546,18 @@ let initHeatmapGraph = function(full_data, containerSelector) {
   }
 
   new_boxes.style('background-color', d => count_scale(d.count))
-    .on('click', function() {
+    .on('click', function () {
       selectStudentForModal($(this).attr('id'));
     });
 
   scale = d3.select()
 };
 
-let selectStudentForModal = function(studentId) {
+let selectStudentForModal = function (studentId) {
   selectedStudent.set(Subjects.findOne({_id: studentId}));
 }
 
-let updateHeatmapGraph = function(full_data, containerSelector) {
+let updateHeatmapGraph = function (full_data, containerSelector) {
   let data;
 
   let d3 = require('d3');
@@ -574,15 +584,17 @@ let updateHeatmapGraph = function(full_data, containerSelector) {
     .attr('data-y', d => d.student.data_y)
     .attr('data-quintile', d => d.quintile)
     .attr('class', d => 'dragger student-box c--observation__student-box-container ' + d.class)
-    .html(function(d) {
+    .html(function (d) {
       let count = d.show_count ? ' (' + d.count + ')' : '';
-      return '<p class="c--observation__student-box">' + d.name + count +'</p>'
+      return '<p class="c--observation__student-box">' + d.name + count + '</p>'
     })
     .merge(boxes)
 
   $('#heatmap-d3-wrapper').removeClass('subjects--fixed-height');
   if (heatmapReportSortType.get() === 'classroom') {
-    new_boxes.style('transform', function(d) { return "translate(" + d.student.data_x + "px, " + d.student.data_y + "px)" })
+    new_boxes.style('transform', function (d) {
+      return "translate(" + d.student.data_x + "px, " + d.student.data_y + "px)"
+    })
     new_boxes.style('position', "absolute");
     $('#heatmap-d3-wrapper').addClass('subjects--fixed-height');
   }
@@ -595,16 +607,17 @@ let updateHeatmapGraph = function(full_data, containerSelector) {
     .transition()
     .duration(500)
     .attr('data-contrib-count', d => d.count)
-    .style('background-color', function(d){return count_scale(d.count)});
-
-  new_boxes.on('click', function() {
-      selectStudentForModal($(this).attr('id'));
+    .style('background-color', function (d) {
+      return count_scale(d.count)
     });
+
+  new_boxes.on('click', function () {
+    selectStudentForModal($(this).attr('id'));
+  });
 };
 
 
-
-let updateHeatmapKey = function(selector, color_axis) {
+let updateHeatmapKey = function (selector, color_axis) {
   let d3 = require('d3');
 
   $(selector).html('<div class="heatmap-key"></div>');
@@ -654,12 +667,12 @@ let updateHeatmapKey = function(selector, color_axis) {
 
   svg.append("g")
     .attr("class", "axis")
-    .attr("transform", "translate(0," + margins.top +")")
+    .attr("transform", "translate(0," + margins.top + ")")
     .call(key_axis);
 }
 
 
-let getObsOptions = function(envId) {
+let getObsOptions = function (envId) {
   if (typeof envId === 'undefined') {
     envId = selectedEnvironment.get();
   }
@@ -677,12 +690,14 @@ let getObsOptions = function(envId) {
 // (students, selected student, env, observations) to the spotlight somehow.
 //
 
-let updateStudentContribGraph = function(refresh) {
+let updateStudentContribGraph = function (refresh) {
   let selector = '.student-contributions-graph__graph';
   let $selector = $(selector);
   // Wait till the graph exists.
   if ($selector.length === 0) {
-    setTimeout(function() {updateStudentContribGraph(refresh)}, 50);
+    setTimeout(function () {
+      updateStudentContribGraph(refresh)
+    }, 50);
     return;
   }
 
@@ -707,7 +722,7 @@ let updateStudentContribGraph = function(refresh) {
   let currentDataRequest = Math.random()
   latestDataRequestStudentContrib.set(currentDataRequest)
 
-  Meteor.call('getStudentContribData', student_contrib_params, refresh, function(err, result) {
+  Meteor.call('getStudentContribData', student_contrib_params, refresh, function (err, result) {
     if (err) {
       console_log_conditional('error', err);
       return;
@@ -720,7 +735,12 @@ let updateStudentContribGraph = function(refresh) {
 
     studentContribGraph(result.data, selector)
 
-    cacheInfoStudentContrib.set({createdAt: result.createdAt.toLocaleString(), timeToGenerate: result.timeToGenerate, timeToFetch: result.timeToFetch, refresh_class_suffix: '-student-contrib'});
+    cacheInfoStudentContrib.set({
+      createdAt: result.createdAt.toLocaleString(),
+      timeToGenerate: result.timeToGenerate,
+      timeToFetch: result.timeToFetch,
+      refresh_class_suffix: '-student-contrib'
+    });
     loadingData.set(false);
     console_log_conditional('result.createdAt.toLocaleString()', result.createdAt.toLocaleString());
   });
@@ -731,7 +751,9 @@ let updateStudentTimeGraph = function (refresh) {
   let $selector = $(selector);
   // Wait till the graph exists.
   if ($selector.length === 0) {
-    setTimeout(function() {updateStudentTimeGraph(refresh)}, 50);
+    setTimeout(function () {
+      updateStudentTimeGraph(refresh)
+    }, 50);
     return;
   }
 
@@ -756,7 +778,7 @@ let updateStudentTimeGraph = function (refresh) {
   let currentDataRequest = Math.random()
   latestDataRequestStudentTime.set(currentDataRequest)
 
-  Meteor.call('getStudentTimeData', student_time_params, refresh, function(err, result) {
+  Meteor.call('getStudentTimeData', student_time_params, refresh, function (err, result) {
     if (err) {
       console_log_conditional('error', err);
       return;
@@ -769,7 +791,12 @@ let updateStudentTimeGraph = function (refresh) {
 
     studentTimeGraph(result.data, selector, selectedEnvironment.get(), dimension)
 
-    cacheInfoStudentTime.set({createdAt: result.createdAt.toLocaleString(), timeToGenerate: result.timeToGenerate, timeToFetch: result.timeToFetch, refresh_class_suffix: '-student-time'});
+    cacheInfoStudentTime.set({
+      createdAt: result.createdAt.toLocaleString(),
+      timeToGenerate: result.timeToGenerate,
+      timeToFetch: result.timeToFetch,
+      refresh_class_suffix: '-student-time'
+    });
     loadingData.set(false);
     console_log_conditional('result.createdAt.toLocaleString()', result.createdAt.toLocaleString());
   });

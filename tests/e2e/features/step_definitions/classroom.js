@@ -5,7 +5,7 @@ import {console_log_conditional} from "../../../../helpers/logging";
 
 var myStepDefinitionsWrapper = function () {
   this.Then(/^A classroom exists with the name "([^"]*)"$/, function (classroom, callback) {
-    let env_found = browser.execute(function(classroom_name) {
+    let env_found = browser.execute(function (classroom_name) {
       return (Environments.findOne({envName: classroom_name}) !== undefined);
     }, classroom);
     assert(env_found);
@@ -13,8 +13,8 @@ var myStepDefinitionsWrapper = function () {
   });
 
   this.Given(/^there is an empty classroom with the name "([^"]*)"$/, function (classroom, callback) {
-    let env_found = browser.execute(function(classroom_name) {
-      Meteor.call('environmentInsert',  {
+    let env_found = browser.execute(function (classroom_name) {
+      Meteor.call('environmentInsert', {
         envName: classroom_name,
       });
     }, classroom);
@@ -22,8 +22,8 @@ var myStepDefinitionsWrapper = function () {
   });
 
   this.Given(/^there is a classroom with the name "([^"]*)" with default parameters$/, function (classroom, callback) {
-    let env_found = browser.executeAsync(function(classroom_name, cb) {
-      let envId_res = Meteor.call('environmentInsert',  {envName: classroom_name}, function (err, res) {
+    let env_found = browser.executeAsync(function (classroom_name, cb) {
+      let envId_res = Meteor.call('environmentInsert', {envName: classroom_name}, function (err, res) {
         if (err) {
           console_log_conditional('error', err);
           cb();
@@ -56,23 +56,23 @@ var myStepDefinitionsWrapper = function () {
         const default_seq_parameters = [
           {
             name: "Teacher Solicitation",
-            options: ['How','What','Why','Other','None']
+            options: ['How', 'What', 'Why', 'Other', 'None']
           },
           {
             name: "Wait Time",
-            options: ["Less than 3 seconds","3 or more seconds","N/A"]
+            options: ["Less than 3 seconds", "3 or more seconds", "N/A"]
           },
           {
             name: "Solicitation Method",
-            options: ["Called On","Not Called On"]
+            options: ["Called On", "Not Called On"]
           },
           {
             name: "Length of Talk",
-            options: ["1-4 words","5-20","21 or more"]
+            options: ["1-4 words", "5-20", "21 or more"]
           },
           {
             name: "Student Talk",
-            options: ["How","What","Why","Other"]
+            options: ["How", "What", "Why", "Other"]
           }
         ];
 
@@ -85,8 +85,8 @@ var myStepDefinitionsWrapper = function () {
   });
 
   this.Given(/^there is a classroom with the name "([^"]*)" with default parameters and default students$/, function (classroom, callback) {
-    let env_found = browser.executeAsync(function(classroom_name, cb) {
-      let envId_res = Meteor.call('environmentInsert',  {envName: classroom_name}, function (err, res) {
+    let env_found = browser.executeAsync(function (classroom_name, cb) {
+      let envId_res = Meteor.call('environmentInsert', {envName: classroom_name}, function (err, res) {
         if (err) {
           console_log_conditional('error', err);
           cb();
@@ -119,23 +119,23 @@ var myStepDefinitionsWrapper = function () {
         const default_seq_parameters = [
           {
             name: "Teacher Solicitation",
-            options: ['How','What','Why','Other','None']
+            options: ['How', 'What', 'Why', 'Other', 'None']
           },
           {
             name: "Wait Time",
-            options: ["Less than 3 seconds","3 or more seconds","N/A"]
+            options: ["Less than 3 seconds", "3 or more seconds", "N/A"]
           },
           {
             name: "Solicitation Method",
-            options: ["Called On","Not Called On"]
+            options: ["Called On", "Not Called On"]
           },
           {
             name: "Length of Talk",
-            options: ["1-4 words","5-20","21 or more"]
+            options: ["1-4 words", "5-20", "21 or more"]
           },
           {
             name: "Student Talk",
-            options: ["How","What","Why","Other"]
+            options: ["How", "What", "Why", "Other"]
           }
         ];
 
@@ -200,7 +200,7 @@ var myStepDefinitionsWrapper = function () {
 
         Meteor.call('updateSubjParameters', {parameters: default_demo_parameters, envId: envId});
         Meteor.call('updateSeqParameters', {parameters: default_seq_parameters, envId: envId});
-        default_students.forEach(function(subj) {
+        default_students.forEach(function (subj) {
           Meteor.call('subjectInsert', subj);
         });
         cb()

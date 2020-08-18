@@ -58,7 +58,8 @@ let envIsSharedToGroup = function (gid, envId) {
 
 let getUserGroupEnvs = function (userId) {
   let groups = Groups.find({
-    $or: [{"members.userId": userId}, {showForAllUsers: true}]}, {reactive: false}).fetch();
+    $or: [{"members.userId": userId}, {showForAllUsers: true}]
+  }, {reactive: false}).fetch();
 
   let env_ids = new Set();
   groups.forEach(function (group) {
@@ -97,7 +98,7 @@ let userCanGroupEditEnv = function (uid, envId) {
     if (
       !!group.environments.find(env => env.envId === envId && env.share_type === 'edit') &&
       group.members.find(m => m.userId === uid)
-      .roles.some(r => ['edit', 'manage', 'admin'].includes(r))) {
+        .roles.some(r => ['edit', 'manage', 'admin'].includes(r))) {
       allow = true;
     }
   });

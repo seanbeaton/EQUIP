@@ -1,144 +1,156 @@
 <!-- HTML for data analyisis page -->
 
 <template name="staticReport">
-  {{> reportBackButton }}
-  <section class="c--view-data-header__container">
-      <h1 class="c--view-data-header__title">Data Report</h1>
-      <div class="c--view-data-header__links-container">
-          <p class="u--header-links c--view-data-header__links export-class-button">Export Student Roster</p>
-          <p class="u--header-links c--view-data-header__links print-button">Print</p>
-          <p class="u--header-links c--view-data-header__links reset-button">Reset</p>
-      </div>
-  </section>
+    {{> reportBackButton }}
+    <section class="c--view-data-header__container">
+        <h1 class="c--view-data-header__title">Data Report</h1>
+        <div class="c--view-data-header__links-container">
+            <p class="u--header-links c--view-data-header__links export-class-button">Export Student Roster</p>
+            <p class="u--header-links c--view-data-header__links print-button">Print</p>
+            <p class="u--header-links c--view-data-header__links reset-button">Reset</p>
+        </div>
+    </section>
 
 
-<!-- HTML for selecting what to include in report (visible to start) -->
-  <section class="c--view-data__container option-select">
-      <div class="no-print">
-          <h3 class="c--view-data__container-title">Select a Classroom</h3>
-          <div class="columns env-selection is-multiline">
+    <!-- HTML for selecting what to include in report (visible to start) -->
+    <section class="c--view-data__container option-select">
+        <div class="no-print">
+            <h3 class="c--view-data__container-title">Select a Classroom</h3>
+            <div class="columns env-selection is-multiline">
 
-          </div>
+            </div>
 
-          <h3 class="c--view-data__container-title">Select Observations</h3>
-          <div class="columns obs-selection is-multiline">
-              <h2 class="column subtitle">Please select a classroom first</h2>
-          </div>
-          <h3 class="c--view-data__container-title">Select Demographic Parameters</h3>
-          <div class="columns dparam-selection is-multiline">
-              <h2 class="column subtitle">Please select a classroom first</h2>
-          </div>
-          <h3 class="c--view-data__container-title">Select Sequence Parameters</h3>
-          <div class="columns sparam-selection is-multiline">
-              <h2 class="column subtitle">Please select a classroom first</h2>
-          </div>
+            <h3 class="c--view-data__container-title">Select Observations</h3>
+            <div class="columns obs-selection is-multiline">
+                <h2 class="column subtitle">Please select a classroom first</h2>
+            </div>
+            <h3 class="c--view-data__container-title">Select Demographic Parameters</h3>
+            <div class="columns dparam-selection is-multiline">
+                <h2 class="column subtitle">Please select a classroom first</h2>
+            </div>
+            <h3 class="c--view-data__container-title">Select Sequence Parameters</h3>
+            <div class="columns sparam-selection is-multiline">
+                <h2 class="column subtitle">Please select a classroom first</h2>
+            </div>
 
-          <button class="o--standard-button generate-button">Generate Report!</button>
-      </div>
-      <div class="print-only">
-          <h2>Please generate the report before printing.</h2>
-      </div>
-  </section>
+            <button class="o--standard-button generate-button">Generate Report!</button>
+        </div>
+        <div class="print-only">
+            <h2>Please generate the report before printing.</h2>
+        </div>
+    </section>
 
-<!-- HTML for displaying graphics (hidden at first) -->
-  <section class="section report-body">
-      <div class="report">
-          <div class="report__section report__section--print-first-page print-only">
-              <div class="report__section-head">
-                  <div class="print-report-header">
-                      <div class="brand-container">
-                          <div class="logo-container">
-                              <a class="header-links" href="/" >
-                                  <h3 class="equip-text">EQUIP</h3>
-                                  <span class="beta-text-wrapper"><h6 class="beta-text">BETA</h6></span>
-                                  <img alt="Brand" class="equip-hands" src="/refresh/equip-hands.svg">
-                              </a>
-                          </div>
-                          <p class="logo-text">Empowered Teachers, Equitable Classrooms</p>
-                      </div>
-                  </div>
-                  <h3 class="title is-2 report-label-head">Analytics Report</h3>
-              </div>
-              <div class="report__section-body">
-                  <div class="classroom-summary">
-                  </div>
-              </div>
-          </div>
+    <!-- HTML for displaying graphics (hidden at first) -->
+    <section class="section report-body">
+        <div class="report">
+            <div class="report__section report__section--print-first-page print-only">
+                <div class="report__section-head">
+                    <div class="print-report-header">
+                        <div class="brand-container">
+                            <div class="logo-container">
+                                <a class="header-links" href="/">
+                                    <h3 class="equip-text">EQUIP</h3>
+                                    <span class="beta-text-wrapper"><h6 class="beta-text">BETA</h6></span>
+                                    <img alt="Brand" class="equip-hands" src="/refresh/equip-hands.svg">
+                                </a>
+                            </div>
+                            <p class="logo-text">Empowered Teachers, Equitable Classrooms</p>
+                        </div>
+                    </div>
+                    <h3 class="title is-2 report-label-head">Analytics Report</h3>
+                </div>
+                <div class="report__section-body">
+                    <div class="classroom-summary">
+                    </div>
+                </div>
+            </div>
 
-          <div class="report__section no-print">
-              <div class="report__section-head">
-                  <h3 class="title is-3 report-label-head">Summary</h3>
-                  <h4 class="subtitle is-5 report-description">Details about the classroom in this report.</h4>
-              </div>
-              <div class="report__section-body">
-                  <div class="classroom-summary">
-                  </div>
-              </div>
-          </div>
+            <div class="report__section no-print">
+                <div class="report__section-head">
+                    <h3 class="title is-3 report-label-head">Summary</h3>
+                    <h4 class="subtitle is-5 report-description">Details about the classroom in this report.</h4>
+                </div>
+                <div class="report__section-body">
+                    <div class="classroom-summary">
+                    </div>
+                </div>
+            </div>
 
-          <div class="report__section">
-              <div class="report__section-head">
-                  <h3 class="title is-3 report-label-head">Classroom Demographic Breakdown</h3>
-                  <h4 class="subtitle is-5 report-description">Demographics of the class.</h4>
-              </div>
-              <div class="report__section-body">
-                  <div class="plots demo-plots">
-                  </div>
-              </div>
-          </div>
+            <div class="report__section">
+                <div class="report__section-head">
+                    <h3 class="title is-3 report-label-head">Classroom Demographic Breakdown</h3>
+                    <h4 class="subtitle is-5 report-description">Demographics of the class.</h4>
+                </div>
+                <div class="report__section-body">
+                    <div class="plots demo-plots">
+                    </div>
+                </div>
+            </div>
 
-          <div class="report__section">
-              <div class="report__section-head">
-                  <h3 class="title is-3 report-label-head">Classroom Statistics</h3>
-                  <h4 class="subtitle is-5 report-description">This is a summary of the participation at the classroom level.</h4>
-              </div>
-              <div class="report__section-body">
-                <div class="class-stats row"></div>
-              </div>
+            <div class="report__section">
+                <div class="report__section-head">
+                    <h3 class="title is-3 report-label-head">Classroom Statistics</h3>
+                    <h4 class="subtitle is-5 report-description">This is a summary of the participation at the classroom
+                        level.</h4>
+                </div>
+                <div class="report__section-body">
+                    <div class="class-stats row"></div>
+                </div>
 
-          </div>
-          <div class="report__section">
+            </div>
+            <div class="report__section">
 
-              <div class="report__section-head">
-                  <h3 class="title is-3 report-label-head">Individual Contributions</h3>
-                  <h4 class="subtitle is-5 report-description">A bar graph showing individual contributions across all students.</h4>
-              </div>
-              <div class="report__section-body">
-                  <div class="plots individual-plots">
-                      <div class="vert-ind"> </div>
-                  </div>
-              </div>
-          </div>
-          <div class="report__section">
-              <div class="report__section-head">
-                  <h3 class="title is-3 report-label-head">Contribution Ratios Across Demographics</h3>
-                  <h4 class="subtitle is-5 report-description">Bar graphs showing equity factor for contributions across all demographic categories chosen. The equity factor describes the ratio of actual participation over expected participation, based on demographics (e.g., if Latinx students make up 30% of the class, one would expect that they have 30% of the contributions). An equity factor greater than 1 indicates the group is participating more than one would expect in an "equal" classroom, 1 is what one would expect, and less than 1 is less than one would expect (underrepreseted). </h4>
-              </div>
-              <div class="report__section-body">
-                  <div class="plots ratio-plots">
+                <div class="report__section-head">
+                    <h3 class="title is-3 report-label-head">Individual Contributions</h3>
+                    <h4 class="subtitle is-5 report-description">A bar graph showing individual contributions across all
+                        students.</h4>
+                </div>
+                <div class="report__section-body">
+                    <div class="plots individual-plots">
+                        <div class="vert-ind"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="report__section">
+                <div class="report__section-head">
+                    <h3 class="title is-3 report-label-head">Contribution Ratios Across Demographics</h3>
+                    <h4 class="subtitle is-5 report-description">Bar graphs showing equity factor for contributions
+                        across all demographic categories chosen. The equity factor describes the ratio of actual
+                        participation over expected participation, based on demographics (e.g., if Latinx students make
+                        up 30% of the class, one would expect that they have 30% of the contributions). An equity factor
+                        greater than 1 indicates the group is participating more than one would expect in an "equal"
+                        classroom, 1 is what one would expect, and less than 1 is less than one would expect
+                        (underrepreseted). </h4>
+                </div>
+                <div class="report__section-body">
+                    <div class="plots ratio-plots">
 
-                  </div>
-              </div>
-          </div>
-      </div>
-  </section>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
     <!-- HELP MODAL -->
-  <div id="help-env-modal" class="modal">
-    <div class="modal-background"></div>
-    <div class="modal-card">
-      <header class="modal-card-head">
-        <p class="modal-card-title">How to Generate Analytics</p>
-        <button id="help-close-modal" class="delete"></button>
-      </header>
-      <section class="modal-card-body">
-	    This interface will allow you to generate analytics for the observations you have already performed. Simply click on the classroom, observations, demographics, and observation parameters you wish to include, and then click on "generate report." You may also use the "export observations" and "export classroom" buttons to generate .csv files containing your observed data, so that you can work with them using external statistical software.
-      </section>
-      <footer class="modal-card-foot">
-        <a class="button">Cancel</a>
-      </footer>
+    <div id="help-env-modal" class="modal">
+        <div class="modal-background"></div>
+        <div class="modal-card">
+            <header class="modal-card-head">
+                <p class="modal-card-title">How to Generate Analytics</p>
+                <button id="help-close-modal" class="delete"></button>
+            </header>
+            <section class="modal-card-body">
+                This interface will allow you to generate analytics for the observations you have already performed.
+                Simply click on the classroom, observations, demographics, and observation parameters you wish to
+                include, and then click on "generate report." You may also use the "export observations" and "export
+                classroom" buttons to generate .csv files containing your observed data, so that you can work with them
+                using external statistical software.
+            </section>
+            <footer class="modal-card-foot">
+                <a class="button">Cancel</a>
+            </footer>
+        </div>
     </div>
-  </div>
-  <div id="toolTip"></div>
+    <div id="toolTip"></div>
 
 </template>

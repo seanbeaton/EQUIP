@@ -1,5 +1,3 @@
-import {console_log_conditional} from "/helpers/logging"
-
 Meteor.methods({
   /**
    * update a user's permissions
@@ -12,7 +10,7 @@ Meteor.methods({
     var loggedInUser = Meteor.user()
 
     if (!loggedInUser || !Roles.userIsInRole(loggedInUser,
-        ['manage-users'], group)) {
+      ['manage-users'], group)) {
       throw new Meteor.Error(403, "Access denied")
     }
 

@@ -4,7 +4,7 @@ import {checkAccess} from "../../helpers/access";
 
 
 Meteor.methods({
-  getTimelineData: function(parameters, refresh) {
+  getTimelineData: function (parameters, refresh) {
     checkAccess(parameters.envId, 'environment', 'view');
     if (typeof refresh === 'undefined') {
       refresh = false;
@@ -12,15 +12,15 @@ Meteor.methods({
     let user = Meteor.user();
 
     const parameters_cache_key = JSON.stringify(parameters);
-    const one_hour = 1*60*60*1000;
+    const one_hour = 1 * 60 * 60 * 1000;
     const search_time_limit = refresh ? 0 : one_hour;
     let fetch_start = new Date().getTime();
     let report_data = CachedReportData.findOne({
-      createdAt: {$gte: new Date(new Date().getTime()-search_time_limit)},
+      createdAt: {$gte: new Date(new Date().getTime() - search_time_limit)},
       reportType: 'getTimelineData',
       parameters_cache_key: parameters_cache_key,
     }, {
-      sort: { createdAt : -1 }
+      sort: {createdAt: -1}
     });
 
     if (!report_data) {
@@ -44,7 +44,7 @@ Meteor.methods({
   },
 })
 
-let createTimelineData = function(params) {
+let createTimelineData = function (params) {
   let d3 = require('d3');
 
   console_log_conditional('params', params);
@@ -61,7 +61,7 @@ let createTimelineData = function(params) {
   let demo_opts = params.demo_opts;
   let selectedObservations = params.selectedObservations;
 
-  let students_by_demo = demo_opts.map(function(demo_opt) {
+  let students_by_demo = demo_opts.map(function (demo_opt) {
     //console_log_conditional('demo_opt', demo_opt);
     return {
       label: demo_opt,
@@ -72,7 +72,7 @@ let createTimelineData = function(params) {
 
   let start_1 = new Date().getTime();
 
-  allStudents.forEach(function(student) {
+  allStudents.forEach(function (student) {
     let demoCountIndex = students_by_demo.findIndex(demoopt => demoopt.label === student.info.demographics[demo])
     students_by_demo[demoCountIndex].count++;
   });
@@ -81,7 +81,7 @@ let createTimelineData = function(params) {
   // let start_2 = new Date().getTime();
 
   // console.log('students_by_demo', students_by_demo);
-  students_by_demo.forEach(function(demographic) {
+  students_by_demo.forEach(function (demographic) {
     demographic.percent = demographic.count / students_by_demo.reduce((t, d) => d.count + t, 0)
   });
 
@@ -90,7 +90,7 @@ let createTimelineData = function(params) {
   // let start_3 = new Date().getTime();
 
   let obsers = getObservations(selectedObservations);
-  obsIds.forEach(function(obsId) {
+  obsIds.forEach(function (obsId) {
     if (!ret.contributions_dataset.find(datapoint => datapoint.obsId === obsId)) {
       // If it wasn't there:
       let obs = obsers.find(obs => obs._id === obsId);
@@ -111,7 +111,7 @@ let createTimelineData = function(params) {
       ret.contributions_dataset.push(datapoint)
     }
 
-    Sequences.find({obsId: obsId}).forEach(function(sequence) {
+    Sequences.find({obsId: obsId}).forEach(function (sequence) {
       let seqDemoOption = sequence.info.student.demographics[demo];
 
       let ds_index = ret.contributions_dataset.findIndex(datapoint => datapoint.obsId === obsId);
@@ -130,7 +130,7 @@ let createTimelineData = function(params) {
 
   ret.equity_dataset = [];
 
-  ret.equity_dataset = ret.contributions_dataset.map(function(observation) {
+  ret.equity_dataset = ret.contributions_dataset.map(function (observation) {
     let obs_equity = {
       _total: 1,
       obsId: observation.obsId,
@@ -140,7 +140,7 @@ let createTimelineData = function(params) {
       studentsByDemo: students_by_demo,
       contribsByDemo: [],
     }
-    demo_opts.forEach(function(demo_opt) {
+    demo_opts.forEach(function (demo_opt) {
       let percent_of_contribs = observation[demo_opt] / observation._total;
       if (isNaN(percent_of_contribs)) {
         percent_of_contribs = 0;
@@ -171,11 +171,11 @@ let createTimelineData = function(params) {
   // console.log(new Date().getTime() - start_4, 'start_4')
   // let start_5 = new Date().getTime();
 
-  ret.contributions_dataset.forEach(function(obs) {
+  ret.contributions_dataset.forEach(function (obs) {
     let vals = demo_opts.map(demo_opt => obs[demo_opt]);
     obs.max = Math.max.apply(null, vals);
   });
-  ret.equity_dataset.forEach(function(obs) {
+  ret.equity_dataset.forEach(function (obs) {
     let vals = demo_opts.map(demo_opt => obs[demo_opt]);
     obs.max = Math.max.apply(null, vals);
   })

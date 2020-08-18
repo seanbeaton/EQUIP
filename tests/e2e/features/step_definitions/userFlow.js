@@ -2,7 +2,6 @@
 // import {generateData} from "../../../imports/api/generate-data.app-tests"
 // import {delayedGo} from "./sharedSteps.js"
 const assert = require('assert');
-import {console_log_conditional} from "../../../../helpers/logging";
 
 var myStepDefinitionsWrapper = function () {
   // this.Before(function(scenario) {
@@ -21,10 +20,10 @@ var myStepDefinitionsWrapper = function () {
   this.Given(/^I have generated an example classroom$/, function (callback) {
     browser.executeAsync(
       (cb) => {
-        Meteor.call('environmentInsertExample', null, function(error, result) {
+        Meteor.call('environmentInsertExample', null, function (error, result) {
           cb();
         });
-        })
+      })
     callback()
   });
 
@@ -34,7 +33,7 @@ var myStepDefinitionsWrapper = function () {
     callback();
   });
 
-  this.When(/^I create an account with username "([^"]*)" and password "([^"]*)"$/, function(user, pass, callback) {
+  this.When(/^I create an account with username "([^"]*)" and password "([^"]*)"$/, function (user, pass, callback) {
     createAccount(user, pass)
     callback()
   });
@@ -51,7 +50,9 @@ var myStepDefinitionsWrapper = function () {
 
   this.Then(/^I am logged in as the user "([^"]*)"$/, function (arg1, callback) {
     browser.pause(250);
-    let current_user = browser.execute(() => {return Meteor.user()});
+    let current_user = browser.execute(() => {
+      return Meteor.user()
+    });
     assert(current_user.value.username === arg1);
     callback();
   });
@@ -62,7 +63,7 @@ var myStepDefinitionsWrapper = function () {
   });
 };
 
-let createAccount = function(username, password) {
+let createAccount = function (username, password) {
   browser.$('#at-field-username').waitForExist(4000);
   browser.$('#at-field-username').setValue(username);
   browser.$('#at-field-email').setValue(username + '@example.com');
@@ -81,7 +82,7 @@ let createAccount = function(username, password) {
 
 }
 
-let logInAccount = function(username, password) {
+let logInAccount = function (username, password) {
   browser.$('#at-field-username_and_email').waitForExist(4000);
   browser.$('#at-field-username_and_email').setValue(username);
   browser.$('#at-field-password').setValue(password);
@@ -92,8 +93,8 @@ let logInAccount = function(username, password) {
 }
 
 
-let delayedGo = function(loc) {
-  browser.executeAsync(function(route, done) {
+let delayedGo = function (loc) {
+  browser.executeAsync(function (route, done) {
     Router.go(route);
     setTimeout(done, 200)
   }, loc)

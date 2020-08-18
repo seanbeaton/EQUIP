@@ -1,22 +1,22 @@
-import {userIsGroupMember, getHumanEnvPermission, hasRemovePermission, userIsEnvOwner} from "/helpers/groups";
+import {getHumanEnvPermission, hasRemovePermission, userIsEnvOwner} from "/helpers/groups";
 import {console_log_conditional} from "/helpers/logging"
 
 Template.groupView.helpers({
-  group: function() {
+  group: function () {
     return this.group;
   },
-  myRole: function(group) {
+  myRole: function (group) {
     return group.members.find(u => u.userId === Meteor.userId()).roles.join(', ')
   },
-  getEnvOwner: function(envId) {
+  getEnvOwner: function (envId) {
     let ownerId = Environments.findOne({_id: envId}).userId;
     return Meteor.users.findOne({_id: ownerId}).username;
   },
-  getEnvName: function(envId) {
+  getEnvName: function (envId) {
     console_log_conditional('getEnvName', envId);
     return Environments.findOne({_id: envId}).envName
   },
-  isEnvOwner: function(envId) {
+  isEnvOwner: function (envId) {
     return userIsEnvOwner(envId);
   },
   getHumanEnvPermission(perm) {
@@ -29,7 +29,7 @@ Template.groupView.helpers({
 });
 
 
-Template.groupView.onCreated(function() {
+Template.groupView.onCreated(function () {
   console_log_conditional('this before', this.data);
   let group_ids = this.data.group.environments.map(env => env.envId);
   console_log_conditional('ret', group_ids)
@@ -38,10 +38,10 @@ Template.groupView.onCreated(function() {
 })
 
 Template.envShareTypeChanger.helpers({
-  viewChecked: function() {
+  viewChecked: function () {
     return this.env.share_type === 'view' ? 'checked' : ''
   },
-  editChecked: function() {
+  editChecked: function () {
     return this.env.share_type === 'edit' ? 'checked' : ''
   },
   getHumanEnvPermission(perm) {
@@ -50,13 +50,13 @@ Template.envShareTypeChanger.helpers({
 })
 
 Template.envShareTypeChanger.events = {
-  'click input[type="radio"]': function(e, template) {
+  'click input[type="radio"]': function (e, template) {
     Meteor.call('changeGroupEnvPermission', this.group._id, this.env.envId, $(e.target).attr('data-share-type'))
   }
 }
 
 Template.envAddForm.helpers({
-  autocompleteSettings: function() {
+  autocompleteSettings: function () {
     return {
       position: "bottom",
       limit: 5,
@@ -67,10 +67,10 @@ Template.envAddForm.helpers({
           field: 'envName',
           template: Template.envAutocompleteOption,
           noMatchTemplate: Template.noAutocompleteAvailable,
-          selector: function(match) {
+          selector: function (match) {
             let regex = new RegExp(match, 'i');
             return {
-              $or: [ {
+              $or: [{
                 'envName': regex
               }
               ]
@@ -86,7 +86,7 @@ Template.envAddForm.helpers({
 })
 
 Template.groupView.events = {
-  'autocompleteselect .environment-add-form__input': function(e, template, doc) {
+  'autocompleteselect .environment-add-form__input': function (e, template, doc) {
     let share_type = $('input[name="env-share-type"]:checked').attr('data-share-type')
     console.log('addenv', doc, doc._id, template.data.group._id)
     Meteor.call('addEnvToGroup', doc._id, template.data.group._id, share_type)
@@ -96,7 +96,7 @@ Template.groupView.events = {
 }
 
 Template.removeEnvButton.events = {
-  'click .remove-env-from-group': function(e, template, doc) {
+  'click .remove-env-from-group': function (e, template, doc) {
     console_log_conditional('temp, doc', template, doc);
     Meteor.call('removeEnvFromGroup', template.data.env.envId, template.data.group._id)
   }

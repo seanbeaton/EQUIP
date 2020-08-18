@@ -1,11 +1,7 @@
-import vis from 'vis';
 import {Sidebar} from '../../../../helpers/graph_sidebar';
 import {console_log_conditional} from "/helpers/logging"
 
 import '/node_modules/vis/dist/vis.min.css';
-
-import {setupSequenceParameters, setupSubjectParameters} from "/helpers/parameters";
-import {getStudents} from "/helpers/students";
 import {convertISODateToUS} from "/helpers/dates";
 import {clone_object} from "/helpers/objects";
 import {setupVis} from "/helpers/timeline";
@@ -39,12 +35,12 @@ Template.timelineReport.onCreated(function created() {
 });
 
 Template.timelineReport.helpers({
-  environments: function() {
+  environments: function () {
     // //console_log_conditional('envs', Environments.find());
     let envs = Environments.find().fetch();
     //console_log_conditional('envs', envs);
     // let default_set = false;
-    envs = envs.map(function(env) {
+    envs = envs.map(function (env) {
       if (typeof env.envName === 'undefined') {
         env.envName = 'Loading...';
         env.disabled = 'disabled';
@@ -68,10 +64,10 @@ Template.timelineReport.helpers({
     });
     return envs;
   },
-  environmentChosen: function() {
+  environmentChosen: function () {
     return !!(selectedEnvironment.get());
   },
-  observationChosen: function() {
+  observationChosen: function () {
     return !!(selectedObservations.get().length >= 2)
   },
   // discourseDimensions: function() {
@@ -80,18 +76,18 @@ Template.timelineReport.helpers({
   // demographics: function() {
   //   return getDemographics()
   // },
-  environment: function() {
+  environment: function () {
     return getEnvironment();
   },
-  observations: function() {
+  observations: function () {
     return getObservations(selectedObservations.get());
   },
-  observationNames: function() {
+  observationNames: function () {
     let observations = getObservations(selectedObservations.get());
     let obsNames = observations.map(obs => obs.name);
 
     if (obsNames.length >= 3) {
-      return obsNames.slice(0,-1).join(', ') + ', and ' + obsNames[obsNames.length - 1]
+      return obsNames.slice(0, -1).join(', ') + ', and ' + obsNames[obsNames.length - 1]
     }
     else if (obsNames.length === 2) {
       return obsNames.join(' and ');
@@ -100,29 +96,35 @@ Template.timelineReport.helpers({
       return obsNames[0]
     }
   },
-  demographics: function() {
+  demographics: function () {
     //console_log_conditional('getDemographics', getDemographics());
     return getDemographics();
   },
-  discourseparams: function() {
+  discourseparams: function () {
     return getDiscourseDimensions(selectedEnvironment.get());
   },
-  demo_available: function() {
-    setTimeout(function(){$(".chosen-select").trigger("chosen:updated");}, 100);  // makes these elements respect the disabled attr on their selects
+  demo_available: function () {
+    setTimeout(function () {
+      $(".chosen-select").trigger("chosen:updated");
+    }, 100);  // makes these elements respect the disabled attr on their selects
     return !!selectedEnvironment.get() && !!(selectedObservations.get().length >= 2) ? '' : 'disabled'
   },
-  disc_available: function() {
-    setTimeout(function(){$(".chosen-select").trigger("chosen:updated");}, 100);  // makes these elements respect the disabled attr on their selects
+  disc_available: function () {
+    setTimeout(function () {
+      $(".chosen-select").trigger("chosen:updated");
+    }, 100);  // makes these elements respect the disabled attr on their selects
     return !!selectedEnvironment.get() && !!(selectedObservations.get().length >= 2) ? '' : 'disabled'
   },
-  disc_options_available: function() {
-    setTimeout(function(){$(".chosen-select").trigger("chosen:updated");}, 100);  // makes these elements respect the disabled attr on their selects
+  disc_options_available: function () {
+    setTimeout(function () {
+      $(".chosen-select").trigger("chosen:updated");
+    }, 100);  // makes these elements respect the disabled attr on their selects
     return !!selectedDiscourseDimension.get() && !!selectedEnvironment.get() && !!(selectedObservations.get().length >= 2) ? '' : 'disabled'
   },
-  selected_discourse_options: function() {
+  selected_discourse_options: function () {
     return getDiscourseOptionsForDimension(selectedEnvironment.get(), selectedDiscourseDimension.get());
   },
-  dataset_types: function() {
+  dataset_types: function () {
     return [
       {
         id: 'contributions',
@@ -136,16 +138,16 @@ Template.timelineReport.helpers({
       }
     ]
   },
-  cache_info: function() {
+  cache_info: function () {
     return cacheInfo.get();
   },
-  loadingDataClass: function() {
+  loadingDataClass: function () {
     return loadingData.get();
   },
 });
 
 
-let getDemographics = function() {
+let getDemographics = function () {
   let envId = selectedEnvironment.get();
   if (!envId) {
     return []
@@ -154,23 +156,23 @@ let getDemographics = function() {
 };
 
 
-let getDemographicOptions = function() {
+let getDemographicOptions = function () {
   let options = getDemographics();
   let selected_demo = selectedDemographic.get();
-  let opt =  options.find(opt => opt.label === selected_demo);
+  let opt = options.find(opt => opt.label === selected_demo);
   //console_log_conditional('opt', opt);
   return opt.options
 };
 
 
-let getEnvironment = function() {
+let getEnvironment = function () {
   let envId = selectedEnvironment.get();
   return Environments.findOne({_id: envId})
 }
 
 
 Template.timelineReport.events({
-  'change #env-select': function(e) {
+  'change #env-select': function (e) {
 
     let selected = $('option:selected', e.target);
     //console_log_conditional('env-select,', selected.val());
@@ -179,8 +181,8 @@ Template.timelineReport.events({
     selectedDiscourseOption.set(false);
     clearObservations();
     obsOptions.set(getObsOptions());
-    setTimeout(function() {
-      setupVis('vis-container', function() {
+    setTimeout(function () {
+      setupVis('vis-container', function () {
         updateGraph();
       }, obsOptions, selectedObservations, 'whole_class');
     }, 50);
@@ -193,7 +195,7 @@ Template.timelineReport.events({
       sidebar.setCurrentPanel('start');
     }
   },
-  'change #disc-select': function(e) {
+  'change #disc-select': function (e) {
     let selected = $('option:selected', e.target);
     //console_log_conditional('disc-select,', selected.val());
     selectedDiscourseDimension.set(selected.val());
@@ -202,25 +204,25 @@ Template.timelineReport.events({
     selectedDiscourseOption.set(false);
     updateGraph();
   },
-  'change #demo-select': function(e) {
+  'change #demo-select': function (e) {
     let selected = $('option:selected', e.target);
     //console_log_conditional('demo-select,', selected.val());
     selectedDemographic.set(selected.val());
     updateGraph()
   },
-  'change #disc-opt-select': function(e) {
+  'change #disc-opt-select': function (e) {
     let selected = $('option:selected', e.target);
     //console_log_conditional('disc-opt-select,', selected.val());
     selectedDiscourseOption.set(selected.val());
     updateGraph()
   },
-  'change #dataset-type-select': function(e) {
+  'change #dataset-type-select': function (e) {
     let selected = $('option:selected', e.target);
     //console_log_conditional('dataset-type-select,', selected.val());
     selectedDatasetType.set(selected.val());
     updateGraph()
   },
-  'click .refresh-report': function(e) {
+  'click .refresh-report': function (e) {
     e.preventDefault();
     updateGraph(true)
   }
@@ -228,13 +230,13 @@ Template.timelineReport.events({
 
 let sidebar;
 
-let clearGraph = function() {
+let clearGraph = function () {
   //console_log_conditional('clearing-graph');
   let timeline_selector = '.timeline-report__graph';
   $(timeline_selector + ' svg').remove();
 }
 
-let updateGraph = async function(refresh) {
+let updateGraph = async function (refresh) {
   if (typeof refresh === 'undefined') {
     refresh = false;
   }
@@ -266,7 +268,7 @@ let updateGraph = async function(refresh) {
   }
 
   loadingData.set(true);
-  Meteor.call('getTimelineData', timeline_params, refresh, function(err, result) {
+  Meteor.call('getTimelineData', timeline_params, refresh, function (err, result) {
     if (err) {
       console_log_conditional('error', err);
       return;
@@ -286,15 +288,18 @@ let updateGraph = async function(refresh) {
       sidebar.setCurrentPanel('start');
       updateTimelineGraph(result.data, timeline_selector)
     }
-    cacheInfo.set({createdAt: result.createdAt.toLocaleString(), timeToGenerate: result.timeToGenerate, timeToFetch: result.timeToFetch});
+    cacheInfo.set({
+      createdAt: result.createdAt.toLocaleString(),
+      timeToGenerate: result.timeToGenerate,
+      timeToFetch: result.timeToFetch
+    });
     loadingData.set(false);
     console_log_conditional('result.createdAt.toLocaleString()', result.createdAt.toLocaleString());
   });
 }
 
 
-
-let initTimelineGraph = function(full_data, containerSelector) {
+let initTimelineGraph = function (full_data, containerSelector) {
   let d3 = require('d3');
   let data;
 
@@ -306,7 +311,9 @@ let initTimelineGraph = function(full_data, containerSelector) {
     data = full_data.equity_dataset;
   }
 
-  data = data.sort(function(a, b) {return a.d3date - b.d3date});
+  data = data.sort(function (a, b) {
+    return a.d3date - b.d3date
+  });
 
   let svg_tag = $('<svg width="718" height="500">' +
     '<defs>\n' +
@@ -343,7 +350,7 @@ let initTimelineGraph = function(full_data, containerSelector) {
   //   .y(function(d) { return y(d._total)});
 
 
-  let lines = demos.map(function(demo) {
+  let lines = demos.map(function (demo) {
     let line = d3.line()
       .x(d => x(d.d3date))
       .y(d => y(d[demo]));
@@ -375,7 +382,7 @@ let initTimelineGraph = function(full_data, containerSelector) {
 
   //console_log_conditional('key_colors', key_colors);
 
-  lines.forEach(function(line) {
+  lines.forEach(function (line) {
     g.append('path')
       .data([data])
       .attr('class', 'line line--demo')
@@ -395,7 +402,7 @@ let initTimelineGraph = function(full_data, containerSelector) {
       .attr('cy', d => y(d[line.demo]))
       .attr('data-demo-name', line.demo)
       .style("fill", z(line.demo))
-      .on('mouseover', function(d) {
+      .on('mouseover', function (d) {
         d['line_name'] = line.demo;
         let data = [];
         let circles = g.selectAll('circle[cx="' + x(d.d3date) + '"][cy="' + y(d[line.demo]) + '"]');
@@ -404,7 +411,7 @@ let initTimelineGraph = function(full_data, containerSelector) {
           //console_log_conditional('d', d);
           //console_log_conditional('this', this);
           //console_log_conditional('circles', circles);
-          circles.each(function(d) {
+          circles.each(function (d) {
             let datum = clone_object(d);
             datum.line_name = $(this).attr('data-demo-name');
             data.push(datum)
@@ -418,7 +425,7 @@ let initTimelineGraph = function(full_data, containerSelector) {
 
         buildBarTooltipSlide(data, z)
       })
-      .on('mouseout', function() {
+      .on('mouseout', function () {
         // sidebar.setCurrentPanel('start', 250)
       });
 
@@ -442,8 +449,8 @@ let initTimelineGraph = function(full_data, containerSelector) {
     y_a =
       g.append("g")
         .attr("class", "axis--y")
-        .call(d3.axisLeft(y).tickFormat(function(e){
-            if(Math.floor(e) !== e) {
+        .call(d3.axisLeft(y).tickFormat(function (e) {
+            if (Math.floor(e) !== e) {
               return;
             }
             return e;
@@ -469,9 +476,7 @@ let initTimelineGraph = function(full_data, containerSelector) {
   //   .attr("transform", "rotate(-90)")
 
 
-
-
-  let toggleTickDirection = function(tick) {
+  let toggleTickDirection = function (tick) {
     if ($(tick).attr('x2') === "-6") {
       $(tick).attr('x2', width)
     }
@@ -483,7 +488,7 @@ let initTimelineGraph = function(full_data, containerSelector) {
   if (selectedDatasetType.get() === 'equity') {
     let center_line = $('.axis--y g').filter((idx, item) => parseFloat($('text', item).text()) === 1.);
     // toggleTickDirection($('line', center_line[0]));
-    $(center_line[0]).on('click', function(tick) {
+    $(center_line[0]).on('click', function (tick) {
       toggleTickDirection($('line', center_line[0]));
     });
     $(center_line[0]).addClass('clickable-tick')
@@ -492,12 +497,12 @@ let initTimelineGraph = function(full_data, containerSelector) {
 };
 
 
-let updateTimelineGraph = function(full_data, containerSelector) {
+let updateTimelineGraph = function (full_data, containerSelector) {
   initTimelineGraph(full_data, containerSelector)
 };
 
-let updateKey = function(key_wrapper, y_values, color_axis) {
-  let key_chunks = y_values.map(function(label) {
+let updateKey = function (key_wrapper, y_values, color_axis) {
+  let key_chunks = y_values.map(function (label) {
     let color = color_axis(label)
     return `<span class="key--label"><span class="key--color" style="background-color: ${color}"></span><span class="key--text">${label}</span></span>`
   })
@@ -506,22 +511,23 @@ let updateKey = function(key_wrapper, y_values, color_axis) {
   $(key_wrapper).html(html)
 }
 
-let buildBarTooltipSlide = function(data, demo_color_axis) {
+let buildBarTooltipSlide = function (data, demo_color_axis) {
   let title = '',
     html = '';
 
   if (data.length > 1) {
     title = 'Multiple datapoints'
-  } else {
+  }
+  else {
     title = `${data[0].obsName} <br/> ${convertISODateToUS(data[0].date)}`;
   }
 
   //console_log_conditional('buidling sidebar, ', data);
   if (selectedDatasetType.get() === 'contributions') {
-    html = data.map(function(datum) {
+    html = data.map(function (datum) {
       let ret = '';
       if (data.length > 1) {
-          ret += `<h4 class="panel-section__title">${datum.obsName} <br/> ${convertISODateToUS(datum.date)}</h4>`
+        ret += `<h4 class="panel-section__title">${datum.obsName} <br/> ${convertISODateToUS(datum.date)}</h4>`
       }
       ret += `
     <div class="stat-group">
@@ -536,7 +542,7 @@ let buildBarTooltipSlide = function(data, demo_color_axis) {
     }).join('');
   }
   else {
-    html = data.map(function(datum) {
+    html = data.map(function (datum) {
       let ret = '';
       if (data.length > 1) {
         ret += `<h4 class="panel-section__title">${datum.obsName} </br> ${convertISODateToUS(datum.date)}</h4>`
@@ -600,16 +606,16 @@ let avail_colors_viridis = [
 
 
 function shiftArrayToLeft(arr, places) {
-  arr.push.apply(arr, arr.splice(0,places));
+  arr.push.apply(arr, arr.splice(0, places));
 }
 
-let getLabelColors = function(labels) {
+let getLabelColors = function (labels) {
   let local_colors = avail_colors_viridis.slice();
 
   let spacing = Math.max(Math.floor(avail_colors_viridis.length / labels.length), 1);
 
   let label_colors = {};
-  let _ = labels.map(function(label) {
+  let _ = labels.map(function (label) {
     if (typeof label_colors[label] === 'undefined') {
       let new_color = local_colors[0];
       local_colors.push(new_color);
@@ -623,7 +629,7 @@ let getLabelColors = function(labels) {
   return label_colors
 }
 
-let getObsOptions = function(envId) {
+let getObsOptions = function (envId) {
   if (typeof envId === 'undefined') {
     envId = selectedEnvironment.get();
   }
@@ -653,21 +659,21 @@ const possibleSlides = {
 
 const lastSlide = new ReactiveVar('env');
 
-let calculateSlidePosition = function(section) {
+let calculateSlidePosition = function (section) {
   //console_log_conditional('calculateSlidePosition, going to slide', section);
   lastSlide.set(section);
   let slideSettings = possibleSlides[lastSlide.get()];
   let prevSlides = Object.keys(possibleSlides).filter(item => possibleSlides[item].pos < slideSettings.pos);
   //console_log_conditional('prevsliders', prevSlides);
 
-  let heights = prevSlides.map(prevSlide => $('.report-section[data-slide-id="' + prevSlide +'"]').height() + 40); // 40px margin
+  let heights = prevSlides.map(prevSlide => $('.report-section[data-slide-id="' + prevSlide + '"]').height() + 40); // 40px margin
   let aboveItemsHeight = heights.reduce((a, b) => a + b, 0);  // sum
   let topMargin = `${aboveItemsHeight * -1}px`;
 
   $('.report-section-wrapper__slide').css('marginTop', topMargin)
 }
 
-let clearObservations = function() {
+let clearObservations = function () {
   //console_log_conditional('TODO: CLEAN OBSERVATIONS');
   clearParameters();
   selectedObservations.set([]);
@@ -675,7 +681,7 @@ let clearObservations = function() {
 
 };
 
-let clearParameters = function() {
+let clearParameters = function () {
   //console_log_conditional('TODO: CLEAN PARAMS')
 };
 

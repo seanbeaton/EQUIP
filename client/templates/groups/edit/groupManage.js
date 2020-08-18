@@ -1,43 +1,44 @@
 import {console_log_conditional} from "/helpers/logging"
+
 const groupNameEditActive = ReactiveVar(false);
 
 Template.groupNameEditable.helpers({
-  editing: function() {
+  editing: function () {
     return groupNameEditActive.get()
   }
 })
 
 Template.groupNameEditable.events({
-  'click .group__name--start-edit': function(e) {
+  'click .group__name--start-edit': function (e) {
     groupNameEditActive.set(true);
   },
-  'submit .group__name__edit-form': function(e) {
+  'submit .group__name__edit-form': function (e) {
     e.preventDefault();
     let $group_name = $('.group__name__edit-field');
     if (!$group_name.val()) {
       alert('Invalid group name');
       return;
     }
-    Meteor.call('groupEdit', {gid: this.group._id, groupName: $group_name.val()}, function(err, res) {
+    Meteor.call('groupEdit', {gid: this.group._id, groupName: $group_name.val()}, function (err, res) {
       groupNameEditActive.set(false);
     })
   }
 })
 
 Template.groupManage.helpers({
-  group: function() {
+  group: function () {
     return this
   },
-  myRole: function(group) {
+  myRole: function (group) {
     return group.members.find(u => u.userId === Meteor.userId()).roles.join(', ')
   },
-  getUserDetails: function(user) {
+  getUserDetails: function (user) {
     return {
       'roles': getUserRoles(user, this),
       'username': Meteor.users.findOne({_id: user.userId}).username
     }
   },
-  getUserName: function(user) {
+  getUserName: function (user) {
     let u = Meteor.users.findOne({_id: user.userId});
     if (u) {
       return u.username;
@@ -46,19 +47,19 @@ Template.groupManage.helpers({
       return false
     }
   },
-  getGroupMembership: function(user, role) {
+  getGroupMembership: function (user, role) {
     return getUserRoles(user.userId, this)[role] === true;
   },
-  memberRemovalAllowed: function(member) {
+  memberRemovalAllowed: function (member) {
     return memberRemovalAllowed(member, this)
   }
 });
 
 Template.memberPermissionCheckbox.helpers({
-  getGroupMembershipChecked: function(user, role) {
+  getGroupMembershipChecked: function (user, role) {
     return getUserRoles(user.userId, this.group)[role] === true ? 'checked' : '';
   },
-  getGroupMembershipCheckDisabled: function(user, role) {
+  getGroupMembershipCheckDisabled: function (user, role) {
     // todo: possible future improvement, use the same permissions check function here and on the backend.
     let roles = getUserRoles(user.userId, this.group);
     let own_roles = currentUserRoles(this.group);
@@ -84,7 +85,7 @@ Template.memberPermissionCheckbox.helpers({
 })
 
 Template.memberPermissionCheckbox.events = {
-  'change .permission-checkbox': function(e) {
+  'change .permission-checkbox': function (e) {
     let tar = $(e.target);
     let role = this.checkboxtype;
     let uid = this.member.userId;
@@ -101,7 +102,7 @@ Template.memberPermissionCheckbox.events = {
   }
 }
 
-let memberRemovalAllowed = function(member, group) {
+let memberRemovalAllowed = function (member, group) {
   let member_roles = getUserRoles(member.userId, group);
   if (member.userId === Meteor.userId()) {
     return false;
@@ -116,7 +117,7 @@ let memberRemovalAllowed = function(member, group) {
 }
 
 Template.memberAddForm.events = {
-  'submit .member-add-form': function(e) {
+  'submit .member-add-form': function (e) {
     let $user = $('.member-add-form__input');
     e.preventDefault();
     if (!$user.val()) {
@@ -126,14 +127,14 @@ Template.memberAddForm.events = {
     Meteor.call('addUserToGroup', $user.val(), this._id, addUserHandler)
     $user.val('');
   },
-  'autocompleteselect .member-add-form__input': function(e, template, doc) {
+  'autocompleteselect .member-add-form__input': function (e, template, doc) {
     Meteor.call('addUserToGroup', doc._id, template.data.group._id, addUserHandler)
     $('.member-add-form__input').val('');
     // Meteor.subscribe('groupUsers', template.data.group._id);
   }
 }
 
-let addUserHandler = function(error, result) {
+let addUserHandler = function (error, result) {
   if (error) {
     console_log_conditional('Error:', error);
     if (error.error === 500) {
@@ -146,7 +147,7 @@ let addUserHandler = function(error, result) {
 }
 
 Template.memberAddForm.helpers({
-  settings: function() {
+  settings: function () {
     return {
       position: "bottom",
       limit: 5,
@@ -157,12 +158,12 @@ Template.memberAddForm.helpers({
           field: 'username',
           template: Template.userAutocompleteOption,
           noMatchTemplate: Template.noAutocompleteAvailable,
-          selector: function(match) {
+          selector: function (match) {
             let regex = new RegExp(match, 'i');
             return {
-              $or: [ {
-                  'username': regex
-                }
+              $or: [{
+                'username': regex
+              }
               ]
             };
           },
@@ -173,20 +174,20 @@ Template.memberAddForm.helpers({
 })
 
 Template.memberRemoveButton.events = {
-  'click .member-remove-button': function(e) {
+  'click .member-remove-button': function (e) {
     Meteor.call('removeUserFromGroup', this.member.userId, this.group._id)
   }
 }
 
-Template.memberAddForm.rendered = function() {
+Template.memberAddForm.rendered = function () {
   // console_log_conditional('hello');
 }
 
-let currentUserRoles = function(group) {
+let currentUserRoles = function (group) {
   return getUserRoles(Meteor.userId(), group)
 }
 
-let getUserRoles = function(userId, group) {
+let getUserRoles = function (userId, group) {
   let default_roles = {
     'admin': false,
     'manage': false,
@@ -196,7 +197,7 @@ let getUserRoles = function(userId, group) {
 
   let member_roles = group.members.find(u => u.userId === userId);
   if (member_roles) {
-    member_roles.roles.forEach(function(role) {
+    member_roles.roles.forEach(function (role) {
       default_roles[role] = true;
     })
   }
@@ -216,7 +217,7 @@ let getUserRoles = function(userId, group) {
 
 
 Template.noAutocompleteAvailable.helpers({
-  searchTextLengthCheck: function(searchText) {
+  searchTextLengthCheck: function (searchText) {
     return searchText.length >= 3
   }
 })

@@ -1,79 +1,81 @@
-
 <template name="timelineReport">
     {{> reportBackButton }}
 
     <div class="report-section-wrapper">
         <!--<div class="report-section-wrapper__fade">-->
-            <!--<div class="report-section-wrapper__prev-section-button"><i class="fa fa-arrow-up" aria-hidden="true"></i></div>-->
+        <!--<div class="report-section-wrapper__prev-section-button"><i class="fa fa-arrow-up" aria-hidden="true"></i></div>-->
         <!--</div>-->
         <!--<div class="report-section-wrapper__slide-track">-->
-            <!--<div class="report-section-wrapper__slide">-->
+        <!--<div class="report-section-wrapper__slide">-->
 
-                <section data-slide-id="params" class="report-section report-section--select">
-                    <h3>
-                        Classroom: {{>environmentSelect environments=environments}}
-                    </h3>
-                    <h3>
-                        Graph type: {{> inlineDataTypeSelect dataset_types=dataset_types}}
-                    </h3>
-                    {{#if environmentChosen }}
-                        <h2>Choose two or more observations.</h2>
-                        <p>Click observations on the timeline to select them.</p>
-                        <p>Drag the graph to see earlier or later observations.</p>
-                        <div class="report-select__options report-select__options--observations">
-                            <div id="vis-container"></div>
-                        </div>
-                    {{/if}}
-                    {{#if observationNames}} <h3>Observations: {{ observationNames }}</h3> {{/if }}
-                    {{#if observationChosen}}
-                        {{>absentStudents observations=observations}}
-                    {{/if}}
-                </section>
-                <section class="report-section report-section__graph">
-                    <div class="timeline-report-wrapper report-wrapper {{#if loadingDataClass}}report-wrapper--loading{{/if}}">
-                        <div class="timeline-report">
-                            <div class="timeline-report__top-left"></div>
-                            <div class="timeline-report__y-scale"></div>
-                            <div class="timeline-report__title">
-                                <div class="parameter-options">
-                                    <div class="demographic-select">
-                                        <label for="demo-select">Demographic</label>
-                                        <select id="demo-select" {{demo_available}} class="timeline-param-select demographic chosen-select">
-                                            <option disabled selected value="">- Select -</option>
-                                            {{#each demographics}}
-                                                <option value="{{label}}">{{label}}</option>
-                                            {{/each}}
-                                        </select>
-                                    </div>
-                                    <div class="discourse-select">
-                                        <label for="disc-select">Discourse dimension</label>
-                                        <select id="disc-select" {{disc_available}} class="timeline-param-select discourse chosen-select">
-                                            <option disabled selected value="">- Select -</option>
-                                            {{#each discourseparams}}
-                                                <option data-options="{{options}}" value="{{label}}">{{label}}</option>
-                                            {{/each}}
-                                        </select>
-                                    </div>
-                                    <div class="discourse-option-select">
-                                        <label for="disc-opt-select">Option</label>
-                                        <select id="disc-opt-select" {{disc_options_available}} class="timeline-param-select discourse-option chosen-select">
-                                            <option disabled selected value="">- Select -</option>
-                                            {{#each label in selected_discourse_options }}
-                                                <option value="{{label}}">{{label}}</option>
-                                            {{/each }}
-                                        </select>
-                                    </div>
-                                </div>
+        <section data-slide-id="params" class="report-section report-section--select">
+            <h3>
+                Classroom: {{>environmentSelect environments=environments}}
+            </h3>
+            <h3>
+                Graph type: {{> inlineDataTypeSelect dataset_types=dataset_types}}
+            </h3>
+            {{#if environmentChosen }}
+                <h2>Choose two or more observations.</h2>
+                <p>Click observations on the timeline to select them.</p>
+                <p>Drag the graph to see earlier or later observations.</p>
+                <div class="report-select__options report-select__options--observations">
+                    <div id="vis-container"></div>
+                </div>
+            {{/if}}
+            {{#if observationNames}} <h3>Observations: {{ observationNames }}</h3> {{/if }}
+            {{#if observationChosen}}
+                {{>absentStudents observations=observations}}
+            {{/if}}
+        </section>
+        <section class="report-section report-section__graph">
+            <div class="timeline-report-wrapper report-wrapper {{#if loadingDataClass}}report-wrapper--loading{{/if}}">
+                <div class="timeline-report">
+                    <div class="timeline-report__top-left"></div>
+                    <div class="timeline-report__y-scale"></div>
+                    <div class="timeline-report__title">
+                        <div class="parameter-options">
+                            <div class="demographic-select">
+                                <label for="demo-select">Demographic</label>
+                                <select id="demo-select" {{demo_available}}
+                                        class="timeline-param-select demographic chosen-select">
+                                    <option disabled selected value="">- Select -</option>
+                                    {{#each demographics}}
+                                        <option value="{{label}}">{{label}}</option>
+                                    {{/each}}
+                                </select>
                             </div>
-                            <div class="timeline-report__graph"></div>
-                            <div class="timeline-report__graph-key"></div>
-                            <div class="timeline-report__sidebar"></div>
+                            <div class="discourse-select">
+                                <label for="disc-select">Discourse dimension</label>
+                                <select id="disc-select" {{disc_available}}
+                                        class="timeline-param-select discourse chosen-select">
+                                    <option disabled selected value="">- Select -</option>
+                                    {{#each discourseparams}}
+                                        <option data-options="{{options}}" value="{{label}}">{{label}}</option>
+                                    {{/each}}
+                                </select>
+                            </div>
+                            <div class="discourse-option-select">
+                                <label for="disc-opt-select">Option</label>
+                                <select id="disc-opt-select" {{disc_options_available}}
+                                        class="timeline-param-select discourse-option chosen-select">
+                                    <option disabled selected value="">- Select -</option>
+                                    {{#each label in selected_discourse_options }}
+                                        <option value="{{label}}">{{label}}</option>
+                                    {{/each }}
+                                </select>
+                            </div>
                         </div>
                     </div>
-                    {{>cacheInfoBlock cache_info=cache_info}}
-                </section>
+                    <div class="timeline-report__graph"></div>
+                    <div class="timeline-report__graph-key"></div>
+                    <div class="timeline-report__sidebar"></div>
+                </div>
             </div>
-        <!--</div>-->
+            {{>cacheInfoBlock cache_info=cache_info}}
+        </section>
+    </div>
+    <!--</div>-->
     <!--</div>-->
 </template>
 

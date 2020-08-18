@@ -1,17 +1,17 @@
-
 <template name="heatmapReport">
     {{> reportBackButton }}
 
     <div class="report-section-wrapper">
         <!--<div class="report-section-wrapper__slide-track">-->
-            <!--<div class="report-section-wrapper__slide">-->
+        <!--<div class="report-section-wrapper__slide">-->
 
         <section data-slide-id="params" class="report-section report-section--select">
             <h3>
-                Classroom: <span class="env-select {{#if selectedStudent}} env-select--disabled {{/if}}">{{>environmentSelect environments=environments}}</span>
+                Classroom: <span class="env-select {{#if
+                    selectedStudent}} env-select--disabled {{/if}}">{{>environmentSelect environments=environments}}</span>
             </h3>
             {{#if environmentChosen }}
-            <h3 class="heatmap-report__sort">{{>heatmapReportSort demoParams=demographic_filters }}</h3>
+                <h3 class="heatmap-report__sort">{{>heatmapReportSort demoParams=demographic_filters }}</h3>
             {{/if}}
 
             {{#if environmentChosen }}
@@ -35,35 +35,37 @@
                 <div class="heatmap-report">
                     <div class="heatmap-report__graph">
                         {{#if students }}
-                        <h3>Click on a student to see more details.</h3>
-                        <div class="subjects" id="heatmap-d3-wrapper">
+                            <h3>Click on a student to see more details.</h3>
+                            <div class="subjects" id="heatmap-d3-wrapper">
 
-                        </div>
-                        {{>cacheInfoBlock cache_info=cache_info}}
+                            </div>
+                            {{>cacheInfoBlock cache_info=cache_info}}
                         {{/if}}
                     </div>
                     <div class="heatmap-report__graph-key"></div>
-                    <div class="heatmap-report__graph-stat">{{#if totalContributions}}<h4>Total contributions: {{totalContributions}}</h4>{{/if}}</div>
+                    <div class="heatmap-report__graph-stat">{{#if totalContributions}}
+                        <h4>Total contributions: {{totalContributions}}</h4>{{/if}}</div>
                     <!--<div class="heatmap-report__sort">-->
-               <!---->
+                    <!---->
                     <!--</div>-->
                     <div class="heatmap-report__filters">
                         {{#if showFilters}}
                             <h4>Additional filters</h4>
                             <div class="filters__wrapper">
-                            {{#each filter in demographic_filters }}
-                                {{> demographicHeatmapFilter filter=filter }}
-                            {{/each}}
+                                {{#each filter in demographic_filters }}
+                                    {{> demographicHeatmapFilter filter=filter }}
+                                {{/each}}
                             </div>
                         {{/if}}
                     </div>
-                    <div class="heatmap-report__student-spotlight spotlight-wrapper {{#if selectedStudent}} student-spotlight--active {{/if}}">
+                    <div class="heatmap-report__student-spotlight spotlight-wrapper {{#if
+                            selectedStudent}} student-spotlight--active {{/if}}">
                         {{> studentSpotlight selectedStudent=selectedStudent discourseparams=discourseparams multipleObservationsChosen=multipleObservationsChosen cache_info_student_contrib=cache_info_student_contrib cache_info_student_time=cache_info_student_time}}
                     </div>
                 </div>
             </div>
         </section>
-            <!--</div>-->
+        <!--</div>-->
         <!--</div>-->
     </div>
 </template>

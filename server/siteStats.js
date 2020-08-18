@@ -1,4 +1,3 @@
-
 import {console_log_conditional} from "/helpers/logging"
 
 
@@ -9,7 +8,7 @@ const month_color = "#999999";
 
 
 Meteor.methods({
-  getParamPopularity: function(refresh) {
+  getParamPopularity: function (refresh) {
     if (typeof refresh === 'undefined') {
       refresh = false;
     }
@@ -17,14 +16,14 @@ Meteor.methods({
     if (!user || !Roles.userIsInRole(user, 'admin', 'site')) {
       throw new Meteor.Error('403', `Access forbidden`);
     }
-    const six_hours = 6*60*60*1000;
+    const six_hours = 6 * 60 * 60 * 1000;
     const search_time_limit = refresh ? 0 : six_hours;
 
     let stats = CachedStats.findOne({
-      createdAt: {$gte: new Date(new Date().getTime()-search_time_limit)},
+      createdAt: {$gte: new Date(new Date().getTime() - search_time_limit)},
       statsType: 'paramPopularity',
     }, {
-      sort: { createdAt : -1 }
+      sort: {createdAt: -1}
     });
 
     if (!stats) {
@@ -41,7 +40,7 @@ Meteor.methods({
     }
     return stats
   },
-  getCounts: function(refresh) {
+  getCounts: function (refresh) {
     if (typeof refresh === 'undefined') {
       refresh = false;
     }
@@ -49,24 +48,33 @@ Meteor.methods({
     if (!user || !Roles.userIsInRole(user, 'admin', 'site')) {
       throw new Meteor.Error('403', `Access forbidden`);
     }
-    const six_hours = 6*60*60*1000;
+    const six_hours = 6 * 60 * 60 * 1000;
     const search_time_limit = refresh ? 0 : six_hours;
 
     let stats = CachedStats.findOne({
-      createdAt: {$gte: new Date(new Date().getTime()-search_time_limit)},
+      createdAt: {$gte: new Date(new Date().getTime() - search_time_limit)},
       statsType: 'counts',
     }, {
-      sort: { createdAt : -1 }
+      sort: {createdAt: -1}
     });
 
 
     if (!stats) {
       let items = []
       items.push({label: 'Number of users', value: Meteor.users.find({}, {reactive: false}).count()});
-      items.push({label: 'Number of classrooms', value: Environments.find({isExample: null, envName: {$ne: "Example Classroom"}}, {reactive: false}).count()});
-      items.push({label: 'Number of example classrooms', value: Environments.find({$or: [{isExample: true}, {envName: "Example Classroom"}]}, {reactive: false}).count()});
+      items.push({
+        label: 'Number of classrooms',
+        value: Environments.find({isExample: null, envName: {$ne: "Example Classroom"}}, {reactive: false}).count()
+      });
+      items.push({
+        label: 'Number of example classrooms',
+        value: Environments.find({$or: [{isExample: true}, {envName: "Example Classroom"}]}, {reactive: false}).count()
+      });
       items.push({label: 'Number of students', value: Subjects.find({origStudId: null}, {reactive: false}).count()});
-      items.push({label: 'Number of observations', value: Observations.find({origObsId: null}).count()}, {reactive: false});
+      items.push({
+        label: 'Number of observations',
+        value: Observations.find({origObsId: null}).count()
+      }, {reactive: false});
       items.push({label: 'Number of sequences', value: Sequences.find({origObsId: null}).count()}, {reactive: false});
 
       stats = {
@@ -79,7 +87,7 @@ Meteor.methods({
     }
     return stats
   },
-  getStatsTime: async function(refresh) {
+  getStatsTime: async function (refresh) {
     if (typeof refresh === 'undefined') {
       refresh = false;
     }
@@ -88,22 +96,47 @@ Meteor.methods({
     if (!user || !Roles.userIsInRole(user, 'admin', 'site')) {
       throw new Meteor.Error('403', `Access forbidden`);
     }
-    const six_hours = 6*60*60*1000;
+    const six_hours = 6 * 60 * 60 * 1000;
     const search_time_limit = refresh ? 0 : six_hours;
     let stats = CachedStats.findOne({
-      createdAt: {$gte: new Date(new Date().getTime()-search_time_limit)},
+      createdAt: {$gte: new Date(new Date().getTime() - search_time_limit)},
       statsType: 'statsTime',
     }, {
-      sort: { createdAt : -1 }
+      sort: {createdAt: -1}
     });
 
     if (!stats) {
       let items = []
-      items.push({selector: 'new_classrooms_graph', group_label_prefix: new_total_guide(), group_label: 'classrooms', months: await classrooms_over_time()});
-      items.push({selector: 'new_users_graph', group_label_prefix: new_total_guide(), group_label: 'users', months: await users_over_time()});
-      items.push({selector: 'new_students_graph', group_label_prefix: new_total_guide(), group_label: 'students', months: await students_over_time()});
-      items.push({selector: 'new_observations_graph', group_label_prefix: new_total_guide(), group_label: 'observations', months: await observations_over_time()});
-      items.push({selector: 'new_sequences_graph', group_label_prefix: new_total_guide(), group_label: 'sequences', months: await sequences_over_time()});
+      items.push({
+        selector: 'new_classrooms_graph',
+        group_label_prefix: new_total_guide(),
+        group_label: 'classrooms',
+        months: await classrooms_over_time()
+      });
+      items.push({
+        selector: 'new_users_graph',
+        group_label_prefix: new_total_guide(),
+        group_label: 'users',
+        months: await users_over_time()
+      });
+      items.push({
+        selector: 'new_students_graph',
+        group_label_prefix: new_total_guide(),
+        group_label: 'students',
+        months: await students_over_time()
+      });
+      items.push({
+        selector: 'new_observations_graph',
+        group_label_prefix: new_total_guide(),
+        group_label: 'observations',
+        months: await observations_over_time()
+      });
+      items.push({
+        selector: 'new_sequences_graph',
+        group_label_prefix: new_total_guide(),
+        group_label: 'sequences',
+        months: await sequences_over_time()
+      });
 
       stats = {
         stats: items,
@@ -118,8 +151,7 @@ Meteor.methods({
 })
 
 
-
-let new_total_guide = function() {
+let new_total_guide = function () {
   return `<span class="key--label"><span class="key--color" style="background-color: ${total_color}"></span><span class="key--text">Total</span></span>/<span class="key--label"><span class="key--color" style="background-color: ${month_color}"></span><span class="key--text">New</span></span>&nbsp;`
 }
 
@@ -174,36 +206,35 @@ function _getParamPopularity(parameter_sets) {
 }
 
 
-
-let users_over_time = function() {
+let users_over_time = function () {
   let search = {};
   let collection = Meteor.users;
   let result = get_grouped_data(search, collection, '$createdAt')
   return result;
 }
 
-let classrooms_over_time = function() {
+let classrooms_over_time = function () {
   let search = {isExample: null, envName: {$ne: "Example Classroom"}};
   let collection = Environments;
   let result = get_grouped_data(search, collection, '$submitted')
   return result;
 }
 
-let students_over_time = function() {
+let students_over_time = function () {
   let search = {origStudId: null};
   let collection = Subjects;
   let result = get_grouped_data(search, collection, '$submitted')
   return result;
 }
 
-let observations_over_time = function() {
+let observations_over_time = function () {
   let search = {origObsId: null};
   let collection = Observations;
   let result = get_grouped_data(search, collection, '$submitted')
   return result;
 }
 
-let sequences_over_time = function() {
+let sequences_over_time = function () {
   let search = {origObsId: null};
   let collection = Sequences;
   let result = get_grouped_data(search, collection, '$submitted')
@@ -211,33 +242,37 @@ let sequences_over_time = function() {
 }
 
 
-let get_grouped_data = async function(search, collection, key) {
+let get_grouped_data = async function (search, collection, key) {
   let d3 = require('d3');
   const command = [{
     $match: search
   }, {
     $group: {
-      _id : { year: { $year: key } , month: { $month: key }},
-      count: { $sum: 1 }
+      _id: {year: {$year: key}, month: {$month: key}},
+      count: {$sum: 1}
     }
   }];
   console_log_conditional('command', command);
   let res = collection.rawCollection().aggregate(command);
   const locale = 'en-us';
   let stats = []
-  await res.forEach(function(date_count) {
-    let human_month = new Date(`${date_count._id.year}-${date_count._id.month.toString().padStart(2, '0')}-01`).toLocaleString(locale, {timeZone: 'UTC', month: 'long', year: 'numeric'});
+  await res.forEach(function (date_count) {
+    let human_month = new Date(`${date_count._id.year}-${date_count._id.month.toString().padStart(2, '0')}-01`).toLocaleString(locale, {
+      timeZone: 'UTC',
+      month: 'long',
+      year: 'numeric'
+    });
     stats.push({
       label: human_month,
       value: date_count.count,
       d3date: d3.timeParse('%B %Y')(human_month)
     })
   })
-  stats.sort(function(a, b) {
+  stats.sort(function (a, b) {
     return (new Date(a.label) - new Date(b.label))
   });
   let running_total = 0;
-  stats.forEach(function(stat) {
+  stats.forEach(function (stat) {
     running_total += stat.value;
     stat.total = running_total;
   });

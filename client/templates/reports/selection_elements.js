@@ -2,7 +2,7 @@ let chosen = require('chosen-js');
 import {console_log_conditional} from "/helpers/logging"
 
 
-let handleChosenUpdates = function(e) {
+let handleChosenUpdates = function (e) {
   if (e.target.tagName.toLowerCase() === "select") {
     $(e.target).trigger("chosen:updated");
   }
@@ -64,7 +64,7 @@ let handleChosenUpdates = function(e) {
 Template.environmentSelect.events({
   'DOMSubtreeModified select.chosen-select': handleChosenUpdates,
 })
-Template.environmentSelect.rendered = function(){
+Template.environmentSelect.rendered = function () {
   // import '/node_modules/chosen-js/chosen.min.css';
   $('.env-select.chosen-select')
     .filter(':not(.chosen--processed)').addClass('chosen--processed')
@@ -76,7 +76,7 @@ Template.environmentSelect.rendered = function(){
 Template.timelineReport.events({
   'DOMSubtreeModified select.chosen-select': handleChosenUpdates,
 })
-Template.timelineReport.rendered = function(){
+Template.timelineReport.rendered = function () {
   $('.timeline-param-select.chosen-select')
     .filter(':not(.chosen--processed)').addClass('chosen--processed')
     .chosen({disable_search_threshold: 10, width: "300px"});
@@ -86,7 +86,7 @@ Template.timelineReport.rendered = function(){
 Template.dataTypeSelect.events({
   'DOMSubtreeModified select.chosen-select': handleChosenUpdates,
 })
-Template.dataTypeSelect.rendered = function(){
+Template.dataTypeSelect.rendered = function () {
   // import '/node_modules/chosen-js/chosen.min.css';
   $('.dataset.chosen-select')
     .filter(':not(.chosen--processed)').addClass('chosen--processed')
@@ -98,7 +98,7 @@ Template.dataTypeSelect.rendered = function(){
 Template.interactiveReport.events({
   'DOMSubtreeModified select.chosen-select': handleChosenUpdates,
 })
-Template.interactiveReport.rendered = function(){
+Template.interactiveReport.rendered = function () {
   // import '/node_modules/chosen-js/chosen.min.css';
   $('.param-select-form-item.chosen-select')
     .filter(':not(.chosen--processed)').addClass('chosen--processed')
@@ -110,7 +110,7 @@ Template.interactiveReport.rendered = function(){
 Template.groupWorkDiscSelect.events({
   'DOMSubtreeModified select.chosen-select': handleChosenUpdates,
 })
-Template.groupWorkDiscSelect.rendered = function() {
+Template.groupWorkDiscSelect.rendered = function () {
   $('.group-work-report__graph-disc-select .chosen-select')
     .filter(':not(.chosen--processed)').addClass('chosen--processed')
     .chosen({disable_search_threshold: 10, width: "300px"});
@@ -121,7 +121,7 @@ Template.groupWorkDiscSelect.rendered = function() {
 Template.demographicHeatmapFilter.events({
   'DOMSubtreeModified select.chosen-select': handleChosenUpdates,
 })
-Template.demographicHeatmapFilter.rendered = function() {
+Template.demographicHeatmapFilter.rendered = function () {
   $('.filter.chosen-select')
     .filter(':not(.chosen--processed)').addClass('chosen--processed')
     .chosen({disable_search_threshold: 10, width: "240px", placeholder_text_multiple: "Choose Multiple Options"});
@@ -131,7 +131,7 @@ Template.demographicHeatmapFilter.rendered = function() {
 Template.spotlightDiscourseSelect.events({
   'DOMSubtreeModified select.chosen-select': handleChosenUpdates,
 })
-Template.spotlightDiscourseSelect.rendered = function() {
+Template.spotlightDiscourseSelect.rendered = function () {
   $('.disc-select-chosen')
     .filter(':not(.chosen--processed)').addClass('chosen--processed')
     .chosen({disable_search_threshold: 10, width: "250px"});
@@ -141,7 +141,7 @@ Template.spotlightDiscourseSelect.rendered = function() {
 Template.heatmapReportSort.events({
   'DOMSubtreeModified select.chosen-select': handleChosenUpdates,
 })
-Template.heatmapReportSort.rendered = function() {
+Template.heatmapReportSort.rendered = function () {
   console_log_conditional('rendered run');
   $('.students-select-sort')
     .trigger('change')
@@ -153,7 +153,7 @@ Template.heatmapReportSort.rendered = function() {
 Template.heatmapReportSortDemo.events({
   'DOMSubtreeModified select.chosen-select': handleChosenUpdates,
 })
-Template.heatmapReportSortDemo.rendered = function() {
+Template.heatmapReportSortDemo.rendered = function () {
   $('.students-select-buckets-demo')
     .trigger('change')
     .filter(':not(.chosen--processed)').addClass('chosen--processed')
@@ -164,7 +164,7 @@ Template.heatmapReportSortDemo.rendered = function() {
 Template.histogramDemoSelect.events({
   'DOMSubtreeModified select.chosen-select': handleChosenUpdates,
 })
-Template.histogramDemoSelect.rendered = function() {
+Template.histogramDemoSelect.rendered = function () {
   $('.' + this.data.class_prefix + '-demographic-chosen')
     .trigger('change')
     .filter(':not(.chosen--processed)').addClass('chosen--processed')
@@ -175,7 +175,7 @@ const showDemoSelect = new ReactiveVar(false);
 const heatmapReportSortType = new ReactiveVar(false);
 const heatmapReportSortDemoChosen = new ReactiveVar(false);
 Template.heatmapReportSort.helpers({
-  showDemoSelect: function() {
+  showDemoSelect: function () {
     return showDemoSelect.get()
   }
 })
@@ -185,7 +185,7 @@ Template.heatmapReportSort.events({
   'DOMSubtreeModified select.chosen-select': handleChosenUpdates,
 })
 Template.heatmapReportSort.events({
-  'change #students-sort': function(e) {
+  'change #students-sort': function (e) {
     let selected = $('option:selected', e.target);
     showDemoSelect.set(selected.val() === 'buckets');
     heatmapReportSortType.set(selected.val());
@@ -198,7 +198,7 @@ Template.heatmapReportSortDemo.events({
   'DOMSubtreeModified select.chosen-select': handleChosenUpdates,
 })
 Template.heatmapReportSortDemo.events({
-  'change #students-buckets-demo': function(e) {
+  'change #students-buckets-demo': function (e) {
     let selected = $('option:selected', e.target);
     heatmapReportSortDemoChosen.set(selected.val());
     $(window).trigger('heatmap_student_sort_demo_updated', selected.val())
@@ -210,10 +210,10 @@ Template.studentSpotlight.events({
   'DOMSubtreeModified select.chosen-select': handleChosenUpdates,
 })
 Template.studentSpotlight.helpers({
-  arrayify: function(obj) {
+  arrayify: function (obj) {
     let result = [];
     for (let key in obj) {
-      result.push({name:key,value:obj[key]});
+      result.push({name: key, value: obj[key]});
     }
     return result;
   },

@@ -8,11 +8,11 @@
                 <span>Stats generated last at {{stat_gen_time}}</span>
             {{/if}}
             <ul>
-            {{#each stats}}
-                {{> stat }}
-            {{ else }}
-                <li>No stats available</li>
-            {{/each}}
+                {{#each stats}}
+                    {{> stat }}
+                {{ else }}
+                    <li>No stats available</li>
+                {{/each}}
             </ul>
         </div>
         <div class="stats-container">
@@ -21,11 +21,11 @@
                 <span>Stats generated last at {{param_stat_gen_time}}</span>
             {{/if}}
             <ul>
-            {{#each demographic_popularities}}
-                {{> param_pop }}
-            {{ else }}
-                <li>No stats available</li>
-            {{/each}}
+                {{#each demographic_popularities}}
+                    {{> param_pop }}
+                {{ else }}
+                    <li>No stats available</li>
+                {{/each}}
             </ul>
         </div>
         <div class="stats-container">
@@ -34,11 +34,11 @@
                 <span>Stats generated last at {{param_stat_gen_time}}</span>
             {{/if}}
             <ul>
-            {{#each discourse_param_popularities}}
-                {{> param_pop }}
-            {{ else }}
-                <li>No stats available</li>
-            {{/each}}
+                {{#each discourse_param_popularities}}
+                    {{> param_pop }}
+                {{ else }}
+                    <li>No stats available</li>
+                {{/each}}
             </ul>
         </div>
     </div>

@@ -1,67 +1,67 @@
 .c-help-faq-header__container {
-    margin-top: 60px;
+  margin-top: 60px;
 }
 
 .c-help-faq-create__outer {
-    max-width: 960px;
-    margin: 0 auto;
+  max-width: 960px;
+  margin: 0 auto;
 }
 
 .c-help-faq-create__container,
 .c-help-faq-customize__container {
-    margin: 60px 0px;
+  margin: 60px 0px;
 }
 
 .c-help-faq-create__image-container,
 .c-help-faq-customize__image-container {
-    display: flex;
-    height: 325px;
-    align-items: center;
+  display: flex;
+  height: 325px;
+  align-items: center;
 }
 
 .c-help-faq-create__image,
 .c-help-faq-customize__image {
-    width: 50%;
+  width: 50%;
 }
 
 .c--help-faq-customize__copy, .c--help-faq-create__copy {
-    font-family: 'Roboto', sans-serif;
-    margin-bottom: 40px;
+  font-family: 'Roboto', sans-serif;
+  margin-bottom: 40px;
 }
 
 .c--help-faq-customize__title {
-    font-family: 'Roboto', sans-serif;
-    font-weight: bold;
+  font-family: 'Roboto', sans-serif;
+  font-weight: bold;
 }
 
 .c--help-faq-customize__list {
-    font-family: 'Roboto', sans-serif;
-    font-size: 21px;
-    margin: 10px 0px;
-    color: var(--black);
+  font-family: 'Roboto', sans-serif;
+  font-size: 21px;
+  margin: 10px 0px;
+  color: var(--black);
 }
 
 .c--help-faq-customize__sub-inner {
-    margin-left: 40px;
-    margin-bottom: 40px;
+  margin-left: 40px;
+  margin-bottom: 40px;
 }
 
 .c-help-faq-create__title,
 .c-help-faq-customize__title {
-    font-family: 'Crimson Text', cursive;
-    font-size: 50px;
-    text-transform: uppercase;
-    color: var(--black);
-    font-weight: normal;
+  font-family: 'Crimson Text', cursive;
+  font-size: 50px;
+  text-transform: uppercase;
+  color: var(--black);
+  font-weight: normal;
 }
 
 .c-help-faq-terminology__header {
-    font-weight: bold;
-    margin-bottom: var(--spacer-40);
+  font-weight: bold;
+  margin-bottom: var(--spacer-40);
 }
 
 .c-help-faq-terminology__title {
-    font-weight: bold;
+  font-weight: bold;
 }
 
 .c-help-faq-grid__container {
@@ -85,82 +85,83 @@
 }
 
 .c-help-faq-grid__item img {
-    max-height: 400px;
-    margin: 0 auto;
+  max-height: 400px;
+  margin: 0 auto;
 }
 
 .slick-prev {
-    left: -40px !important;
+  left: -40px !important;
 }
 
 .slick-prev:before, .slick-next:before {
-    color: gray !important;
-    font-size: 35px !important;
+  color: gray !important;
+  font-size: 35px !important;
 }
 
 
 .c-faq-accordion__container {
-    background-color: #C9EFEF;
-    margin-bottom: 5px;
-    cursor: pointer;
+  background-color: #C9EFEF;
+  margin-bottom: 5px;
+  cursor: pointer;
 }
 
 .c-faq-accordion__title {
-    color: #34C4C4;
+  color: #34C4C4;
 }
 
 .c--accordion-item-copy {
-    text-align: left;
-    margin: 15px 0px;
+  text-align: left;
+  margin: 15px 0px;
 }
 
 .c-faq {
-    max-width: var(--max-inner-container-width);
-    margin: 0 auto;
+  max-width: var(--max-inner-container-width);
+  margin: 0 auto;
 }
 
 .c-faq__title {
-    color: var(--black);
+  color: var(--black);
 }
 
 .c-faq-table {
-    margin: 15px 0px;
+  margin: 15px 0px;
 }
 
 .c-faq-table, th, td {
-    border: 1px solid var(--gray);
+  border: 1px solid var(--gray);
 }
 
-.c-faq-table th, .c-faq-table td  {
-    padding-left: 20px;
+.c-faq-table th, .c-faq-table td {
+  padding-left: 20px;
 }
 
 .c-faq-table th {
-    background-color: var(--black);
-    color: var(--white);
-    vertical-align: middle;
+  background-color: var(--black);
+  color: var(--white);
+  vertical-align: middle;
 }
 
 .c-faq__select-inner {
-    color: gray;
-    overflow: hidden;
-    position: relative;
-    border-radius: 3px;
-    max-width: 420px;
+  color: gray;
+  overflow: hidden;
+  position: relative;
+  border-radius: 3px;
+  max-width: 420px;
 }
 
 .c-faq__select-inner:after {
-    content: "▼";
-    padding: 12px 8px;
-    position: absolute;
-    right: 25px;
-    top: 7px;
-    z-index: 1;
-    text-align: center;
-    width: 10%;
-    height: 100%;
-    pointer-events: none;
+  content: "▼";
+  padding: 12px 8px;
+  position: absolute;
+  right: 25px;
+  top: 7px;
+  z-index: 1;
+  text-align: center;
+  width: 10%;
+  height: 100%;
+  pointer-events: none;
 }
+
 .c-faq__select {
   -webkit-appearance: none;
   -moz-appearance: none;

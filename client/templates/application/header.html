@@ -1,19 +1,21 @@
 <!-- HTML for a navbar that shows up on every page -->
 
 <template name="header">
-<!-- Bootstrap core CSS, JS dependancies included in Meteor Bootstrap package -->
+    <!-- Bootstrap core CSS, JS dependancies included in Meteor Bootstrap package -->
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>EQUIP App</title>
-        <meta name="description" content="Tool for educational researchers to do equity-based observations in classrooms">
+        <meta name="description"
+              content="Tool for educational researchers to do equity-based observations in classrooms">
         <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,700" rel="stylesheet">
         <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed" rel="stylesheet">
         <link href="https://fonts.googleapis.com/css?family=Fredericka+the+Great" rel="stylesheet">
         <link href="https://fonts.googleapis.com/css?family=Crimson+Text" rel="stylesheet">
         <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css"/>
-        <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/gh/kenwheeler/slick@1.8.1/slick/slick-theme.css"/>
+        <link rel="stylesheet" type="text/css"
+              href="//cdn.jsdelivr.net/gh/kenwheeler/slick@1.8.1/slick/slick-theme.css"/>
         <script defer src="https://use.fontawesome.com/releases/v5.0.6/js/all.js"></script>
     </head>
 
@@ -26,7 +28,7 @@
         <div class="header-container">
             <div class="brand-container">
                 <div class="logo-container">
-                    <a class="header-links" href="/" >
+                    <a class="header-links" href="/">
                         <img alt="Brand" class="equip-logo" src="/refresh/equip-beta.svg">
                         <img alt="Brand" class="equip-hands" src="/refresh/equip-hands.svg">
                     </a>
@@ -34,53 +36,61 @@
                 <p class="logo-text">Empowered Teachers, Equitable Classrooms</p>
             </div>
             {{#if currentUser}}
-            <nav class="main-menu">
-                <ul class="c-main-menu__not-signed-in--ul">
-                    <li class="c-main-menu__not-signed-in--li desktop-only"><a href="{{pathFor 'environmentList'}}">Dashboard</a></li>
-                    <li class="c-main-menu__not-signed-in--li desktop-only"><a href="{{pathFor 'reportsSelection'}}">Analysis</a></li>
-                </ul>
-                <div class="dropdown-wrapper menu-button">
-                    <a class="menu-button menu-button-header" href="#">
+                <nav class="main-menu">
+                    <ul class="c-main-menu__not-signed-in--ul">
+                        <li class="c-main-menu__not-signed-in--li desktop-only"><a href="{{pathFor 'environmentList'}}">Dashboard</a>
+                        </li>
+                        <li class="c-main-menu__not-signed-in--li desktop-only"><a
+                                href="{{pathFor 'reportsSelection'}}">Analysis</a></li>
+                    </ul>
+                    <div class="dropdown-wrapper menu-button">
+                        <a class="menu-button menu-button-header" href="#">
                         <span class="desktop-only">
                             <span class="current-username">{{currentUser.username}}</span>
                             <i style="width: .325em" class="fa fa-caret-down"></i>
                             <i style="width: .325em" class="fa fa-caret-up hide"></i>
                         </span>
-                        <span class="mobile-only">
+                            <span class="mobile-only">
                             <span class="current-username">{{currentUser.username}}</span>
                             <i style="width: 1em" class="fa fa-bars"></i>
                             <i style="width: 1em" class="fa fa-times hide"></i>
                         </span>
-                    </a>
-                    <div class="drop-menu fade-in effect">
+                        </a>
+                        <div class="drop-menu fade-in effect">
 
-                        <a class="menu-button mobile-only" href="{{pathFor 'environmentList'}}">Dashboard</a>
-                        <a class="menu-button mobile-only" href="{{pathFor 'reportsSelection'}}">Analysis</a>
-                        <a class="menu-button" href="{{pathFor 'faq'}}">FAQ</a>
-                        <a class="menu-button" href="{{pathFor 'aboutPage'}}">About</a>
-                        <a class="menu-button" href="{{pathFor 'help'}}">Help</a>
-                        <a class="menu-button" href="{{pathFor 'press'}}">Press</a>
-                        <a class="menu-button" href="{{pathFor 'research'}}">Research</a>
-                        <a class="menu-button" target="_blank" href="https://docs.google.com/forms/d/e/1FAIpQLScx4pYulHHXaBcIzGz7ZD3Y4KymOzINGGope1UyasPXqRd18g/viewform">Report a bug</a>
-                        <a class="menu-button" id="signOut" href="#">Sign&nbsp;Out</a>
+                            <a class="menu-button mobile-only" href="{{pathFor 'environmentList'}}">Dashboard</a>
+                            <a class="menu-button mobile-only" href="{{pathFor 'reportsSelection'}}">Analysis</a>
+                            <a class="menu-button" href="{{pathFor 'faq'}}">FAQ</a>
+                            <a class="menu-button" href="{{pathFor 'aboutPage'}}">About</a>
+                            <a class="menu-button" href="{{pathFor 'help'}}">Help</a>
+                            <a class="menu-button" href="{{pathFor 'press'}}">Press</a>
+                            <a class="menu-button" href="{{pathFor 'research'}}">Research</a>
+                            <a class="menu-button" target="_blank"
+                               href="https://docs.google.com/forms/d/e/1FAIpQLScx4pYulHHXaBcIzGz7ZD3Y4KymOzINGGope1UyasPXqRd18g/viewform">Report
+                                a bug</a>
+                            <a class="menu-button" id="signOut" href="#">Sign&nbsp;Out</a>
 
+                        </div>
                     </div>
-                </div>
-            </nav>
+                </nav>
             {{else}}
-            <nav class="main-menu">
-                <ul class="c-main-menu__not-signed-in--ul">
-                    <li class="c-main-menu__not-signed-in--li desktop-only"><a href="{{pathFor 'aboutPage'}}">About</a></li>
-                    <li class="c-main-menu__not-signed-in--li desktop-only"><a href="{{pathFor 'help'}}">Help</a></li>
-                    <li class="c-main-menu__not-signed-in--li desktop-only"><a href="{{pathFor 'press'}}">Press</a></li>
-                    <li class="c-main-menu__not-signed-in--li desktop-only"><a href="{{pathFor 'research'}}">Research</a></li>
-                </ul>
-                <span class="desktop-only">
+                <nav class="main-menu">
+                    <ul class="c-main-menu__not-signed-in--ul">
+                        <li class="c-main-menu__not-signed-in--li desktop-only"><a
+                                href="{{pathFor 'aboutPage'}}">About</a></li>
+                        <li class="c-main-menu__not-signed-in--li desktop-only"><a href="{{pathFor 'help'}}">Help</a>
+                        </li>
+                        <li class="c-main-menu__not-signed-in--li desktop-only"><a href="{{pathFor 'press'}}">Press</a>
+                        </li>
+                        <li class="c-main-menu__not-signed-in--li desktop-only"><a href="{{pathFor 'research'}}">Research</a>
+                        </li>
+                    </ul>
+                    <span class="desktop-only">
                     <div class="c-main-menu__not-signed-in-login-button">
                         <a href="{{pathFor 'login'}}">Log&nbsp;in</a>
                     </div>
                 </span>
-                <span class="mobile-only">
+                    <span class="mobile-only">
                     <div class="dropdown-wrapper">
                         <a class="menu-button menu-button-header" href="#">
                             <i style="width: 1em" class="fa fa-bars"></i>
@@ -93,7 +103,7 @@
                         </div>
                     </div>
                 </span>
-            </nav>
+                </nav>
             {{/if}}
         </div>
     </header>

@@ -11,22 +11,22 @@ const stat_gen_time = new ReactiveVar('');
 // const numStatsLoaded = new ReactiveVar('0');
 
 Template.siteStatsTime.helpers({
-  statsLoaded: function() {
+  statsLoaded: function () {
     return statsLoaded.get();
   },
-  totalNumStats: function() {
+  totalNumStats: function () {
     return 5;
   },
-  stat_gen_time: function() {
+  stat_gen_time: function () {
     return stat_gen_time.get()
   }
 });
 
 Template.siteStatsTime.events({
-  'click .refresh-site-stats': function(e) {
+  'click .refresh-site-stats': function (e) {
     $(e.target).attr("disabled", true)
     $('.refresh-site-stats-text').html('Refreshing...');
-    updateStats(true, function() {
+    updateStats(true, function () {
       $(e.target).attr("disabled", false)
       $('.refresh-site-stats-text').html('Refreshed!');
     })
@@ -34,19 +34,19 @@ Template.siteStatsTime.events({
 })
 
 
-Template.siteStatsTime.rendered = function() {
+Template.siteStatsTime.rendered = function () {
   statsLoaded.set(false);
-  Meteor.defer(function() {
+  Meteor.defer(function () {
     updateStats(false);
   })
 }
 
-let updateStats = function(refresh, callback) {
-  Meteor.call('getStatsTime', refresh, function(err, res) {
+let updateStats = function (refresh, callback) {
+  Meteor.call('getStatsTime', refresh, function (err, res) {
     if (!err) {
       $('.stats-container--graphs').html('');
       $('.stats-container--text').html('');
-      res.stats.forEach(function(stat) {
+      res.stats.forEach(function (stat) {
         console_log_conditional('stat', stat);
         $('.stats-container--graphs').append('<div class="' + stat.selector + '"><h4>' + stat.group_label_prefix + stat.group_label + '</h4><div id="' + stat.selector + '"></div></div>')
         $('.stats-container--text').append('<div class="' + stat.selector + '"><h4>New/Total ' + stat.group_label + '</h4><div id="' + stat.selector + '--text">' + create_text(stat) + '</div></div>')
@@ -62,7 +62,7 @@ let updateStats = function(refresh, callback) {
   })
 }
 
-let create_graph = function(stats, selector) {
+let create_graph = function (stats, selector) {
   let d3 = require('d3');
   let data = stats.months;
 
@@ -88,7 +88,6 @@ let create_graph = function(stats, selector) {
     .range([height, 0]);
 
 
-
   g.append('path')
     .data([data])
     .attr('class', 'line line--stat')
@@ -112,10 +111,11 @@ let create_graph = function(stats, selector) {
   g.append("g")
     .attr("transform", "translate(0," + height + ")")
     .attr('class', 'x-axis')
-    .call(d3.axisBottom(x).tickFormat(function(date){
+    .call(d3.axisBottom(x).tickFormat(function (date) {
       if (d3.timeYear(date) < date) {
         return d3.timeFormat('%b')(date);
-      } else {
+      }
+      else {
         return d3.timeFormat('%Y')(date);
       }
     }));
@@ -127,14 +127,14 @@ let create_graph = function(stats, selector) {
 
   g.append("g")
     .attr("class", "axis--y")
-    .call(d3.axisLeft(y).tickFormat(function(e){
+    .call(d3.axisLeft(y).tickFormat(function (e) {
         if (Math.floor(e) !== e) {
           return;
         }
         return e;
       })
     )
-  .append("text")
+    .append("text")
     .attr("x", 2)
     .attr("y", y(y.ticks().pop()) + 0.5)
     .attr("dy", "-3.4em")
@@ -147,14 +147,14 @@ let create_graph = function(stats, selector) {
   g.append("g")
     .attr("transform", "translate(" + width + ", 0)")
     .attr("class", "axis--y axis--y--right")
-    .call(d3.axisRight(y2).tickFormat(function(e){
+    .call(d3.axisRight(y2).tickFormat(function (e) {
         if (Math.floor(e) !== e) {
           return;
         }
         return e;
       })
     )
-  .append("text")
+    .append("text")
     .attr("x", 2)
     .attr("y", y(y.ticks().pop()) + 0.5)
     .attr("dy", "-3.4em")
@@ -165,7 +165,7 @@ let create_graph = function(stats, selector) {
     .text("Total");
 };
 
-let create_text = function(stat) {
+let create_text = function (stat) {
 
   let markup = `    
        <table>
@@ -176,7 +176,7 @@ let create_text = function(stat) {
     markup += `<tr><td colspan="3">No stats available for this month</td></tr>`;
   }
 
-  stat.months.forEach(function(month) {
+  stat.months.forEach(function (month) {
     markup += `<tr><td>${month.label}</td><td class="number-td">${month.value}</td><td class="number-td">${month.total}</td></tr>`
   })
 

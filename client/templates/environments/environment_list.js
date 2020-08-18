@@ -2,7 +2,6 @@
 * JS file for environment_list.html
 */
 
-import {getStudents} from "/helpers/students";
 import {console_log_conditional} from "/helpers/logging"
 
 export const smallGroupStudentSelectActive = new ReactiveVar(false);
@@ -19,7 +18,7 @@ export const currentNewObservation = new ReactiveVar(false);
 // });
 
 
-Template.environmentList.rendered = function() {
+Template.environmentList.rendered = function () {
   // if (document.querySelector(".toggle-accordion")) {
   //     document.querySelectorAll('.toggle-accordion')[0].click(); // main
   //     document.querySelectorAll('.toggle-accordion')[1].click(); // observations
@@ -27,8 +26,8 @@ Template.environmentList.rendered = function() {
 
   var urlParams = new URLSearchParams(window.location.search);
   if (urlParams.has("onboarding")) {
-      $('#onboarding-modal').removeClass("is-active");
-      $('#env-create-modal').addClass("is-active");
+    $('#onboarding-modal').removeClass("is-active");
+    $('#env-create-modal').addClass("is-active");
   }
   if (!this._rendered) {
     this._rendered = true;
@@ -39,7 +38,7 @@ Template.environmentList.rendered = function() {
       $toggle.next().toggleClass('show');
       $toggle.next().slideToggle(0);
       $toggle.find(".carat").toggleClass("carat-show");
-      setTimeout(function() {
+      setTimeout(function () {
         $([document.documentElement, document.body]).animate({
           scrollTop: $acc.offset().top - 50
         }, 500);
@@ -49,37 +48,41 @@ Template.environmentList.rendered = function() {
   }
 }
 
-Template.obsCreationModal.rendered = function() {
+Template.obsCreationModal.rendered = function () {
   processDatepickers();
 };
 
 Template.obsCreationModal.helpers({
-  subjects: function() {
+  subjects: function () {
     return Subjects.find({envId: activeEnvId.get()}).fetch();
   },
-  activeEnvId: function() {
+  activeEnvId: function () {
     return activeEnvId.get();
   },
-  currentISODate: function() {
+  currentISODate: function () {
     let date = new Date();
+
     function pad(number) {
       if (number < 10) {
         return '0' + number;
       }
       return number;
     }
+
     return date.getFullYear() +
       '-' + pad(date.getMonth() + 1) +
       '-' + pad(date.getDate())
   },
-  currentUSDate: function() {
+  currentUSDate: function () {
     let date = new Date();
+
     function pad(number) {
       if (number < 10) {
         return '0' + number;
       }
       return number;
     }
+
     return pad(date.getMonth() + 1) +
       '/' + pad(date.getDate()) +
       '/' + date.getFullYear();
@@ -87,7 +90,7 @@ Template.obsCreationModal.helpers({
 });
 
 Template.obsCreationModal.events({
-  'click #save-obs-name': function(e) {
+  'click #save-obs-name': function (e) {
     var id = $('#obs-create-modal').attr("data-id");
     var sequenceParams = SequenceParameters.findOne({'envId': id}, {reactive: false});
     var demographicParams = SubjectParameters.findOne({'envId': id}, {reactive: false});
@@ -129,14 +132,14 @@ Template.obsCreationModal.events({
       return;
     }
 
-    if (observations.length === 0 ) {
+    if (observations.length === 0) {
       var confirmation = getConfirmation();
       if (!confirmation) {
         return;
       }
     }
 
-    let closeObsModal = function() {
+    let closeObsModal = function () {
       $('#observationName').val('');
       $('#obs-close-modal').click();
 
@@ -156,7 +159,7 @@ Template.obsCreationModal.events({
       currentNewObservation.set(observation);
     }
     else {
-      Meteor.call('observationInsert', observation, function(error, result) {
+      Meteor.call('observationInsert', observation, function (error, result) {
         return 0;
       });
       closeObsModal()
@@ -172,39 +175,39 @@ Template.obsCreationModal.events({
       }
     }
   },
-  'click #obs-close-modal': function(e) {
+  'click #obs-close-modal': function (e) {
     obsCreateModal.set(false);
   },
 })
 
 Template.obsAbsentModal.helpers({
-  subjects: function() {
+  subjects: function () {
     return Subjects.find({envId: activeEnvId.get()}).fetch();
   },
-  activeEnvId: function() {
+  activeEnvId: function () {
     return activeEnvId.get();
   },
-  transformStudentPosition: function(pos) {
+  transformStudentPosition: function (pos) {
     return parseInt(pos) * 0.6;
   },
 });
 
 Template.obsAbsentModal.events({
-  'click #save-absent-students': function(e) {
+  'click #save-absent-students': function (e) {
     e.preventDefault();
     let observation = currentNewObservation.get();
     observation.absent = getAbsentStudents();
     console_log_conditional('about to save observation:', observation)
-    Meteor.call('observationInsert', observation, function(error, result) {
+    Meteor.call('observationInsert', observation, function (error, result) {
       return 0
     });
     absentStudentSelectActive.set(false);
     currentNewObservation.set(false)
   },
-  'click #absent-close-modal': function() {
+  'click #absent-close-modal': function () {
     absentStudentSelectActive.set(false);
   },
-  'click .class-absent-student': function(e) {
+  'click .class-absent-student': function (e) {
     let target = $(e.target);
     if (target.hasClass('class-absent-student')) {
       target.toggleClass('selected');
@@ -216,19 +219,19 @@ Template.obsAbsentModal.events({
 })
 
 Template.obsSmallGroupModal.helpers({
-  subjects: function() {
+  subjects: function () {
     return Subjects.find({envId: activeEnvId.get()}).fetch();
   },
-  activeEnvId: function() {
+  activeEnvId: function () {
     return activeEnvId.get();
   },
-  transformStudentPosition: function(pos) {
+  transformStudentPosition: function (pos) {
     return parseInt(pos) * 0.6;
   },
 });
 
 Template.obsSmallGroupModal.events({
-  'click #save-small-group': function(e) {
+  'click #save-small-group': function (e) {
     e.preventDefault();
     let observation = currentNewObservation.get();
     observation.small_group = getSmallGroupStudents();
@@ -237,17 +240,17 @@ Template.obsSmallGroupModal.events({
       return;
     }
     console_log_conditional('observations small group', observation.small_group);
-    Meteor.call('observationInsert', observation, function(error, result) {
+    Meteor.call('observationInsert', observation, function (error, result) {
       return 0
     });
     smallGroupStudentSelectActive.set(false);
     currentNewObservation.set(false)
   },
-  'click #small-group-close-modal': function() {
+  'click #small-group-close-modal': function () {
     smallGroupStudentSelectActive.set(false);
   },
 
-  'click .small-group-student': function(e) {
+  'click .small-group-student': function (e) {
     let target = $(e.target);
     if (target.hasClass('small-group-student')) {
       target.toggleClass('selected');
@@ -259,22 +262,22 @@ Template.obsSmallGroupModal.events({
 })
 
 Template.environmentList.helpers({
-  smallGroupStudentSelectActive: function() {
+  smallGroupStudentSelectActive: function () {
     return smallGroupStudentSelectActive.get();
   },
-  absentStudentSelectActive: function() {
+  absentStudentSelectActive: function () {
     return absentStudentSelectActive.get();
   },
-  obsCreateModal: function() {
+  obsCreateModal: function () {
     return obsCreateModal.get()
   },
-  activeEnvId: function() {
+  activeEnvId: function () {
     return activeEnvId.get();
   },
-  subjects: function() {
+  subjects: function () {
     return Subjects.find({envId: activeEnvId.get()}).fetch();
   },
-  environment: function() {
+  environment: function () {
     var envs = this.environments;
     // var obs;
     // var subjects;
@@ -288,39 +291,43 @@ Template.environmentList.helpers({
 
     return results;
   },
-  currentISODate: function() {
+  currentISODate: function () {
     let date = new Date();
+
     function pad(number) {
       if (number < 10) {
         return '0' + number;
       }
       return number;
     }
+
     return date.getFullYear() +
-    '-' + pad(date.getMonth() + 1) +
-    '-' + pad(date.getDate())
+      '-' + pad(date.getMonth() + 1) +
+      '-' + pad(date.getDate())
   },
-  currentUSDate: function() {
+  currentUSDate: function () {
     let date = new Date();
+
     function pad(number) {
       if (number < 10) {
         return '0' + number;
       }
       return number;
     }
+
     return pad(date.getMonth() + 1) +
-    '/' + pad(date.getDate()) +
-    '/' + date.getFullYear();
+      '/' + pad(date.getDate()) +
+      '/' + date.getFullYear();
   },
-  needsEnvironment: function() {
+  needsEnvironment: function () {
     var obj = Environments.find({}, {reactive: false}).fetch();
 
-    return $.isEmptyObject(obj)?"green-pulse":"";
+    return $.isEmptyObject(obj) ? "green-pulse" : "";
   }
 });
 
 Template.environmentList.events({
-  'click #analyze-button': function (e){
+  'click #analyze-button': function (e) {
     e.preventDefault();
     e.stopPropagation();
     Router.go('reportsSelection');
@@ -328,21 +335,21 @@ Template.environmentList.events({
   'click .help-button': function (e) {
     $('#help-env-modal').addClass("is-active");
   },
-  'click #help-close-modal': function(e) {
+  'click #help-close-modal': function (e) {
     $('#help-env-modal').removeClass("is-active");
   },
-   'click #env-create-button': function(e) {
+  'click #env-create-button': function (e) {
     $('#env-create-modal').addClass("is-active");
   },
-   'click #env-close-modal': function(e) {
+  'click #env-close-modal': function (e) {
     $('#env-create-modal').removeClass("is-active");
   },
-  'click .modal-card-foot .button': function(e) {
+  'click .modal-card-foot .button': function (e) {
     $('#env-create-modal').removeClass("is-active");
     $('#help-env-modal').removeClass("is-active");
   },
 
-  'click #save-env-name': function(e) {
+  'click #save-env-name': function (e) {
     var environment = {
       envName: $('#environmentName').val()
     };
@@ -352,32 +359,32 @@ Template.environmentList.events({
       return;
     }
 
-    Meteor.call('environmentInsert', environment, function(error, result) {
+    Meteor.call('environmentInsert', environment, function (error, result) {
       return 0;
     });
 
     $('#env-create-modal').removeClass("is-active");
     $('#environmentName').val('');
   },
-  'click .generate-example-classroom': function() {
-    Meteor.call('environmentInsertExample', null, function(error, result) {
+  'click .generate-example-classroom': function () {
+    Meteor.call('environmentInsertExample', null, function (error, result) {
       return 0;
     });
   },
 });
 
-let getSmallGroupStudents = function() {
+let getSmallGroupStudents = function () {
   let ret = [];
-  $('.small-group-student.selected').each(function() {
+  $('.small-group-student.selected').each(function () {
     ret.push($(this).attr('id'))
   })
   // console_log_conditional('ret', ret);
   return ret;
 };
 
-let getAbsentStudents = function() {
+let getAbsentStudents = function () {
   let ret = [];
-  $('.class-absent-student.selected').each(function() {
+  $('.class-absent-student.selected').each(function () {
     ret.push($(this).attr('id'))
   })
   // console_log_conditional('ret', ret);

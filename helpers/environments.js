@@ -1,11 +1,11 @@
 import {userCanGroupEditEnv} from "./groups";
 
-export let envHasObservations = function(envId) {
+export let envHasObservations = function (envId) {
   let obs = Observations.find({envId: envId}, {sort: {lastModified: -1, reactive: false}}).fetch();
   return obs.length !== 0
 }
 
-export let userHasEnvEditAccess = function(env) {
+export let userHasEnvEditAccess = function (env) {
   if (!env) {
     return false
   }

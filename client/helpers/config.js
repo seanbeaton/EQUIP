@@ -7,16 +7,17 @@ Accounts.ui.config({
   passwordSignupFields: 'USERNAME_AND_EMAIL'
 });
 
-Accounts.createUser = _.wrap(Accounts.createUser, function(createUser) {
-    // Store the original arguments
-    var args = _.toArray(arguments).slice(1),
-        user = args[0];
-        origCallback = args[1];
+Accounts.createUser = _.wrap(Accounts.createUser, function (createUser) {
+  // Store the original arguments
+  const args = _.toArray(arguments).slice(1)
+  const user = args[0];
+  const origCallback = args[1];
 
-    var newCallback = function(error) {
-        $('#onboarding-modal').addClass('is-active');
-        origCallback.call(this, error);
-    };
+  let newCallback = function (error) {
+    $('#onboarding-modal').addClass('is-active');
+    origCallback.call(this, error);
+  };
 
-    createUser(user, newCallback);
-});;
+  createUser(user, newCallback);
+});
+;

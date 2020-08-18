@@ -14,18 +14,20 @@
                 classrooms and their details. Click “Create New Classroom” to
                 get started. To view existing classroom details, click on your
                 classroom’s name. For additional guidance, visit the <a href="./help"> help </a> page.
-             </p>
+            </p>
             <!--<p>-->
-                <!--To view classrooms shared with you, <a href="{{pathFor route='groupsList'}}">take a look at your groups.</a>-->
+            <!--To view classrooms shared with you, <a href="{{pathFor
+                    route='groupsList'}}">take a look at your groups.</a>-->
             <!--</p>-->
             <p>
-                Want to explore some example data before jumping into your own? Take a look at the Example Classroom below.
-<!--                <a class="generate-example-classroom" href="#">Generate an example classroom</a>.-->
-             </p>
+                Want to explore some example data before jumping into your own? Take a look at the Example Classroom
+                below.
+                <!--                <a class="generate-example-classroom" href="#">Generate an example classroom</a>.-->
+            </p>
 
             <ul class="c-dashboard__accordion">
                 {{#each environment.list}}
-                  {{> environmentItem }}
+                    {{> environmentItem }}
                 {{/each}}
             </ul>
         </div>
@@ -48,23 +50,23 @@
 
     <!-- CREATE NEW CLASSROOM MODAL -->
     <div id="env-create-modal" class="modal">
-      <div class="modal-background"></div>
-      <div class="modal-card">
-        <header class="modal-card-head">
-          <p class="modal-card-title">Create New Classroom</p>
-          <button id="env-close-modal" class="delete"></button>
-        </header>
-        <section class="modal-card-body">
-          <label class="label">Classroom Name</label>
-            <p class="control">
-              <input class="input" type="text" placeholder="Type Name Here" id="environmentName">
-            </p>
-        </section>
-        <footer class="modal-card-foot">
-          <a id="save-env-name" class="o--standard-button" style="margin-right: 10px;">Save changes</a>
-          <a id="env-close-modal" class="o--standard-button">Cancel</a>
-        </footer>
-      </div>
+        <div class="modal-background"></div>
+        <div class="modal-card">
+            <header class="modal-card-head">
+                <p class="modal-card-title">Create New Classroom</p>
+                <button id="env-close-modal" class="delete"></button>
+            </header>
+            <section class="modal-card-body">
+                <label class="label">Classroom Name</label>
+                <p class="control">
+                    <input class="input" type="text" placeholder="Type Name Here" id="environmentName">
+                </p>
+            </section>
+            <footer class="modal-card-foot">
+                <a id="save-env-name" class="o--standard-button" style="margin-right: 10px;">Save changes</a>
+                <a id="env-close-modal" class="o--standard-button">Cancel</a>
+            </footer>
+        </div>
     </div>
 
 </template>
@@ -84,14 +86,16 @@
                 </p>
                 <label class="label">Observation Date</label>
                 <p class="control">
-                    <input class="input datepicker" type="text" value="{{currentUSDate}}" placeholder="01/01/2019" id="observationDate">
+                    <input class="input datepicker" type="text" value="{{currentUSDate}}" placeholder="01/01/2019"
+                           id="observationDate">
                     <input type="hidden" value="{{currentISODate}}" id="altObservationDate">
                 </p>
                 <label class="label">Observation Type</label>
                 <p class="control">
                     <span>Whole class groups allow you to code for the entire class, and mark certain students as absent. Small groups allow you to only code for a select few students, then analyse and compare data between different small groups. Small groups and Whole class observations can't be compared against each other.</span>
-                    <br />
-                    <input name="classroom-type" type="radio" data-classroom-type="whole_class" id="type--whole-class" checked>
+                    <br/>
+                    <input name="classroom-type" type="radio" data-classroom-type="whole_class" id="type--whole-class"
+                           checked>
                     <label for="type--whole-class">Whole Class</label>
                     <input name="classroom-type" type="radio" data-classroom-type="small_group" id="type--small-group">
                     <label for="type--small-group">Small Group</label>
@@ -99,8 +103,9 @@
                 <label class="label" for="observationDescription">Description</label>
                 <p class="control">
                     <span>Write a short (max. 280 characters) description of the observation you're coding.</span>
-                    <br />
-                    <textarea rows='5' cols="70" maxlength="280" id="observationDescription" name="observationDescription"></textarea>
+                    <br/>
+                    <textarea rows='5' cols="70" maxlength="280" id="observationDescription"
+                              name="observationDescription"></textarea>
                 </p>
             </section>
             <footer class="modal-card-foot">
@@ -125,7 +130,9 @@
                 <div class="subjects">
                     <div class="subjects-scroller">
                         {{#each subjects}}
-                            <div id="{{_id}}" style='transform:translate({{transformStudentPosition data_x}}px, {{transformStudentPosition data_y}}px);' data-x="{{data_x}}" data-y="{{data_y}}" class="small-group-student c--observation__student-box-container">
+                            <div id="{{_id}}" style='transform:translate({{transformStudentPosition
+                                    data_x}}px, {{transformStudentPosition data_y}}px);' data-x="{{data_x}}"
+                                 data-y="{{data_y}}" class="small-group-student c--observation__student-box-container">
                                 <p class="c--observation__student-box">{{info.name}}</p>
                             </div>
                         {{/each}}
@@ -153,7 +160,9 @@
                 <div class="subjects">
                     <div class="subjects-scroller">
                         {{#each subjects}}
-                            <div id="{{_id}}" style='transform:translate({{transformStudentPosition data_x}}px, {{transformStudentPosition data_y}}px);' data-x="{{data_x}}" data-y="{{data_y}}" class="class-absent-student c--observation__student-box-container">
+                            <div id="{{_id}}" style='transform:translate({{transformStudentPosition
+                                    data_x}}px, {{transformStudentPosition data_y}}px);' data-x="{{data_x}}"
+                                 data-y="{{data_y}}" class="class-absent-student c--observation__student-box-container">
                                 <p class="c--observation__student-box">{{info.name}}</p>
                             </div>
                         {{/each}}

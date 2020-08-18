@@ -1,22 +1,18 @@
 /* eslint-env mocha */
 /* eslint-disable func-names, prefer-arrow-callback */
 
-import { Factory } from 'meteor/dburles:factory';
-import { assert } from 'chai';
-import { Template } from 'meteor/templating';
-import { $ } from 'meteor/jquery';
+import {assert} from 'chai';
+import {Template} from 'meteor/templating';
 import {console_log_conditional} from "/helpers/logging"
-
-console_log_conditional('testing');
-
-import { withRenderedTemplate } from '../../../imports/ui/test-helpers.js';
 
 
 // import * as edit_subjects from './edit_subjects'
-import { getClassName } from './edit_advanced_subjects'
+import {getClassName} from './edit_advanced_subjects'
+
+console_log_conditional('testing');
 
 
-describe('edit advanced subjects', function() {
+describe('edit advanced subjects', function () {
   beforeEach(function () {
     Template.registerHelper('_', key => key);
   });
@@ -25,7 +21,7 @@ describe('edit advanced subjects', function() {
     Template.deregisterHelper('_');
   });
 
-  it('getClassName works', function() {
+  it('getClassName works', function () {
     let test1 = getClassName('aBcD s asd S');
     let test1_answer = 'aabcd--s-asd-s';
     let test2 = getClassName('This is a test class');

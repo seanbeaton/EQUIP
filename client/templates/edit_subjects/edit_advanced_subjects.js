@@ -1,55 +1,54 @@
-import {setupSubjectParameters} from "/helpers/parameters";
-import {getStudents} from "/helpers/students";
 import {find_open_position} from "./edit_subjects";
 import {console_log_conditional} from "/helpers/logging"
+
 const partial_rows = new ReactiveVar([]);
 const showStudentRows = new ReactiveVar(true);
 const deletedRows = new ReactiveVar({});
 
 Template.editSubjectsAdvanced.helpers({
-  deletedClass: function(id) {
+  deletedClass: function (id) {
     let rows = deletedRows.get();
     return (typeof rows[id] !== 'undefined' && rows[id] === true) ? ' deleted-student' : '';
   },
-  isDeleted: function(id) {
+  isDeleted: function (id) {
     let rows = deletedRows.get();
     return (typeof rows[id] !== 'undefined' && rows[id] === true)
   },
-  isDeletedText: function(id) {
+  isDeletedText: function (id) {
     let rows = deletedRows.get();
     return (typeof rows[id] !== 'undefined' && rows[id] === true) ? 'true' : 'false'
   },
-  deleteButtonClass: function(id) {
+  deleteButtonClass: function (id) {
     let rows = deletedRows.get();
     return (typeof rows[id] !== 'undefined' && rows[id] === true) ? 'undo-remove-student' : 'remove-student'
   },
-  deleteButtonText: function(id) {
+  deleteButtonText: function (id) {
     let rows = deletedRows.get();
     return (typeof rows[id] !== 'undefined' && rows[id] === true) ? '+' : '-'
   },
-  showStudentRows: function() {
+  showStudentRows: function () {
     return showStudentRows.get()
   },
-  envId: function() {
+  envId: function () {
     return this.environment._id;
   },
-  subjects: function() {
+  subjects: function () {
     return Subjects.find({envId: this.environment._id})
   },
-  subject_parameters: function() {
+  subject_parameters: function () {
     let subj_params = SubjectParameters.findOne({envId: this.environment._id}).parameters;
     return subj_params
   },
-  className: function(text) {
+  className: function (text) {
     return getClassName(text);
   },
-  student_rows: function() {
-    let students = Subjects.find({envId:this.environment._id});
+  student_rows: function () {
+    let students = Subjects.find({envId: this.environment._id});
     let subj_params = SubjectParameters.findOne({envId: this.environment._id});
 
     let student_rows = [];
 
-    students.forEach(function(student) {
+    students.forEach(function (student) {
       let columns = [];
       columns.push({
         id: 'student--name--' + student._id,
@@ -59,7 +58,7 @@ Template.editSubjectsAdvanced.helpers({
         data_student_type: 'existing',
         value: student.info.name,
       });
-      subj_params.parameters.forEach(function(param) {
+      subj_params.parameters.forEach(function (param) {
         columns.push({
           id: 'student--' + getClassName(param.label) + '--' + student._id,
           data_student_id: student._id,
@@ -89,7 +88,7 @@ Template.editSubjectsAdvanced.helpers({
   }
 });
 
-let examinePartialRows = function(envId) {
+let examinePartialRows = function (envId) {
   let rows = partial_rows.get();
   let subj_params = SubjectParameters.findOne({envId: envId});
 
@@ -100,7 +99,7 @@ let examinePartialRows = function(envId) {
 };
 
 Template.editSubjectsAdvanced.events({
-  'click .remove-student': function(e, template) {
+  'click .remove-student': function (e, template) {
     let target = $(e.target);
     let row = target.parents('tr');
     if (row.attr('data-row-status') === 'new') {
@@ -108,7 +107,7 @@ Template.editSubjectsAdvanced.events({
       let row_to_remove = new_rows.findIndex(r => r.id === row.attr('data-student-id'))
       new_rows.splice(row_to_remove, 1);
       partial_rows.set(new_rows);
-      setTimeout(function() {
+      setTimeout(function () {
         checkTableValues(SubjectParameters.findOne({envId: template.data.environment._id}).parameters)
       }, 500)
     }
@@ -119,13 +118,13 @@ Template.editSubjectsAdvanced.events({
     }
 
   },
-  'click .undo-remove-student': function(e) {
+  'click .undo-remove-student': function (e) {
     let row = $(e.target).parents('tr');
     let del_rows = deletedRows.get();
     del_rows[row.attr('data-student-id')] = false;
     deletedRows.set(del_rows);
   },
-  'focusout input[data-student-type="new"]': function(e, template) {
+  'focusout input[data-student-type="new"]': function (e, template) {
     let target = $(e.target);
     let rows = partial_rows.get();
     let row = rows.find(row => row.id === target.attr('data-student-id'));
@@ -133,7 +132,7 @@ Template.editSubjectsAdvanced.events({
     column.value = target.val();
     partial_rows.set(rows);
   },
-  'focusout .student-data-input': function(e, template) {
+  'focusout .student-data-input': function (e, template) {
     let target = $(e.target);
     if (checkTableValues(SubjectParameters.findOne({envId: template.data.environment._id}).parameters)) {
       target.removeClass('invalid-param-value')
@@ -142,7 +141,7 @@ Template.editSubjectsAdvanced.events({
       target.addClass('invalid-param-value')
     }
   },
-  'keyup .student-data-input': function(e, template) {
+  'keyup .student-data-input': function (e, template) {
     if (e.keyCode === 13) {
       let target = $(e.target);
       let new_target;
@@ -155,13 +154,13 @@ Template.editSubjectsAdvanced.events({
       new_target.focus();
     }
   },
-  'click .delete-all-students': function(e, template) {
+  'click .delete-all-students': function (e, template) {
     $('.remove-student').click();
   },
-  'click .undelete-all-students': function(e, template) {
+  'click .undelete-all-students': function (e, template) {
     $('.undo-remove-student').click();
   },
-  'paste .student-data-input': function(e, template) {
+  'paste .student-data-input': function (e, template) {
     let target = $(e.target);
     let data = e.originalEvent.clipboardData.getData('text');
     // console_log_conditional('e.clipboardData.types', e.originalEvent.clipboardData.types);
@@ -182,10 +181,10 @@ Template.editSubjectsAdvanced.events({
       if (!rows[0].split(/\t/g).every(header => !!param_names.find(name => name.toLowerCase() === header.toLowerCase()))) {
         alert("Some of the data you pasted was able to match to existing columns, but not all. The following headers did not match: " +
           rows[0].split(/\t/g).filter(col => !param_names.find(name => name.toLowerCase() === col.toLowerCase())).join(', ')
-        + '.\nThe data in those columns were not imported.')
+          + '.\nThe data in those columns were not imported.')
       }
       let header_row_items = rows[0].split(/\t/g)
-      header_row_items.forEach(function(header_item, index) {
+      header_row_items.forEach(function (header_item, index) {
         if (!!param_names.find(name => name.toLowerCase() === header_item.toLowerCase())) {
           headers[index] = header_item;
         }
@@ -198,7 +197,7 @@ Template.editSubjectsAdvanced.events({
       console_log_conditional('No headers found.')
     }
 
-    let structured_data = rows.map(function(row) {
+    let structured_data = rows.map(function (row) {
       console_log_conditional('row', row);
       return row.split(/\t/g);
     })
@@ -212,10 +211,10 @@ Template.editSubjectsAdvanced.events({
       return;
     }
 
-    structured_data.forEach(function(row) {
+    structured_data.forEach(function (row) {
       if (Object.keys(headers).length > 0) {
         let new_row_data = {};
-        Object.keys(headers).forEach(function(index) {
+        Object.keys(headers).forEach(function (index) {
           new_row_data[headers[index]] = row[index]
         })
         console_log_conditional('new row data', new_row_data);
@@ -230,13 +229,13 @@ Template.editSubjectsAdvanced.events({
     if (target.attr('data-student-type') === 'new') {
       target.parents('tr').find('.remove-student').click();
     }
-    setTimeout(function() {
+    setTimeout(function () {
       if (!checkTableValues(params)) {
         alert('Errors found in pasted data. Please review your input for any highlighted issues.');
       }
     }, 500)
   },
-  'click .save-all-students': function(e, template) {
+  'click .save-all-students': function (e, template) {
     let params = SubjectParameters.findOne({envId: template.data.environment._id}).parameters;
     if (!checkTableValues(params)) {
       alert('Errors found, not saving. Please review your input for any highlighted issues.');
@@ -244,7 +243,7 @@ Template.editSubjectsAdvanced.events({
     }
     saveStudentsTable(template.data.environment._id, params)
   },
-  'click .check-all-students': function(e, template) {
+  'click .check-all-students': function (e, template) {
     let params = SubjectParameters.findOne({envId: template.data.environment._id}).parameters;
     checkTableValues(params);
     if (!checkTableValues(params)) {
@@ -257,14 +256,14 @@ Template.editSubjectsAdvanced.events({
 });
 
 
-let saveStudentsTable = function(envId, params) {
+let saveStudentsTable = function (envId, params) {
 
   let students_info = []
-  $('tr.student-row').each(function(idx) {
+  $('tr.student-row').each(function (idx) {
     let $row = $(this);
     // Don't save completely empty rows.
     let row_empty = true;
-    $row.find('input').each(function(){
+    $row.find('input').each(function () {
       if ($(this).val()) {
         row_empty = false;
       }
@@ -275,7 +274,7 @@ let saveStudentsTable = function(envId, params) {
 
     // create demos obj.
     let demos = {};
-    params.forEach(function(param) {
+    params.forEach(function (param) {
       demos[param.label] = $row.find('input[data-field="' + param.label + '"][data-field-type="param"]').val();
     })
 
@@ -284,7 +283,7 @@ let saveStudentsTable = function(envId, params) {
       _id: $row.attr('data-student-id'),
       status: $row.attr('data-row-status'),
       deleted: ($row.attr('data-deleted') === 'true'),
-      data_x:  $row.attr('data-x'),
+      data_x: $row.attr('data-x'),
       data_y: $row.attr('data-y'),
       envId: envId,
       info: {
@@ -294,7 +293,7 @@ let saveStudentsTable = function(envId, params) {
     })
   });
 
-  students_info.forEach(function(student) {
+  students_info.forEach(function (student) {
     if (student.deleted) {
       Meteor.call('subjectDelete', student._id);
     }
@@ -327,7 +326,7 @@ let saveStudentsTable = function(envId, params) {
   // setTimeout(function() {document.location.reload()}, 2000);
 }
 
-let addNewRow = function(params, values) {
+let addNewRow = function (params, values) {
   if (typeof values === 'undefined') {
     values = {};
   }
@@ -348,7 +347,7 @@ let addNewRow = function(params, values) {
     data_student_type: 'new',
     value: (typeof values['name'] !== 'undefined') ? values.name : ((typeof values['Name'] !== 'undefined') ? values.Name : ''),
   }]
-  params.forEach(function(param) {
+  params.forEach(function (param) {
     new_row_columns.push({
       id: 'student--' + getClassName(param.label) + '--new-row-' + new_row_id,
       data_student_id: 'new-row--' + new_row_id,
@@ -372,11 +371,11 @@ let addNewRow = function(params, values) {
 }
 
 
-let getClassName = function(text) {
+let getClassName = function (text) {
   return text.toLowerCase().replace(' ', '-')
 }
 
-let checkCellValue = function(cell, parameters) {
+let checkCellValue = function (cell, parameters) {
   if (cell.attr('data-field-type') === 'base' && cell.attr('data-field') === 'name') {
     return true;
   }
@@ -388,13 +387,13 @@ let checkCellValue = function(cell, parameters) {
 // run this on each paste
 // also check for duplicate names? do we allow dupe names right now?
 // todo: also need to do validation of this input on the server side when we save.
-let checkTableValues = function(parameters) {
+let checkTableValues = function (parameters) {
   let table_passes = true;
-  $('tr.student-row').each(function(idx) {
+  $('tr.student-row').each(function (idx) {
     let $row = $(this);
     // Don't check completely empty rows, they won't be saved anyway.
     let row_empty = true;
-    $row.find('input').each(function(){
+    $row.find('input').each(function () {
       if ($(this).val()) {
         row_empty = false;
       }
@@ -403,7 +402,7 @@ let checkTableValues = function(parameters) {
       $row.find('input').removeClass('invalid-param-value');
       return;
     }
-    $row.find('input').each(function() {
+    $row.find('input').each(function () {
       let $input = $(this);
       if (checkCellValue($input, parameters)) {
         $input.removeClass('invalid-param-value')
@@ -435,7 +434,7 @@ let checkTableValues = function(parameters) {
 //   return student;
 // })
 
-let refreshTableContent = function() {
+let refreshTableContent = function () {
   showStudentRows.set(false);
   showStudentRows.set(true);
 }

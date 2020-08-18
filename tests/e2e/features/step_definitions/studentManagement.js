@@ -1,5 +1,4 @@
 const assert = require('assert');
-import {console_log_conditional} from "../../../../helpers/logging";
 
 var myStepDefinitionsWrapper = function () {
   this.When(/^I create a student named "([^"]*)" with the demographics "([^"]*)": "([^"]*)" and "([^"]*)": "([^"]*)"$/, function (name, demo1, demo1val, demo2, demo2val, callback) {
@@ -26,7 +25,7 @@ var myStepDefinitionsWrapper = function () {
     let student_box = browser.$('.c--student-body__container-drag-label=' + name);
     student_box.waitForExist(2000);
 
-    let res = browser.executeAsync(function(name, demo1, demo1val, demo2, demo2val, cb) {
+    let res = browser.executeAsync(function (name, demo1, demo1val, demo2, demo2val, cb) {
       let student_search = {
         'info.name': name
       }
@@ -58,10 +57,10 @@ var myStepDefinitionsWrapper = function () {
   // });
 
 
-  this.Then(/^a student named "([^"]*)" with the demographics "([^"]*)": "([^"]*)" and "([^"]*)": "([^"]*)"( does not | )exist[s]?$/, function(name, demo1, demo1val, demo2, demo2val, negation, callback) {
+  this.Then(/^a student named "([^"]*)" with the demographics "([^"]*)": "([^"]*)" and "([^"]*)": "([^"]*)"( does not | )exist[s]?$/, function (name, demo1, demo1val, demo2, demo2val, negation, callback) {
     negation = negation === ' does not ';
 
-    let res = browser.executeAsync(function(name, demo1, demo1val, demo2, demo2val, cb) {
+    let res = browser.executeAsync(function (name, demo1, demo1val, demo2, demo2val, cb) {
       let student_search = {
         'info.name': name
       }

@@ -1,6 +1,7 @@
 .heatmap-report {
   display: grid;
   margin: 20px 0 0;
+
   div {
     margin: 0;
   }
@@ -9,40 +10,49 @@
     .filters-active &:not(.disabled-student) {
       border: 2px solid #333;
     }
+
     position: relative;
     cursor: pointer;
     float: left;
     margin: 5px;
     @include nt($prop: opacity);
+
     &:hover {
       opacity: 0.8;
     }
+
     &.demo-label {
       clear: both;
+
       &,
       &[style] {
         background: 0 !important;
       }
+
       p {
         color: #333;
         background: 0;
       }
+
       + .student-box {
         clear: left;
       }
     }
   }
+
   .subjects {
     padding: 7px 20px;
     display: block;
     flex-flow: row wrap;
     min-height: auto;
     height: auto;
+
     &.subjects--fixed-height {
       min-height: 1200px;
       height: 1200px;
     }
   }
+
   grid-template-columns: 50% 50%;
   grid-template-rows: auto auto auto auto;
 }
@@ -110,10 +120,12 @@ $light-grid-color: #ddd;
 .heatmap-report__graph-stat {
   display: flex;
   flex-flow: column nowrap;
+
   h4 {
     margin-top: auto;
   }
 }
+
 //
 //.heatmap-report__student-spotlight {
 //  background-color: white;
@@ -133,6 +145,7 @@ $light-grid-color: #ddd;
   z-index: 1;
   pointer-events: none;
   @include nt($prop: opacity);
+
   &.student-spotlight--active {
     opacity: 1;
     pointer-events: auto;
@@ -140,10 +153,11 @@ $light-grid-color: #ddd;
 }
 
 .heatmap-report__filters {
-  .filters__wrapper  {
+  .filters__wrapper {
     display: flex;
     flex-flow: row wrap;
   }
+
   .select__wrapper {
     margin-right: 10px;
     margin-bottom: 10px;
@@ -167,6 +181,7 @@ $light-grid-color: #ddd;
   .demo-label {
     font-weight: 600;
   }
+
   li {
     margin: 0;
   }
@@ -195,6 +210,7 @@ $light-grid-color: #ddd;
 .env-select--disabled {
   opacity: 0.5;
   cursor: not-allowed;
+
   > div {
     pointer-events: none;
   }

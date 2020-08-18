@@ -1,6 +1,4 @@
-import {setupSequenceParameters, setupSubjectParameters} from "/helpers/parameters";
 import {getStudent} from "./students";
-import {console_log_conditional} from "./logging"
 
 //
 // function updateSequences(sequences, allParams) {
@@ -17,7 +15,9 @@ function updateSequence(sequence, allParams) {
     sequence.info.parameters = {};
 
     for (let param_k in allParams) {
-      if (!allParams.hasOwnProperty(param_k)) continue;
+      if (!allParams.hasOwnProperty(param_k)) {
+        continue;
+      }
       let param = allParams[param_k];
       sequence.info.parameters[param.label] = sequence.info[param.label]
     }

@@ -1,7 +1,6 @@
 import {getStudent} from "./students";
-import {updateSequence} from "./sequences";
 
-export const upgradeSequence = function(sequence, cachedEnvsParams, cachedEnvsMemoStats) {
+export const upgradeSequence = function (sequence, cachedEnvsParams, cachedEnvsMemoStats) {
   let new_info = {
     studentId: sequence.info.studentId,
     parameters: {}
@@ -20,9 +19,8 @@ export const upgradeSequence = function(sequence, cachedEnvsParams, cachedEnvsMe
     cachedEnvsMemoStats.memo++
     // console.log('using cached allParams')
   }
-
   else {
-    allParams = SequenceParameters.findOne({envId:sequence.envId});
+    allParams = SequenceParameters.findOne({envId: sequence.envId});
     cachedEnvsParams[sequence.envId] = allParams
     cachedEnvsMemoStats.new++
     // console.log('using fresh allParams')
@@ -37,7 +35,7 @@ export const upgradeSequence = function(sequence, cachedEnvsParams, cachedEnvsMe
   }
 
   if (sequence.info && allParams && (sequence.info['parameters'] === undefined || !sequence.info['parameters'])) {
-    allParams.parameters.forEach(function(param) {
+    allParams.parameters.forEach(function (param) {
       new_info.parameters[param.label] = sequence.info[param.label]
     });
   }
@@ -46,9 +44,9 @@ export const upgradeSequence = function(sequence, cachedEnvsParams, cachedEnvsMe
   }
   else {
     console.log('first check', sequence.info && allParams && (sequence.info['parameters'] === undefined || !sequence.info['parameters']))
-    console.log('first check', Boolean(sequence.info) , Boolean(allParams) , sequence.info['parameters'] === undefined , !sequence.info['parameters'])
+    console.log('first check', Boolean(sequence.info), Boolean(allParams), sequence.info['parameters'] === undefined, !sequence.info['parameters'])
     console.log('second check', Boolean(sequence.info) && Boolean(allParams) && sequence.info['parameters'].length > 0)
-    console.log('second check items', sequence.info , allParams , sequence.info['parameters'].length > 0)
+    console.log('second check items', sequence.info, allParams, sequence.info['parameters'].length > 0)
     console.log('sequence.info', sequence.info);
     console.log('allParams', allParams);
   }
@@ -98,7 +96,7 @@ export const upgradeParams = function (params) {
   return params;
 }
 
-export const upgradeSubject = function(subj, subjEnvCache, subjEnvMemoStats) {
+export const upgradeSubject = function (subj, subjEnvCache, subjEnvMemoStats) {
   if (subj.info['demographics'] === undefined || Object.keys(subj.info['demographics']).length === 0) {
 
     let allParams;
@@ -107,13 +105,13 @@ export const upgradeSubject = function(subj, subjEnvCache, subjEnvMemoStats) {
       subjEnvMemoStats.memo++
     }
     else {
-      allParams = SubjectParameters.findOne({envId:subj.envId}).parameters;
+      allParams = SubjectParameters.findOne({envId: subj.envId}).parameters;
       subjEnvCache[subj.envId] = allParams
       subjEnvMemoStats.new++
     }
 
     let new_demos = {};
-    allParams.forEach(function(param) {
+    allParams.forEach(function (param) {
       new_demos[param.label] = subj.info[param.label];
     })
     subj.info = {
@@ -138,9 +136,9 @@ export const downgradeParams = function (params) {
   return params;
 }
 
-export const downgradeSequence = function(sequence) {
+export const downgradeSequence = function (sequence) {
   let sequence_params = {}
-  sequence.info.parameters.map(function(param) {
+  sequence.info.parameters.map(function (param) {
     sequence_params[param.label] = param.value;
   })
   sequence.info.parameters = sequence_params;

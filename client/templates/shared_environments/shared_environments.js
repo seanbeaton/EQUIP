@@ -1,7 +1,7 @@
 import {console_log_conditional} from "/helpers/logging"
 
 Template.sharedEnv.events({
-  'click .save-shared-env': function(e) {
+  'click .save-shared-env': function (e) {
     e.preventDefault();
     e.stopPropagation();
     //
@@ -9,52 +9,52 @@ Template.sharedEnv.events({
     //   console_log_conditional('logged out');
     // }
 
-    Router.go('sharedEnvSave', {_shareId:Router.current().params._shareId});
+    Router.go('sharedEnvSave', {_shareId: Router.current().params._shareId});
   }
 })
 
-Template.sharedEnvSave.rendered = function() {
+Template.sharedEnvSave.rendered = function () {
   if (confirm('Are you sure you want to copy this classroom?')) {
     copySharedClassroom(Router.current().params._shareId);
     Router.go('environmentList')
   }
   else {
-    Router.go('sharedEnv', {_shareId:Router.current().params._shareId})
+    Router.go('sharedEnv', {_shareId: Router.current().params._shareId})
   }
 }
 
 
 Template.sharedEnv.helpers({
-  sequenceParams: function() {
-    var sharedEnv = SharedEnvironments.findOne({_id:Router.current().params._shareId});
+  sequenceParams: function () {
+    var sharedEnv = SharedEnvironments.findOne({_id: Router.current().params._shareId});
     return sharedEnv.sequenceParameters.parameters;
   },
-  subjectParams: function() {
-    var sharedEnv = SharedEnvironments.findOne({_id:Router.current().params._shareId});
+  subjectParams: function () {
+    var sharedEnv = SharedEnvironments.findOne({_id: Router.current().params._shareId});
     return sharedEnv.subjectParameters.parameters;
 
   },
-  students: function() {
-    let sharedEnv = SharedEnvironments.findOne({_id:Router.current().params._shareId});
+  students: function () {
+    let sharedEnv = SharedEnvironments.findOne({_id: Router.current().params._shareId});
     return sharedEnv.students;
   },
 });
 
 Template.sequenceParam.helpers({
-  joined: function(list) {
+  joined: function (list) {
     return list.join(', ');
   },
 })
 
 Template.subjectParam.helpers({
-  joined: function(list) {
+  joined: function (list) {
     return list.join(', ');
   },
 })
 
 
 function copySharedClassroom(shareId) {
-  Meteor.call('environmentImportShared', shareId, function(error, result) {
+  Meteor.call('environmentImportShared', shareId, function (error, result) {
     if (error) {
       alert(error)
     }

@@ -7,7 +7,8 @@
 
         <section class="report-section report-section--main">
             <h3>
-                Classroom: <span class="env-select {{#if selectedStudent}} env-select--disabled {{/if}}">{{>environmentSelect environments=environments}}</span>
+                Classroom: <span class="env-select {{#if
+                    selectedStudent}} env-select--disabled {{/if}}">{{>environmentSelect environments=environments}}</span>
             </h3>
             {{#if environmentChosen }}
                 <h2>Choose one or more observations.</h2>
@@ -40,7 +41,8 @@
                         {{/if}}
                     </div>
                     <div class="histogram-report__graph-key"></div>
-                    <div class="histogram-report__student-spotlight spotlight-wrapper {{#if selectedStudent}} student-spotlight--active {{/if}}">
+                    <div class="histogram-report__student-spotlight spotlight-wrapper {{#if
+                            selectedStudent}} student-spotlight--active {{/if}}">
                         {{> studentSpotlight selectedStudent=selectedStudent discourseparams=discourseparams multipleObservationsChosen=multipleObservationsChosen cache_info_student_time=cache_info_student_time cache_info_student_contrib=cache_info_student_contrib}}
                     </div>
                 </div>

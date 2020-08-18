@@ -18,16 +18,17 @@
 
 <template name="dataTypeSelect">
     <select id="dataset-type-select" class="dataset chosen-select">
-    {{#each dataset_types}}
-        <option {{selected}} value="{{id}}">{{name}}</option>
-    {{/each}}
+        {{#each dataset_types}}
+            <option {{selected}} value="{{id}}">{{name}}</option>
+        {{/each}}
     </select>
 </template>
 
 
 <template name="observationsButtonSelect">
     <div class="report-select__options report-select__options--observations">
-        <div class="report-select__option option--all option--all-observations"><span class="option__text">Select All</span></div>
+        <div class="report-select__option option--all option--all-observations"><span
+                class="option__text">Select All</span></div>
         {{#each observations }}
             {{> obsButton }}
         {{else}}
@@ -75,7 +76,7 @@
     {{#if showDemoSelect }}
         <!-- wrapper required to this all is removed reactively -->
         <div class="heatmap-demo-select-wrapper">
-        {{> heatmapReportSortDemo demoParams=demoParams}}
+            {{> heatmapReportSortDemo demoParams=demoParams}}
         </div>
     {{/if}}
 </template>
@@ -92,13 +93,13 @@
 
 <template name="histogramDemoSelect">
     <div class="{{class_prefix}}-demographic__wrapper">
-    <label for="{{class_prefix}}-demographic">Select Demographic</label>
-    <select id="{{class_prefix}}-demographic" class="demographic {{class_prefix}}-demographic-chosen">
-        <option selected value="">{{default}}</option>
-        {{#each demographics}}
-            <option data-options="{{options}}" value="{{label}}">{{label}}</option>
-        {{/each}}
-    </select>
+        <label for="{{class_prefix}}-demographic">Select Demographic</label>
+        <select id="{{class_prefix}}-demographic" class="demographic {{class_prefix}}-demographic-chosen">
+            <option selected value="">{{default}}</option>
+            {{#each demographics}}
+                <option data-options="{{options}}" value="{{label}}">{{label}}</option>
+            {{/each}}
+        </select>
     </div>
 </template>
 
@@ -141,7 +142,8 @@
                 {{/if}}
             </div>
         {{else}}
-            <p>Oops, that student doesn't appear to have any data. If you think this is a bug, please report it to us using the link in the footer.</p>
+            <p>Oops, that student doesn't appear to have any data. If you think this is a bug, please report it to us
+                using the link in the footer.</p>
         {{/if}}
     </div>
 </template>

@@ -1,5 +1,11 @@
 import {console_log_conditional} from "/helpers/logging"
-import {upgradeParams, upgradeSequence, upgradeSubject, downgradeParams, downgradeSequence} from "../helpers/migration_transforms";
+import {
+  downgradeParams,
+  downgradeSequence,
+  upgradeParams,
+  upgradeSequence,
+  upgradeSubject
+} from "../helpers/migration_transforms";
 import {import_data} from "../sample_data/all";
 import {updateSequence} from "../helpers/sequences";
 
@@ -158,7 +164,10 @@ Migrations.add({
       if (typeof sequence.info.delete_seq !== 'undefined') {
         console.log('deleting sequence for reason:', sequence.info.reason)
         console.log('sequence to be removed:', sequence)
-        if (typeof failure_reasons[sequence.info.reason] === 'undefined') { failure_reasons[sequence.info.reason] = 0};
+        if (typeof failure_reasons[sequence.info.reason] === 'undefined') {
+          failure_reasons[sequence.info.reason] = 0
+        }
+        ;
         failure_reasons[sequence.info.reason]++;
 
         Sequences.remove({'_id': sequence._id});
@@ -169,7 +178,7 @@ Migrations.add({
     console.log('cachedEnvsMemoStats new', cachedEnvsMemoStats.new, 'memod', cachedEnvsMemoStats.memo)
     console.log('Updated ' + oldFormatSequencesUpdated + ' old format Sequences.')
     console.log('Removed sequences for the following reasons')
-    console.log(Object.keys(failure_reasons).map((k)=>k + ' #: ' + failure_reasons[k]).join('\n'))
+    console.log(Object.keys(failure_reasons).map((k) => k + ' #: ' + failure_reasons[k]).join('\n'))
 
   },
   down: function () {

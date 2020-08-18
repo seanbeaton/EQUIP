@@ -1,11 +1,11 @@
 import {createStudentContribData, createStudentTimeData} from "../../helpers/graphs";
-import {console_log_conditional, console_table_conditional} from "/helpers/logging"
+import {console_log_conditional} from "/helpers/logging"
 import {checkAccess} from "../../helpers/access";
 
 CachedReportData = new Mongo.Collection('cached_report_data');
 
 Meteor.methods({
-  getStudentContribData: function(parameters, refresh) {
+  getStudentContribData: function (parameters, refresh) {
     checkAccess(parameters.envId, 'environment', 'view');
     console_log_conditional(parameters, refresh)
     if (typeof refresh === 'undefined') {
@@ -14,16 +14,16 @@ Meteor.methods({
     let user = Meteor.user();
 
     const parameters_cache_key = JSON.stringify(parameters);
-    const one_hour = 1*60*60*1000;
+    const one_hour = 1 * 60 * 60 * 1000;
     const search_time_limit = refresh ? 0 : one_hour;
 
     let fetch_start = new Date().getTime();
     let report_data = CachedReportData.findOne({
-      createdAt: {$gte: new Date(new Date().getTime()-search_time_limit)},
+      createdAt: {$gte: new Date(new Date().getTime() - search_time_limit)},
       reportType: 'getStudentContribData',
       parameters_cache_key: parameters_cache_key,
     }, {
-      sort: { createdAt : -1 }
+      sort: {createdAt: -1}
     });
 
     if (!report_data) {
@@ -45,7 +45,7 @@ Meteor.methods({
     return report_data
   },
 
-  getObsSequences: function(parameters, refresh) {
+  getObsSequences: function (parameters, refresh) {
     checkAccess(parameters.envId, 'environment', 'view');
     console_log_conditional(parameters, refresh)
     if (typeof refresh === 'undefined') {
@@ -54,16 +54,16 @@ Meteor.methods({
     let user = Meteor.user();
 
     const parameters_cache_key = JSON.stringify(parameters);
-    const one_hour = 1*60*60*1000;
+    const one_hour = 1 * 60 * 60 * 1000;
     const search_time_limit = refresh ? 0 : one_hour;
 
     let fetch_start = new Date().getTime();
     let report_data = CachedReportData.findOne({
-      createdAt: {$gte: new Date(new Date().getTime()-search_time_limit)},
+      createdAt: {$gte: new Date(new Date().getTime() - search_time_limit)},
       reportType: 'getObsSequences',
       parameters_cache_key: parameters_cache_key,
     }, {
-      sort: { createdAt : -1 }
+      sort: {createdAt: -1}
     });
 
     if (!report_data) {
@@ -84,7 +84,7 @@ Meteor.methods({
     // console_log_conditional('getObsSequences data', report_data);
     return report_data
   },
-  getStudentTimeData: function(parameters, refresh) {
+  getStudentTimeData: function (parameters, refresh) {
     checkAccess(parameters.envId, 'environment', 'view');
     console_log_conditional(parameters, refresh)
     if (typeof refresh === 'undefined') {
@@ -93,16 +93,16 @@ Meteor.methods({
     let user = Meteor.user();
 
     const parameters_cache_key = JSON.stringify(parameters);
-    const one_hour = 1*60*60*1000;
+    const one_hour = 1 * 60 * 60 * 1000;
     const search_time_limit = refresh ? 0 : one_hour;
 
     let fetch_start = new Date().getTime();
     let report_data = CachedReportData.findOne({
-      createdAt: {$gte: new Date(new Date().getTime()-search_time_limit)},
+      createdAt: {$gte: new Date(new Date().getTime() - search_time_limit)},
       reportType: 'getStudentTimeData',
       parameters_cache_key: parameters_cache_key,
     }, {
-      sort: { createdAt : -1 }
+      sort: {createdAt: -1}
     });
 
     if (!report_data) {
@@ -125,7 +125,7 @@ Meteor.methods({
   },
 })
 
-let getSequencesForObs = function(params) {
+let getSequencesForObs = function (params) {
   if (typeof params.obsIds !== 'undefined') {
     return {sequences: Sequences.find({obsId: {$in: params.obsIds}}).fetch()};
   }

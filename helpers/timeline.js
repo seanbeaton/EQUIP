@@ -1,4 +1,3 @@
-
 /*
   visContainerId is a string, the css id of the container for the vis timeline.
 
@@ -11,11 +10,11 @@
   the currently active observations per the timeline.
  */
 
-let setupVis = function(visContainerId, selectionCallback, obsOptions, selectedObservations, class_type) {
+let setupVis = function (visContainerId, selectionCallback, obsOptions, selectedObservations, class_type) {
   import vis from "vis";
 
   let observations = obsOptions.get();
-  let disabled_class = function(obs) {
+  let disabled_class = function (obs) {
     // if (getSequences(obs._id, obs.envId).length < 1) {
     //   return 'disabled';
     // }
@@ -27,7 +26,7 @@ let setupVis = function(visContainerId, selectionCallback, obsOptions, selectedO
     }
     return 'disabled';
   }
-  let obs = observations.map(function(obs) {
+  let obs = observations.map(function (obs) {
     return {
       id: obs._id,
       content: obs.name + ' (' + obs.observationDate + ' - ' + obsTypeAbbrev(obs.observationType) + ')',
@@ -42,18 +41,19 @@ let setupVis = function(visContainerId, selectionCallback, obsOptions, selectedO
   let options = {
     multiselect: true,
     zoomable: false,
-    zoomMin: 7*24*60*60*1000, // 1 week in ms
+    zoomMin: 7 * 24 * 60 * 60 * 1000, // 1 week in ms
   }
   let timeline = new vis.Timeline(container, items, options)
 
-  timeline.on('select', function(props) {
+  timeline.on('select', function (props) {
     if (props.event.firstTarget.classList.contains('vis-group')) {
       timeline.setSelection(selectedObservations.get());
       return;
     }
     if (props.items.length > 1) {
       selectedObservations.set(props.items);
-    } else {
+    }
+    else {
       let currentObs = selectedObservations.get();
       let obsIndex = currentObs.indexOf(props.items[0])
       if (obsIndex === -1) {
@@ -69,14 +69,16 @@ let setupVis = function(visContainerId, selectionCallback, obsOptions, selectedO
     selectionCallback()
   });
 
-  let recent_obs = obs.sort(function(a, b) {return a.compare_date - b.compare_date}).slice(-8);
+  let recent_obs = obs.sort(function (a, b) {
+    return a.compare_date - b.compare_date
+  }).slice(-8);
   let recent_obs_ids = recent_obs.map(obs => obs.id);
   timeline.focus(recent_obs_ids);
 
   return timeline
 }
 
-let obsTypeAbbrev = function(type) {
+let obsTypeAbbrev = function (type) {
   if (type === 'whole_class') {
     return 'WC';
   }

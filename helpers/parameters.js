@@ -22,10 +22,10 @@ function setupParameters(parameterType, envId, reactive) {
 
   let subjParams;
   if (parameterType === 'subject') {
-    subjParams = SubjectParameters.findOne({'envId':envId}, {reactive: reactive});
+    subjParams = SubjectParameters.findOne({'envId': envId}, {reactive: reactive});
   }
   else {
-    subjParams = SequenceParameters.findOne({'envId':envId}, {reactive: reactive});
+    subjParams = SequenceParameters.findOne({'envId': envId}, {reactive: reactive});
   }
 
   if (typeof subjParams === 'undefined') {
@@ -41,8 +41,8 @@ function setupParameters(parameterType, envId, reactive) {
     // for legacy classrooms
     for (let p = 0; p < subjParams["children"]["parameterPairs"]; p++) {
       allParams.push({
-        'name': subjParams['children']['label'+p],
-        'options': subjParams['children']['parameter'+p],
+        'name': subjParams['children']['label' + p],
+        'options': subjParams['children']['parameter' + p],
       });
     }
   }

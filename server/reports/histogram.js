@@ -1,11 +1,10 @@
-import {getStudents} from "../../helpers/students";
 import {get_average, get_median} from "../../helpers/graphs";
 import {console_log_conditional, console_table_conditional} from "/helpers/logging"
 import {checkAccess} from "../../helpers/access";
 
 
 Meteor.methods({
-  getHistogramData: function(parameters, refresh) {
+  getHistogramData: function (parameters, refresh) {
     checkAccess(parameters.envId, 'environment', 'view');
     console_log_conditional(parameters, refresh)
     if (typeof refresh === 'undefined') {
@@ -14,16 +13,16 @@ Meteor.methods({
     let user = Meteor.user();
 
     const parameters_cache_key = JSON.stringify(parameters);
-    const one_hour = 1*60*60*1000;
+    const one_hour = 1 * 60 * 60 * 1000;
     const search_time_limit = refresh ? 0 : one_hour;
 
     let fetch_start = new Date().getTime();
     let report_data = CachedReportData.findOne({
-      createdAt: {$gte: new Date(new Date().getTime()-search_time_limit)},
+      createdAt: {$gte: new Date(new Date().getTime() - search_time_limit)},
       reportType: 'getHistogramData',
       parameters_cache_key: parameters_cache_key,
     }, {
-      sort: { createdAt : -1 }
+      sort: {createdAt: -1}
     });
 
     if (!report_data) {
@@ -46,7 +45,7 @@ Meteor.methods({
   },
 })
 
-let createHistogramData = function(params) {
+let createHistogramData = function (params) {
   let {envId, obsIds} = params
   let ret = {
     students: [],
@@ -55,7 +54,7 @@ let createHistogramData = function(params) {
 
   let allStudents = Subjects.find({envId: envId}).fetch()
 
-  ret.students = allStudents.map(function(student) {
+  ret.students = allStudents.map(function (student) {
     return {
       name: student.info.name,
       studentId: student._id,
@@ -68,11 +67,13 @@ let createHistogramData = function(params) {
   });
 
   for (let obsId_k in obsIds) {
-    if (!obsIds.hasOwnProperty(obsId_k)) continue;
+    if (!obsIds.hasOwnProperty(obsId_k)) {
+      continue;
+    }
     let obsId = obsIds[obsId_k];
 
-    Sequences.find({obsId: obsId}).forEach(function(sequence) {
-      allStudents.map(function(student) {
+    Sequences.find({obsId: obsId}).forEach(function (sequence) {
+      allStudents.map(function (student) {
         if (sequence.info.student.studentId === student._id) {
           let ds_index = ret.students.findIndex(datapoint => datapoint.studentId === student._id);
           ret.students[ds_index].count += 1;
@@ -85,13 +86,13 @@ let createHistogramData = function(params) {
   ret.median = get_median(all_counts);
   ret.average = get_average(all_counts);
   ret.quartiles = get_n_groups(all_counts, 4, true, 'Group'); //quartiles
-  ret.students.forEach(function(student) {
+  ret.students.forEach(function (student) {
     student.median = get_median(all_counts);
     student.average = get_average(all_counts);
   })
 
-  ret.quartiles.forEach(function(quartile) {
-    quartile.students = ret.students.filter(function(student) {
+  ret.quartiles.forEach(function (quartile) {
+    quartile.students = ret.students.filter(function (student) {
       return quartile.min_exclusive < student.count && student.count <= quartile.max_inclusive
     }).sort((a, b) => b.count - a.count)
   })
@@ -137,7 +138,7 @@ let createHistogramData = function(params) {
 //   return ret;
 // }
 
-let get_n_groups = function(values, n, zero_separate, group_name) {
+let get_n_groups = function (values, n, zero_separate, group_name) {
   if (typeof group_name === 'undefined') {
     group_name = n + ' group';
   }
@@ -183,7 +184,7 @@ let get_n_groups = function(values, n, zero_separate, group_name) {
   return ret;
 }
 
-let get_ordinal_suffix = function(i) {
+let get_ordinal_suffix = function (i) {
   let j = i % 10,
     k = i % 100;
 

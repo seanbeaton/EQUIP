@@ -3,15 +3,13 @@
 */
 import {userCanGroupEditEnv, userCanGroupViewEnv, userIsEnvOwner} from "../../../helpers/groups";
 import Fuse from 'fuse.js'
-
-var Stopwatch = require('stopwatchjs');
-var lastChoices = {};
-
 import * as observation_helpers from '/helpers/observations.js'
-import {updateStudent, updateStudents} from '/helpers/students.js'
 import {convertISODateToUS} from '/helpers/dates.js'
 import {userHasEnvEditAccess} from "../../../helpers/environments";
 import {console_log_conditional} from "/helpers/logging"
+
+var Stopwatch = require('stopwatchjs');
+var lastChoices = {};
 
 const classroomMode = new ReactiveVar('code');
 const classroomStudentsSearchable = new ReactiveVar([]);
@@ -21,7 +19,7 @@ const activeEditSequence = new ReactiveVar('');
 const environment = new ReactiveVar();
 const observation = new ReactiveVar();
 
-Template.observatory.created = function() {
+Template.observatory.created = function () {
 }
 
 Template.observatory.onCreated(function created() {
@@ -32,20 +30,20 @@ Template.observatory.onCreated(function created() {
     this.data.observation = Observations.findOne(this.data.obsId, {reactive: true});
     observation.set(this.data.observation);
 
-    this.data.sequenceParameters = SequenceParameters.findOne({envId:this.data.envId}).parameters;
+    this.data.sequenceParameters = SequenceParameters.findOne({envId: this.data.envId}).parameters;
     let that = this;
     let subjects = Subjects.find({
       envId: that.data.observation.envId,
     });
-    classroomStudentsSearchable.set(subjects.map(function(s) {
+    classroomStudentsSearchable.set(subjects.map(function (s) {
       return {'name': s.info.name.toLowerCase(), 'active': true, _id: s._id}
     }));
   })
   processKeyboardObservationNavigation(this.data.observation);
 });
 
-Template.observatory.onRendered(function() {
-  $(document).keyup(function(e) {
+Template.observatory.onRendered(function () {
+  $(document).keyup(function (e) {
     if (e.keyCode == 27) {
       $('#seq-param-modal').removeClass('is-active');
       $('#seq-data-modal').removeClass('is-active');
@@ -55,7 +53,7 @@ Template.observatory.onRendered(function() {
   processDatepickers();
 })
 
-let processKeyboardObservationNavigation = function(obs) {
+let processKeyboardObservationNavigation = function (obs) {
   let searchTimeout;
   const fuse_options = {
     shouldSort: true,
@@ -72,7 +70,7 @@ let processKeyboardObservationNavigation = function(obs) {
   let has_scrolled_to_view = false;
 
   // name search
-  $(document).keydown(function(e) {
+  $(document).keydown(function (e) {
     if (['select', 'option', 'optionset', 'textarea', 'input', 'button'].indexOf(e.target.localName) !== -1) {
       return;
     }
@@ -87,14 +85,16 @@ let processKeyboardObservationNavigation = function(obs) {
     //   // handle tab
     //   return;
     // }
-    if (searchTimeout) {clearTimeout(searchTimeout);}
+    if (searchTimeout) {
+      clearTimeout(searchTimeout);
+    }
 
-    searchTimeout = setTimeout(function() {
+    searchTimeout = setTimeout(function () {
       currentSearch.set('')
     }, 2000);
     if (e.key === "Backspace") {
       let s = currentSearch.get();
-      currentSearch.set(s.substring(0, s.length-1))
+      currentSearch.set(s.substring(0, s.length - 1))
     }
     else {
       currentSearch.set(currentSearch.get() + e.key.toLowerCase())
@@ -102,7 +102,7 @@ let processKeyboardObservationNavigation = function(obs) {
 
     let results = fuse.search(currentSearch.get());
 
-    classroomStudentsSearchable.set(classroomStudentsSearchable.get().map(function(s) {
+    classroomStudentsSearchable.set(classroomStudentsSearchable.get().map(function (s) {
       s.active = results.findIndex(r => r.name === s.name) !== -1;
       if (s.active && obs.observationType === 'small_group' && !obs.small_group.find(id => id === s._id)) {
         s.active = false;
@@ -126,7 +126,7 @@ let processKeyboardObservationNavigation = function(obs) {
 }
 
 // let getStudentMatches = function(needle) {
-  // let studentsSearch = classroomStudentsSearchable.get()
+// let studentsSearch = classroomStudentsSearchable.get()
 //
 // }
 
@@ -145,20 +145,20 @@ let processKeyboardObservationNavigation = function(obs) {
 // };
 
 Template.observatory.helpers({
-  userHasEditAccess: function() {
+  userHasEditAccess: function () {
     console_log_conditional('environment.get()', environment.get());
     return userHasEnvEditAccess(environment.get());
   },
-  smallGroup: function() {
+  smallGroup: function () {
     return observation.get().observationType === 'small_group';
   },
-  wholeClass: function() {
+  wholeClass: function () {
     return observation.get().observationType === 'whole_class';
   },
-  environment: function() {
+  environment: function () {
     return environment.get();
   },
-  notes_status: function() {
+  notes_status: function () {
     return observation.get() && observation.get().notes && observation.get().notes.length > 0 ? "(notes logged)" : '(empty)'
   },
   observation: function () {
@@ -175,13 +175,13 @@ Template.observatory.helpers({
       return '<span class="access-level">View</span> access through group'
     }
   },
-  currentSearch: function() {
+  currentSearch: function () {
     return currentSearch.get();
   },
-  currentSearchExists: function() {
+  currentSearchExists: function () {
     return currentSearch.get() !== '';
   },
-  allowTabbing: function(student) {
+  allowTabbing: function (student) {
     // console_log_conditional('at', student, this.observation);
     if (observation.get().observationType === 'small_group' && !observation.get().small_group.find(id => id === student._id)) {
       return false;
@@ -194,7 +194,7 @@ Template.observatory.helpers({
     }
     return classroomStudentsSearchable.get().find(s => s.name === student.info.name.toLowerCase()).active
   },
-  subjects: function() {
+  subjects: function () {
     if (!observation.get()) {
       return []
     }
@@ -202,7 +202,7 @@ Template.observatory.helpers({
       envId: observation.get().envId,
     }, {sort: {data_y: 1, data_x: 1}})
   },
-  studentActive: function(student) {
+  studentActive: function (student) {
     if (observation.get().observationType === 'small_group') {
       return !!observation.get().small_group.find(id => id === student._id)
     }
@@ -210,14 +210,14 @@ Template.observatory.helpers({
       return !observation.get().absent.find(id => id === student._id)
     }
   },
-  searchEnabled: function(student) {
+  searchEnabled: function (student) {
     let result = classroomStudentsSearchable.get().find(s => s.name === student.info.name.toLowerCase());
     return result && result.active;
   },
-  convertISODateToUS: function(isoDate) {
+  convertISODateToUS: function (isoDate) {
     return convertISODateToUS(isoDate);
   },
-  classTypeHuman: function(obsType) {
+  classTypeHuman: function (obsType) {
     if (obsType === 'small_group') {
       return "Small group";
     }
@@ -228,20 +228,20 @@ Template.observatory.helpers({
       return "No type";
     }
   },
-  classroomMode: function() {
+  classroomMode: function () {
     return 'observatory--' + classroomMode.get();
   },
-  classroomInEditMode: function() {
+  classroomInEditMode: function () {
     return classroomMode.get() === 'edit';
   }
 });
 
 Template.observatory.events({
-  'click .back-head-params': function(e) {
+  'click .back-head-params': function (e) {
     //Save stopwatch value
-    Router.go('observationList', {_envId:Router.current().params._envId});
+    Router.go('observationList', {_envId: Router.current().params._envId});
   },
-  'click .observatory.observatory--code .student-box.enabled': function(e) {
+  'click .observatory.observatory--code .student-box.enabled': function (e) {
     if (!userHasEnvEditAccess(environment.get())) {
       // access control also done on server side.
       return;
@@ -252,14 +252,15 @@ Template.observatory.events({
     var myId;
     if ($(e.target).is('p')) {
       myId = $(e.target).parent().attr('id')
-    } else {
+    }
+    else {
       myId = $(e.target).attr('id');
     }
     currentStudentId.set(myId);
     observation_helpers.populateParamBoxes(myId);
     $('#seq-param-modal').addClass('is-active');
   },
-  'keydown .observatory.observatory--code .student-box.enabled': function(e) {
+  'keydown .observatory.observatory--code .student-box.enabled': function (e) {
     if (!userHasEnvEditAccess(environment.get())) {
       // access control also done on server side.
       return;
@@ -272,7 +273,8 @@ Template.observatory.events({
       let myId;
       if ($(e.target).is('p')) {
         myId = $(e.target).parent().attr('id')
-      } else {
+      }
+      else {
         myId = $(e.target).attr('id');
       }
 
@@ -352,7 +354,7 @@ Template.observatory.events({
       }
     }
   },
-  'click .observatory.observatory--edit .student-box': function(e) {
+  'click .observatory.observatory--edit .student-box': function (e) {
     if (!userHasEnvEditAccess(environment.get())) {
       // access control also done on server side.
       return;
@@ -360,7 +362,8 @@ Template.observatory.events({
     let target_id;
     if ($(e.target).is('.student-box')) {
       target_id = $(e.target).attr('id');
-    } else {
+    }
+    else {
       target_id = $(e.target).parents('.student-box').attr('id')
     }
     Meteor.call('observationModifyAbsentStudent', {
@@ -372,35 +375,35 @@ Template.observatory.events({
   'click .help-button': function (e) {
     $('#help-env-modal').addClass("is-active");
   },
-  'click #help-close-modal': function(e) {
+  'click #help-close-modal': function (e) {
     $('#help-env-modal').removeClass("is-active");
   },
-  'click .modal-card-foot .button': function(e) {
+  'click .modal-card-foot .button': function (e) {
     $('#help-env-modal').removeClass("is-active");
   },
-  'click .modal-background': function(e){
+  'click .modal-background': function (e) {
     $('#seq-param-modal').removeClass('is-active');
     $('#seq-data-modal').removeClass('is-active');
     $('#help-env-modal').removeClass("is-active");
   },
-  'click .modal-close': function(e){
+  'click .modal-close': function (e) {
     $('#seq-param-modal').removeClass('is-active');
     $('#seq-data-modal').removeClass('is-active');
   },
-  'click .edit-observation-name': function(e) {
+  'click .edit-observation-name': function (e) {
     editObservationName(observation.get()._id);
   },
-  'click .edit-observation-date': function(e) {
+  'click .edit-observation-date': function (e) {
     editObservationDate(observation.get()._id);
   },
-  'click #delete-observation': function(e) {
+  'click #delete-observation': function (e) {
     deleteObservation(observation.get()._id);
   },
-  'submit #save-seq-params-form': function(e) {
+  'submit #save-seq-params-form': function (e) {
     e.preventDefault();
 
-    let callback = function() {
-      setTimeout(function() {
+    let callback = function () {
+      setTimeout(function () {
         $('#seq-param-modal').removeClass('is-processing');
       }, 500)
     };
@@ -423,7 +426,7 @@ Template.observatory.events({
     sequence.info.parameters = {};
 
     let missing_params = [];
-    this.sequenceParameters.forEach(function(param) {
+    this.sequenceParameters.forEach(function (param) {
       let param_value = $('input[name="' + param.label + '"]:checked').attr('value');
       if (typeof param_value === 'undefined') {
         missing_params.push(param.label);
@@ -439,17 +442,18 @@ Template.observatory.events({
       return;
     }
 
-    Meteor.call('sequenceInsert', sequence, function(error, result) {
+    Meteor.call('sequenceInsert', sequence, function (error, result) {
       if (error) {
         alert(error.reason);
-      } else {
-        gtag('event',  'add_success', {'event_category': 'sequences'});
+      }
+      else {
+        gtag('event', 'add_success', {'event_category': 'sequences'});
       }
     });
 
     $('#seq-param-modal').removeClass('is-active');
   },
-  'submit #edit-seq-params-form': function(e) {
+  'submit #edit-seq-params-form': function (e) {
     if (activeEditSequence.get().length === 0) {
       alert('There was an error with editing that student. Please try again later, or if the issue persists, contact us with the link at the bottom of the page.');
       $('#seq-data-modal').removeClass('is-active');
@@ -467,7 +471,7 @@ Template.observatory.events({
 
     let missing_params = [];
     sequence.info = {parameters: {}};
-    this.sequenceParameters.forEach(function(param) {
+    this.sequenceParameters.forEach(function (param) {
       let param_value = $('input[name="' + param.label + '"]:checked').attr('value');
       if (typeof param_value === 'undefined') {
         missing_params.push(param.label);
@@ -483,10 +487,11 @@ Template.observatory.events({
     let that = this;
 
     console_log_conditional('sequence about to send to server:', sequence)
-    Meteor.call('sequenceUpdate', sequence, function(error, result) {
+    Meteor.call('sequenceUpdate', sequence, function (error, result) {
       if (error) {
         alert(error.reason);
-      } else {
+      }
+      else {
         $('#seq-param-modal').removeClass('is-active');
         observation_helpers.createTableOfContributions(that.observation._id);
         $('#seq-data-modal').addClass('is-active');
@@ -494,7 +499,7 @@ Template.observatory.events({
       }
     });
   },
-  'click .edit-seq': function(e) {
+  'click .edit-seq': function (e) {
     gtag('event', 'edit', {'event_category': 'sequences'});
     $('#seq-data-modal').removeClass('is-active');
 
@@ -505,15 +510,15 @@ Template.observatory.events({
     observation_helpers.editParamBoxes(seqId, subjId, environment.get()._id);
     $('#seq-param-modal').addClass('is-active');
   },
-  'click .delete-seq': function(e) {
+  'click .delete-seq': function (e) {
     observation_helpers.deleteContribution(e, observation.get()._id);
   },
-  'click #show-all-observations':function (e){
+  'click #show-all-observations': function (e) {
     observation_helpers.createTableOfContributions(observation.get()._id);
     gtag('event', 'view_sequence_list', {'event_category': 'observations'});
     $('#seq-data-modal').addClass('is-active');
   },
-  'click .edit-included-students': function() {
+  'click .edit-included-students': function () {
     if (classroomMode.get() === 'code') {
       classroomMode.set('edit');
     }
@@ -521,33 +526,36 @@ Template.observatory.events({
       classroomMode.set('code');
     }
   },
-  'submit #obs-desc-form': function(e) {
+  'submit #obs-desc-form': function (e) {
     e.preventDefault();
 
     let $desc = $('.observation__description', e.target);
-    Meteor.call('observationUpdateDescription', {obsId: observation.get()._id, description: $desc.val()}, function(err, res) {
+    Meteor.call('observationUpdateDescription', {
+      obsId: observation.get()._id,
+      description: $desc.val()
+    }, function (err, res) {
       if (err) {
         alert(err)
       }
       else {
         $('details', e.target).append('<span class="item-saved-message">Saved</span>')
-        setTimeout(function() {
+        setTimeout(function () {
           $('.item-saved-message', e.target).remove()
         }, 2000)
       }
     })
   },
-  'submit #obs-notes-form': function(e) {
+  'submit #obs-notes-form': function (e) {
     e.preventDefault();
 
     let $notes = $('.observation__notes', e.target);
-    Meteor.call('observationUpdateNotes', {obsId: observation.get()._id, notes: $notes.val()}, function(err, res) {
+    Meteor.call('observationUpdateNotes', {obsId: observation.get()._id, notes: $notes.val()}, function (err, res) {
       if (err) {
         alert(err)
       }
       else {
         $('details', e.target).append('<span class="item-saved-message">Saved</span>')
-        setTimeout(function() {
+        setTimeout(function () {
           $('.item-saved-message', e.target).remove()
         }, 2000)
       }
@@ -556,7 +564,7 @@ Template.observatory.events({
 });
 
 function getAllowedStudentIds(envId, obs) {
-  return Subjects.find({envId: envId}).fetch().map(function(s) {
+  return Subjects.find({envId: envId}).fetch().map(function (s) {
     if (obs.observationType === 'small_group' && !obs.small_group.find(id => id === s._id)) {
       return;
     }
@@ -568,12 +576,20 @@ function getAllowedStudentIds(envId, obs) {
 }
 
 
-Template.registerHelper( 'math', function () {
+Template.registerHelper('math', function () {
   return {
-    mul ( a, b ) { return a * b; },
-    div ( a, b ) { return b ? a / b : 0; },
-    sum ( a, b ) { return a + b; },
-    sub ( a, b ) { return a - b; },
+    mul(a, b) {
+      return a * b;
+    },
+    div(a, b) {
+      return b ? a / b : 0;
+    },
+    sum(a, b) {
+      return a + b;
+    },
+    sub(a, b) {
+      return a - b;
+    },
   }
 });
 
@@ -597,45 +613,45 @@ function editObservationName(obsId) {
   save_button
     .filter(':not(.save-observation-name--processed)')
     .addClass('save-observation-name--processed')
-    .on('click', function() {
-    var new_obs_name = $('.edit-obs-name', context);
-    var new_name = new_obs_name.val();
+    .on('click', function () {
+      var new_obs_name = $('.edit-obs-name', context);
+      var new_name = new_obs_name.val();
 
-    var args = {
-      'obsId': obsId,
-      'obsName': new_name,
-    };
+      var args = {
+        'obsId': obsId,
+        'obsName': new_name,
+      };
 
-    Meteor.call('observationRename', args, function(error, result) {
-      var message;
-      if (result) {
-        message = $('<span/>', {
-          class: 'name-save-result tag is-success inline-block success-message',
-          text: 'Saved'
-        });
-        obs_name.html(new_name);
-        gtag('event',  'rename', {'event_category': 'observations'});
-      }
-      else {
-        message = $('<span/>', {
-          class: 'name-save-result tag is-warning inline-block error-message',
-          text: 'Failed to save. Try again later'
-        })
-      }
-      obs_name_wrapper.append(message);
+      Meteor.call('observationRename', args, function (error, result) {
+        var message;
+        if (result) {
+          message = $('<span/>', {
+            class: 'name-save-result tag is-success inline-block success-message',
+            text: 'Saved'
+          });
+          obs_name.html(new_name);
+          gtag('event', 'rename', {'event_category': 'observations'});
+        }
+        else {
+          message = $('<span/>', {
+            class: 'name-save-result tag is-warning inline-block error-message',
+            text: 'Failed to save. Try again later'
+          })
+        }
+        obs_name_wrapper.append(message);
 
-      setTimeout(function() {
-        message.remove();
-      }, 3000);
+        setTimeout(function () {
+          message.remove();
+        }, 3000);
 
-      return 0;
-    });
+        return 0;
+      });
 
-    save_button.hide();
-    new_obs_name.remove();
-    obs_name.removeClass('editing');
-    obs_name.show();
-  })
+      save_button.hide();
+      new_obs_name.remove();
+      obs_name.removeClass('editing');
+      obs_name.show();
+    })
 
   obs_name_wrapper.prepend($('<input>', {
     class: 'edit-obs-name inherit-font-size',
@@ -646,7 +662,7 @@ function editObservationName(obsId) {
   obs_name.hide();
   save_button.show();
 
-  $('.edit-obs-name:not(.edit-obs-name--processed)', context).addClass('edit-obs-name--processed').on('keyup', function(e) {
+  $('.edit-obs-name:not(.edit-obs-name--processed)', context).addClass('edit-obs-name--processed').on('keyup', function (e) {
     if (e.keyCode === 13) {
       save_button.click()
     }
@@ -676,55 +692,55 @@ function editObservationDate(obsId) {
   save_button
     .filter(':not(.save-observation-date--processed)')
     .addClass('save-observation-date--processed')
-    .on('click', function() {
-    var new_obs_date_iso = $('.edit-obs-date--iso', context);
-    var new_obs_date = $('.edit-obs-date', context);
-    var new_date = new_obs_date_iso.val();
+    .on('click', function () {
+      var new_obs_date_iso = $('.edit-obs-date--iso', context);
+      var new_obs_date = $('.edit-obs-date', context);
+      var new_date = new_obs_date_iso.val();
 
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(new_date)) {
-      alert('Please input a valid date');
-      return;
-    }
-
-    var args = {
-      'obsId': obsId,
-      'observationDate': new_date,
-    };
-
-    Meteor.call('observationUpdateDate', args, function(error, result) {
-      var message;
-      if (error) {
-        alert('error on date update, error')
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(new_date)) {
+        alert('Please input a valid date');
+        return;
       }
-      if (result) {
-        message = $('<span/>', {
-          class: 'name-save-result tag is-success inline-block success-message',
-          text: 'Saved'
-        });
-        obs_date.html(new_date);
-        gtag('event', 'updateDate', {'event_category': 'observations'});
-      }
-      else {
-        message = $('<span/>', {
-          class: 'name-save-result tag is-warning inline-block error-message',
-          text: 'Failed to save. Try again later'
-        })
-      }
-      obs_wrapper.append(message);
 
-      setTimeout(function() {
-        message.remove();
-      }, 3000);
+      var args = {
+        'obsId': obsId,
+        'observationDate': new_date,
+      };
 
-      return 0;
-    });
+      Meteor.call('observationUpdateDate', args, function (error, result) {
+        var message;
+        if (error) {
+          alert('error on date update, error')
+        }
+        if (result) {
+          message = $('<span/>', {
+            class: 'name-save-result tag is-success inline-block success-message',
+            text: 'Saved'
+          });
+          obs_date.html(new_date);
+          gtag('event', 'updateDate', {'event_category': 'observations'});
+        }
+        else {
+          message = $('<span/>', {
+            class: 'name-save-result tag is-warning inline-block error-message',
+            text: 'Failed to save. Try again later'
+          })
+        }
+        obs_wrapper.append(message);
 
-    save_button.hide();
-    new_obs_date_iso.remove();
-    new_obs_date.remove();
-    obs_date.removeClass('editing');
-    obs_date_display.show();
-  })
+        setTimeout(function () {
+          message.remove();
+        }, 3000);
+
+        return 0;
+      });
+
+      save_button.hide();
+      new_obs_date_iso.remove();
+      new_obs_date.remove();
+      obs_date.removeClass('editing');
+      obs_date_display.show();
+    })
 
   obs_wrapper.prepend($('<input>', {
     class: 'edit-obs-date datepicker inherit-font-size',
@@ -742,7 +758,7 @@ function editObservationDate(obsId) {
   obs_date_display.hide();
   save_button.show();
 
-  $('.edit-obs-date:not(.edit-obs-date--processed)', context).addClass('edit-obs-date--processed').on('keyup', function(e) {
+  $('.edit-obs-date:not(.edit-obs-date--processed)', context).addClass('edit-obs-date--processed').on('keyup', function (e) {
     if (e.keyCode === 13) {
       save_button.click()
     }
@@ -754,7 +770,7 @@ function editObservationDate(obsId) {
 function deleteObservation(obsId) {
   var result = confirm("Are you sure you want to delete this observation?");
   if (result) {
-    Meteor.call('observationDelete', obsId, function(error, result) {
+    Meteor.call('observationDelete', obsId, function (error, result) {
       if (!error) {
         gtag('event', 'delete', {'event_category': 'observations'});
         Router.go('environmentList');

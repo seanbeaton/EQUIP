@@ -3,7 +3,7 @@ import {console_log_conditional} from "../../../../helpers/logging";
 const assert = require('assert');
 
 var myStepDefinitionsWrapper = function () {
-  this.Given(/^I am on the site$/, function(callback) {
+  this.Given(/^I am on the site$/, function (callback) {
     browser.url('http://localhost:3005')
     callback()
   });
@@ -17,7 +17,7 @@ var myStepDefinitionsWrapper = function () {
 
   this.Given(/^a clean database$/, function (callback) {
     server.call('logout');
-    server.execute(function() {
+    server.execute(function () {
       Package['xolvio:cleaner'].resetDatabase();
     });
     callback()
@@ -26,7 +26,7 @@ var myStepDefinitionsWrapper = function () {
 
   this.Given(/^I am logged in as a new test user$/, function (callback) {
     server.call('logout');
-    server.execute(function() {
+    server.execute(function () {
       Accounts.createUser({
         username: "testuser",
         email: "testuser@example.com",
@@ -34,7 +34,7 @@ var myStepDefinitionsWrapper = function () {
       });
     })
     server.call('logout');
-    browser.execute(function() {
+    browser.execute(function () {
       Meteor.loginWithPassword('testuser', 'testuser')
     });
     callback()
@@ -42,7 +42,7 @@ var myStepDefinitionsWrapper = function () {
 
   this.Given(/^a new test user exists$/, function (callback) {
     server.call('logout');
-    server.execute(function() {
+    server.execute(function () {
       Accounts.createUser({
         username: "testuser",
         email: "testuser@example.com",
@@ -55,7 +55,9 @@ var myStepDefinitionsWrapper = function () {
 
 
   this.Given(/^I am logged out/, function (callback) {
-    let user = browser.execute(() => {return Meteor.user()});
+    let user = browser.execute(() => {
+      return Meteor.user()
+    });
     if (!user) {
       callback()
     }
@@ -107,7 +109,7 @@ var myStepDefinitionsWrapper = function () {
     else {
       let searchItems = browser.elements(selector);
       let found_items = 0;
-      searchItems.value.forEach(function(searchItem) {
+      searchItems.value.forEach(function (searchItem) {
         // console_log_conditional('searchItem', searchItem);
         if (!see_negation) {
           // console_log_conditional("check does exist");
@@ -156,7 +158,7 @@ var myStepDefinitionsWrapper = function () {
     else {
       let searchItems = wrapper.elements(selector);
       let found_items = 0;
-      searchItems.value.forEach(function(searchItem) {
+      searchItems.value.forEach(function (searchItem) {
 
         if (!see_negation) {
           searchItem.waitForExist(2000);
@@ -239,7 +241,7 @@ var myStepDefinitionsWrapper = function () {
     // console_log_conditional('searchItem', searchItem);
     // console_log_conditional('searchItem.getCssProperty(\'display\').value', searchItem.getCssProperty('display').value);
 
-    let xor = function(a, b) {
+    let xor = function (a, b) {
       return (a && !b) || (!a && b)
     }
 
@@ -340,7 +342,7 @@ var myStepDefinitionsWrapper = function () {
   });
 
   this.Given(/^the "([^"]*)" is removed$/, function (remove, callback) {
-    browser.execute(function(el) {
+    browser.execute(function (el) {
       let remove_el = document.querySelector(el);
       if (remove_el) {
         remove_el.remove()
@@ -370,7 +372,8 @@ var myStepDefinitionsWrapper = function () {
     // console_log_conditional('searchItem', Object.getOwnPropertyNames(browser).filter((key) => key.startsWith("alert")));
     if (confirm) {
       browser.alertAcceptSync();
-    } else {
+    }
+    else {
       browser.alertDismissSync();
     }
     callback();
@@ -378,7 +381,7 @@ var myStepDefinitionsWrapper = function () {
 
 
   this.Then(/^I am on the route "([^"]*)"$/, function (route_name, callback) {
-    let current_route = browser.executeAsync(function(route_name, done) {
+    let current_route = browser.executeAsync(function (route_name, done) {
       done(Router.current().route.getName())
     }, route_name);
     assert(current_route.value === route_name);
@@ -401,8 +404,8 @@ var myStepDefinitionsWrapper = function () {
 };
 
 
-let signOut = function() {
-  browser.executeAsync(function(done) {
+let signOut = function () {
+  browser.executeAsync(function (done) {
     Meteor.logout(function () {
       Router.go('landingPage');
       done()
@@ -410,18 +413,17 @@ let signOut = function() {
   })
 }
 
-let delayedGo = function(loc) {
-  browser.executeAsync(function(route, done) {
+let delayedGo = function (loc) {
+  browser.executeAsync(function (route, done) {
     Router.go(route);
     setTimeout(done, 1000)
   }, loc)
 }
 
-let getMethods = function(obj)
-{
+let getMethods = function (obj) {
   var res = [];
-  for(var m in obj) {
-    if(typeof obj[m] == "function") {
+  for (var m in obj) {
+    if (typeof obj[m] == "function") {
       res.push(m)
     }
   }
@@ -429,7 +431,7 @@ let getMethods = function(obj)
 }
 
 
-let xor = function(a, b) {
+let xor = function (a, b) {
   return (a && !b) || (!a && b)
 };
 

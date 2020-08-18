@@ -13,61 +13,72 @@
     </section>
 
     <div class="c--student-body__wrapper">
-      <div class="c--student-body__description">
-          <ul class="c--student-body__container-list-container">
-              <a href="{{pathFor 'environmentList'}}">
-                  <li class="c--student-body__container-list">Dashboard<span> &#62;</span></li>
-              </a>
-              <li class="c--student-body__container-list-current"><span>{{classRoomName}} - Student Roster</span></li>
-          </ul>
-          <p>
-              This is the student roster for your classroom: {{classRoomName}}. You can add students, edit their demographic information, or delete students from the roster. You can also save the visual layout of where students are sitting in the classroom. For additional guidance, visit the <a href="{{pathFor 'help' hash='customize'}}">help</a> page.
-          </p>
-          <p>
-              You can also use the <a href="{{pathFor route="editSubjectsAdvanced" _envId=envId}}">advanced student entry page</a>, which allows for tabular data input.
-          </p>
-      </div>
-    <div class="c--student-body__container subjects">
-        <div class="drag-bounding-box">
-        {{#each subject}}
-            <div id="{{_id}}" style='transform:translate({{data_x}}px, {{data_y}}px);' data-id="{{_id}}" data-x="{{data_x}}" data-y="{{data_y}}" class="draggable student c--student-body__container-drag-area o--box-item">
-                <p class="c--student-body__container-drag-label">{{info.name}}</p><span class="student-edit-button edit-stud" data-id="{{_id}}"><i class="fa fa-edit"></i></span>
+        <div class="c--student-body__description">
+            <ul class="c--student-body__container-list-container">
+                <a href="{{pathFor 'environmentList'}}">
+                    <li class="c--student-body__container-list">Dashboard<span> &#62;</span></li>
+                </a>
+                <li class="c--student-body__container-list-current"><span>{{classRoomName}} - Student Roster</span></li>
+            </ul>
+            <p>
+                This is the student roster for your classroom: {{classRoomName}}. You can add students, edit their
+                demographic information, or delete students from the roster. You can also save the visual layout of
+                where students are sitting in the classroom. For additional guidance, visit the <a
+                    href="{{pathFor 'help' hash='customize'}}">help</a> page.
+            </p>
+            <p>
+                You can also use the <a href="{{pathFor route="editSubjectsAdvanced" _envId=envId}}">advanced student
+                entry page</a>, which allows for tabular data input.
+            </p>
+        </div>
+        <div class="c--student-body__container subjects">
+            <div class="drag-bounding-box">
+                {{#each subject}}
+                    <div id="{{_id}}" style='transform:translate({{data_x}}px, {{data_y}}px);' data-id="{{_id}}"
+                         data-x="{{data_x}}" data-y="{{data_y}}"
+                         class="draggable student c--student-body__container-drag-area o--box-item">
+                        <p class="c--student-body__container-drag-label">{{info.name}}</p><span
+                            class="student-edit-button edit-stud" data-id="{{_id}}"><i class="fa fa-edit"></i></span>
+                    </div>
+                {{/each}}
             </div>
-        {{/each}}
         </div>
     </div>
-  </div>
 
-  <!-- MODAL FOR STUDENT PARAMS -->
-  <div id="stud-param-modal" class="modal">
-    <div class="modal-background"></div>
-      <div id="param-modal-content" class="modal-content"></div>
-      <button class="modal-close"></button>
-  </div>
-
-
-  <!-- MODAL FOR TABLE OF STUDENTS -->
-  <div id="stud-data-modal" class="modal">
-    <div class="modal-background"></div>
-      <div id="data-modal-content" class="modal-content">
-      </div>
-      <button class="modal-close"></button>
-  </div>
-
-  <div id="help-env-modal" class="modal">
-    <div class="modal-background"></div>
-    <div class="modal-card">
-      <header class="modal-card-head">
-        <p class="modal-card-title">How to Work With Students</p>
-        <button id="help-close-modal" class="delete"></button>
-      </header>
-      <section class="modal-card-body">
-      Begin by clicking on the "add" button. This will set up a new student for you. With this student, enter their name and demographic information. Initially when you add students they will be stacked on top of each other. If you click and hold on the student you can drag them to different areas in the classroom. Once you are finished moving students, be sure to click on "save locations." By clicking the "edit/remove" button you can edit the parameters of students you have already added.
-      </section>
-      <footer class="modal-card-foot">
-        <a class="button">Cancel</a>
-      </footer>
+    <!-- MODAL FOR STUDENT PARAMS -->
+    <div id="stud-param-modal" class="modal">
+        <div class="modal-background"></div>
+        <div id="param-modal-content" class="modal-content"></div>
+        <button class="modal-close"></button>
     </div>
-  </div>
+
+
+    <!-- MODAL FOR TABLE OF STUDENTS -->
+    <div id="stud-data-modal" class="modal">
+        <div class="modal-background"></div>
+        <div id="data-modal-content" class="modal-content">
+        </div>
+        <button class="modal-close"></button>
+    </div>
+
+    <div id="help-env-modal" class="modal">
+        <div class="modal-background"></div>
+        <div class="modal-card">
+            <header class="modal-card-head">
+                <p class="modal-card-title">How to Work With Students</p>
+                <button id="help-close-modal" class="delete"></button>
+            </header>
+            <section class="modal-card-body">
+                Begin by clicking on the "add" button. This will set up a new student for you. With this student, enter
+                their name and demographic information. Initially when you add students they will be stacked on top of
+                each other. If you click and hold on the student you can drag them to different areas in the classroom.
+                Once you are finished moving students, be sure to click on "save locations." By clicking the
+                "edit/remove" button you can edit the parameters of students you have already added.
+            </section>
+            <footer class="modal-card-foot">
+                <a class="button">Cancel</a>
+            </footer>
+        </div>
+    </div>
 
 </template>

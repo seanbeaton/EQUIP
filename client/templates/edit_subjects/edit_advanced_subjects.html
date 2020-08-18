@@ -16,32 +16,46 @@
         </div>
         <div class="page-section--body">
             <div class="students-table-explanation">
-                <p>Add new students by filling in the fields. New lines will be added automatically for you. Pasting in data copied from a spreadsheet will fill in the correct fields as long as you copied the header as well. The header fields must match the headers shown here exactly.</p>
+                <p>Add new students by filling in the fields. New lines will be added automatically for you. Pasting in
+                    data copied from a spreadsheet will fill in the correct fields as long as you copied the header as
+                    well. The header fields must match the headers shown here exactly.</p>
             </div>
             <div class="subjects-table">
                 <table>
                     <thead>
-                        <tr>
-                            <td class="text-content"></td>
-                            <td class="text-content">Status</td>
-                            <td class="text-content">Name</td>
-                            {{#each param in subject_parameters}}
-                                <td class="student__header student__header--{{className param.label}} text-content">{{param.label}}</td>
-                            {{/each}}
-                        </tr>
+                    <tr>
+                        <td class="text-content"></td>
+                        <td class="text-content">Status</td>
+                        <td class="text-content">Name</td>
+                        {{#each param in subject_parameters}}
+                            <td class="student__header student__header--{{className
+                                    param.label}} text-content">{{param.label}}</td>
+                        {{/each}}
+                    </tr>
                     </thead>
                     <tbody>
-                        {{#if showStudentRows }}
+                    {{#if showStudentRows }}
                         {{#each row in student_rows}}
-                            <tr class="student-row {{deletedClass row.id}}" data-deleted="{{isDeletedText row.id}}" data-student-id="{{row.id}}" data-row-status="{{row.status}}" data-x="{{row.data_x}}" data-y="{{row.data_y}}">
-                                <td class="text-content student-action"><button data-remove-id="{{column.id}}" class="simple-button simple-button--mini {{deleteButtonClass row.id}}">{{deleteButtonText row.id}}</button></td>
+                            <tr class="student-row {{deletedClass row.id}}" data-deleted="{{isDeletedText row.id}}"
+                                data-student-id="{{row.id}}" data-row-status="{{row.status}}" data-x="{{row.data_x}}"
+                                data-y="{{row.data_y}}">
+                                <td class="text-content student-action">
+                                    <button data-remove-id="{{column.id}}"
+                                            class="simple-button simple-button--mini {{deleteButtonClass
+                                                    row.id}}">{{deleteButtonText row.id}}</button>
+                                </td>
                                 <td class="text-content">{{row.status}}</td>
                                 {{#each column in row.columns}}
-                                    <td><input class="student-data-input" type="text" id="{{column.id}}" data-student-type="{{column.data_student_type}}" data-field-type="{{column.data_field_type}}" data-field="{{column.data_field}}" data-student-id="{{column.data_student_id}}" value="{{column.value}}"></td>
+                                    <td><input class="student-data-input" type="text" id="{{column.id}}"
+                                               data-student-type="{{column.data_student_type}}"
+                                               data-field-type="{{column.data_field_type}}"
+                                               data-field="{{column.data_field}}"
+                                               data-student-id="{{column.data_student_id}}" value="{{column.value}}">
+                                    </td>
                                 {{/each}}
                             </tr>
                         {{/each}}
-                        {{/if}}
+                    {{/if}}
                     </tbody>
                 </table>
             </div>
