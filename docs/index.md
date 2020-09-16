@@ -18,8 +18,6 @@ You can also take a look at the videos on the following topics:
 - [Observations](./usage/observations.md)
 - [Reports](./usage/reports.md)
 
-
-
 ## Development
 
 View the sections below for information on what each entity does.
