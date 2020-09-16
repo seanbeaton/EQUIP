@@ -1,0 +1,26 @@
+site_name: EQUIP Docs
+theme:
+  name: readthedocs
+  highlightjs: true
+  hljs_languages:
+    - json
+    - js
+    - css
+    - scss
+    - html
+nav:
+  - Home: index.md
+  - Getting Started: gettingstarted.md
+  - Usage:
+    - Classrooms: usage/classrooms.md
+    - Observations: usage/observations.md
+    - Reports: usage/reports.md
+  - Development:
+    - Sequence and Subject Parameters: dev/entities/subject_sequence_parameter.md
+    - Subjects: dev/entities/subject.md
+    - Environments: dev/entities/environment.md
+    - Observations: dev/entities/observation.md
+    - Sequences: dev/entities/sequence.md
+    - Groups (WIP): dev/entities/group.md
+    - Access control: dev/access.md
+    - Reports: dev/reports.md
