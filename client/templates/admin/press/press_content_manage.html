@@ -1,0 +1,88 @@
+<template name="pressContentManage">
+    <h2 class="page__heading">Press Content</h2>
+    <section class="page__section section">
+        <h4 class="section__title"></h4>
+        <div class="section__content">
+            {{#each pressItem in pressContent}}
+                <div class="press press--manage">
+                    <div class="press__publication">
+                        <label for="press__publication--{{pressItem._id}}">Publication</label>
+                        <input id="press__publication--{{pressItem._id}}" value="{{pressItem.pressPublication}}">
+                    </div>
+                    <div class="press__title-title">
+                        <label for="press__title--{{pressItem._id}}">Title</label>
+                        <input size='50' id="press__title--{{pressItem._id}}" value="{{pressItem.pressTitle}}">
+                    </div>
+                    <div class="press__date">
+                        <div class="press__date-display">
+                            <label for="press__date-display--{{pressItem._id}}">Display Date</label>
+                            <input id="press__date-display--{{pressItem._id}}" value="{{pressItem.pressDateDisplay}}">
+                        </div>
+                        <div class="press__date-sort">
+                            <label for="press__date-sort--{{pressItem._id}}">Sort Date (YYYY-MM-DD)</label>
+                            <input id="press__date-sort--{{pressItem._id}}" value="{{pressItem.pressDateSort}}">
+                        </div>
+                    </div>
+                    <div class="press__content">
+                        <label for="press__content--{{pressItem._id}}">Content</label>
+                        <textarea rows='8' cols='60' id="press__content--{{pressItem._id}}">{{pressItem.pressDescription}}</textarea>
+                    </div>
+                    <div class="press__embed">
+                        <label for="press__embed--{{pressItem._id}}">Embed</label>
+                        <textarea rows='8' cols='60' id="press__embed--{{pressItem._id}}">{{pressItem.pressEmbed}}</textarea>
+                    </div>
+                    <div class="press__link">
+                        <label for="press__link--{{pressItem._id}}">Link Destination</label>
+                        <input id="press__link--{{pressItem._id}}" value="{{pressItem.pressLink}}">
+                    </div>
+                    <div class="press__link-text">
+                        <label for="press__link-text--{{pressItem._id}}">Link Text</label>
+                        <input id="press__link-text--{{pressItem._id}}" value="{{pressItem.pressLinkText}}">
+                    </div>
+                    <div class="press__categorization">
+                        <label for="press__categorization--{{pressItem._id}}">Categorization</label>
+                        <input id="press__categorization--{{pressItem._id}}" value="{{pressItem.pressCategorization}}">
+                    </div>
+                    <div class="press__image">
+                        <label>Image</label>
+                        {{#each image in allowedImages}}
+                            <div class="press-image__option">
+                                {{#if imageMatch pressItem.pressImage image.fileName}}
+                                    <input checked="checked" type="radio" name="press__image--{{pressItem._id}}" id="press__image--{{pressItem._id}}--{{image.fileName}}" value="{{image.fileName}}">
+                                {{else}}
+                                    <input type="radio"  name="press__image--{{pressItem._id}}" id="press__image--{{pressItem._id}}--{{image.fileName}}" value="{{image.fileName}}">
+                                {{/if}}
+                                <label for="press__image--{{pressItem._id}}--{{image.fileName}}">
+                                    {{#if imageMatch image.fileName '' }}
+                                        No Image
+                                    {{else}}
+                                        <img src="{{image.path}}">
+                                    {{/if}}
+                                </label>
+                            </div>
+                        {{/each}}
+                    </div>
+                    <div class="press__meta">
+                        <div class="press__published">
+                            <label for="press__published--{{pressItem._id}}">Published</label>
+                            {{#if pressItem.published}}
+                                <input id="press__published--{{pressItem._id}}" checked="checked" type="checkbox">
+                            {{else}}
+                                <input id="press__published--{{pressItem._id}}" type="checkbox">
+                            {{/if}}
+                        </div>
+                        <div class="press__weight">
+                            <label for="press__weight--{{pressItem._id}}">Sort Weight</label>
+                            <input id="press__weight--{{pressItem._id}}" type='number' size="3" value="{{pressItem.weight}}">
+                        </div>
+                    </div>
+                    <button class="press__save" data-save-id="{{pressItem._id}}">Save Item</button>
+                    <button class="press__delete" data-save-id="{{pressItem._id}}">Delete Item</button>
+                </div>
+            {{/each}}
+        </div>
+        <div class="actions">
+            <button class="press__add-new">Add New Item</button>
+        </div>
+    </section>
+</template>

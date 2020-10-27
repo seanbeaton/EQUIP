@@ -6,10 +6,10 @@ Template.researchContentManage.helpers({
     return ResearchContent.find().fetch();
   },
   allowedImages: function() {
-    return allowed_images.map(i => `/research_images/${i}`)
+    return allowed_images.map(i => {return {path: `/research_images/${i}`, fileName: i}})
   },
-  imageIsActive: function(image, option) {
-    return "/research_images/" + image === option
+  imageMatch: function(image, option) {
+    return image === option
   }
 });
 
@@ -18,10 +18,14 @@ Template.researchContentManage.events = {
     Meteor.call('researchContentInsert', {
       'researchAuthor': '',
       'researchTitle': '',
+      'researchDateSort': '',
+      'researchDateDisplay': '',
       'researchDescription': '',
       'researchLink': '',
       'researchCategorization': '',
-      'researchImage': 'image_1.jpg',
+      'researchImage': '',
+      'published': true,
+      'weight': 0,
     })
   },
   'click .research__save': function (e) {
@@ -29,16 +33,20 @@ Template.researchContentManage.events = {
     Meteor.call('researchContentUpdate', {
       'researchAuthor': $('#research__authors--' + rpid).val(),
       'researchTitle': $('#research__title--' + rpid).val(),
+      'researchDateSort': $('#research__date-sort--' + rpid).val(),
+      'researchDateDisplay': $('#research__date-display--' + rpid).val(),
       'researchDescription': $('#research__content--' + rpid).val(),
       'researchLink': $('#research__link--' + rpid).val(),
       'researchCategorization': $('#research__categorization--' + rpid).val(),
-      'researchImage': 'image_1.jpg',
+      'researchImage': $('input[name="research__image--' + rpid + '"]:checked').val(),
+      'published': $('#research__published--' + rpid).is(':checked'),
+      'weight' : parseInt($('#research__weight--' + rpid).val()),
       'rpid': rpid,
     })
   },
   'click .research__delete': function (e) {
     const rpid = $(e.target).attr('data-save-id');
-    if (!Window.confirm('Are you sure you want to delete this content?')) {
+    if (!confirm('Are you sure you want to delete this content?')) {
       return;
     }
     Meteor.call('researchContentDelete', {

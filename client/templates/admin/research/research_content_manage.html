@@ -5,16 +5,24 @@
         <div class="section__content">
             {{#each researchItem in researchContent}}
                 <div class="research research--manage">
-<!--                    <div class="research__title">-->
-                        <div class="research__authors">
-                            <label for="research__authors--{{researchItem._id}}">Authors</label>
-                            <input id="research__authors--{{researchItem._id}}" value="{{researchItem.researchAuthor}}">
+                    <div class="research__authors">
+                        <label for="research__authors--{{researchItem._id}}">Authors</label>
+                        <input id="research__authors--{{researchItem._id}}" value="{{researchItem.researchAuthor}}">
+                    </div>
+                    <div class="research__title-title">
+                        <label for="research__title--{{researchItem._id}}">Title</label>
+                        <input size='50' id="research__title--{{researchItem._id}}" value="{{researchItem.researchTitle}}">
+                    </div>
+                    <div class="research__date">
+                        <div class="research__date-display">
+                            <label for="research__date-display--{{researchItem._id}}">Display Date</label>
+                            <input id="research__date-display--{{researchItem._id}}" value="{{researchItem.researchDateDisplay}}">
                         </div>
-                        <div class="research__title-title">
-                            <label for="research__title--{{researchItem._id}}">Title</label>
-                            <input size='50' id="research__title--{{researchItem._id}}" value="{{researchItem.researchTitle}}">
+                        <div class="research__date-sort">
+                            <label for="research__date-sort--{{researchItem._id}}">Sort Date (YYYY-MM-DD)</label>
+                            <input id="research__date-sort--{{researchItem._id}}" value="{{researchItem.researchDateSort}}">
                         </div>
-<!--                    </div>-->
+                    </div>
                     <div class="research__content">
                         <label for="research__content--{{researchItem._id}}">Content</label>
                         <textarea rows='8' cols='60' id="research__content--{{researchItem._id}}">{{researchItem.researchDescription}}</textarea>
@@ -31,14 +39,34 @@
                         <label>Image</label>
                         {{#each image in allowedImages}}
                             <div class="research-image__option">
-                                {{#if imageIsActive researchItem.researchImage image}}
-                                    <input checked="checked" type="radio" id="research__image--{{researchItem._id}}--{{image}}" value="{{researchItem.researchCategorization}}">
+                                {{#if imageMatch researchItem.researchImage image.fileName}}
+                                    <input checked="checked" type="radio" name="research__image--{{researchItem._id}}" id="research__image--{{researchItem._id}}--{{image.fileName}}" value="{{image.fileName}}">
                                 {{else}}
-                                    <input type="radio" id="research__image--{{researchItem._id}}--{{image}}" value="{{researchItem.researchCategorization}}">
+                                    <input type="radio"  name="research__image--{{researchItem._id}}" id="research__image--{{researchItem._id}}--{{image.fileName}}" value="{{image.fileName}}">
                                 {{/if}}
-                                <label for="research__image--{{researchItem._id}}--{{image}}"><img src="{{image}}"></label>
+                                <label for="research__image--{{researchItem._id}}--{{image.fileName}}">
+                                    {{#if imageMatch image.fileName '' }}
+                                        No Image
+                                    {{else}}
+                                        <img src="{{image.path}}">
+                                    {{/if}}
+                                </label>
                             </div>
                         {{/each}}
+                    </div>
+                    <div class="research__meta">
+                        <div class="research__published">
+                            <label for="research__published--{{researchItem._id}}">Published</label>
+                            {{#if researchItem.published}}
+                                <input id="research__published--{{researchItem._id}}" checked="checked" type="checkbox">
+                            {{else}}
+                                <input id="research__published--{{researchItem._id}}" type="checkbox">
+                            {{/if}}
+                        </div>
+                        <div class="research__weight">
+                            <label for="research__weight--{{researchItem._id}}">Sort Weight</label>
+                            <input id="research__weight--{{researchItem._id}}" type='number' size="3" value="{{researchItem.weight}}">
+                        </div>
                     </div>
                     <button class="research__save" data-save-id="{{researchItem._id}}">Save Item</button>
                     <button class="research__delete" data-save-id="{{researchItem._id}}">Delete Item</button>

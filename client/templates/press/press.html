@@ -3,6 +3,35 @@
     <section class="page__section section">
         <h3 class="section__title"></h3>
         <div class="section__content">
+            {{#each pressItem in pressContent}}
+                <div class="press">
+                    <div class="press__logo">
+                        {{#if pressItem.pressImage}}
+                        <img src="/press_images/{{pressItem.pressImage}}" alt="{{pressItem.pressPublication}}"/>
+                        {{/if}}
+                    </div>
+                    <div class="press__info">
+                        <h4 class="press__title">
+                            <span class="press__tag">{{pressItem.pressCategorization}}</span>
+                            <span class="press__title">{{pressItem.pressTitle}}</span>
+                        </h4>
+                        <div class="press__date">{{pressItem.pressDataDisplay}}</div>
+                        <div class="press__content">{{pressItem.pressDescription}}
+                        </div>
+                        {{#if pressItem.pressEmbed}}
+                            <div class="press__podcast-embed">
+                                {{{pressItem.pressEmbed}}}
+                            </div>
+                        {{/if}}
+                        {{#if pressItem.pressLink}}<a class="research__read" href="{{pressItem.pressLink}}">{{#if
+                                pressItem.pressLinkText}}{{pressItem.pressLinkText}}{{else}}
+                            Read More{{/if}} ></a>{{/if}}
+                    </div>
+                </div>
+            {{/each}}
+
+            <h3 class="page__heading"> --- Static Content Below --- </h3>
+
 
             <div class="press">
                 <div class="press__logo">

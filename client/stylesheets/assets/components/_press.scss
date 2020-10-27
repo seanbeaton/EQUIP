@@ -76,3 +76,49 @@
     padding-top: 1rem;
   }
 }
+
+.press.press--manage {
+  display: block;
+
+  > div {
+    padding: 0;
+  }
+  label {
+    display: block;
+    margin-top: 8px;
+  }
+  button {
+    margin-top: 16px;
+  }
+  textarea {
+    padding: 8px;
+  }
+
+  .press__meta,
+  .press__date {
+    display: flex;
+    margin: 0 -8px;
+    flex-flow: row wrap;
+    > div {
+      padding: 0 8px;
+    }
+  }
+
+  .press__image {
+    display: flex;
+    flex-flow: row wrap;
+    margin: 0 -8px;
+    > label {
+      flex-basis: 100%;
+      padding: 0 8px;
+    }
+    .press-image__option {
+      padding: 8px 8px;
+    }
+    label img {
+      max-width: 150px;
+      height: auto;
+    }
+  }
+
+}

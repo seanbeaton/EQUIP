@@ -47,6 +47,20 @@
   button {
     margin-top: 16px;
   }
+
+  textarea {
+    padding: 8px;
+  }
+  .research__meta,
+  .research__date {
+    display: flex;
+    margin: 0 -8px;
+    flex-flow: row wrap;
+    > div {
+      padding: 0 8px;
+    }
+  }
+
   .research__image {
     display: flex;
     flex-flow: row wrap;
