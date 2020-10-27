@@ -91,21 +91,6 @@ Template.header.events({
   }
 });
 
-Template.header.helpers({
-  isBetaThankYou: function () {
-    const routerPath = Router.current().route.path();
-    const getLocalStorage = window.localStorage.getItem("firstSession");
-
-    if (routerPath === "/" && !getLocalStorage) {
-      window.localStorage.setItem("firstSession", true);
-      return true;
-    }
-    else {
-      return false;
-    }
-  }
-});
-
 Template.header.rendered = function () {
   setTimeout(function () {
     const loginText = document.getElementById('login-name-link');
