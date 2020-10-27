@@ -3,13 +3,16 @@
     <section class="page__section section">
         <h4 class="section__title"></h4>
         <div class="section__content">
-            {{#each researchItem in researchContent}}
-                <div class="research">
-                    <h4 class="research__title"><span
-                            class="research__authors">{{researchItem.researchAuthor}}</span> {{researchItem.researchTitle}}</h4>
-                    {{#if researchItem.researchDescription}}<div class="research__content">{{researchItem.researchDescription}}</div>{{/if}}
-                    {{#if researchItem.researchLink}}<a class="research__read" href="{{researchItem.researchLink}}">Read More ></a>{{/if}}
-                </div>
+            {{#each category in researchContentCategorized}}
+                <h3 class="research__category-name">{{category.category_name}}</h3>
+                {{#each researchItem in category.children}}
+                    <div class="research">
+                        <h4 class="research__title"><span
+                                class="research__authors">{{researchItem.researchAuthor}}</span> {{researchItem.researchTitle}}</h4>
+                        {{#if researchItem.researchDescription}}<div class="research__content">{{researchItem.researchDescription}}</div>{{/if}}
+                        {{#if researchItem.researchLink}}<a class="research__read" href="{{researchItem.researchLink}}">Read More ></a>{{/if}}
+                    </div>
+                {{/each}}
             {{/each}}
 
             <h3 class="page__heading"> --- Static Content Below --- </h3>
