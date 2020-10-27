@@ -765,3 +765,13 @@ Meteor.publishComposite('groupEnvs', function (groupId) {
 //   return Meteor.users.find(selector, options);
 //
 // });
+
+
+Meteor.publish('research_content', function () {
+  return ResearchContent.find({});
+});
+
+
+Meteor.publish('press_content', function () {
+  return PressContent.find({});
+});

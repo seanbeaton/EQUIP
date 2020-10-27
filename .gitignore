@@ -7,3 +7,4 @@ node_modules
 db
 dump
 local_scripts
+site/

@@ -1,0 +1,52 @@
+<template name="researchContentManage">
+    <h2 class="page__heading">Research</h2>
+    <section class="page__section section">
+        <h4 class="section__title"></h4>
+        <div class="section__content">
+            {{#each researchItem in researchContent}}
+                <div class="research research--manage">
+<!--                    <div class="research__title">-->
+                        <div class="research__authors">
+                            <label for="research__authors--{{researchItem._id}}">Authors</label>
+                            <input id="research__authors--{{researchItem._id}}" value="{{researchItem.researchAuthor}}">
+                        </div>
+                        <div class="research__title-title">
+                            <label for="research__title--{{researchItem._id}}">Title</label>
+                            <input size='50' id="research__title--{{researchItem._id}}" value="{{researchItem.researchTitle}}">
+                        </div>
+<!--                    </div>-->
+                    <div class="research__content">
+                        <label for="research__content--{{researchItem._id}}">Content</label>
+                        <textarea rows='8' cols='60' id="research__content--{{researchItem._id}}">{{researchItem.researchDescription}}</textarea>
+                    </div>
+                    <div class="research__link">
+                        <label for="research__link--{{researchItem._id}}">Read More Link</label>
+                        <input id="research__link--{{researchItem._id}}" value="{{researchItem.researchLink}}">
+                    </div>
+                    <div class="research__categorization">
+                        <label for="research__categorization--{{researchItem._id}}">Categorization</label>
+                        <input id="research__categorization--{{researchItem._id}}" value="{{researchItem.researchCategorization}}">
+                    </div>
+                    <div class="research__image">
+                        <label>Image</label>
+                        {{#each image in allowedImages}}
+                            <div class="research-image__option">
+                                {{#if imageIsActive researchItem.researchImage image}}
+                                    <input checked="checked" type="radio" id="research__image--{{researchItem._id}}--{{image}}" value="{{researchItem.researchCategorization}}">
+                                {{else}}
+                                    <input type="radio" id="research__image--{{researchItem._id}}--{{image}}" value="{{researchItem.researchCategorization}}">
+                                {{/if}}
+                                <label for="research__image--{{researchItem._id}}--{{image}}"><img src="{{image}}"></label>
+                            </div>
+                        {{/each}}
+                    </div>
+                    <button class="research__save" data-save-id="{{researchItem._id}}">Save Item</button>
+                    <button class="research__delete" data-save-id="{{researchItem._id}}">Delete Item</button>
+                </div>
+            {{/each}}
+        </div>
+        <div class="actions">
+            <button class="research__add-new">Add New Item</button>
+        </div>
+    </section>
+</template>
