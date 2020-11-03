@@ -16,6 +16,7 @@ nav:
     - Observations: usage/observations.md
     - Reports: usage/reports.md
   - Development:
+    - Dev Home: dev/index.md
     - Sequence and Subject Parameters: dev/entities/subject_sequence_parameter.md
     - Subjects: dev/entities/subject.md
     - Environments: dev/entities/environment.md
