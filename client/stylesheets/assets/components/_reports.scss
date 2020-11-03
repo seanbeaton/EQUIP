@@ -27,6 +27,17 @@ div {
 
 }
 
+.report-section {
+  h5 {
+    font-family: 'Roboto', sans-serif;
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 180%;
+    color: var(--teal);
+    text-transform: none;
+  }
+}
+
 .report-select__options {
   display: flex;
   flex-flow: row wrap;

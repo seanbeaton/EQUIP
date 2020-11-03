@@ -1,0 +1,129 @@
+<!-- HTML for data analyisis page -->
+
+<template name="staticReport">
+    {{> reportBackButton }}
+
+    <div class="report-section-wrapper">
+
+        <section data-slide-id="params" class="report-section report-section--select">
+            <h3>
+                Classroom: {{>environmentSelect environments=environments}}
+            </h3>
+
+            {{#if environmentChosen }}
+                <h4>Choose one or more observations.</h4>
+                <p>Click observations on the timeline to select them.</p>
+                <p>Drag the graph to see earlier or later observations.</p>
+                <div class="report-select__options report-select__options--observations">
+                    <div id="vis-container"></div>
+                </div>
+            {{/if}}
+            {{#if observationChosen}}
+                {{>absentStudents observations=observations}}
+            {{/if}}
+
+        </section>
+        {{#if environmentChosen }}{{#if observationChosen }}
+        <section class="report-section report-section__graph">
+
+            <div class="static-report-wrapper report-wrapper {{#if
+                    loadingDataClass}}report-wrapper--loading{{/if}}">
+                <div class="static-report">
+                    <div class="static-report__section">
+                        <h3 class="static-report__section-title">Report for classroom "{{ activeEnvironment.envName }}"</h3>
+                        <div class="static-report__section-body">
+                            <h4 class="static-report__subsection-header">Observations included</h4>
+                            <div class="static-report__subsection-body">
+                                <table>
+                                    <thead>
+                                    <td>Observation Name</td><td>Observation Date</td><td>Number of Sequences (% of total)</td><td>Absent Students</td>
+                                    </thead>
+                                    <tbody>
+                                    {{#each obs in observations}}
+                                        <tr>
+                                            <td class="">{{obs.name}}</td>
+                                            <td class="">{{obs.observationDate}}</td>
+                                            <td class="">{{obs.sequenceCount}} ({{divRound obs.sequenceCount totalSequenceCount 2 true}}%)</td>
+                                            <td class="">{{obs.absent.length}}</td>
+                                        </tr>
+                                    {{/each }}
+                                    <tr class="totals-row">
+                                        <td class="">Total</td>
+                                        <td class="">{{obs.observationDate}}</td>
+                                        <td class="">{{totalSequenceCount}}</td>
+                                        <td class=""></td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <h4 class="static-report__subsection-header">Classroom makeup</h4>
+                            <div class="static-report__subsection-body">
+                                <div class="subsection__student-count">
+                                    <span class="report-label">Total Students:</span> <span class="report-value">{{activeEnvironment.studentCount}}</span>
+                                </div>
+                                <div class="subsection__student-demos">
+                                    {{#each param in activeEnvironment.demographics.parameters}}
+                                        <h5>{{param.label}}</h5>
+
+                                        {{#each option in param.options }}
+                                            <div>
+                                                <span class="report-label">{{option}}</span>
+                                                <span class="report-value report-value--isotype">
+                                                    {{#each student in activeEnvironment.studentsInDemographic param.label option}}
+                                                        <span class="isotype-icon--student">X</span>
+                                                    {{/each}}
+                                                </span>
+                                            </div>
+                                        {{/each}}
+                                    {{/each}}
+                                </div>
+                            </div>
+
+                            <h4 class="static-report__subsection-header">Aggregate contribution data</h4>
+                            <div class="static-report__subsection-body">
+                                <div class="subsection__student-count">
+                                    <span class="report-label">Total Students:</span> <span class="report-value">{{activeEnvironment.studentCount}}</span>
+                                </div>
+                                <div class="subsection__student-demos">
+                                    {{#each param in activeEnvironment.demographics.parameters}}
+                                        <h5>{{param.label}}</h5>
+
+                                        <table>
+                                            <thead>
+                                            <td></td>
+                                            {{#each option in param.options }}
+                                                <td>{{option}}</td>
+                                            {{/each}}
+                                            <td>Total</td>
+                                            </thead>
+                                            <tbody>
+                                            <tr>
+                                                <td># of Students (% of total)</td>
+                                                {{#each option in param.options }}
+                                                    <td>{{activeEnvironment.studentsInDemographicCount param.label option}} ({{activeEnvironment.studentsInDemographicPercentInt param.label option}}%)</td>
+                                                {{/each}}
+                                                <td>{{activeEnvironment.studentCount}} (100%)</td>
+                                            </tr>
+                                            <tr>
+                                                <td># of Contributions</td>
+                                                {{#each option in param.options }}
+                                                    <td>{{activeEnvironment.sequencesByDemographicCount param.label option activeObsIds}} ({{activeEnvironment.sequencesByDemographicPercentInt param.label option activeObsIds totalSequenceCount}}%)</td>
+                                                {{/each}}
+                                                <td>{{totalSequenceCount}} (100%)</td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    {{/each}}
+                                </div>
+                            </div>
+
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+        {{/if}}{{/if}}
+    </div>
+</template>

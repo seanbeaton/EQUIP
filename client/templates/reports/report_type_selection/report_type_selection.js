@@ -4,9 +4,9 @@ Template.reportsSelection.rendered = function () {
 }
 
 Template.reportsSelection.events({
-  // 'click .option--static': function() {
-  //     Router.go('staticReport')
-  // },
+  'click .option--static': function() {
+      Router.go('staticReport')
+  },
   'click .option--interactive': function () {
     Router.go('interactiveReport')
   },
