@@ -26,6 +26,18 @@ div {
   }
 
 }
+.report-section--main,
+.report-section--select {
+  position: relative;
+}
+
+.report-tutorial {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 8px;
+  margin: 8px;
+}
 
 .report-section {
   h5 {
