@@ -37,14 +37,14 @@
                             <div class="static-report__subsection-body">
                                 <table>
                                     <thead>
-                                    <td>Observation Name</td><td>Observation Date</td><td>Number of Sequences (% of total)</td><td>Absent Students</td>
+                                    <td>Observation Name</td><td>Observation Date</td><td>Number of Contributions (% of total)</td><td>Absent Students</td>
                                     </thead>
                                     <tbody>
                                     {{#each obs in observations}}
                                         <tr>
                                             <td class="">{{obs.name}}</td>
                                             <td class="">{{obs.observationDate}}</td>
-                                            <td class="">{{obs.sequenceCount}} ({{divRound obs.sequenceCount totalSequenceCount 2 true}}%)</td>
+                                            <td class="">{{obs.getSequenceCount}} ({{divRound obs.getSequenceCount totalSequenceCount 2 true}}%)</td>
                                             <td class="">{{obs.absent.length}}</td>
                                         </tr>
                                     {{/each }}

@@ -107,7 +107,7 @@ Template.staticReport.helpers({
     return loadingData.get();
   },
   totalSequenceCount: function() {
-    return getSelectedObservations().reduce((a, b) => a + b.sequenceCount, 0)
+    return getSelectedObservations().reduce((a, b) => a + b.getSequenceCount, 0)
   },
   divRound: function(num, den, round, percent) {
     if (typeof round === 'undefined') {
