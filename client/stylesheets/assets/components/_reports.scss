@@ -17,7 +17,7 @@ div {
 }
 
 .report-section:first-child {
-  margin: 100px auto 20px;
+  margin: 20px auto 20px;
 }
 
 .report-section-wrapper__slide-track {
@@ -350,4 +350,11 @@ div {
     position: relative;
     content: ', ';
   }
+}
+
+
+.report-title {
+  position: relative;
+  display: block;
+  margin: 60px 20px 20px;
 }
