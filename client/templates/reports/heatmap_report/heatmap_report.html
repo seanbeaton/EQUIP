@@ -34,6 +34,8 @@
                 {{>absentStudents observations=observations}}
             {{/if}}
         </section>
+
+        {{#if environmentChosen }}{{#if observationChosen }}
         <section class="report-section report-section__graph">
             <div class="heatmap-report-wrapper report-wrapper {{#if loadingDataClass}}report-wrapper--loading{{/if}}">
                 <div class="heatmap-report">
@@ -69,6 +71,8 @@
                 </div>
             </div>
         </section>
+        {{/if}}{{/if}}
+
         <!--</div>-->
         <!--</div>-->
     </div>

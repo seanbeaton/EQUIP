@@ -14,28 +14,32 @@ let setupVis = function (visContainerId, selectionCallback, obsOptions, selected
   import vis from "vis";
 
   let observations = obsOptions.get();
+
+  let disabled = function (obs) {
+    // if (getSequences(obs._id, obs.envId).length < 1) {
+    //   return 'disabled';
+    // }
+    return !(class_type === 'all' || class_type === obs.observationType)
+  }
+
   let disabled_class = function (obs) {
     // if (getSequences(obs._id, obs.envId).length < 1) {
     //   return 'disabled';
     // }
-    if (class_type === 'all') {
-      return '';
-    }
-    if (class_type === obs.observationType) {
-      return ''
-    }
-    return 'disabled';
+    return disabled(obs) ? 'disabled' : '';
   }
-  let obs = observations.map(function (obs) {
+
+  let all_observations = observations.map(function (obs) {
     return {
       id: obs._id,
       content: obs.name + ' (' + obs.observationDate + ' - ' + obsTypeAbbrev(obs.observationType) + ')',
       compare_date: new Date(obs.observationDate),
       start: obs.observationDate,
-      className: disabled_class(obs)
+      className: disabled_class(obs),
+      disabled: disabled(obs)
     }
   })
-  let items = new vis.DataSet(obs);
+  let items = new vis.DataSet(all_observations);
   let container = document.getElementById(visContainerId);
   $(container).html('');
   let options = {
@@ -69,11 +73,30 @@ let setupVis = function (visContainerId, selectionCallback, obsOptions, selected
     selectionCallback()
   });
 
-  let recent_obs = obs.sort(function (a, b) {
+  let recent_obs = all_observations.sort(function (a, b) {
     return a.compare_date - b.compare_date
   }).slice(-8);
   let recent_obs_ids = recent_obs.map(obs => obs.id);
   timeline.focus(recent_obs_ids);
+
+  let select_all_button = $('<a class="vis-select-all" href="#">Select All Observations</a>')
+  select_all_button.on('click', function(e) {
+    e.preventDefault();
+    let valid_observation_ids = all_observations.filter(o => !o.disabled).map(o => o.id);
+    if (selectedObservations.get().length === valid_observation_ids.length) {
+      timeline.setSelection([])
+      selectedObservations.set([])
+    }
+    else {
+      timeline.setSelection(valid_observation_ids)
+      selectedObservations.set(valid_observation_ids)
+    }
+    selectionCallback()
+  })
+  $(container)
+    .filter(':not(.vis-container-select-all-processed)')
+    .addClass('vis-container-select-all-processed')
+    .after(select_all_button)
 
   return timeline
 }
