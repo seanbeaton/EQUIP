@@ -386,6 +386,8 @@ div {
 
   .report-title {
     margin: 0px 0px 20px;
+    padding: 0;
+    max-width: none;
   }
 
   .isotype-icon--student {
@@ -405,4 +407,11 @@ div {
   .static-report__subsection-body table {
     page-break-inside: avoid;
   }
+  .static-report__subsection-body .subsection__student-isotype {
+    .report-label {
+      min-height: 25px;
+      line-height: 25px;
+    }
+  }
+
 }
