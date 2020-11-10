@@ -16,10 +16,9 @@ Template.researchContentManage.helpers({
 Template.researchContentManage.events = {
   'click .research__add-new': function (e) {
     Meteor.call('researchContentInsert', {
-      'researchAuthor': '',
+      'researchCitation': '',
       'researchTitle': '',
       'researchDateSort': '',
-      'researchDateDisplay': '',
       'researchDescription': '',
       'researchLink': '',
       'researchCategorization': '',
@@ -31,10 +30,9 @@ Template.researchContentManage.events = {
   'click .research__save': function (e) {
     const rpid = $(e.target).attr('data-save-id');
     Meteor.call('researchContentUpdate', {
-      'researchAuthor': $('#research__authors--' + rpid).val(),
+      'researchCitation': $('#research__citation--' + rpid).val(),
       'researchTitle': $('#research__title--' + rpid).val(),
       'researchDateSort': $('#research__date-sort--' + rpid).val(),
-      'researchDateDisplay': $('#research__date-display--' + rpid).val(),
       'researchDescription': $('#research__content--' + rpid).val(),
       'researchLink': $('#research__link--' + rpid).val(),
       'researchCategorization': $('#research__categorization--' + rpid).val(),

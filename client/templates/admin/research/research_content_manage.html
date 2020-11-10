@@ -5,19 +5,15 @@
         <div class="section__content">
             {{#each researchItem in researchContent}}
                 <div class="research research--manage">
-                    <div class="research__authors">
-                        <label for="research__authors--{{researchItem._id}}">Authors</label>
-                        <input id="research__authors--{{researchItem._id}}" value="{{researchItem.researchAuthor}}">
+                    <div class="research__citation">
+                        <label for="research__citation--{{researchItem._id}}">Citation</label>
+                        <input size='50' id="research__citation--{{researchItem._id}}" value="{{researchItem.researchCitation}}">
                     </div>
                     <div class="research__title-title">
                         <label for="research__title--{{researchItem._id}}">Title</label>
                         <input size='50' id="research__title--{{researchItem._id}}" value="{{researchItem.researchTitle}}">
                     </div>
                     <div class="research__date">
-                        <div class="research__date-display">
-                            <label for="research__date-display--{{researchItem._id}}">Display Date</label>
-                            <input id="research__date-display--{{researchItem._id}}" value="{{researchItem.researchDateDisplay}}">
-                        </div>
                         <div class="research__date-sort">
                             <label for="research__date-sort--{{researsorachItem._id}}">Sort Date (YYYY-MM-DD)</label>
                             <input id="research__date-sort--{{researchItem._id}}" value="{{researchItem.researchDateSort}}">
