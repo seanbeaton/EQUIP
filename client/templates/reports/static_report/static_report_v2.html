@@ -3,8 +3,8 @@
 <template name="staticReport">
     {{> reportBackButton }}
 
-    <h2 class="report-title">Static Report</h2>
     <div class="report-section-wrapper">
+        <h2 class="report-title">Static Report</h2>
 
         <section data-slide-id="params" class="report-section report-section--select">
             <h3>
@@ -91,6 +91,7 @@
                                         </span>
                                        </div>
                                     {{#each param in activeEnvironment.demographics.parameters}}
+                                    <div class="section__nobreak-group">
                                         <h5>{{param.label}}</h5>
                                         <table>
                                             {{#each option in param.options }}
@@ -111,6 +112,7 @@
                                                 </tr>
                                             {{/each}}
                                         </table>
+                                    </div>
                                     {{/each}}
                                 </div>
                             </div>
@@ -119,6 +121,8 @@
                             <div class="static-report__subsection-body">
                                 <div class="subsection__student-by-demo">
                                     {{#each param in activeEnvironment.demographics.parameters}}
+                                    <div class="section__nobreak-group">
+
                                         <h5>{{param.label}}</h5>
 
                                         <table>
@@ -139,6 +143,7 @@
                                             </tr>
                                             </tbody>
                                         </table>
+                                    </div>
                                     {{/each}}
                                 </div>
                             </div>
@@ -147,27 +152,27 @@
                             <div class="static-report__subsection-body">
                                 <div class="subsection__student-by-disc">
                                     {{#each param in activeEnvironment.discourseDimensions.parameters}}
-                                        <div class="section__isotype-group">
-                                        <h5>{{param.label}}</h5>
+                                        <div class="section__nobreak-group">
+                                            <h5>{{param.label}}</h5>
 
-                                        <table>
-                                            <thead>
-                                            <td></td>
-                                            {{#each option in param.options }}
-                                                <td>{{option}}</td>
-                                            {{/each}}
-                                            <td>Total</td>
-                                            </thead>
-                                            <tbody>
-                                            <tr>
-                                                <td># of Contributions (% of total)</td>
+                                            <table>
+                                                <thead>
+                                                <td></td>
                                                 {{#each option in param.options }}
-                                                    <td>{{activeEnvironment.sequencesByDiscourseDimensionCount param.label option activeObsIds}} ({{activeEnvironment.sequencesByDiscourseDimensionPercentInt param.label option activeObsIds}}%)</td>
+                                                    <td>{{option}}</td>
                                                 {{/each}}
-                                                <td>{{activeEnvironment.sequenceCountForObservations activeObsIds}} (100%)</td>
-                                            </tr>
-                                            </tbody>
-                                        </table>
+                                                <td>Total</td>
+                                                </thead>
+                                                <tbody>
+                                                <tr>
+                                                    <td># of Contributions (% of total)</td>
+                                                    {{#each option in param.options }}
+                                                        <td>{{activeEnvironment.sequencesByDiscourseDimensionCount param.label option activeObsIds}} ({{activeEnvironment.sequencesByDiscourseDimensionPercentInt param.label option activeObsIds}}%)</td>
+                                                    {{/each}}
+                                                    <td>{{activeEnvironment.sequenceCountForObservations activeObsIds}} (100%)</td>
+                                                </tr>
+                                                </tbody>
+                                            </table>
                                         </div>
                                     {{/each}}
                                 </div>
