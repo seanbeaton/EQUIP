@@ -358,3 +358,40 @@ div {
   display: block;
   margin: 60px 20px 20px;
 }
+
+@media print {
+  .report-section--select {
+    display: none;
+  }
+  .back-button {
+    display: none;
+  }
+  .report__page-break {
+    page-break-before: always;
+  }
+  @page {size: landscape}
+  .report-section {
+    margin: 20px 0;
+  }
+  .report-title {
+    margin: 0px 0px 20px;
+  }
+
+  .isotype-icon--student {
+    position: relative;
+    width: 15px;
+    height: 20px;
+    margin: 3px;
+    img {
+      max-width: 100%;
+      height: auto;
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+  }
+  .section__isotype-group,
+  .static-report__subsection-body table {
+    page-break-inside: avoid;
+  }
+}

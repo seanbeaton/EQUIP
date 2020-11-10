@@ -100,8 +100,6 @@
                                                         <div class="report-value--isotype-flex">
 
                                                             {{#each student in activeEnvironment.studentsInDemographic param.label option}}
-                                                                <span class="isotype-icon--student isotype-icon--student--active"><img width="20" alt="{{student.info.name}} contributed" title="{{student.info.name}} contributed" src="/icons/user-active.svg"></span>
-
                                                                 {{#if studentActiveInSelection student }}
                                                                     <span class="isotype-icon--student isotype-icon--student--active"><img width="20" alt="{{student.info.name}} contributed" title="{{student.info.name}} contributed" src="/icons/user-active.svg"></span>
                                                                 {{else}}
@@ -117,7 +115,7 @@
                                 </div>
                             </div>
 
-                            <h4 class="static-report__subsection-header">Aggregate contribution data - Demographics</h4>
+                            <h4 class="static-report__subsection-header report__page-break">Aggregate contribution data - Demographics</h4>
                             <div class="static-report__subsection-body">
                                 <div class="subsection__student-by-demo">
                                     {{#each param in activeEnvironment.demographics.parameters}}
@@ -145,10 +143,11 @@
                                 </div>
                             </div>
 
-                            <h4 class="static-report__subsection-header">Aggregate contribution data - Discourse Dimensions</h4>
+                            <h4 class="static-report__subsection-header report__page-break">Aggregate contribution data - Discourse Dimensions</h4>
                             <div class="static-report__subsection-body">
                                 <div class="subsection__student-by-disc">
                                     {{#each param in activeEnvironment.discourseDimensions.parameters}}
+                                        <div class="section__isotype-group">
                                         <h5>{{param.label}}</h5>
 
                                         <table>
@@ -169,6 +168,7 @@
                                             </tr>
                                             </tbody>
                                         </table>
+                                        </div>
                                     {{/each}}
                                 </div>
                             </div>
