@@ -206,7 +206,7 @@ let updateGraph = function (refresh) {
     return;
   }
 
-  let heatmap_params = {
+  let group_work_params = {
     obsIds: selectedObservations.get(),
     envId: selectedEnvironment.get(),
   }
@@ -215,8 +215,8 @@ let updateGraph = function (refresh) {
 
   let cachedResult = cachedDataRequests.get();
 
-  if (typeof cachedResult[JSON.stringify(heatmap_params)] !== 'undefined' && !refresh) {
-    showData(cachedResult[JSON.stringify(heatmap_params)]);
+  if (typeof cachedResult[JSON.stringify(group_work_params)] !== 'undefined' && !refresh) {
+    showData(cachedResult[JSON.stringify(group_work_params)]);
     cacheInfo.set({...cacheInfo.get(), ...{localCache: true}});
   }
   else {
@@ -226,14 +226,14 @@ let updateGraph = function (refresh) {
     console_log_conditional(new Error().stack);
     console_log_conditional('setting latest data req', currentDataRequest)
 
-    Meteor.call('getGroupWorkData', heatmap_params, refresh, function (err, result) {
+    Meteor.call('getGroupWorkData', group_work_params, refresh, function (err, result) {
       if (err) {
         console_log_conditional('error', err);
         return;
       }
 
       let cachedData = cachedDataRequests.get()
-      cachedData[JSON.stringify(heatmap_params)] = result
+      cachedData[JSON.stringify(group_work_params)] = result
       cachedDataRequests.set(cachedData);
 
       if (currentDataRequest !== latestDataRequest.get()) {
