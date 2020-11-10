@@ -3,6 +3,7 @@
 <template name="staticReport">
     {{> reportBackButton }}
 
+    <h2 class="report-title">Static Report</h2>
     <div class="report-section-wrapper">
 
         <section data-slide-id="params" class="report-section report-section--select">
@@ -59,32 +60,66 @@
                             <h4 class="static-report__subsection-header">Classroom makeup</h4>
                             <div class="static-report__subsection-body">
                                 <div class="subsection__student-count">
-                                    <span class="report-label">Total Students:</span> <span class="report-value">{{activeEnvironment.studentCount}}</span>
+                                    <div class="report-item">
+                                        <span class="report-label">Total Students:</span> <span class="report-value">{{activeEnvironment.studentCount}}</span>
+                                    </div>
+                                    <div class="report-item">
+                                        <span class="report-label">Participating students:</span> <span class="report-value">{{activeEnvironment.participatingStudentCount activeObsIds}} ({{activeEnvironment.participatingStudentPercentInt activeObsIds}}%)</span>
+                                    </div>
+                                    <div class="report-item">
+                                        <span class="report-label">Non-Participating students:</span> <span class="report-value">{{activeEnvironment.nonParticipatingStudentCount activeObsIds}} ({{activeEnvironment.nonParticipatingStudentPercentInt activeObsIds}}%)</span>
+                                    </div>
+                                    <div class="report-item">
+                                        <span class="report-value">
+                                            {{#each student in activeEnvironment.nonParticipatingStudents activeObsIds }}
+                                                <span class="non-participating-student">{{student.info.name}}</span>
+                                            {{/each}}
+                                        </span>
+                                    </div>
+<!--                                    <div class="report-item">-->
+<!--                                        <span class="report-label"></span> <span class="report-value"></span>-->
+<!--                                    </div>-->
                                 </div>
-                                <div class="subsection__student-demos">
+                                <div class="subsection__student-isotype">
+                                    <div class="student-demos__legend">
+                                        <span class="student-demos__legend__title">Legend:</span>
+                                        <span class="student-demos__legend__body">
+                                            <span>Contributing student:</span>
+                                            <span class="isotype-icon--student isotype-icon--student--active"><img width="20" alt="Student contributed" title="Student contributed" src="/icons/user-active.svg"></span>
+                                            <span>Non-Contributing student:</span>
+                                            <span class="isotype-icon--student isotype-icon--student--inactive"><img width="20" alt="Student did not contribute" title="Student did not contribute" src="/icons/user-grey.svg"></span>
+                                        </span>
+                                       </div>
                                     {{#each param in activeEnvironment.demographics.parameters}}
                                         <h5>{{param.label}}</h5>
+                                        <table>
+                                            {{#each option in param.options }}
+                                                <tr>
+                                                    <td class="report-label">{{option}} ({{activeEnvironment.studentsInDemographicCount param.label option}}, {{activeEnvironment.studentsInDemographicPercentInt param.label option}}%)</td>
+                                                    <td class="report-value report-value--isotype">
+                                                        <div class="report-value--isotype-flex">
 
-                                        {{#each option in param.options }}
-                                            <div>
-                                                <span class="report-label">{{option}}</span>
-                                                <span class="report-value report-value--isotype">
-                                                    {{#each student in activeEnvironment.studentsInDemographic param.label option}}
-                                                        <span class="isotype-icon--student">X</span>
-                                                    {{/each}}
-                                                </span>
-                                            </div>
-                                        {{/each}}
+                                                            {{#each student in activeEnvironment.studentsInDemographic param.label option}}
+                                                                <span class="isotype-icon--student isotype-icon--student--active"><img width="20" alt="{{student.info.name}} contributed" title="{{student.info.name}} contributed" src="/icons/user-active.svg"></span>
+
+                                                                {{#if studentActiveInSelection student }}
+                                                                    <span class="isotype-icon--student isotype-icon--student--active"><img width="20" alt="{{student.info.name}} contributed" title="{{student.info.name}} contributed" src="/icons/user-active.svg"></span>
+                                                                {{else}}
+                                                                    <span class="isotype-icon--student isotype-icon--student--inactive"><img width="20" alt="{{student.info.name}} did not contribute" title="{{student.info.name}} did not contribute" src="/icons/user-grey.svg"></span>
+                                                                {{/if}}
+                                                            {{/each}}
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            {{/each}}
+                                        </table>
                                     {{/each}}
                                 </div>
                             </div>
 
-                            <h4 class="static-report__subsection-header">Aggregate contribution data</h4>
+                            <h4 class="static-report__subsection-header">Aggregate contribution data - Demographics</h4>
                             <div class="static-report__subsection-body">
-                                <div class="subsection__student-count">
-                                    <span class="report-label">Total Students:</span> <span class="report-value">{{activeEnvironment.studentCount}}</span>
-                                </div>
-                                <div class="subsection__student-demos">
+                                <div class="subsection__student-by-demo">
                                     {{#each param in activeEnvironment.demographics.parameters}}
                                         <h5>{{param.label}}</h5>
 
@@ -98,18 +133,39 @@
                                             </thead>
                                             <tbody>
                                             <tr>
-                                                <td># of Students (% of total)</td>
-                                                {{#each option in param.options }}
-                                                    <td>{{activeEnvironment.studentsInDemographicCount param.label option}} ({{activeEnvironment.studentsInDemographicPercentInt param.label option}}%)</td>
-                                                {{/each}}
-                                                <td>{{activeEnvironment.studentCount}} (100%)</td>
-                                            </tr>
-                                            <tr>
                                                 <td># of Contributions</td>
                                                 {{#each option in param.options }}
                                                     <td>{{activeEnvironment.sequencesByDemographicCount param.label option activeObsIds}} ({{activeEnvironment.sequencesByDemographicPercentInt param.label option activeObsIds totalSequenceCount}}%)</td>
                                                 {{/each}}
                                                 <td>{{totalSequenceCount}} (100%)</td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    {{/each}}
+                                </div>
+                            </div>
+
+                            <h4 class="static-report__subsection-header">Aggregate contribution data - Discourse Dimensions</h4>
+                            <div class="static-report__subsection-body">
+                                <div class="subsection__student-by-disc">
+                                    {{#each param in activeEnvironment.discourseDimensions.parameters}}
+                                        <h5>{{param.label}}</h5>
+
+                                        <table>
+                                            <thead>
+                                            <td></td>
+                                            {{#each option in param.options }}
+                                                <td>{{option}}</td>
+                                            {{/each}}
+                                            <td>Total</td>
+                                            </thead>
+                                            <tbody>
+                                            <tr>
+                                                <td># of Contributions (% of total)</td>
+                                                {{#each option in param.options }}
+                                                    <td>{{activeEnvironment.sequencesByDiscourseDimensionCount param.label option activeObsIds}} ({{activeEnvironment.sequencesByDiscourseDimensionPercentInt param.label option activeObsIds}}%)</td>
+                                                {{/each}}
+                                                <td>{{activeEnvironment.sequenceCountForObservations activeObsIds}} (100%)</td>
                                             </tr>
                                             </tbody>
                                         </table>

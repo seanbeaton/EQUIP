@@ -55,6 +55,8 @@ Template.staticReport.onCreated(function created() {
   })
 });
 
+let cached_activeEnvironment = {}
+let cached_observations = {}
 
 Template.staticReport.helpers({
   environments: function () {
@@ -83,8 +85,11 @@ Template.staticReport.helpers({
     return !!(selectedEnvironment.get());
   },
   activeEnvironment: function () {
-    let env = Environments.findOne({_id: selectedEnvironment.get()});
-    return env;
+    let envId = selectedEnvironment.get();
+    if (!cached_activeEnvironment[envId]) {
+      cached_activeEnvironment[envId] = Environments.findOne({_id: selectedEnvironment.get()});
+    }
+    return cached_activeEnvironment[envId]
   },
   observations: function () {
     return getSelectedObservations();
@@ -113,13 +118,25 @@ Template.staticReport.helpers({
     }
     const percentMultiplier = (percent) ? 100 : 1;
     return parseFloat((parseFloat(num) / parseFloat(den)) * percentMultiplier).toFixed(round);
-  }
+  },
+  studentActiveInSelection: function(student) {
+    return Sequences.find({obsId: {$in: selectedObservations.get()}, 'info.student.studentId': student._id}, {reactive: false}).count() >= 1;
+  },
+  studentSequenceCountInSelection: function(student) {
+    return Sequences.find({obsId: {$in: selectedObservations.get()}, 'info.student.studentId': student._id}, {reactive: false}).count();
+  },
 });
 
 let getSelectedObservations = function () {
   let obsIds = selectedObservations.get();
-  console.log('getSelectedObservations', Observations.find({_id: {$in: obsIds}}).fetch());
-  return Observations.find({_id: {$in: obsIds}}).fetch();
+  const cache_key = obsIds.sort().join('__');
+  // console.log('cache_key', cache_key);
+  // console.log('obsIds', obsIds);
+  // console.log('cached_observations', cached_observations);
+  if (!cached_observations[cache_key]) {
+    cached_observations[cache_key] = Observations.find({_id: {$in: obsIds}}, {sort: {observationDate: 1}}, {reactive: false}).fetch();
+  }
+  return cached_observations[cache_key];
 }
 
 let clearObservations = function () {
