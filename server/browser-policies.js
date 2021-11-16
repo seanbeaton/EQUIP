@@ -1,0 +1,10 @@
+Meteor.startup(function () {
+  BrowserPolicy.content.allowOriginForAll("https://fonts.gstatic.com")
+  BrowserPolicy.content.allowOriginForAll("https://www.youtube-nocookie.com")
+  BrowserPolicy.content.allowOriginForAll("https://fonts.googleapis.com")
+  BrowserPolicy.content.allowOriginForAll("http://cdn.jsdelivr.net")
+  BrowserPolicy.content.allowOriginForAll("https://www.googletagmanager.com")
+  BrowserPolicy.content.allowOriginForAll("https://use.fontawesome.com")
+  BrowserPolicy.content.allowOriginForAll("https://www.google-analytics.com")
+  BrowserPolicy.content.allowFrameOrigin("https://www.youtube-nocookie.com")
+})
