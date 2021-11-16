@@ -1,0 +1,22 @@
+.tutorials {
+ padding: 3rem 2.5rem;
+}
+
+.tutorials {
+  .subsection__title {
+    margin-top: 1rem;
+  }
+
+  .subsection__content {
+    margin: 0 -10px;
+    display: flex;
+    flex-flow: row wrap;
+  }
+  .dummy-item,
+  .tutorial-video {
+    flex: 470px 1 1;
+    iframe {
+      padding: 10px;
+    }
+  }
+}
