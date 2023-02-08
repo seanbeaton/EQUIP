@@ -31,7 +31,6 @@ let setupVis = function (visContainerId, selectionCallback, obsOptions, selected
     return disabled(obs) ? 'disabled' : '';
   }
 
-  console.log('class_type', class_type);
   let all_observations = observations.map(function (obs) {
     return {
       id: obs._id,
@@ -42,8 +41,6 @@ let setupVis = function (visContainerId, selectionCallback, obsOptions, selected
       disabled: disabled(obs)
     }
   })
-
-  console.log('setupVis all_observations ids', all_observations.map(o => o.id + "_" + o.disabled))
 
   let items = new vis.DataSet(all_observations);
   let container = document.getElementById(visContainerId);
@@ -88,12 +85,9 @@ let setupVis = function (visContainerId, selectionCallback, obsOptions, selected
   timeline.focus(recent_obs_ids);
 
   let select_all_button = $('<a class="vis-select-all" href="#">Select All Observations</a>')
-  console.log('selectall button' ,select_all_button)
   select_all_button.on('click', function(e) {
     e.preventDefault();
     let valid_observation_ids = all_observations.filter(o => !o.disabled).map(o => o.id);
-    console.log('selectedObservations.get().length === valid_observation_ids.length', selectedObservations.get().length === valid_observation_ids.length)
-    console.log('valid_observation_ids', valid_observation_ids)
     if (selectedObservations.get().length === valid_observation_ids.length) {
       timeline.setSelection([])
       selectedObservations.set([])
