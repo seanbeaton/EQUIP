@@ -16,6 +16,10 @@ let setupVis = function (visContainerId, selectionCallback, obsOptions, selected
 
   let observations = obsOptions.get();
 
+  if (!observations) {
+    return;
+  }
+
 
   let disabled = function (obs) {
     // if (getSequences(obs._id, obs.envId).length < 1) {

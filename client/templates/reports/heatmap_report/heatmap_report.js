@@ -52,6 +52,10 @@ Template.heatmapReport.onCreated(function created() {
   })
 });
 
+// Template.heatmapReport.rendered = function () {
+//   $('#env-select').trigger('change');
+// };
+
 Template.heatmapReport.helpers({
   environments: function () {
     return getEnvironments(selectedEnvironment);

@@ -1,9 +1,9 @@
 <template name="environmentSelect">
     <div class="environment-select">
         <select id="env-select" class="env-select chosen-select">
-            <option disabled selected value="">- Select -</option>
+<!--            <option disabled selected value="">- Select -</option>-->
             {{#each environments}}
-                <option {{default}} {{ disabled }} value="{{_id}}">{{envName}}</option>
+                <option {{ selected }} {{ disabled }} value="{{_id}}">{{envName}}</option>
             {{/each}}
         </select>
     </div>

@@ -145,7 +145,6 @@ let getEnvironment = function () {
   return Environments.findOne({_id: envId})
 }
 
-
 Template.timelineReport.events({
   'change #env-select': function (e) {
 

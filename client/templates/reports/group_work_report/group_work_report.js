@@ -45,6 +45,10 @@ Template.groupWorkReport.onCreated(function created() {
   })
 });
 
+// Template.groupWorkReport.rendered = function () {
+//   $('#env-select').trigger('change');
+// };
+
 Template.groupWorkReport.events({
   'change #env-select': function (e) {
     let selected = $('option:selected', e.target);

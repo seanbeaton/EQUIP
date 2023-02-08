@@ -21,6 +21,8 @@ export let getEnvironments = function (selectedEnvironment, minObservations, onl
   }
   let envs = Environments.find().fetch();
   envs = envs.map(function (env) {
+    env.selected = '';
+
     if (typeof env.envName === 'undefined') {
       env.envName = 'Loading...';
       env.disabled = 'disabled';
@@ -46,6 +48,9 @@ export let getEnvironments = function (selectedEnvironment, minObservations, onl
     }
     return env
   }).sort((a, b) => b.lastModifiedObs - a.lastModifiedObs);
+  if (envs.findIndex(e => !e.disabled) !== -1) {
+    envs[envs.findIndex(e => !e.disabled)].selected = 'selected';
+  }
   return envs;
 }
 
