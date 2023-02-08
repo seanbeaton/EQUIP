@@ -6,6 +6,7 @@ import {convertISODateToUS} from "/helpers/dates";
 import {clone_object} from "/helpers/objects";
 import {setupVis} from "/helpers/timeline";
 import {getDiscourseDimensions, getDiscourseOptionsForDimension, getObservations} from "/helpers/graphs";
+import {getEnvironments, getObsOptions} from "../../../../helpers/environments";
 
 // const envSet = new ReactiveVar(false);
 const obsOptions = new ReactiveVar([]);
@@ -36,33 +37,7 @@ Template.timelineReport.onCreated(function created() {
 
 Template.timelineReport.helpers({
   environments: function () {
-    // //console_log_conditional('envs', Environments.find());
-    let envs = Environments.find().fetch();
-    //console_log_conditional('envs', envs);
-    // let default_set = false;
-    envs = envs.map(function (env) {
-      if (typeof env.envName === 'undefined') {
-        env.envName = 'Loading...';
-        env.disabled = 'disabled';
-        return env;
-      }
-      let obsOpts = getObsOptions(env._id);
-      //console_log_conditional('obs_opts', obsOpts);
-      if (obsOpts.length === 0) {
-        env.envName += ' (no observations)';
-        env.disabled = 'disabled';
-      }
-      else if (obsOpts.length < 2) {
-        env.envName += ' (' + obsOpts.length + ')';
-        env.disabled = 'disabled';
-      }
-
-      if (env.userId !== Meteor.userId()) {
-        env.envName += ' (shared)';
-      }
-      return env
-    });
-    return envs;
+    return getEnvironments(selectedEnvironment,2);
   },
   environmentChosen: function () {
     return !!(selectedEnvironment.get());
@@ -180,7 +155,7 @@ Template.timelineReport.events({
     clearGraph();
     selectedDiscourseOption.set(false);
     clearObservations();
-    obsOptions.set(getObsOptions());
+    obsOptions.set(getObsOptions(selectedEnvironment));
     setTimeout(function () {
       setupVis('vis-container', function () {
         updateGraph();
@@ -629,18 +604,6 @@ let getLabelColors = function (labels) {
   return label_colors
 }
 
-let getObsOptions = function (envId) {
-  if (typeof envId === 'undefined') {
-    envId = selectedEnvironment.get();
-  }
-  if (!!envId) {
-    let obs = Observations.find({envId: envId}).fetch();
-    return obs;
-  }
-  else {
-    return false;
-  }
-}
 
 const possibleSlides = {
   env: {

@@ -1,6 +1,7 @@
 
 import {setupVis} from '../../../../helpers/timeline';
 import {console_log_conditional} from "/helpers/logging"
+import {getEnvironments, getObsOptions} from "../../../../helpers/environments";
 
 const obsOptions = new ReactiveVar([]);
 const selectedEnvironment = new ReactiveVar(false);
@@ -25,7 +26,7 @@ Template.staticReport.events({
     });
 
 
-    obsOptions.set(getObsOptions());
+    obsOptions.set(getObsOptions(selectedEnvironment));
     setTimeout(function () {
       setupVis('vis-container', function () {
         $(window).trigger('updated-filters');
@@ -60,26 +61,7 @@ let cached_observations = {}
 
 Template.staticReport.helpers({
   environments: function () {
-    let envs = Environments.find().fetch();
-    // let default_set = false;
-    return envs.map(function (env) {
-      if (typeof env.envName === 'undefined') {
-        env.envName = 'Loading...';
-        env.disabled = 'disabled';
-        return env;
-      }
-      let obsOpts = getObsOptions(env._id);
-      //console_log_conditional('obs_opts', obsOpts);
-      if (obsOpts.length === 0) {
-        env.envName += ' (no observations)';
-        env.disabled = 'disabled';
-      }
-
-      if (env.userId !== Meteor.userId()) {
-        env.envName += ' (shared)';
-      }
-      return env
-    });
+    return getEnvironments(selectedEnvironment);
   },
   environmentChosen: function () {
     return !!(selectedEnvironment.get());
@@ -144,16 +126,4 @@ let clearObservations = function () {
   $('.option--observation').removeClass('selected');
 };
 
-let getObsOptions = function (envId) {
-  if (typeof envId === 'undefined') {
-    envId = selectedEnvironment.get();
-  }
-  if (!!envId) {
-    let obs = Observations.find({envId: envId}).fetch();
-    return obs;
-  }
-  else {
-    return false;
-  }
-}
 

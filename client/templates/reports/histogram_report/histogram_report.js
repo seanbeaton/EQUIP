@@ -7,6 +7,7 @@ import {
   studentContribGraph,
   studentTimeGraph
 } from "../../../../helpers/graphs";
+import {getEnvironments, getObsOptions} from "../../../../helpers/environments";
 
 // const envSet = new ReactiveVar(false);
 const obsOptions = new ReactiveVar([]);
@@ -47,7 +48,7 @@ Template.histogramReport.events({
     clearGraph();
 
     selectedEnvironment.set(selected.val());
-    obsOptions.set(getObsOptions());
+    obsOptions.set(getObsOptions(selectedEnvironment));
     students.set(Subjects.find({envId: selectedEnvironment.get()}).fetch());
     console_log_conditional('students', students.get());
     setTimeout(function () {
@@ -95,26 +96,7 @@ Template.histogramReport.events({
 
 Template.histogramReport.helpers({
   environments: function () {
-    let envs = Environments.find().fetch();
-    envs = envs.map(function (env) {
-      if (typeof env.envName === 'undefined') {
-        env.envName = 'Loading...';
-        env.disabled = 'disabled';
-        return env;
-      }
-      let obsOpts = getObsOptions(env._id);
-      //console_log_conditional('obs_opts', obsOpts);
-      if (obsOpts.length === 0) {
-        env.envName += ' (no observations)';
-        env.disabled = 'disabled';
-      }
-
-      if (env.userId !== Meteor.userId()) {
-        env.envName += ' (shared)';
-      }
-      return env
-    });
-    return envs;
+    return getEnvironments(selectedEnvironment)
   },
 
   environmentChosen: function () {
@@ -174,18 +156,6 @@ let clearGraph = function () {
   $('.histogram-report-wrapper').removeClass('heatmap-created');
   $('#histogram-d3-wrapper').html('');
   $('.histogram-report__graph-key').html('');
-}
-
-let getObsOptions = function (envId) {
-  if (typeof envId === 'undefined') {
-    envId = selectedEnvironment.get();
-  }
-  if (!!envId) {
-    return Observations.find({envId: envId}).fetch();
-  }
-  else {
-    return false;
-  }
 }
 
 let updateGraph = function (refresh) {

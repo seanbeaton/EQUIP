@@ -8,6 +8,8 @@ import {
   studentContribGraph,
   studentTimeGraph
 } from "../../../../helpers/graphs";
+import {getEnvironments, getObsOptions} from "../../../../helpers/environments";
+
 
 const obsOptions = new ReactiveVar([]);
 const selectedEnvironment = new ReactiveVar(false);
@@ -49,7 +51,7 @@ Template.groupWorkReport.events({
     clearGraph();
 
     selectedEnvironment.set(selected.val());
-    obsOptions.set(getObsOptions());
+    obsOptions.set(getObsOptions(selectedEnvironment));
     students.set(Subjects.find({envId: selectedEnvironment.get()}).fetch());
     console_log_conditional('students', students.get());
     setTimeout(function () {
@@ -119,30 +121,7 @@ Template.groupWorkReport.events({
 
 Template.groupWorkReport.helpers({
   environments: function () {
-    let envs = Environments.find().fetch();
-    envs = envs.map(function (env) {
-      if (typeof env.envName === 'undefined') {
-        env.envName = 'Loading...';
-        env.disabled = 'disabled';
-        return env;
-      }
-      let obsOpts = getObsOptions(env._id);
-      console_log_conditional('obs_opts', obsOpts);
-      if (obsOpts.length === 0) {
-        env.envName += ' (no observations)';
-        env.disabled = 'disabled';
-      }
-      else if (obsOpts.filter(obs => obs.observationType === 'small_group').length === 0) {
-        env.envName += ' (no group work obs.)';
-        env.disabled = 'disabled';
-      }
-
-      if (env.userId !== Meteor.userId()) {
-        env.envName += ' (shared)';
-      }
-      return env
-    });
-    return envs;
+    return getEnvironments(selectedEnvironment, 1, true)
   },
   disc_options_available: function () {
     setTimeout(function () {
@@ -578,19 +557,6 @@ let clearGraph = function () {
   $('#group-work-d3-wrapper').html('');
   $('.group-work-report__graph-key').html('');
 }
-
-let getObsOptions = function (envId) {
-  if (typeof envId === 'undefined') {
-    envId = selectedEnvironment.get();
-  }
-  if (!!envId) {
-    return Observations.find({envId: envId}).fetch();
-  }
-  else {
-    return false;
-  }
-};
-
 
 let updateStudentContribGraph = function (refresh) {
   let selector = '.student-contributions-graph__graph';
