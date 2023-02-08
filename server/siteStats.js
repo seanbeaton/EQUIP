@@ -40,6 +40,7 @@ Meteor.methods({
     }
     return stats
   },
+
   getCounts: function (refresh) {
     if (typeof refresh === 'undefined') {
       refresh = false;

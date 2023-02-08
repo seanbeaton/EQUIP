@@ -89,8 +89,8 @@ Template.interactiveReport.helpers({
         selected: 'selected'
       },
       {
-        id: 'equity',
-        name: 'Equity Ratio',
+        id: 'avg_contributions',
+        name: 'Average Contributions',
         selected: ''
       },
     ]
@@ -227,7 +227,9 @@ let getDemographics = function () {
   if (!envId) {
     return []
   }
-  return SubjectParameters.findOne({envId: envId}).parameters;
+  let ret = SubjectParameters.findOne({envId: envId}).parameters;
+  ret.unshift({'label': 'All Students', 'options': ['All Students']})
+  return ret
 };
 
 let getDiscourseDimensions = function () {
@@ -235,7 +237,9 @@ let getDiscourseDimensions = function () {
   if (!envId) {
     return []
   }
-  return SequenceParameters.findOne({envId: envId}).parameters;
+  let ret = SequenceParameters.findOne({envId: envId}).parameters;
+  ret.unshift({'label': 'Total Contributions', 'options': ['Total Contributions']})
+  return ret
 };
 
 let getEnvironment = function () {
@@ -403,6 +407,10 @@ let createGraph = function (contribData, containerSelector, dataset) {
   if (selectedDatasetType.get() === 'contributions') {
     data = contribData.y_axis;
     y_label = "Contributions";
+  }
+  else if (selectedDatasetType.get() === 'avg_contributions') {
+    data = contribData.y_axis;
+    y_label = "Average Contributions";
   }
   else {
     data = contribData.equity_ratio_data;

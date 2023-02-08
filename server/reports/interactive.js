@@ -102,12 +102,16 @@ let compileContributionData = function (parameters) {
   });
 
   // Record contributions
-  console.log('obsIds', obsIds);
+  // console.log('obsIds', obsIds);
 
   obsIds.forEach(function (obsId) {
     Sequences.find({obsId: obsId}).forEach(function (sequence) {
       let sequence_y;
-      if (yParams.param_type === 'demographics') {
+
+      if (yParams.selected_value === "Total Contributions" || yParams.selected_value === "All Students") {
+        sequence_y = yParams.selected_value
+      }
+      else if (yParams.param_type === 'demographics') {
         sequence_y = sequence.info.student.demographics[yParams.selected_value];
       }
       else {
@@ -115,7 +119,11 @@ let compileContributionData = function (parameters) {
       }
 
       let sequence_x;
-      if (xParams.param_type === 'demographics') {
+
+      if (xParams.selected_value === "Total Contributions" || xParams.selected_value === "All Students") {
+        sequence_x = xParams.selected_value
+      }
+      else if (xParams.param_type === 'demographics') {
         sequence_x = sequence.info.student.demographics[xParams.selected_value];
       }
       else {
@@ -192,14 +200,24 @@ let compileContributionData = function (parameters) {
 
   // Students were already created earlier.
   let demographics = SubjectParameters.findOne({envId: envId}).parameters;
-  let currentDemoOptions = demographics.filter(demo => demo.label === currentDemo)[0].options
+  let currentDemoOptions;
+  if (currentDemo === 'All Students') {
+    currentDemoOptions = "All Students"
+    contrib_data.student_body_demographic_ratios = {
+      "All Students": 1,
+    }
+  }
+  else {
+    currentDemoOptions = demographics.filter(demo => demo.label === currentDemo)[0].options
+    contrib_data.student_body_demographic_ratios = {}
 
-  contrib_data.student_body_demographic_ratios = {}
+    currentDemoOptions.forEach(function (demo) {
+      contrib_data.student_body_demographic_ratios[demo] =
+        students.filter(student => student.info.demographics[currentDemo] === demo).length / students.length
+    });
+  }
 
-  currentDemoOptions.forEach(function (demo) {
-    contrib_data.student_body_demographic_ratios[demo] =
-      students.filter(student => student.info.demographics[currentDemo] === demo).length / students.length
-  });
+
 
   contrib_data.equity_ratio_data = contrib_data.y_axis.map(function (y) {
 
