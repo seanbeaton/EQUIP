@@ -74,7 +74,7 @@ Template.environmentSelect.rendered = function () {
   setTimeout(() => {
     $('#env-select').trigger('change');
     //todo make each report look at the default
-  }, 500)
+  }, 1000)
 
   // $(".chosen-select").trigger("chosen:updated");   // update chosen to take the updated values into account
 };

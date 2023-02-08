@@ -289,7 +289,7 @@ let initTimelineGraph = function (full_data, containerSelector) {
     return a.d3date - b.d3date
   });
 
-  let svg_tag = $('<svg width="718" height="500">' +
+  let svg_tag = $('<svg width="768" height="500">' +
     '<defs>\n' +
     '  <style type="text/css">\n' +
     '    @font-face {\n' +
@@ -302,7 +302,7 @@ let initTimelineGraph = function (full_data, containerSelector) {
   $(containerSelector).html(svg_tag);
 
   let svg = d3.select(containerSelector + " svg"),
-    margin = {top: 30, right: 20, bottom: 40, left: 50},
+    margin = {top: 30, right: 30, bottom: 40, left: 50},
     width = +svg.attr("width") - margin.left - margin.right,
     height = +svg.attr("height") - margin.top - margin.bottom,
     g = svg.append("g").attr('class', 'graph-container').attr("transform", "translate(" + margin.left + "," + margin.top + ")");
@@ -411,6 +411,7 @@ let initTimelineGraph = function (full_data, containerSelector) {
     .attr("transform", "translate(0," + height + ")")
     .attr('class', 'x-axis')
     .call(d3.axisBottom(x)
+      .tickFormat(d3.timeFormat("%Y-%m-%d"))
       .tickValues(ticks));
 
   // // Add the Y Axis
