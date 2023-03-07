@@ -1,0 +1,92 @@
+<!-- HTML for data analyisis page -->
+
+<template name="interactiveReportNew">
+    {{> reportBackButton }}
+
+    <div class="report-section-wrapper">
+        <h2 class="report-title">Interactive Report</h2>
+
+
+        {{>reportSettingsSelection reportSettings=reportSettings}}
+
+
+        <section class="report-section report-section__graph">
+
+            <div class="interactive-report-wrapper report-wrapper {{#if
+                    loadingDataClass}}report-wrapper--loading{{/if}}">
+                <div class="interactive-report">
+                    <div class="interactive-report__top-left"></div>
+                    <div class="interactive-report__y-scale"></div>
+                    <div class="interactive-report__title">
+                        <div class="x-axis-label param-selector-wrapper swappable">
+                            <div class="select__wrapper select__wrapper--disc"><span
+                                    class="explanation-text">Discourse Dimension</span>
+                                <select id="disc-select" {{disc_available}}
+                                        class="param-select-form-item discourse chosen-select" name="parameter-select"
+                                        data-param-type="discourse">
+                                    <option disabled selected value="">- Select -</option>
+                                    {{#each discourseparams}}
+                                        <option data-options="{{options}}" value="{{label}}">{{label}}</option>
+                                    {{/each}}
+                                </select>
+                            </div>
+                            <span class="center_text"><span class="swappable__button"><i
+                                    class="fas fa-exchange-alt"></i></span></span>
+                            <div class="select__wrapper select__wrapper--demo"><span
+                                    class="explanation-text">Demographic</span>
+                                <select id="demo-select" {{demo_available}}
+                                        class="param-select-form-item demographic chosen-select"
+                                        name="demographic-select" data-param-type="demographics">
+                                    <option disabled selected value="">- Select -</option>
+                                    {{#each demographics}}
+                                        <option data-options="{{options}}" value="{{label}}">{{label}}</option>
+                                    {{/each}}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="interactive-report__graph" data-graph-type="{{selectedDatasetType}}"></div>
+                    <div class="interactive-report__graph-key"></div>
+                    <div class="interactive-report__sidebar"></div>
+                </div>
+            </div>
+            {{>cacheInfoBlock cache_info=cache_info}}
+        </section>
+    </div>
+    <!--</div></div>-->
+</template>
+
+
+<template name="envButton">
+    <div class="report-select__option option--environment" data-env-id="{{_id}}">
+        <span class="option__text">{{ envName }}</span>
+    </div>
+</template>
+
+<template name="obsButton">
+    <div class="report-select__option option--observation" data-obs-id="{{_id}}">
+        <span class="option__text">{{ name }}</span>
+    </div>
+</template>
+
+<template name="discourseButton">
+    <div class="report-select__option option--discourse" data-discourse-id="{{name}}" data-id="{{name}}"
+         data-param-type="discourse">
+        <span class="option__text">{{name}}</span>
+    </div>
+</template>
+
+<template name="discourseOption">
+    <option value="{{name}}">{{name}}</option>
+</template>
+
+<template name="demoButton">
+    <div class="report-select__option option--demographic" data-demo-id="{{name}}" data-id="{{name}}"
+         data-param-type="demographics">
+        <span class="option__text">{{name}}</span>
+    </div>
+</template>
+
+<template name="demoOption">
+    <option value="{{name}}">{{name}}</option>
+</template>
