@@ -130,8 +130,8 @@ let compileContributionData = function (parameters) {
         sequence_x = sequence.info.parameters[xParams.selected_value];
       }
 
-      console.log('seq x and y', sequence_x, sequence_y)
-      console.log('stud', sequence.info.parameters)
+      // console.log('seq x and y', sequence_x, sequence_y)
+      // console.log('stud', sequence.info.parameters)
 
       let student_index = contrib_data.students.findIndex(function (student) {
         return student._id === sequence.info.student.studentId
