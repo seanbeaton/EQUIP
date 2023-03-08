@@ -1,0 +1,41 @@
+<!-- HTML for data analyisis page -->
+
+<template name="histogramReportNew">
+    {{> reportBackButton }}
+
+    <div class="report-section-wrapper">
+        <h2 class="report-title">Histogram Report v2</h2>
+
+
+        {{>reportSettingsSelection reportSettings=reportSettings}}
+
+
+        <section class="report-section report-section__graph">
+
+            <div class="histogram-reportv2-wrapper report-wrapper {{#if loadingDataClass}}report-wrapper--loading{{/if}}">
+                <div class="histogram-reportv2">
+                    <div class="histogram-reportv2__graph">
+                        {{#if students }}
+                        {{#if histogramDemoOptionSelected }}
+                        <h3>Click on a student to see more details.</h3>
+                        {{else}}
+                        <h3>Choose a demographic above to highlight the students below.</h3>
+                        {{/if}}
+                        <div class="subjects" id="histogram-d3-wrapper">
+
+                        </div>
+                        {{>cacheInfoBlock cache_info=cache_info}}
+                        {{/if}}
+                    </div>
+                    <div class="histogram-reportv2__graph-key"></div>
+<!--                    <div class="histogram-reportv2__student-spotlight spotlight-wrapper {{#if selectedStudent}} student-spotlight&#45;&#45;active {{/if}}">-->
+<!--                        {{> studentSpotlight selectedStudent=selectedStudent discourseparams=discourseparams multipleObservationsChosen=multipleObservationsChosen cache_info_student_time=cache_info_student_time cache_info_student_contrib=cache_info_student_contrib}}-->
+<!--                    </div>-->
+
+                </div>
+            </div>
+<!--            {{>cacheInfoBlock cache_info=cache_info}}-->
+        </section>
+    </div>
+    <!--</div></div>-->
+</template>

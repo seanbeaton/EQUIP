@@ -6,8 +6,15 @@
             Classroom: {{>environmentSelectV2 envSelectParams=envSelectParams }}
         </h3>
         <h3>
-            Graph type: {{> dataTypeSelectV2 dataTypeSelectParams=dataTypeSelectParams }}
+            {{ reportSettings.dataTypeSelectLabel }}: {{> dataTypeSelectV2 dataTypeSelectParams=dataTypeSelectParams }}
         </h3>
+        {{#if reportSettings.additionalSelects }}
+            {{#each selector in reportSettings.additionalSelects }}
+                <h3>
+                    {{ selector.label }}: {{> additionalSelect selector }}
+                </h3>
+            {{/each }}
+        {{/if }}
 
         {{#if reportSettings.environmentChosen }}
             <h4>Choose one or more observations.</h4>
@@ -30,4 +37,14 @@
 <!--            {{/each}}-->
 <!--        </select>-->
 <!--    </span>-->
+</template>
+
+<template name="additionalSelect">
+    <span class="{{cssClass}}">
+        <select id="{{cssId}}" class="{{cssId}}">
+            {{#each option in addSelected options}}
+                <option {{ option.selected }} {{ option.disabled }} data-options="{{option.options}}" value="{{option.label}}">{{option.label}}</option>
+            {{/each}}
+        </select>
+    </span>
 </template>

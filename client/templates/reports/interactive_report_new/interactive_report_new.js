@@ -88,10 +88,10 @@ Template.interactiveReportNew.onCreated(function created() {
       instance: this
     }, param_type);
   };
-  this.getDemographics = () => {
+  this.getDemographics = (args) => {
     return getDemographics.call({
       instance: this
-    });
+    }, args);
   };
   this.getSelectedObservations = () => {
     return getSelectedObservations.call({
@@ -99,6 +99,7 @@ Template.interactiveReportNew.onCreated(function created() {
     });
   };
 
+  this.dataTypeSelectLabel = "Graph Type"
   this.datasetTypes = [
     {
       id: 'contributions',
@@ -604,6 +605,7 @@ Template.interactiveReportNew.helpers({
     return {
       environments: instance.getEnvironments(),
       getObsOptions: instance.getObsOptions,
+      dataTypeSelectLabel: instance.dataTypeSelectLabel,
       datasetTypes: instance.datasetTypes,
       visSelectionCallback: instance.visSelectionCallback,
       visClassType: instance.visClassType,

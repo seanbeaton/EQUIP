@@ -41,3 +41,25 @@ Template.reportSettingsSelection.helpers({
   }
 
 })
+
+Template.additionalSelect.onCreated(function created() {
+  console.log('this', this)
+})
+
+Template.additionalSelect.helpers({
+  cssClass: function () {
+    let instance = Template.instance();
+    console.log('instance', instance);
+    return 'additional-select additional-select--' + instance.data.label.replaceAll(/[^a-zA-Z]/g, '-').toLowerCase()
+  },
+  cssId: function () {
+    let instance = Template.instance();
+    return 'additional-select--' + instance.data.label.replaceAll(/[^a-zA-Z]/g, '-').toLowerCase()
+  },
+  addSelected: function(opts) {
+    let instance = Template.instance();
+    console.log('options', opts)
+    // envs.forEach(e => e.selected = (e._id === instance.data.selector.selectedEnvironment ? 'selected' : ''));
+    return opts;
+  }
+})

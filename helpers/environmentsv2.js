@@ -79,7 +79,13 @@ export const getParamOptions = function (param_type) {
 };
 
 
-export const getDemographics = function () {
+export const getDemographics = function (args) {
+  if (typeof args === 'undefined') {
+    args = {}
+  }
+
+  args = Object.assign({aggregate: true}, args)
+
   console.log('getDemographics');
   let envId = this.instance.state.get('selectedEnvironment');
   if (!envId) {
@@ -88,8 +94,9 @@ export const getDemographics = function () {
   let ret = SubjectParameters.findOne({envId: envId}).parameters
   ret.forEach(s => s.selected = "")
   ret[0].selected = "selected";
-  ret.unshift({'label': 'All Students', 'options': ['All Students'], 'selected': ''})
-  console.log('getDemographics ret', ret)
+  if (args.aggregate) {
+    ret.unshift({'label': 'All Students', 'options': ['All Students'], 'selected': ''})
+  }
   return ret
 };
 
