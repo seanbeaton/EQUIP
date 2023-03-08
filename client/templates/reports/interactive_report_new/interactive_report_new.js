@@ -141,8 +141,8 @@ Template.interactiveReportNew.onCreated(function created() {
     let selected_value = selected.val();
     let param_type = select_list.attr('data-param-type');
     let options = this.getParamOptions(param_type);
-    console.log('options', options)
-    console.log('selected_value', selected_value)
+    // console.log('options', options)
+    // console.log('selected_value', selected_value)
     let selected_option = options.filter(opt => opt.label === selected_value)[0];
 
     selected_option.option_list = selected_option.options
@@ -523,15 +523,15 @@ Template.interactiveReportNew.onCreated(function created() {
 Template.interactiveReportNew.helpers({
   reportSettings: function() {
     let instance = Template.instance();
-    console.log('report settings')
-    console.log('this.getEnvironments(instance.state.selectedEnvironment)', instance.getEnvironments())
-    console.log('getObsOptions(instance.state.selectedEnvironment)', instance.getObsOptions())
-    console.log('this.datasetTypes()', instance.datasetTypes)
-    console.log('!!(instance.state.selectedEnvironment.get())', !!(instance.state.get('selectedEnvironment')))
-    console.log('!!(instance.state.selectedObservationIds.get().length)', !!(instance.state.get('selectedObservationIds').length))
-    console.log('instance.state.get(\'selectedEnvironment\')', instance.state.get('selectedEnvironment'))
-    console.log('instance.state.get(\'selectedObservationIds\')', instance.state.get('selectedObservationIds'))
-    console.log('this.selectedObservations', instance.getSelectedObservations())
+    // console.log('report settings')
+    // console.log('this.getEnvironments(instance.state.selectedEnvironment)', instance.getEnvironments())
+    // console.log('getObsOptions(instance.state.selectedEnvironment)', instance.getObsOptions())
+    // console.log('this.datasetTypes()', instance.datasetTypes)
+    // console.log('!!(instance.state.selectedEnvironment.get())', !!(instance.state.get('selectedEnvironment')))
+    // console.log('!!(instance.state.selectedObservationIds.get().length)', !!(instance.state.get('selectedObservationIds').length))
+    // console.log('instance.state.get(\'selectedEnvironment\')', instance.state.get('selectedEnvironment'))
+    // console.log('instance.state.get(\'selectedObservationIds\')', instance.state.get('selectedObservationIds'))
+    // console.log('this.selectedObservations', instance.getSelectedObservations())
     let _ = {
       environments: instance.getEnvironments(),
       obsOptions: instance.getObsOptions(),
