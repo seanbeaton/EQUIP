@@ -5,18 +5,15 @@ export const clearGraph = function () {
 }
 
 
-export const clearObservations = function() {
-  clearParameters.apply(this);
-  this.instance.state.set('selectedObservationIds', []);
-  this.instance.$('.option--observation').removeClass('selected');
-  clearGraph.apply(this);
-};
+// export const clearObservations = function() {
+//   resetParameters.apply(this);
+//   // this.instance.state.set('selectedObservationIds', []);
+//   clearGraph.apply(this);
+// };
 
-export const clearParameters = function () {
-  this.instance.state.set('selectedXParameter', false);
-  this.instance.state.set('selectedYParameter', false);
-  this.instance.$('.option--discourse').removeClass('selected');
-  this.instance.$('.option--demographic').removeClass('selected');
+export const resetParameters = function () {
+  // this.instance.state.set('selectedXParameter', false);
+  // this.instance.state.set('selectedYParameter', false);
   this.instance.$('.swappable').removeClass('swapped')
 };
 

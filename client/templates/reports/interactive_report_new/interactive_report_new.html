@@ -22,11 +22,10 @@
                             <div class="select__wrapper select__wrapper--disc"><span
                                     class="explanation-text">Discourse Dimension</span>
                                 <select id="disc-select" {{disc_available}}
-                                        class="param-select-form-item discourse chosen-select" name="parameter-select"
+                                        class="param-select-form-item discourse" name="parameter-select"
                                         data-param-type="discourse">
-                                    <option disabled selected value="">- Select -</option>
-                                    {{#each discourseparams}}
-                                        <option data-options="{{options}}" value="{{label}}">{{label}}</option>
+                                    {{#each discdim in discourseparams }}
+                                        <option {{discdim.selected}} data-options="{{discdim.options}}" value="{{discdim.label}}">{{discdim.label}}</option>
                                     {{/each}}
                                 </select>
                             </div>
@@ -35,11 +34,10 @@
                             <div class="select__wrapper select__wrapper--demo"><span
                                     class="explanation-text">Demographic</span>
                                 <select id="demo-select" {{demo_available}}
-                                        class="param-select-form-item demographic chosen-select"
+                                        class="param-select-form-item demographic"
                                         name="demographic-select" data-param-type="demographics">
-                                    <option disabled selected value="">- Select -</option>
-                                    {{#each demographics}}
-                                        <option data-options="{{options}}" value="{{label}}">{{label}}</option>
+                                    {{#each demo in demographics}}
+                                        <option {{demo.selected}} data-options="{{demo.options}}" value="{{demo.label}}">{{demo.label}}</option>
                                     {{/each}}
                                 </select>
                             </div>

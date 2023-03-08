@@ -12,7 +12,7 @@
 <template name="environmentSelectV2">
     <span class="environment-selectv2">
         <select id="env-selectv2" class="env-select">
-            {{#each envSelectParams.environments}}
+            {{#each addSelected envSelectParams.environments}}
                 <option {{ selected }} {{ disabled }} value="{{_id}}">{{envName}}</option>
             {{/each}}
         </select>

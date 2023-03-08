@@ -1,6 +1,6 @@
 import {Sidebar} from '../../../../helpers/graph_sidebar';
 import {setupVis} from '../../../../helpers/timeline';
-import {clearGraph, clearObservations, clearParameters, getLabelColors, xor} from '../../../../helpers/graphsv2';
+import {clearGraph, resetParameters, getLabelColors, xor} from '../../../../helpers/graphsv2';
 import {console_log_conditional} from "/helpers/logging"
 import {getEnvironments, getObsOptions, getDiscourseDimensions, getParamOptions, getDemographics, getSelectedObservations} from "../../../../helpers/environmentsv2";
 
@@ -13,6 +13,23 @@ import {getEnvironments, getObsOptions, getDiscourseDimensions, getParamOptions,
 
 // const cacheInfo = new ReactiveVar();
 // const loadingData = new ReactiveVar(false);
+
+
+Template.interactiveReportNew.onRendered(function rendered() {
+  this.autorun(() => {
+    if (this.subscriptionsReady()) {
+      let env_options = this.getEnvironments();
+      if (env_options.findIndex(e => !e.disabled) !== -1) {
+        let default_env_id = env_options[env_options.findIndex(e => !e.disabled)]._id;
+        console.log('default_env_id', default_env_id)
+
+        this.state.set('selectedEnvironment', default_env_id)
+        // // let obs_ids = env_options
+      }
+    }
+  });
+})
+
 
 Template.interactiveReportNew.onCreated(function created() {
   this.autorun(() => {
@@ -29,12 +46,11 @@ Template.interactiveReportNew.onCreated(function created() {
   })
   this.state = new ReactiveDict();
   this.state.setDefault({
-    selectedXParameter: false,
-    selectedYParameter: false,
+    // selectedXParameter: false,
+    // selectedYParameter: false,
     selectedEnvironment: false,
     selectedObservationIds: [],
     selectedDatasetType: 'contributions',
-    obsOptions: false,
     isLoadingData: false,
     cacheInfo: undefined,
   });
@@ -45,26 +61,15 @@ Template.interactiveReportNew.onCreated(function created() {
       graphSelector: '.interactive-report__graph',
     });
   };
-  this.clearObservations = () => {
-    clearObservations.call({
+  this.resetParameters = () => {
+    return resetParameters.call({
       instance: this
     });
   };
-  this.clearParameters = () => {
-    clearParameters.call({
-      instance: this
-    });
-  };
-  //
-  // this.setupVis = (visContainerId, selectionCallback, obsOptions, selectedObservations, class_type) => {
-  //   return setupVis.call({
-  //     instance: this
-  //   }, visContainerId, selectionCallback, obsOptions, selectedObservations, class_type);
-  // };
-  this.getObsOptions = () => {
+  this.getObsOptions = (default_env_id) => {
     return getObsOptions.call({
       instance: this
-    });
+    }, default_env_id);
   };
   this.getEnvironments = (minObservations, onlyGroupWork) => {
     return getEnvironments.call({
@@ -141,7 +146,11 @@ Template.interactiveReportNew.onCreated(function created() {
     let selected_value = selected.val();
     let param_type = select_list.attr('data-param-type');
     let options = this.getParamOptions(param_type);
+    console.log('getAxisSelection options, selected_value', options, selected_value);
     let selected_option = options.filter(opt => opt.label === selected_value)[0];
+    if (typeof selected_option === 'undefined') {
+      return false;
+    }
 
     selected_option.option_list = selected_option.options
 
@@ -532,12 +541,13 @@ Template.interactiveReportNew.helpers({
     // console.log('this.selectedObservations', instance.getSelectedObservations())
     return {
       environments: instance.getEnvironments(),
-      obsOptions: instance.getObsOptions(),
+      getObsOptions: instance.getObsOptions,
       datasetTypes: instance.datasetTypes,
       visSelectionCallback: instance.visSelectionCallback,
       visClassType: instance.visClassType,
       environmentChosen: !!(instance.state.get('selectedEnvironment')),
       observationChosen: !!(instance.state.get('selectedObservationIds').length),
+      reportState: instance.state,
       selectedEnvironment: instance.state.get('selectedEnvironment'),
       selectedObservationIds: instance.state.get('selectedObservationIds'),
       selectedObservations: instance.getSelectedObservations(),
@@ -554,11 +564,14 @@ Template.interactiveReportNew.helpers({
         instance.updateReport();
       },
       environmentSelectCallback() {
-        instance.$('#disc-select').val('');
-        instance.$('#demo-select').val('');
+        // instance.$('#disc-select').val('');
+        // instance.$('#demo-select').val('');
         instance.clearGraph();
-        instance.clearObservations();
-        instance.state.set('obsOptions', instance.getObsOptions(instance.state.get('selectedEnvironment')));
+        instance.resetParameters();
+
+        // this needs to run after the disc select and dim select have been updated
+        setTimeout(() => {instance.updateReport();}, 500)
+        // instance.state.set('obsOptions', instance.getObsOptions(instance.state.get('selectedEnvironment')));
       },
     }
   },
@@ -600,8 +613,8 @@ Template.interactiveReportNew.helpers({
 
 Template.interactiveReportNew.events({
   'change .select__wrapper select': function (e, instance) {
-    instance.state.set('selectedXParameter', instance.getXAxisSelection());
-    instance.state.set('selectedYParameter', instance.getYAxisSelection());
+    // instance.state.set('selectedXParameter', instance.getXAxisSelection());
+    // instance.state.set('selectedYParameter', instance.getYAxisSelection());
     instance.updateReport();
   },
   'click .swappable__button': function (e, instance) {
@@ -611,8 +624,8 @@ Template.interactiveReportNew.events({
     }
     $target.parents('.swappable').toggleClass('swapped');
 
-    instance.state.set('selectedXParameter', instance.getXAxisSelection());
-    instance.state.set('selectedYParameter', instance.getYAxisSelection());
+    // instance.state.set('selectedXParameter', instance.getXAxisSelection());
+    // instance.state.set('selectedYParameter', instance.getYAxisSelection());
     instance.updateReport();
   },
   'click .refresh-report': function (e, instance) {

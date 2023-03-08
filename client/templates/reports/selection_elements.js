@@ -86,8 +86,16 @@ Template.environmentSelectV2.onCreated(function created() {
 
 Template.environmentSelectV2.events({
   'change #env-selectv2': function(e, instance) {
-    this.envSelectParams.setSelectedEnvironment(instance.$(e.target).val())
-    this.envSelectParams.environmentSelectCallback()
+    instance.data.envSelectParams.setSelectedEnvironment(instance.$(e.target).val())
+    instance.data.envSelectParams.environmentSelectCallback()
+  }
+})
+
+Template.environmentSelectV2.helpers({
+  addSelected: function(envs) {
+    let instance = Template.instance();
+    envs.forEach(e => e.selected = (e._id === instance.data.envSelectParams.selectedEnvironment ? 'selected' : ''));
+    return envs;
   }
 })
 Template.dataTypeSelectV2.onCreated(function created() {
@@ -102,16 +110,15 @@ Template.dataTypeSelectV2.events({
 })
 
 Template.visObservationsSelector.onCreated(function created() {
+  this.visRef = undefined;
 
-})
-
-Template.visObservationsSelector.onRendered(function created() {
-  this.autorun(() => {
+  this.setupVis = () => {
     import vis from "vis";
 
     let visParams = this.data.visSetupParams;
+    let selectedObservationIds = this.data.visSetupParams.reportState.get('selectedObservationIds')
     console.log('this', this)
-    let observations = visParams.obsOptions;
+    let observations = visParams.getObsOptions();
 
     if (!observations) {
       return;
@@ -141,23 +148,27 @@ Template.visObservationsSelector.onRendered(function created() {
     $container.removeClass('vis-container-select-all-processed').html('');
     this.$('.vis-select-all').remove();
 
+    console.log('vis startup selectedObservationIds', selectedObservationIds)
+
+
     let options = {
       multiselect: true,
       zoomable: false,
       zoomMin: 7 * 24 * 60 * 60 * 1000, // 1 week in ms
     }
-    let timeline = new vis.Timeline($container[0], items, options)
+    this.visRef = new vis.Timeline($container[0], items, options);
+    this.visRef.setSelection(selectedObservationIds)
 
-    timeline.on('select',  (props) => {
+    this.visRef.on('select',  (props) => {
       if (props.event.firstTarget.classList.contains('vis-group')) {
-        timeline.setSelection(visParams.selectedObservationIds);
+        this.visRef.setSelection(selectedObservationIds);
         return;
       }
       if (props.items.length > 1) {
         visParams.setSelectedObservationIds(props.items);
       }
       else {
-        let currentObs = visParams.selectedObservationIds;
+        let currentObs = selectedObservationIds;
         let obsIndex = currentObs.indexOf(props.items[0])
         if (obsIndex === -1) {
           currentObs.push(props.items[0])
@@ -166,7 +177,7 @@ Template.visObservationsSelector.onRendered(function created() {
           currentObs.splice(obsIndex, 1)
         }
         visParams.setSelectedObservationIds(currentObs);
-        timeline.setSelection(currentObs);
+        this.visRef.setSelection(currentObs);
       }
 
       visParams.visSelectionCallback()
@@ -176,18 +187,18 @@ Template.visObservationsSelector.onRendered(function created() {
       return a.compare_date - b.compare_date
     }).slice(-8);
     let recent_obs_ids = recent_obs.map(obs => obs.id);
-    timeline.focus(recent_obs_ids);
+    this.visRef.focus(recent_obs_ids);
 
     let select_all_button = $('<a class="vis-select-all" href="#">Select All Observations</a>')
     select_all_button.on('click', (e) => {
       e.preventDefault();
       let valid_observation_ids = all_observations.filter(o => !o.disabled).map(o => o.id);
-      if (visParams.selectedObservationIds.length === valid_observation_ids.length) {
-        timeline.setSelection([])
+      if (selectedObservationIds.length === valid_observation_ids.length) {
+        this.visRef.setSelection([])
         visParams.setSelectedObservationIds([])
       }
       else {
-        timeline.setSelection(valid_observation_ids)
+        this.visRef.setSelection(valid_observation_ids)
         visParams.setSelectedObservationIds(valid_observation_ids)
       }
       visParams.visSelectionCallback()
@@ -197,7 +208,40 @@ Template.visObservationsSelector.onRendered(function created() {
       .addClass('vis-container-select-all-processed')
       .after(select_all_button)
 
-    return timeline
+    visParams.visSelectionCallback()
+    return this.visRef
+  }
+
+  this.updateVis = () => {
+    this.visRef.setSelection(this.data.visSetupParams.reportState.get('selectedObservationIds'))
+  }
+
+  this.autorun(() => {
+    // watch these
+    this.data.visSetupParams.reportState.get('selectedEnvironment');
+    // this.data.visSetupParams.reportState.get('selectedObservationIds');
+
+    if (this.view.isRendered) {
+      let obs_options = this.data.visSetupParams.getObsOptions();
+      let default_obs_ids = obs_options.filter(o => (this.data.visSetupParams.visClassType === 'all' || this.data.visSetupParams.visClassType === o.observationType))
+        .map(o => o._id)
+      this.data.visSetupParams.setSelectedObservationIds(default_obs_ids)
+
+
+      this.updateVis();
+      // this.setupVis();
+    }
+  });
+})
+
+Template.visObservationsSelector.onRendered(function created() {
+  this.autorun(() => {
+    let obs_options = this.data.visSetupParams.getObsOptions();
+    let default_obs_ids = obs_options.filter(o => (this.data.visSetupParams.visClassType === 'all' || this.data.visSetupParams.visClassType === o.observationType))
+      .map(o => o._id)
+    this.data.visSetupParams.setSelectedObservationIds(default_obs_ids)
+    console.log('visObservationsSelector.onRendered, selectedObservationIds', default_obs_ids)
+    this.setupVis();
   })
 })
 

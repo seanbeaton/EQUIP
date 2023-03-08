@@ -38,10 +38,7 @@ export let getEnvironments = function (minObservations, onlyGroupWork) {
     }
     return env
   }).sort((a, b) => b.lastModifiedObs - a.lastModifiedObs);
-  if (envs.findIndex(e => !e.disabled) !== -1) {
-    envs[envs.findIndex(e => !e.disabled)].selected = 'selected';
-  }
-  console.log('envs', envs);
+
   return envs;
 }
 
@@ -64,7 +61,10 @@ export const getDiscourseDimensions = function () {
     return []
   }
   let ret = SequenceParameters.findOne({envId: envId}).parameters;
-  ret.unshift({'label': 'Total Contributions', 'options': ['Total Contributions']})
+  ret.forEach(s => s.selected = "")
+  ret.unshift({'label': 'Total Contributions', 'options': ['Total Contributions'], 'selected': 'selected'})
+  console.log('getDiscourseDimensions ret', ret)
+
   return ret
 };
 
@@ -80,12 +80,16 @@ export const getParamOptions = function (param_type) {
 
 
 export const getDemographics = function () {
+  console.log('getDemographics');
   let envId = this.instance.state.get('selectedEnvironment');
   if (!envId) {
     return []
   }
-  let ret = SubjectParameters.findOne({envId: envId}).parameters;
-  ret.unshift({'label': 'All Students', 'options': ['All Students']})
+  let ret = SubjectParameters.findOne({envId: envId}).parameters
+  ret.forEach(s => s.selected = "")
+  ret[0].selected = "selected";
+  ret.unshift({'label': 'All Students', 'options': ['All Students'], 'selected': ''})
+  console.log('getDemographics ret', ret)
   return ret
 };
 

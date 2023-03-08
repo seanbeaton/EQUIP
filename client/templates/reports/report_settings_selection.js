@@ -15,6 +15,7 @@ Template.reportSettingsSelection.helpers({
   envSelectParams: function() {
     return {
       setSelectedEnvironment: this.reportSettings.setSelectedEnvironment,
+      selectedEnvironment: this.reportSettings.selectedEnvironment,
       environments: this.reportSettings.environments,
       environmentSelectCallback: this.reportSettings.environmentSelectCallback
     }
@@ -22,13 +23,16 @@ Template.reportSettingsSelection.helpers({
   dataTypeSelectParams: function() {
     return {
       setSelectedDatasetType: this.reportSettings.setSelectedDatasetType,
+      selectedDatasetType: this.reportSettings.selectedDatasetType,
       datasetTypes: this.reportSettings.datasetTypes,
       datasetSelectCallback: this.reportSettings.datasetSelectCallback
     }
   },
   visSetupParams: function() {
     return {
-      obsOptions: this.reportSettings.obsOptions,
+      getObsOptions: this.reportSettings.getObsOptions,
+      reportState: this.reportSettings.reportState,
+      selectedEnvironment: this.reportSettings.selectedEnvironment,
       visSelectionCallback: this.reportSettings.visSelectionCallback,
       visClassType: this.reportSettings.visClassType,
       selectedObservationIds: this.reportSettings.selectedObservationIds,
