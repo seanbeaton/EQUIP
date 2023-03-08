@@ -345,6 +345,7 @@ Template.interactiveReportNew.onCreated(function created() {
       });
     }))]).nice();
 
+    let this_template = this;
     g.append("g")
       .selectAll("g")
       .data(data)
@@ -392,7 +393,7 @@ Template.interactiveReportNew.onCreated(function created() {
         let group_type = $(this).parent().attr('data-bar-group-type');
         let bar = $(this).attr('data-bar-x');
         let bar_type = $(this).attr('data-bar-x-type');
-        buildBarTooltipSlide(group, group_type, bar, bar_type, contribData)
+        this_template.buildBarTooltipSlide(group, group_type, bar, bar_type, contribData, key_colors)
       })
       .on('mouseout', function () {
         // sidebar.setCurrentPanel('start', 250)
@@ -525,6 +526,63 @@ Template.interactiveReportNew.onCreated(function created() {
     }
   }
 
+  this.buildBarTooltipSlide = (group, group_type, bar, bar_type, contribData, colors) => {
+    let title = `<span class="group">${group}</span> <span class="deemphasize">x</span> <span class="bar">${bar}</span>`;
+
+    let chosen_demo = (group_type === 'demographics') ? group : bar;
+    let chosen_discourse = (bar_type === 'discourse') ? bar : group;
+
+    let students_in_demo = contribData.students.filter(student => student.info.demographics[contribData.selected_demographic] === chosen_demo);
+
+    let students_in_demo_contribs_updated = students_in_demo.map(function (student) {
+      if (chosen_discourse === "Total Contributions") {
+        student.relevant_contributions = student.contributions;
+      }
+      else {
+        student.relevant_contributions = student.contributions.filter(contrib => contrib[contribData.selected_discourse_dimension] === chosen_discourse);
+      }
+      return student;
+    });
+
+    let contributing_students = students_in_demo_contribs_updated.filter(student => student.relevant_contributions.length > 0);
+
+    let non_contributing_students = students_in_demo_contribs_updated.filter(student => student.relevant_contributions.length === 0);
+
+    let max_contribs_contributing = Math.max(...contributing_students.map(student => student.relevant_contributions.length));
+    let contributing_students_html = contributing_students.sort((a, b) => b.relevant_contributions.length - a.relevant_contributions.length).map((student) => {
+      let max_contribs_percent = (student.relevant_contributions.length / max_contribs_contributing) * 100 + '%';
+      return `<span class="student-bar student-bar--contributor" style="background: linear-gradient(to right, ${this.rgbaFromHexOpacity(colors[chosen_demo],0.15)} 0%, ${this.rgbaFromHexOpacity(colors[chosen_demo],0.15)} ${max_contribs_percent}, ${this.rgbaFromHexOpacity(colors[chosen_demo],0.02)} ${max_contribs_percent}, ${this.rgbaFromHexOpacity(colors[chosen_demo],0.02)} 100%)">
+    ${student.info.name} (${student.relevant_contributions.length})
+    </span>`
+    }).join('');
+
+    let non_contributing_students_html = non_contributing_students.map(function (student) {
+      return `<span class="student-bar student-bar--non-contributor">${student.info.name} (0)</span>`
+    }).join('');
+
+    let html = `
+    <div class="stat-leadin">Number of contributions</div>
+    <div class="stat stat--barchart">${contributing_students_html}${non_contributing_students_html}</div>
+  `;
+
+    sidebar.setSlide('bar_tooltip', html, title)
+  }
+
+  this.rgbaFromHexOpacity = (hex, opacity) => {
+    let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    let rgb = result ? {
+      r: parseInt(result[1], 16),
+      g: parseInt(result[2], 16),
+      b: parseInt(result[3], 16)
+    } : null;
+    if (rgb) {
+      return `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${opacity})`;
+    }
+    else {
+      return `rgba(0,0,0,${opacity})`
+    }
+  }
+
   this.getLabelColors = getLabelColors
 
 });
@@ -642,42 +700,6 @@ let sidebar;
 
 
 
-let buildBarTooltipSlide = function (group, group_type, bar, bar_type, contribData) {
-  let title = `<span class="group">${group}</span> <span class="deemphasize">x</span> <span class="bar">${bar}</span>`;
-
-  let chosen_demo = (group_type === 'demographics') ? group : bar;
-  let chosen_discourse = (bar_type === 'discourse') ? bar : group;
-
-  let students_in_demo = contribData.students.filter(student => student.info.demographics[contribData.selected_demographic] === chosen_demo);
-
-  let students_in_demo_contribs_updated = students_in_demo.map(function (student) {
-    student.relevant_contributions = student.contributions.filter(contrib => contrib[contribData.selected_discourse_dimension] === chosen_discourse);
-    return student;
-  });
-
-  let contributing_students = students_in_demo_contribs_updated.filter(student => student.relevant_contributions.length > 0);
-
-  let non_contributing_students = students_in_demo_contribs_updated.filter(student => student.relevant_contributions.length === 0);
-
-  let max_contribs_contributing = Math.max(...contributing_students.map(student => student.relevant_contributions.length));
-  let contributing_students_html = contributing_students.sort((a, b) => b.relevant_contributions.length - a.relevant_contributions.length).map(function (student) {
-    let max_contribs_percent = (student.relevant_contributions.length / max_contribs_contributing) * 100 + '%';
-    return `<span class="student-bar student-bar--contributor" style="background: linear-gradient(to right, rgba(15,129,204,0.15) 0%, rgba(15,129,204,0.15) ${max_contribs_percent}, rgba(15,129,204,0.02) ${max_contribs_percent}, rgba(15,129,204,0.02) 100%)">
-    ${student.info.name} (${student.relevant_contributions.length})
-    </span>`
-  }).join('');
-
-  let non_contributing_students_html = non_contributing_students.map(function (student) {
-    return `<span class="student-bar student-bar--non-contributor">${student.info.name} (0)</span>`
-  }).join('');
-
-  let html = `
-    <div class="stat-leadin">Number of contributions</div>
-    <div class="stat stat--barchart">${contributing_students_html}${non_contributing_students_html}</div>
-  `;
-
-  sidebar.setSlide('bar_tooltip', html, title)
-}
 
 
 // let updateReportTitle = function() {
