@@ -1,12 +1,22 @@
 <template name="environmentSelect">
     <div class="environment-select">
         <select id="env-select" class="env-select chosen-select">
-<!--            <option disabled selected value="">- Select -</option>-->
+            <!--            <option disabled selected value="">- Select -</option>-->
             {{#each environments}}
-                <option {{ selected }} {{ disabled }} value="{{_id}}">{{envName}}</option>
+            <option {{ selected }} {{ disabled }} value="{{_id}}">{{envName}}</option>
             {{/each}}
         </select>
     </div>
+</template>
+
+<template name="environmentSelectV2">
+    <span class="environment-selectv2">
+        <select id="env-selectv2" class="env-select">
+            {{#each envSelectParams.environments}}
+                <option {{ selected }} {{ disabled }} value="{{_id}}">{{envName}}</option>
+            {{/each}}
+        </select>
+    </span>
 </template>
 
 <template name="inlineDataTypeSelect">
@@ -24,22 +34,24 @@
     </select>
 </template>
 
+<template name="dataTypeSelectV2">
 
-<template name="observationsButtonSelect">
+    <span class="data-type-selectv2">
+        <select id="dataset-type-selectv2" class="dataset">
+            {{#each dataTypeSelectParams.datasetTypes }}
+                <option {{selected}} value="{{id}}">{{name}}</option>
+            {{/each}}
+        </select>
+    </span>
+</template>
+
+
+<template name="visObservationsSelector">
     <div class="report-select__options report-select__options--observations">
-        <div class="report-select__option option--all option--all-observations"><span
-                class="option__text">Select All</span></div>
-        {{#each observations }}
-            {{> obsButton }}
-        {{else}}
-            The selected classroom doesn't have any observations.
-        {{/each}}
-        <div class="report-select__option report-select__option--spacer"></div>
-        <div class="report-select__option report-select__option--spacer"></div>
-        <div class="report-select__option report-select__option--spacer"></div>
-        <div class="report-select__option report-select__option--spacer"></div>
+        <div id="vis-container"></div>
     </div>
 </template>
+
 
 <template name="demographicHeatmapFilter">
     <span class="select__wrapper">

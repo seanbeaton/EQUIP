@@ -223,3 +223,20 @@
   font-weight: 700;
   font-size: 24px !important;
 }
+
+#dataset-type-selectv2,
+#env-selectv2 {
+
+  border: none;
+  background: white;
+  border-radius: 0;
+  padding: 10px 12px;
+  font-size: 20px;
+  width: 300px;
+  max-width: 100%;
+}
+#demo-select,
+#disc-select {
+  width: 300px;
+  max-width: 100%;
+}

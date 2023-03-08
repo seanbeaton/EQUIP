@@ -1,8 +1,8 @@
 import {Sidebar} from '../../../../helpers/graph_sidebar';
 import {setupVis} from '../../../../helpers/timeline';
-import {clearGraph, clearObservations, clearParameters} from '../../../../helpers/graphsv2';
+import {clearGraph, clearObservations, clearParameters, getLabelColors, xor} from '../../../../helpers/graphsv2';
 import {console_log_conditional} from "/helpers/logging"
-import {getEnvironments, getObsOptions} from "../../../../helpers/environments";
+import {getEnvironments, getObsOptions, getDiscourseDimensions, getParamOptions, getDemographics, getSelectedObservations} from "../../../../helpers/environmentsv2";
 
 // const obsOptions = new ReactiveVar([]);
 // const selectedEnvironment = new ReactiveVar(false);
@@ -11,8 +11,8 @@ import {getEnvironments, getObsOptions} from "../../../../helpers/environments";
 // const selectedYParameter = new ReactiveVar(false);
 // const selectedDatasetType = new ReactiveVar('contributions');
 
-const cacheInfo = new ReactiveVar();
-const loadingData = new ReactiveVar(false);
+// const cacheInfo = new ReactiveVar();
+// const loadingData = new ReactiveVar(false);
 
 Template.interactiveReportNew.onCreated(function created() {
   this.autorun(() => {
@@ -33,40 +33,516 @@ Template.interactiveReportNew.onCreated(function created() {
     selectedYParameter: false,
     selectedEnvironment: false,
     selectedObservationIds: [],
-    selectedDatasetType: false,
+    selectedDatasetType: 'contributions',
     obsOptions: false,
+    isLoadingData: false,
+    cacheInfo: undefined,
   });
 
   this.clearGraph = () => {
     clearGraph.call({
       instance: this,
       graphSelector: '.interactive-report__graph',
-    }, (err) => { err && alert(err.error); });
+    });
   };
   this.clearObservations = () => {
     clearObservations.call({
       instance: this
-    }, (err) => { err && alert(err.error); });
+    });
   };
   this.clearParameters = () => {
     clearParameters.call({
       instance: this
-    }, (err) => { err && alert(err.error); });
+    });
   };
+  //
+  // this.setupVis = (visContainerId, selectionCallback, obsOptions, selectedObservations, class_type) => {
+  //   return setupVis.call({
+  //     instance: this
+  //   }, visContainerId, selectionCallback, obsOptions, selectedObservations, class_type);
+  // };
+  this.getObsOptions = () => {
+    return getObsOptions.call({
+      instance: this
+    });
+  };
+  this.getEnvironments = (minObservations, onlyGroupWork) => {
+    return getEnvironments.call({
+      instance: this
+    }, minObservations, onlyGroupWork);
+  };
+  this.getDiscourseDimensions = () => {
+    return getDiscourseDimensions.call({
+      instance: this
+    });
+  };
+  this.getParamOptions = (param_type) => {
+    return getParamOptions.call({
+      instance: this
+    }, param_type);
+  };
+  this.getDemographics = () => {
+    return getDemographics.call({
+      instance: this
+    });
+  };
+  this.getSelectedObservations = () => {
+    return getSelectedObservations.call({
+      instance: this
+    });
+  };
+
+  this.datasetTypes = [
+    {
+      id: 'contributions',
+      name: 'Contributions',
+      selected: 'selected'
+    },
+    {
+      id: 'avg_contributions',
+      name: 'Average Contributions',
+      selected: ''
+    },
+  ]
+
+  this.visSelectionCallback = () => {
+    this.updateReport();
+  }
+  this.visClassType = 'whole_class';
+
+
+  this.getXAxisSelection = () => {
+    return this.getAxisSelection('X');
+  }
+
+  this.getYAxisSelection = () => {
+    return this.getAxisSelection('Y');
+  }
+
+  this.getAxisSelection = (axis) => {
+    let $swappable = this.$('.swappable');
+    let select_list;
+
+    let swapped = $swappable.hasClass('swapped');
+    let isXAxis = (axis === 'x' || axis === 'X');
+    // Could totally refactor this to a ternary expression, but those are kinda hard to read/maintain.
+    if (xor(swapped, isXAxis)) {
+      select_list = $swappable.find('.select__wrapper:first-child select');
+    }
+    else {
+      select_list = $swappable.find('.select__wrapper:last-child select');
+    }
+    let selected = $('option:selected', select_list);
+
+    if (!selected.val()) {
+      return false;
+    }
+
+    let selected_value = selected.val();
+    let param_type = select_list.attr('data-param-type');
+    let options = this.getParamOptions(param_type);
+    console.log('options', options)
+    console.log('selected_value', selected_value)
+    let selected_option = options.filter(opt => opt.label === selected_value)[0];
+
+    selected_option.option_list = selected_option.options
+
+    let ret = {
+      selected_value: selected_value,
+      selected_option: selected_option,
+      param_type: param_type,
+      options: options,
+    }
+    //console_log_conditional('ret in ', axis, ' axis', ret);
+    return ret
+  }
+
+  this.updateGraph = async (refresh) => {
+
+    let dataParams = {
+      envId: this.state.get('selectedEnvironment'),
+      obsIds: this.state.get('selectedObservationIds'),
+      xParams: this.getXAxisSelection(),
+      yParams: this.getYAxisSelection(),
+      currentDemo: this.getCurrentDemographicSelection(),
+    }
+
+    this.state.set('isLoadingData', true);
+
+    Meteor.call('getInteractiveReportData', dataParams, refresh, (err, result) => {
+      if (err) {
+        console_log_conditional('error', err);
+        return;
+      }
+      this.state.set('cacheInfo', {
+        createdAt: result.createdAt.toLocaleString(),
+        timeToGenerate: result.timeToGenerate,
+        timeToFetch: result.timeToFetch
+      });
+
+      this.state.set('isLoadingData', false);
+      this.createGraph(result.data, '.interactive-report__graph', this.state.get('selectedDatasetType'))
+    })
+  }
+
+  this.getCurrentDiscourseSelection = () => {
+    let selected = $('.param-select-form-item[data-param-type="discourse"] option:selected');
+    if (selected.val()) {
+      return selected.val();
+    }
+    else {
+      return false
+    }
+  }
+
+  this.getCurrentDemographicSelection = () => {
+    let selected = $('.param-select-form-item[data-param-type="demographics"] option:selected');
+    if (selected.val()) {
+      return selected.val();
+    }
+    else {
+      return false
+    }
+  }
+
+  this.allParamsSelected = () => {
+    let demo_select = this.getCurrentDemographicSelection();
+    let disc_select = this.getCurrentDiscourseSelection();
+    return (!!demo_select && !!disc_select)
+  };
+
+  this.updateReport = () => {
+    let report_wrapper = this.$('.interactive-report-wrapper');
+
+    if (!this.getXAxisSelection() || !this.getYAxisSelection()) {
+      return;
+    }
+
+    if (!this.allParamsSelected()) {
+      return;
+    }
+
+    if (this.state.get('selectedObservationIds').length < 1) {
+      this.clearGraph();
+      return;
+    }
+
+    report_wrapper.removeClass('inactive');
+    if (!report_wrapper.hasClass('timeline-created')) {
+      report_wrapper.addClass('timeline-created');
+      let sidebarLevels = {
+        0: 'start',
+        1: 'bar_tooltip',
+      }
+      sidebar = new Sidebar('.interactive-report__sidebar', sidebarLevels);
+      sidebar.setSlide('start', 'Hover a bar (or tap on mobile) to see more information', '')
+    }
+    // updateReportTitle()
+    sidebar.setCurrentPanel('start');
+    this.updateKey('.interactive-report__graph-key');
+    this.updateGraph();
+
+    // update the report values
+  }
+
+  this.updateKey = (key_wrapper) => {
+    var d3 = require('d3');
+    let y_axis = this.getYAxisSelection();
+    let color_function;
+    if (y_axis.param_type === 'demographics') {
+      color_function = d3.interpolateViridis
+    }
+    else {
+      color_function = d3.interpolatePlasma
+    }
+    let label_colors = this.getLabelColors(y_axis.selected_option.option_list, color_function);
+    let key_chunks = Object.keys(label_colors).map(function (label) {
+      let color = label_colors[label]
+      return `<span class="key--label"><span class="key--color" style="background-color: ${color}"></span><span class="key--text">${label}</span></span>`
+    })
+
+    let html = `${key_chunks.join('')}`;
+    this.$(key_wrapper).html(html)
+  }
+
+  this.createGraph = (contribData, containerSelector, dataset) => {
+    var d3 = require('d3');
+    let data,
+      y_label = '';
+    if (this.state.get('selectedDatasetType') === 'contributions') {
+      data = contribData.y_axis;
+      y_label = "Contributions";
+    }
+    else if (this.state.get('selectedDatasetType') === 'avg_contributions') {
+      data = contribData.avg_contributions_data;
+      y_label = "Average Contributions";
+    }
+    else {
+      data = contribData.equity_ratio_data;
+      y_label = "Equity Ratio";
+    }
+
+    let svg_tag = $('<svg width="718" height="580">' +
+      '<defs>\n' +
+      '  <style type="text/css">\n' +
+      '    @font-face {\n' +
+      '      font-family: Roboto;\n' +
+      '      @import url(\'https://fonts.googleapis.com/css?family=Roboto:300,400,700\');\n' +
+      '    }\n' +
+      '  </style>\n' +
+      '</defs>' +
+      '</svg>');
+    this.$(containerSelector).html(svg_tag);
+
+    var svg = d3.select(containerSelector + " svg"),
+      margin = {top: 30, right: 20, bottom: 80, left: 50},
+      width = +svg.attr("width") - margin.left - margin.right,
+      height = +svg.attr("height") - margin.top - margin.bottom,
+      g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    var x0 = d3.scaleBand() // each group
+      .rangeRound([0, width])
+      .paddingInner(0.1);
+
+    var x1 = d3.scaleBand() // inside each group
+      .padding(0.10);
+
+    var y = d3.scaleLinear()
+      .rangeRound([height, 0]);
+
+    // var keys = data.column_keys.slice(1);
+    var keys = contribData.column_keys;
+
+
+    let color_function;
+    console_log_conditional('contribData', contribData);
+    if (contribData.y_axis_param_type === 'demographics') {
+      color_function = d3.interpolateViridis
+    }
+    else {
+      color_function = d3.interpolatePlasma
+    }
+    let key_colors = this.getLabelColors(keys, color_function);
+    var z = d3.scaleOrdinal()
+      .range(Object.values(key_colors));
+
+    x0.domain(data.map(function (d) {
+      return d.column_name;
+    }));
+    x1.domain(keys).rangeRound([0, x0.bandwidth()]);
+    y.domain([0, Math.max(2, d3.max(data, function (d) {
+      return d3.max(keys, function (key) {
+        return d[key];
+      });
+    }))]).nice();
+
+    g.append("g")
+      .selectAll("g")
+      .data(data)
+      .enter().append("g")
+      .attr("transform", function (d) {
+        return "translate(" + x0(d.column_name) + ",0)";
+      })
+      .attr("class", 'bar-group')
+      .attr("data-bar-group", function (d) {
+        return d.column_name
+      })
+      .attr("data-bar-group-type", function (d) {
+        return contribData.x_axis_param_type
+      })
+      .selectAll("rect")
+      .data(function (d) {
+        return keys.map(function (key) {
+          return {key: key, value: d[key]};
+        });
+      })
+      .enter().append("rect")
+      .attr("x", function (d) {
+        return x1(d.key);
+      })
+      .attr("y", function (d) {
+        return y(d.value);
+      })
+      .attr("width", x1.bandwidth())
+      .attr("height", function (d) {
+        return height - y(d.value);
+      })
+      .attr("fill", function (d) {
+        return z(d.key);
+      })
+      .attr("class", 'hover-bar')
+      .attr("data-bar-x", function (d) {
+        return d.key
+      })
+      .attr("data-bar-x-type", function (d) {
+        return contribData.y_axis_param_type
+      })
+      .on('mouseover', function () {
+        // hover on
+        let group = $(this).parent().attr('data-bar-group');
+        let group_type = $(this).parent().attr('data-bar-group-type');
+        let bar = $(this).attr('data-bar-x');
+        let bar_type = $(this).attr('data-bar-x-type');
+        buildBarTooltipSlide(group, group_type, bar, bar_type, contribData)
+      })
+      .on('mouseout', function () {
+        // sidebar.setCurrentPanel('start', 250)
+        // hover out
+
+      })
+    // text labels for 0s
+
+    g.selectAll('g.bar-group')
+      .selectAll('text')
+      .data(function (d) {
+        return keys.map(function (key) {
+          return {key: key, value: d[key]};
+        });
+      })
+      .enter()
+      .append('text')
+      .text(function (d) {
+        if (d.value === 0) {
+          return '0';
+        }
+      })
+      .attr("text-anchor", "middle")
+      .attr("x", function (d) {
+        return x1(d.key) + x1.bandwidth() / 2;
+      })
+      .attr("y", function (d) {
+        return y(d.value) - 6;
+      })
+      .attr("font-family", "sans-serif")
+      .attr("font-size", "16px")
+      .attr("fill", "black");
+
+    let xAxis = d3.axisBottom(x0)
+      .tickFormat(function (d, i) {
+        if (contribData.y_axis_param_type === 'demographics') {
+          return `${d}(n = ${contribData.x_axis_n_values[d].n})`
+        }
+        else {
+          return `${d}`
+        }
+      })
+    // .attr('n', function(d) {return contribData.x_axis_n_values[d].n});
+
+    g.append("g")
+      .attr("class", "axis axis--x")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis)
+      //
+      .selectAll('.tick text')
+      .call(function (text) {
+        text.each(function () {
+          let tick_text = d3.select(this),
+            y = tick_text.attr("y"),
+            dy = parseFloat(tick_text.attr("dy"));
+          let text = tick_text.text();
+          let rows = /(^.+)(\(n = \d+\)$)/.exec(text);
+
+          if (rows) {
+            tick_text.text(null)
+            tick_text.append('tspan').attr('x', 0).attr('y', y).attr('dy', dy + 'em').text(rows[1]);
+            tick_text.append('tspan').attr('x', 0).attr('y', y).attr('dy', dy + 1.1 + 'em').text(rows[2]).attr('class', 'n-value');
+          }
+        });
+        text.each(function () {
+          let $this = $(this);
+          if (x0.bandwidth() < $this[0].getBBox().width) {
+            $('.axis--x .tick text').attr('font-size', '14px');
+          }
+          if (x0.bandwidth() < $this[0].getBBox().width) {
+            let text_tags = $('.axis--x .tick text');
+            text_tags.attr('transform', 'rotate(-45)');
+            text_tags.attr('text-anchor', 'end');
+          }
+          if (Math.sqrt(($this[0].getBBox().height ** 2) + ($this[0].getBBox().width ** 2)) > 80) {
+            let text_tags = $('.axis--x .tick text');
+            text_tags.attr('font-size', '11px');
+          }
+        })
+      });
+
+    let y_a;
+    if (dataset === 'contributions') {
+      y_a =
+        g.append("g")
+          .attr("class", "axis axis--y")
+          .call(d3.axisLeft(y).tickFormat(function (e) {
+              if (Math.floor(e) !== e) {
+                return;
+              }
+              return e;
+            })
+          )
+    }
+    else {
+      y_a = g.append("g")
+        .attr("class", "axis axis--y")
+        .call(d3.axisLeft(y).ticks(null, "s")
+        )
+    }
+
+    y_a.append("text")
+      .attr("x", 2)
+      .attr("y", y(y.ticks().pop()) + 0.5)
+      .attr("dy", "-2.4em")
+      .attr("dx", height / -2)
+      .attr("fill", "#000")
+      .attr("font-weight", "bold")
+      .attr("text-anchor", "middle" +
+        "")
+      .attr("transform", "rotate(-90)")
+      .text(y_label);
+
+    let toggleTickDirection = function (tick) {
+      if ($(tick).attr('x2') === "-6") {
+        $(tick).attr('x2', width)
+      }
+      else {
+        $(tick).attr('x2', "-6")
+      }
+    };
+
+    if (this.state.get('selectedDatasetType') === 'equity') {
+      let center_line = $('.axis--y g').filter((idx, item) => parseFloat($('text', item).text()) === 1.);
+      // toggleTickDirection($('line', center_line[0]));
+      this.$(center_line[0]).on('click', function (tick) {
+        toggleTickDirection($('line', center_line[0]));
+      });
+      this.$(center_line[0]).addClass('clickable-tick')
+    }
+  }
+
+  this.getLabelColors = getLabelColors
 
 });
 
 Template.interactiveReportNew.helpers({
   reportSettings: function() {
     let instance = Template.instance();
-    return {
-      environments: this.getEnvironments(instance.state.selectedEnvironment),
-      obsOptions: getObsOptions(instance.state.selectedEnvironment),
-      environmentChosen: !!(instance.state.selectedEnvironment.get()),
-      observationChosen: !!(instance.state.selectedObservations.get().length),
-      selectedEnvironment: instance.state.selectedEnvironment.get(),
-      selectedObservationIds: instance.state.selectedObservationIds.get(),
-      selectedObservation: this.selectedObservations,
+    console.log('report settings')
+    console.log('this.getEnvironments(instance.state.selectedEnvironment)', instance.getEnvironments())
+    console.log('getObsOptions(instance.state.selectedEnvironment)', instance.getObsOptions())
+    console.log('this.datasetTypes()', instance.datasetTypes)
+    console.log('!!(instance.state.selectedEnvironment.get())', !!(instance.state.get('selectedEnvironment')))
+    console.log('!!(instance.state.selectedObservationIds.get().length)', !!(instance.state.get('selectedObservationIds').length))
+    console.log('instance.state.get(\'selectedEnvironment\')', instance.state.get('selectedEnvironment'))
+    console.log('instance.state.get(\'selectedObservationIds\')', instance.state.get('selectedObservationIds'))
+    console.log('this.selectedObservations', instance.getSelectedObservations())
+    let _ = {
+      environments: instance.getEnvironments(),
+      obsOptions: instance.getObsOptions(),
+      datasetTypes: instance.datasetTypes,
+      visSelectionCallback: instance.visSelectionCallback,
+      visClassType: instance.visClassType,
+      environmentChosen: !!(instance.state.get('selectedEnvironment')),
+      observationChosen: !!(instance.state.get('selectedObservationIds').length),
+      selectedEnvironment: instance.state.get('selectedEnvironment'),
+      selectedObservationIds: instance.state.get('selectedObservationIds'),
+      selectedObservations: instance.getSelectedObservations(),
       setSelectedEnvironment(id) {
         instance.state.set('selectedEnvironment', id);
       },
@@ -75,525 +551,84 @@ Template.interactiveReportNew.helpers({
       },
       setSelectedDatasetType(id) {
         instance.state.set('selectedDatasetType', id);
-      }
+      },
+      datasetSelectCallback() {
+        instance.updateReport();
+      },
+      environmentSelectCallback() {
+        instance.$('#disc-select').val('');
+        instance.$('#demo-select').val('');
+        instance.clearGraph();
+        instance.clearObservations();
+        instance.state.set('obsOptions', instance.getObsOptions(instance.state.get('selectedEnvironment')));
+      },
     }
+    console.log('reportSettings', _)
+    return _;
   },
   selectedObservations: function() {
-    let instance = Template.instance();
-    let obsIds = instance.state.selectedObservations.get();
-    return Observations.find({_id: {$in: obsIds}}).fetch();
+    return this.getSelectedObservations()
   },
 
   demographics: function () {
-    //console_log_conditional('getDemographics', getDemographics());
-    return getDemographics();
+    let instance = Template.instance();
+    return instance.getDemographics();
   },
   discourseparams: function () {
-    return getDiscourseDimensions();
+    let instance = Template.instance();
+    return instance.getDiscourseDimensions();
   },
   demo_available: function () {
-    setTimeout(function () {
-      $(".chosen-select").trigger("chosen:updated");
-    }, 100);  // makes these elements respect the disabled attr on their selects
-    return !!selectedEnvironment.get() && !!(selectedObservations.get().length >= 1) ? '' : 'disabled'
+    let instance = Template.instance();
+    return !!instance.state.get('selectedEnvironment') && !!(instance.state.get('selectedObservationIds').length >= 1) ? '' : 'disabled'
   },
   disc_available: function () {
-    setTimeout(function () {
-      $(".chosen-select").trigger("chosen:updated");
-    }, 100);  // makes these elements respect the disabled attr on their selects
-    return !!selectedEnvironment.get() && !!(selectedObservations.get().length >= 1) ? '' : 'disabled'
-  },
-  dataset_types: function () {
-    return [
-      {
-        id: 'contributions',
-        name: 'Contributions',
-        selected: 'selected'
-      },
-      {
-        id: 'avg_contributions',
-        name: 'Average Contributions',
-        selected: ''
-      },
-    ]
+    let instance = Template.instance();
+    return !!instance.state.get('selectedEnvironment') && !!(instance.state.get('selectedObservationIds').length >= 1) ? '' : 'disabled'
   },
   selectedDatasetType: function () {
-    return selectedDatasetType.get();
+    let instance = Template.instance();
+    return instance.state.get('selectedDatasetType');
   },
   cache_info: function () {
-    return cacheInfo.get();
+    let instance = Template.instance();
+    return instance.state.get('cacheInfo');
   },
   loadingDataClass: function () {
-    return loadingData.get();
+
+    let instance = Template.instance();
+    return instance.state.get('isLoadingData');
   },
 });
 
 
 Template.interactiveReportNew.events({
-  'change #env-select': function (e, instance) {
-
-    let selected = $('option:selected', e.target);
-    //console_log_conditional('env-select,', selected.val());
-    selectedEnvironment.set(selected.val());
-    instance.clearGraph();
-    instance.clearObservations();
-    obsOptions.set(getObsOptions(selectedEnvironment));
-    setTimeout(function () {
-      setupVis('vis-container', function () {
-        $(window).trigger('updated-filters');
-      }, obsOptions, selectedObservations, 'whole_class');
-    }, 50);
-
-    $('#disc-select').val('');
-    $('#demo-select').val('');
-    $('#disc-opt-select').val('');
+  'change .select__wrapper select': function (e, instance) {
+    instance.state.set('selectedXParameter', instance.getXAxisSelection());
+    instance.state.set('selectedYParameter', instance.getYAxisSelection());
+    instance.updateReport();
   },
-  'change .select__wrapper select': function (e) {
-    selectedXParameter.set(getXAxisSelection());
-    selectedYParameter.set(getYAxisSelection());
-    $(window).trigger('updated-filters')
-  },
-  'click .swappable__button': function (e) {
+  'click .swappable__button': function (e, instance) {
     let $target = $(e.target);
     if (!$target.hasClass('.swappable__button')) {
       $target = $target.parents('.swappable__button');
     }
     $target.parents('.swappable').toggleClass('swapped');
 
-    selectedXParameter.set(getXAxisSelection());
-    selectedYParameter.set(getYAxisSelection());
-    $(window).trigger('updated-filters');
+    instance.state.set('selectedXParameter', instance.getXAxisSelection());
+    instance.state.set('selectedYParameter', instance.getYAxisSelection());
+    instance.updateReport();
   },
-  'click .refresh-report': function (e) {
+  'click .refresh-report': function (e, instance) {
     e.preventDefault();
-    updateGraph(true)
+    instance.updateGraph(true)
   }
 });
 
 
-let getDemographics = function () {
-  let envId = selectedEnvironment.get();
-  if (!envId) {
-    return []
-  }
-  let ret = SubjectParameters.findOne({envId: envId}).parameters;
-  ret.unshift({'label': 'All Students', 'options': ['All Students']})
-  return ret
-};
-
-let getDiscourseDimensions = function () {
-  let envId = selectedEnvironment.get();
-  if (!envId) {
-    return []
-  }
-  let ret = SequenceParameters.findOne({envId: envId}).parameters;
-  ret.unshift({'label': 'Total Contributions', 'options': ['Total Contributions']})
-  return ret
-};
-
-let getEnvironment = function () {
-  let envId = selectedEnvironment.get();
-  return Environments.findOne({_id: envId})
-}
-
-
-let getCurrentDiscourseSelection = function () {
-  let selected = $('.param-select-form-item[data-param-type="discourse"] option:selected');
-  if (selected.val()) {
-    return selected.val();
-  }
-  else {
-    return false
-  }
-}
-
-let getCurrentDemographicSelection = function () {
-  let selected = $('.param-select-form-item[data-param-type="demographics"] option:selected');
-  if (selected.val()) {
-    return selected.val();
-  }
-  else {
-    return false
-  }
-};
-
-let getXAxisSelection = function () {
-  return getAxisSelection('X');
-};
-
-let getYAxisSelection = function () {
-  return getAxisSelection('Y');
-};
-
-let xor = function (a, b) {
-  return (a || b) && !(a && b);
-};
-
-let getAxisSelection = function (axis) {
-  let $swappable = $('.swappable');
-  let select_list;
-
-  let swapped = $swappable.hasClass('swapped');
-  let isXAxis = (axis === 'x' || axis === 'X');
-  // Could totally refactor this to a ternary expression, but those are kinda hard to read/maintain.
-  if (xor(swapped, isXAxis)) {
-    select_list = $swappable.find('.select__wrapper:first-child select');
-  }
-  else {
-    select_list = $swappable.find('.select__wrapper:last-child select');
-  }
-  let selected = $('option:selected', select_list);
-
-  if (!selected.val()) {
-    return false;
-  }
-
-  let selected_value = selected.val();
-  let param_type = select_list.attr('data-param-type');
-  let options = getParamOptions(param_type);
-  let selected_option = options.filter(opt => opt.label === selected_value)[0];
-
-  selected_option.option_list = selected_option.options
-
-  let ret = {
-    selected_value: selected_value,
-    selected_option: selected_option,
-    param_type: param_type,
-    options: options,
-  }
-  //console_log_conditional('ret in ', axis, ' axis', ret);
-  return ret
-}
-
-
-let getParamOptions = function (param_type) {
-  if (param_type === "discourse") {
-    return getDiscourseDimensions()
-  }
-  else {
-    return getDemographics()
-  }
-};
-
-let allParamsSelected = function () {
-  let demo_select = getCurrentDemographicSelection();
-  let disc_select = getCurrentDiscourseSelection();
-  return (!!demo_select && !!disc_select)
-};
-
-
-$(window).on('updated-filters', function () {
-  if (allParamsSelected()) {
-    updateReport()
-  }
-});
 
 let sidebar;
-let updateReport = function () {
 
-  let report_wrapper = $('.interactive-report-wrapper');
-  if (!getXAxisSelection() || !getYAxisSelection()) {
-    return;
-  }
-
-  if (selectedObservations.get().length < 1) {
-    clearGraph();
-    return;
-  }
-
-  report_wrapper.removeClass('inactive');
-  if (!report_wrapper.hasClass('timeline-created')) {
-    report_wrapper.addClass('timeline-created');
-    let sidebarLevels = {
-      0: 'start',
-      1: 'bar_tooltip',
-    }
-    sidebar = new Sidebar('.interactive-report__sidebar', sidebarLevels);
-    sidebar.setSlide('start', 'Hover a bar (or tap on mobile) to see more information', '')
-  }
-  // updateReportTitle()
-  sidebar.setCurrentPanel('start');
-  updateKey('.interactive-report__graph-key');
-  updateGraph();
-
-  // update the report values
-}
-
-let updateGraph = async function (refresh) {
-  let dataParams = {
-    envId: selectedEnvironment.get(),
-    obsIds: selectedObservations.get(),
-    xParams: getXAxisSelection(),
-    yParams: getYAxisSelection(),
-    currentDemo: getCurrentDemographicSelection(),
-  }
-
-  loadingData.set(true);
-  Meteor.call('getInteractiveReportData', dataParams, refresh, function (err, result) {
-    if (err) {
-      console_log_conditional('error', err);
-      return;
-    }
-    cacheInfo.set({
-      createdAt: result.createdAt.toLocaleString(),
-      timeToGenerate: result.timeToGenerate,
-      timeToFetch: result.timeToFetch
-    });
-    loadingData.set(false);
-    createGraph(result.data, '.interactive-report__graph', selectedDatasetType.get())
-  })
-};
-
-let createGraph = function (contribData, containerSelector, dataset) {
-  var d3 = require('d3');
-  let data,
-    y_label = '';
-  if (selectedDatasetType.get() === 'contributions') {
-    data = contribData.y_axis;
-    y_label = "Contributions";
-  }
-  else if (selectedDatasetType.get() === 'avg_contributions') {
-    data = contribData.y_axis;
-    y_label = "Average Contributions";
-  }
-  else {
-    data = contribData.equity_ratio_data;
-    y_label = "Equity Ratio";
-  }
-
-  let svg_tag = $('<svg width="718" height="580">' +
-    '<defs>\n' +
-    '  <style type="text/css">\n' +
-    '    @font-face {\n' +
-    '      font-family: Roboto;\n' +
-    '      @import url(\'https://fonts.googleapis.com/css?family=Roboto:300,400,700\');\n' +
-    '    }\n' +
-    '  </style>\n' +
-    '</defs>' +
-    '</svg>');
-  $(containerSelector).html(svg_tag);
-
-  var svg = d3.select(containerSelector + " svg"),
-    margin = {top: 30, right: 20, bottom: 80, left: 50},
-    width = +svg.attr("width") - margin.left - margin.right,
-    height = +svg.attr("height") - margin.top - margin.bottom,
-    g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-  var x0 = d3.scaleBand() // each group
-    .rangeRound([0, width])
-    .paddingInner(0.1);
-
-  var x1 = d3.scaleBand() // inside each group
-    .padding(0.10);
-
-  var y = d3.scaleLinear()
-    .rangeRound([height, 0]);
-
-  // var keys = data.column_keys.slice(1);
-  var keys = contribData.column_keys;
-
-
-  let color_function;
-  console_log_conditional('contribData', contribData);
-  if (contribData.y_axis_param_type === 'demographics') {
-    color_function = d3.interpolateViridis
-  }
-  else {
-    color_function = d3.interpolatePlasma
-  }
-  let key_colors = getLabelColors(keys, color_function);
-  var z = d3.scaleOrdinal()
-    .range(Object.values(key_colors));
-
-  x0.domain(data.map(function (d) {
-    return d.column_name;
-  }));
-  x1.domain(keys).rangeRound([0, x0.bandwidth()]);
-  y.domain([0, Math.max(2, d3.max(data, function (d) {
-    return d3.max(keys, function (key) {
-      return d[key];
-    });
-  }))]).nice();
-
-  g.append("g")
-    .selectAll("g")
-    .data(data)
-    .enter().append("g")
-    .attr("transform", function (d) {
-      return "translate(" + x0(d.column_name) + ",0)";
-    })
-    .attr("class", 'bar-group')
-    .attr("data-bar-group", function (d) {
-      return d.column_name
-    })
-    .attr("data-bar-group-type", function (d) {
-      return contribData.x_axis_param_type
-    })
-    .selectAll("rect")
-    .data(function (d) {
-      return keys.map(function (key) {
-        return {key: key, value: d[key]};
-      });
-    })
-    .enter().append("rect")
-    .attr("x", function (d) {
-      return x1(d.key);
-    })
-    .attr("y", function (d) {
-      return y(d.value);
-    })
-    .attr("width", x1.bandwidth())
-    .attr("height", function (d) {
-      return height - y(d.value);
-    })
-    .attr("fill", function (d) {
-      return z(d.key);
-    })
-    .attr("class", 'hover-bar')
-    .attr("data-bar-x", function (d) {
-      return d.key
-    })
-    .attr("data-bar-x-type", function (d) {
-      return contribData.y_axis_param_type
-    })
-    .on('mouseover', function () {
-      // hover on
-      let group = $(this).parent().attr('data-bar-group');
-      let group_type = $(this).parent().attr('data-bar-group-type');
-      let bar = $(this).attr('data-bar-x');
-      let bar_type = $(this).attr('data-bar-x-type');
-      buildBarTooltipSlide(group, group_type, bar, bar_type, contribData)
-    })
-    .on('mouseout', function () {
-      // sidebar.setCurrentPanel('start', 250)
-      // hover out
-
-    })
-  // text labels for 0s
-
-  g.selectAll('g.bar-group')
-    .selectAll('text')
-    .data(function (d) {
-      return keys.map(function (key) {
-        return {key: key, value: d[key]};
-      });
-    })
-    .enter()
-    .append('text')
-    .text(function (d) {
-      if (d.value === 0) {
-        return '0';
-      }
-    })
-    .attr("text-anchor", "middle")
-    .attr("x", function (d) {
-      return x1(d.key) + x1.bandwidth() / 2;
-    })
-    .attr("y", function (d) {
-      return y(d.value) - 6;
-    })
-    .attr("font-family", "sans-serif")
-    .attr("font-size", "16px")
-    .attr("fill", "black");
-
-  let xAxis = d3.axisBottom(x0)
-    .tickFormat(function (d, i) {
-      if (contribData.y_axis_param_type === 'demographics') {
-        return `${d}(n = ${contribData.x_axis_n_values[d].n})`
-      }
-      else {
-        return `${d}`
-      }
-    })
-  // .attr('n', function(d) {return contribData.x_axis_n_values[d].n});
-
-  g.append("g")
-    .attr("class", "axis axis--x")
-    .attr("transform", "translate(0," + height + ")")
-    .call(xAxis)
-    //
-    .selectAll('.tick text')
-    .call(function (text) {
-      text.each(function () {
-        let tick_text = d3.select(this),
-          y = tick_text.attr("y"),
-          dy = parseFloat(tick_text.attr("dy"));
-        let text = tick_text.text();
-        let rows = /(^.+)(\(n = \d+\)$)/.exec(text);
-
-        if (rows) {
-          tick_text.text(null)
-          tick_text.append('tspan').attr('x', 0).attr('y', y).attr('dy', dy + 'em').text(rows[1]);
-          tick_text.append('tspan').attr('x', 0).attr('y', y).attr('dy', dy + 1.1 + 'em').text(rows[2]).attr('class', 'n-value');
-        }
-      });
-      text.each(function () {
-        let $this = $(this);
-        if (x0.bandwidth() < $this[0].getBBox().width) {
-          $('.axis--x .tick text').attr('font-size', '14px');
-        }
-        if (x0.bandwidth() < $this[0].getBBox().width) {
-          let text_tags = $('.axis--x .tick text');
-          text_tags.attr('transform', 'rotate(-45)');
-          text_tags.attr('text-anchor', 'end');
-        }
-        if (Math.sqrt(($this[0].getBBox().height ** 2) + ($this[0].getBBox().width ** 2)) > 80) {
-          let text_tags = $('.axis--x .tick text');
-          text_tags.attr('font-size', '11px');
-        }
-      })
-    });
-
-  let y_a;
-  if (dataset === 'contributions') {
-    y_a =
-      g.append("g")
-        .attr("class", "axis axis--y")
-        .call(d3.axisLeft(y).tickFormat(function (e) {
-            if (Math.floor(e) !== e) {
-              return;
-            }
-            return e;
-          })
-        )
-  }
-  else {
-    y_a = g.append("g")
-      .attr("class", "axis axis--y")
-      .call(d3.axisLeft(y).ticks(null, "s")
-      )
-  }
-
-  y_a.append("text")
-    .attr("x", 2)
-    .attr("y", y(y.ticks().pop()) + 0.5)
-    .attr("dy", "-2.4em")
-    .attr("dx", height / -2)
-    .attr("fill", "#000")
-    .attr("font-weight", "bold")
-    .attr("text-anchor", "middle" +
-      "")
-    .attr("transform", "rotate(-90)")
-    .text(y_label);
-
-  let toggleTickDirection = function (tick) {
-    if ($(tick).attr('x2') === "-6") {
-      $(tick).attr('x2', width)
-    }
-    else {
-      $(tick).attr('x2', "-6")
-    }
-  };
-
-  if (selectedDatasetType.get() === 'equity') {
-    let center_line = $('.axis--y g').filter((idx, item) => parseFloat($('text', item).text()) === 1.);
-    // toggleTickDirection($('line', center_line[0]));
-    $(center_line[0]).on('click', function (tick) {
-      toggleTickDirection($('line', center_line[0]));
-    });
-    $(center_line[0]).addClass('clickable-tick')
-  }
-}
 
 
 let buildBarTooltipSlide = function (group, group_type, bar, bar_type, contribData) {
@@ -639,25 +674,6 @@ let buildBarTooltipSlide = function (group, group_type, bar, bar_type, contribDa
 //   $('.interactive-report__title').html(title)
 // }
 
-let updateKey = function (key_wrapper) {
-  var d3 = require('d3');
-  let y_axis = getYAxisSelection();
-  let color_function;
-  if (y_axis.param_type === 'demographics') {
-    color_function = d3.interpolateViridis
-  }
-  else {
-    color_function = d3.interpolatePlasma
-  }
-  let label_colors = getLabelColors(y_axis.selected_option.option_list, color_function);
-  let key_chunks = Object.keys(label_colors).map(function (label) {
-    let color = label_colors[label]
-    return `<span class="key--label"><span class="key--color" style="background-color: ${color}"></span><span class="key--text">${label}</span></span>`
-  })
-
-  let html = `${key_chunks.join('')}`;
-  $(key_wrapper).html(html)
-}
 
 
 let available_colors = [
@@ -686,42 +702,3 @@ let avail_colors_viridis = [
   "#97d73eff", "#9ed93aff", "#a8db34ff", "#b0dd31ff", "#b8de30ff", "#c3df2eff",
   "#cbe02dff", "#d6e22bff", "#e1e329ff", "#eae428ff", "#f5e626ff", "#fde725ff",
 ];
-
-// let getLabelColors = function(labels) {
-//   let local_colors = avail_colors_viridis.slice();
-//
-//   let spacing = Math.max(Math.floor(avail_colors_viridis.length / labels.length), 1);
-//
-//   let label_colors = {};
-//   let _ = labels.map(function(label) {
-//     if (typeof label_colors[label] === 'undefined') {
-//       let new_color = local_colors[0];
-//       local_colors.push(new_color);
-//       label_colors[label] = new_color;
-//       shiftArrayToLeft(local_colors, spacing);
-//     }
-//     else {
-//
-//     }
-//   });
-//   return label_colors
-// }
-let getLabelColors = function (labels, color_function) {
-  var d3 = require('d3');
-  if (typeof color_function === 'undefined') {
-    color_function = d3.interpolateViridis;
-  }
-
-  let spacing = 1 / labels.length;
-
-  let label_colors = {};
-  let _ = labels.map(function (label, index) {
-    if (typeof label_colors[label] === 'undefined') {
-      label_colors[label] = color_function(index * spacing);
-    }
-    else {
-
-    }
-  });
-  return label_colors
-}

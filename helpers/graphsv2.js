@@ -5,17 +5,41 @@ export const clearGraph = function () {
 }
 
 
-export const clearObservations = function(instance) {
-  clearParameters();
-  instance.state.selectedObservations.set([]);
-  instance.$('.option--observation').removeClass('selected');
-  clearGraph();
+export const clearObservations = function() {
+  clearParameters.apply(this);
+  this.instance.state.set('selectedObservationIds', []);
+  this.instance.$('.option--observation').removeClass('selected');
+  clearGraph.apply(this);
 };
 
-export const clearParameters = function (instance) {
-  instance.state.selectedXParameter.set(false);
-  instance.state.selectedYParameter.set(false);
-  instance.$('.option--discourse').removeClass('selected');
-  instance.$('.option--demographic').removeClass('selected');
-  instance.$('.swappable').removeClass('swapped')
+export const clearParameters = function () {
+  this.instance.state.set('selectedXParameter', false);
+  this.instance.state.set('selectedYParameter', false);
+  this.instance.$('.option--discourse').removeClass('selected');
+  this.instance.$('.option--demographic').removeClass('selected');
+  this.instance.$('.swappable').removeClass('swapped')
 };
+
+export const xor = function (a, b) {
+  return (a || b) && !(a && b);
+};
+
+export const getLabelColors = function (labels, color_function) {
+  var d3 = require('d3');
+  if (typeof color_function === 'undefined') {
+    color_function = d3.interpolateViridis;
+  }
+
+  let spacing = 1 / labels.length;
+
+  let label_colors = {};
+  let _ = labels.map(function (label, index) {
+    if (typeof label_colors[label] === 'undefined') {
+      label_colors[label] = color_function(index * spacing);
+    }
+    else {
+
+    }
+  });
+  return label_colors
+}

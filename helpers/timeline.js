@@ -118,5 +118,5 @@ let obsTypeAbbrev = function (type) {
     return "SG";
   }
 }
-
-export {setupVis}
+//
+export {setupVis, obsTypeAbbrev}

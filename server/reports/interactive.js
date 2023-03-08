@@ -203,6 +203,9 @@ let compileContributionData = function (parameters) {
   let currentDemoOptions;
   if (currentDemo === 'All Students') {
     currentDemoOptions = "All Students"
+    contrib_data.student_body_demographic_counts = {
+      "All Students": students.length,
+    }
     contrib_data.student_body_demographic_ratios = {
       "All Students": 1,
     }
@@ -210,14 +213,46 @@ let compileContributionData = function (parameters) {
   else {
     currentDemoOptions = demographics.filter(demo => demo.label === currentDemo)[0].options
     contrib_data.student_body_demographic_ratios = {}
+    contrib_data.student_body_demographic_counts = {}
 
     currentDemoOptions.forEach(function (demo) {
       contrib_data.student_body_demographic_ratios[demo] =
         students.filter(student => student.info.demographics[currentDemo] === demo).length / students.length
+      contrib_data.student_body_demographic_counts[demo] =
+        students.filter(student => student.info.demographics[currentDemo] === demo).length
     });
+
   }
 
 
+  // contribData.students.filter(student => student.info.demographics[contribData.selected_demographic] === chosen_demo)
+  contrib_data.avg_contributions_data = contrib_data.y_axis.map(function (y) {
+
+    let column_values = Object.assign({}, y);
+    delete column_values['column_name'];
+    delete column_values['student_contributions'];
+    let avg_count_contribs = {}
+    Object.keys(column_values).forEach(function (key) {
+      // //console_log_conditional('contrib_data', contrib_data, 'key', key);
+
+      let demo_key = (yParams.param_type === 'demographics') ? key : y.column_name;
+      // let param_key = (yParams.param_type === 'discourse') ? key: y.column_name;
+
+      let count_in_demo = contrib_data.student_body_demographic_counts[demo_key];
+      if (isNaN(count_in_demo)) {
+        count_in_demo = 1;
+      }
+
+      let count_contribs_by_demo = column_values[key];
+      if (isNaN(count_contribs_by_demo)) {
+        count_contribs_by_demo = 0;
+      }
+
+      avg_count_contribs[key] = count_contribs_by_demo / count_in_demo
+    });
+    avg_count_contribs['column_name'] = y['column_name'];
+    return avg_count_contribs;
+  });
 
   contrib_data.equity_ratio_data = contrib_data.y_axis.map(function (y) {
 

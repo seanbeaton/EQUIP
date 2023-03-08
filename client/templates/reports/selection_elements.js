@@ -1,5 +1,6 @@
 let chosen = require('chosen-js');
 import {console_log_conditional} from "/helpers/logging"
+import {obsTypeAbbrev} from "/helpers/timeline"
 
 
 let handleChosenUpdates = function (e) {
@@ -79,6 +80,132 @@ Template.environmentSelect.rendered = function () {
   // $(".chosen-select").trigger("chosen:updated");   // update chosen to take the updated values into account
 };
 
+Template.environmentSelectV2.onCreated(function created() {
+
+})
+
+Template.environmentSelectV2.events({
+  'change #env-selectv2': function(e, instance) {
+    this.envSelectParams.setSelectedEnvironment(instance.$(e.target).val())
+    this.envSelectParams.environmentSelectCallback()
+  }
+})
+Template.dataTypeSelectV2.onCreated(function created() {
+
+})
+
+Template.dataTypeSelectV2.events({
+  'change #dataset-type-selectv2': function(e, instance) {
+    this.dataTypeSelectParams.setSelectedDatasetType(instance.$(e.target).val())
+    this.dataTypeSelectParams.datasetSelectCallback()
+  }
+})
+
+Template.visObservationsSelector.onCreated(function created() {
+
+})
+
+Template.visObservationsSelector.onRendered(function created() {
+  this.autorun(() => {
+    import vis from "vis";
+
+    let visParams = this.data.visSetupParams;
+    console.log('this', this)
+    let observations = visParams.obsOptions;
+
+    if (!observations) {
+      return;
+    }
+
+    let disabled = function (obs) {
+      return !(visParams.visClassType === 'all' || visParams.visClassType === obs.observationType)
+    }
+
+    let disabled_class = function (obs) {
+      return disabled(obs) ? 'disabled' : '';
+    }
+
+    let all_observations = observations.map(function (obs) {
+      return {
+        id: obs._id,
+        content: obs.name + ' (' + obs.observationDate + ' - ' + obsTypeAbbrev(obs.observationType) + ')',
+        compare_date: new Date(obs.observationDate),
+        start: obs.observationDate,
+        className: disabled_class(obs),
+        disabled: disabled(obs)
+      }
+    })
+
+    let items = new vis.DataSet(all_observations);
+    let $container = this.$('#vis-container');
+    $container.removeClass('vis-container-select-all-processed').html('');
+    this.$('.vis-select-all').remove();
+
+    let options = {
+      multiselect: true,
+      zoomable: false,
+      zoomMin: 7 * 24 * 60 * 60 * 1000, // 1 week in ms
+    }
+    let timeline = new vis.Timeline($container[0], items, options)
+
+    timeline.on('select',  (props) => {
+      if (props.event.firstTarget.classList.contains('vis-group')) {
+        timeline.setSelection(visParams.selectedObservationIds);
+        return;
+      }
+      if (props.items.length > 1) {
+        visParams.setSelectedObservationIds(props.items);
+      }
+      else {
+        let currentObs = visParams.selectedObservationIds;
+        let obsIndex = currentObs.indexOf(props.items[0])
+        if (obsIndex === -1) {
+          currentObs.push(props.items[0])
+        }
+        else {
+          currentObs.splice(obsIndex, 1)
+        }
+        visParams.setSelectedObservationIds(currentObs);
+        timeline.setSelection(currentObs);
+      }
+
+      visParams.visSelectionCallback()
+    });
+
+    let recent_obs = all_observations.sort(function (a, b) {
+      return a.compare_date - b.compare_date
+    }).slice(-8);
+    let recent_obs_ids = recent_obs.map(obs => obs.id);
+    timeline.focus(recent_obs_ids);
+
+    let select_all_button = $('<a class="vis-select-all" href="#">Select All Observations</a>')
+    select_all_button.on('click', (e) => {
+      e.preventDefault();
+      let valid_observation_ids = all_observations.filter(o => !o.disabled).map(o => o.id);
+      if (visParams.selectedObservationIds.length === valid_observation_ids.length) {
+        timeline.setSelection([])
+        visParams.setSelectedObservationIds([])
+      }
+      else {
+        timeline.setSelection(valid_observation_ids)
+        visParams.setSelectedObservationIds(valid_observation_ids)
+      }
+      visParams.visSelectionCallback()
+    })
+    $container
+      .filter(':not(.vis-container-select-all-processed)')
+      .addClass('vis-container-select-all-processed')
+      .after(select_all_button)
+
+    return timeline
+  })
+})
+
+Template.visObservationsSelector.events({
+  // 'change #dataset-type-selectv2': function(e, instance) {
+  //   this.dataTypeSelectParams.setSelectedDatasetType(instance.$(e.target).val())
+  // }
+})
 
 Template.timelineReport.events({
   'DOMSubtreeModified select.chosen-select': handleChosenUpdates,
