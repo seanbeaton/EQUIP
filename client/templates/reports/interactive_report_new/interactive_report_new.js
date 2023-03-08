@@ -55,6 +55,8 @@ Template.interactiveReportNew.onCreated(function created() {
     cacheInfo: undefined,
   });
 
+  this.sidebar;
+
   this.clearGraph = () => {
     clearGraph.call({
       instance: this,
@@ -241,11 +243,11 @@ Template.interactiveReportNew.onCreated(function created() {
         0: 'start',
         1: 'bar_tooltip',
       }
-      sidebar = new Sidebar('.interactive-report__sidebar', sidebarLevels);
-      sidebar.setSlide('start', 'Hover a bar (or tap on mobile) to see more information', '')
+      this.sidebar = new Sidebar('.interactive-report__sidebar', sidebarLevels);
+      this.sidebar.setSlide('start', 'Hover a bar (or tap on mobile) to see more information', '')
     }
     // updateReportTitle()
-    sidebar.setCurrentPanel('start');
+    this.sidebar.setCurrentPanel('start');
     this.updateKey('.interactive-report__graph-key');
     this.updateGraph();
 
@@ -565,7 +567,7 @@ Template.interactiveReportNew.onCreated(function created() {
     <div class="stat stat--barchart">${contributing_students_html}${non_contributing_students_html}</div>
   `;
 
-    sidebar.setSlide('bar_tooltip', html, title)
+    this.sidebar.setSlide('bar_tooltip', html, title)
   }
 
   this.rgbaFromHexOpacity = (hex, opacity) => {
@@ -695,8 +697,6 @@ Template.interactiveReportNew.events({
 });
 
 
-
-let sidebar;
 
 
 
