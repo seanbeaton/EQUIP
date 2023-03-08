@@ -141,8 +141,6 @@ Template.interactiveReportNew.onCreated(function created() {
     let selected_value = selected.val();
     let param_type = select_list.attr('data-param-type');
     let options = this.getParamOptions(param_type);
-    // console.log('options', options)
-    // console.log('selected_value', selected_value)
     let selected_option = options.filter(opt => opt.label === selected_value)[0];
 
     selected_option.option_list = selected_option.options
@@ -532,7 +530,7 @@ Template.interactiveReportNew.helpers({
     // console.log('instance.state.get(\'selectedEnvironment\')', instance.state.get('selectedEnvironment'))
     // console.log('instance.state.get(\'selectedObservationIds\')', instance.state.get('selectedObservationIds'))
     // console.log('this.selectedObservations', instance.getSelectedObservations())
-    let _ = {
+    return {
       environments: instance.getEnvironments(),
       obsOptions: instance.getObsOptions(),
       datasetTypes: instance.datasetTypes,
@@ -563,8 +561,6 @@ Template.interactiveReportNew.helpers({
         instance.state.set('obsOptions', instance.getObsOptions(instance.state.get('selectedEnvironment')));
       },
     }
-    console.log('reportSettings', _)
-    return _;
   },
   selectedObservations: function() {
     return this.getSelectedObservations()
