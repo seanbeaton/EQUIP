@@ -1,4 +1,4 @@
-import {get_average, get_median} from "../../helpers/graphs";
+import {get_average, get_median, get_max} from "../../helpers/graphs";
 import {console_log_conditional, console_table_conditional} from "/helpers/logging"
 import {checkAccess} from "../../helpers/access";
 
@@ -85,6 +85,7 @@ let createHistogramData = function (params) {
   let all_counts = ret.students.map(d => d.count);
   ret.median = get_median(all_counts);
   ret.average = get_average(all_counts);
+  ret.max = get_max(all_counts);
   ret.quartiles = get_n_groups(all_counts, 4, true, 'Group'); //quartiles
   ret.students.forEach(function (student) {
     student.median = get_median(all_counts);

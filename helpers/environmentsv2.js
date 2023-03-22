@@ -62,7 +62,7 @@ export const getDiscourseDimensions = function () {
   }
   let ret = SequenceParameters.findOne({envId: envId}).parameters;
   ret.forEach(s => s.selected = "")
-  ret.unshift({'label': 'Total Contributions', 'options': ['Total Contributions'], 'selected': 'selected'})
+  ret.unshift({'label': 'All Contributions', 'options': ['All Contributions'], 'selected': 'selected'})
   console.log('getDiscourseDimensions ret', ret)
 
   return ret

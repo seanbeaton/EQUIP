@@ -5,9 +5,11 @@
         <h3>
             Classroom: {{>environmentSelectV2 envSelectParams=envSelectParams }}
         </h3>
+        {{# if reportSettings.dataTypeSelectLabel }}
         <h3>
             {{ reportSettings.dataTypeSelectLabel }}: {{> dataTypeSelectV2 dataTypeSelectParams=dataTypeSelectParams }}
         </h3>
+        {{/if }}
         {{#if reportSettings.additionalSelects }}
             {{#each selector in reportSettings.additionalSelects }}
                 <h3>

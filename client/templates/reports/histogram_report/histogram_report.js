@@ -203,9 +203,6 @@ let updateGraph = function (refresh) {
   });
 }
 
-let selectStudentForModal = function (studentId) {
-  selectedStudent.set(Subjects.findOne({_id: studentId}));
-}
 
 let initHistogram = function (data, selector) {
   let d3 = require('d3');

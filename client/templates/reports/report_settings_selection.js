@@ -63,3 +63,18 @@ Template.additionalSelect.helpers({
     return opts;
   }
 })
+
+
+Template.additionalSelect.onCreated(function() {
+  console.log('this is the additional select')
+  this.$('select')[0].selectedIndex = 0;
+  this.data.setterCallback(this.$('select').val())
+})
+
+Template.additionalSelect.events({
+  'change .additional-select': function(e, instance) {
+    instance.data.setterCallback(instance.$(e.target).val())
+  }
+})
+
+

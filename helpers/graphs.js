@@ -476,6 +476,15 @@ function get_average(values) {
 }
 
 
+function get_max(values) {
+  if (values.length === 0) {
+    return 0;
+  }
+
+  return Math.max(...values)
+}
+
+
 const createHeatmapData = function (params, sequences) {
   let {envId, obsIds, selectedDemo, heatmapReportSortType} = params
 
@@ -610,5 +619,6 @@ export {
   studentTimeGraph,
   studentContribGraph,
   get_average,
-  get_median
+  get_median,
+  get_max
 }

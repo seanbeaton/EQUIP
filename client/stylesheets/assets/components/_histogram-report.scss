@@ -181,3 +181,32 @@ $light-grid-color: #ddd;
 .heatmap-sort-select-wrapper {
   margin-right: 1rem;
 }
+
+.histogramv2-table {
+  border-collapse: collapse;
+  tr {
+    border: 0;
+  }
+  td {
+    border: 0;
+  }
+  .student-line__name {
+    border-right: 1px solid $grid-color;
+  }
+}
+
+.student-line__name {
+  padding: 5px 5px 5px 0;
+  text-align: right;
+  font-weight: bold;
+}
+
+.student-line__bar-container {
+  width: 500px;
+  padding: 5px 5px 5px 0;
+}
+
+.student-line__bar-inner {
+  height: 20px;
+  background-color: grey;
+}

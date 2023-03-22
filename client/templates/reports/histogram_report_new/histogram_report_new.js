@@ -50,7 +50,8 @@ Template.histogramReportNew.onCreated(function created() {
     selectedObservationIds: [],
     students: [],
     selectedStudent: false,
-    selectedDatasetType: 'contributions',
+    selectedDemographic: false,
+    // selectedDatasetType: 'demographic_groups',
     isLoadingData: false,
     cacheInfo: undefined,
   });
@@ -93,19 +94,19 @@ Template.histogramReportNew.onCreated(function created() {
     });
   };
 
-  this.dataTypeSelectLabel = "Select View";
-  this.datasetTypes = [
-    {
-      id: 'demographic_groups',
-      name: 'Demographic Groups',
-      selected: 'selected'
-    },
-    {
-      id: 'whole_class',
-      name: 'Whole Class',
-      selected: ''
-    },
-  ]
+  // this.dataTypeSelectLabel = "Select View";
+  // this.datasetTypes = [
+  //   {
+  //     id: 'demographic_groups',
+  //     name: 'Demographic Groups',
+  //     selected: 'selected'
+  //   },
+  //   {
+  //     id: 'whole_class',
+  //     name: 'Whole Class',
+  //     selected: ''
+  //   },
+  // ]
 
   this.visSelectionCallback = () => {
     this.updateReport();
@@ -113,81 +114,127 @@ Template.histogramReportNew.onCreated(function created() {
   this.visClassType = 'whole_class';
 
 
-  this.getXAxisSelection = () => {
-    return this.getAxisSelection('X');
-  }
-
-  this.getYAxisSelection = () => {
-    return this.getAxisSelection('Y');
-  }
-
-  this.getAxisSelection = (axis) => {
-    let $swappable = this.$('.swappable');
-    let select_list;
-
-    let swapped = $swappable.hasClass('swapped');
-    let isXAxis = (axis === 'x' || axis === 'X');
-    // Could totally refactor this to a ternary expression, but those are kinda hard to read/maintain.
-    if (xor(swapped, isXAxis)) {
-      select_list = $swappable.find('.select__wrapper:first-child select');
-    }
-    else {
-      select_list = $swappable.find('.select__wrapper:last-child select');
-    }
-    let selected = $('option:selected', select_list);
-
-    if (!selected.val()) {
-      return false;
-    }
-
-    let selected_value = selected.val();
-    let param_type = select_list.attr('data-param-type');
-    let options = this.getParamOptions(param_type);
-    console.log('getAxisSelection options, selected_value', options, selected_value);
-    let selected_option = options.filter(opt => opt.label === selected_value)[0];
-    if (typeof selected_option === 'undefined') {
-      return false;
-    }
-
-    selected_option.option_list = selected_option.options
-
-    let ret = {
-      selected_value: selected_value,
-      selected_option: selected_option,
-      param_type: param_type,
-      options: options,
-    }
-    //console_log_conditional('ret in ', axis, ' axis', ret);
-    return ret
-  }
-
   this.updateGraph = async (refresh) => {
+    let histogram_wrapper = this.$('.histogramv2-report-wrapper');
+    let histogram_selector = '#histogram-d3-wrapper';
 
-    let dataParams = {
-      envId: this.state.get('selectedEnvironment'),
+    let histogram_params = {
       obsIds: this.state.get('selectedObservationIds'),
-      xParams: this.getXAxisSelection(),
-      yParams: this.getYAxisSelection(),
-      currentDemo: this.getCurrentDemographicSelection(),
+      envId: this.state.get('selectedEnvironment'),
     }
 
     this.state.set('isLoadingData', true);
 
-    Meteor.call('getInteractiveReportData', dataParams, refresh, (err, result) => {
+    Meteor.call('getHistogramData', histogram_params, refresh, (err, result) => {
       if (err) {
         console_log_conditional('error', err);
         return;
       }
+
+
+      if (!histogram_wrapper.hasClass('histogram-created')) {
+        histogram_wrapper.addClass('histogram-created');
+        this.initHistogram(result.data, histogram_selector)
+      }
+      else {
+        $('#heatmap-d3-wrapper').html('');
+        this.updateHistogram(result.data, histogram_selector)
+      }
+
+
       this.state.set('cacheInfo', {
         createdAt: result.createdAt.toLocaleString(),
         timeToGenerate: result.timeToGenerate,
         timeToFetch: result.timeToFetch
       });
-
       this.state.set('isLoadingData', false);
-      this.createGraph(result.data, '.interactive-report__graph', this.state.get('selectedDatasetType'))
-    })
+      // console_log_conditional('result.createdAt.toLocaleString()', result.createdAt.toLocaleString());
+    });
+
   }
+
+  this.selectStudentForModal = (studentId) => {
+    this.state.set('selectedStudent', Subjects.findOne({_id: studentId}));
+  }
+
+  this.initHistogram = (data, selector) => {
+    let d3 = require('d3');
+    let container = this.$(selector + '');
+    console.log('data', data);
+
+    let selectedDemo = this.state.get('selectedDemographic')
+    let selectedDemographicOptions = this.getSelectedDemographicOptions();
+    console.log('selectedDemo', selectedDemo);
+    console.log('selectedDemographicOptions', selectedDemographicOptions);
+
+
+    let markup = $('<table class="histogramv2-table"><tbody></tbody></table>');
+
+    data.students.sort((s_1, s_2) => {
+      // if (s_1.student.info.demographics[selectedDemo])
+    }).forEach(function (student) {
+      let line_markup = $("<tr class='student-line'></tr>")
+      line_markup.append('<td class="student-line__name">' + student.name + '</td>')
+      line_markup.append('<td class="student-line__data"><div class="student-line__bar-container"><div class="student-line__bar-inner" style="width: ' + student.count / data.max * 100 + '%"></div></div></td>')
+      markup.append(line_markup);
+    })
+    container.html(markup);
+
+    $('.student-box').on('click', function () {
+      this.selectStudentForModal($(this).attr('id'));
+    });
+
+    // let dim = selectedDemographic.get();
+
+    if (key_options.length > 0) {
+      let key_colors = getLabelColors(key_options);
+      let color_scale = d3.scaleOrdinal()
+        .range(Object.values(key_colors))
+
+      this.updateHistogramDemoKey('.histogram-report__graph-key', key_options, color_scale);
+
+      let all_students = this.state.get('students');
+      let demo = this.state.get('selectedDemographic');
+      let student_boxes = $('.student-box');
+      student_boxes.each(function (box_index) {
+        let $box = $($('.student-box')[box_index]);
+        console_log_conditional('box', $box);
+        console_log_conditional('getting students');
+        let student = all_students.filter(stud => stud._id === $box.attr('id'))[0]
+        console_log_conditional('student', student);
+        console.log('color_scale(student.info.demographics[demo])', color_scale(student.info.demographics[demo]));
+        $box.attr('style', `background-color: ${color_scale(student.info.demographics[demo])}`);
+      })
+    }
+    else {
+      $('.histogram-report__graph-key').html('');
+    }
+
+  }
+
+  this.getSelectedDemographicOptions = () => {
+    let options = this.getDemographics();
+    let selected_demo = this.state.get('selectedDemographic');
+    if (!selected_demo) {
+      return [];
+    }
+    let opt = options.find(opt => opt.label === selected_demo);
+    return opt.options
+  };
+
+  this.updateHistogramDemoKey = (key_wrapper, y_values, color_axis) => {
+    let key_chunks = y_values.map(function (label) {
+      return `<span class="key--label"><span class="key--color" style="background-color: ${color_axis(label)}"></span><span class="key--text">${label}</span></span>`
+    })
+
+    let html = `${key_chunks.join('')}`;
+    $(key_wrapper).html(html)
+  }
+
+  this.updateHistogram = (data, selector) => {
+    this.initHistogram(data, selector);
+  }
+
 
   this.getCurrentDiscourseSelection = () => {
     let selected = $('.param-select-form-item[data-param-type="discourse"] option:selected');
@@ -231,14 +278,19 @@ Template.histogramReportNew.helpers({
     return {
       environments: instance.getEnvironments(),
       getObsOptions: instance.getObsOptions,
-      dataTypeSelectLabel: instance.dataTypeSelectLabel,
-      datasetTypes: instance.datasetTypes,
+      // dataTypeSelectLabel: instance.dataTypeSelectLabel,
+      // datasetTypes: instance.datasetTypes,
       visSelectionCallback: instance.visSelectionCallback,
       visClassType: instance.visClassType,
       additionalSelects: [
         {
           label: 'Demographic',
           options: instance.getDemographics({aggregate: false}),
+          autoselectType: 'first_item',
+          setterCallback: (id) => {
+            instance.state.set('selectedDemographic', id);
+            instance.updateReport();
+          }
         }
       ],
       environmentChosen: !!(instance.state.get('selectedEnvironment')),
@@ -296,19 +348,21 @@ Template.histogramReportNew.helpers({
     return instance.state.get('cacheInfo');
   },
   loadingDataClass: function () {
-
     let instance = Template.instance();
     return instance.state.get('isLoadingData');
   },
 
   students: function () {
-    return this.state.get('students');
+    let instance = Template.instance();
+    return instance.state.get('students');
   },
   selectedStudent: function () {
-    return this.state.get('selectedStudent');
+    let instance = Template.instance();
+    return instance.state.get('selectedStudent');
   },
   histogramDemoOptionSelected: function () {
-    return !!(this.state.get('selectedDemographic').get())
+    let instance = Template.instance();
+    return !!(instance.state.get('selectedDemographic'))
   },
 
 });

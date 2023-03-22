@@ -50,7 +50,7 @@ Template.interactiveReportNew.onCreated(function created() {
     // selectedYParameter: false,
     selectedEnvironment: false,
     selectedObservationIds: [],
-    selectedDatasetType: 'contributions',
+    selectedDatasetType: 'avg_contributions',
     isLoadingData: false,
     cacheInfo: undefined,
   });
@@ -103,13 +103,13 @@ Template.interactiveReportNew.onCreated(function created() {
   this.datasetTypes = [
     {
       id: 'contributions',
-      name: 'Contributions',
-      selected: 'selected'
+      name: 'All Contributions',
+      selected: ''
     },
     {
       id: 'avg_contributions',
       name: 'Average Contributions',
-      selected: ''
+      selected: 'selected'
     },
   ]
 
@@ -538,7 +538,7 @@ Template.interactiveReportNew.onCreated(function created() {
     let students_in_demo = contribData.students.filter(student => student.info.demographics[contribData.selected_demographic] === chosen_demo);
 
     let students_in_demo_contribs_updated = students_in_demo.map(function (student) {
-      if (chosen_discourse === "Total Contributions") {
+      if (chosen_discourse === "All Contributions") {
         student.relevant_contributions = student.contributions;
       }
       else {
@@ -554,7 +554,7 @@ Template.interactiveReportNew.onCreated(function created() {
     let max_contribs_contributing = Math.max(...contributing_students.map(student => student.relevant_contributions.length));
     let contributing_students_html = contributing_students.sort((a, b) => b.relevant_contributions.length - a.relevant_contributions.length).map((student) => {
       let max_contribs_percent = (student.relevant_contributions.length / max_contribs_contributing) * 100 + '%';
-      return `<span class="student-bar student-bar--contributor" style="background: linear-gradient(to right, ${this.rgbaFromHexOpacity(colors[chosen_demo],0.15)} 0%, ${this.rgbaFromHexOpacity(colors[chosen_demo],0.15)} ${max_contribs_percent}, ${this.rgbaFromHexOpacity(colors[chosen_demo],0.02)} ${max_contribs_percent}, ${this.rgbaFromHexOpacity(colors[chosen_demo],0.02)} 100%)">
+      return `<span class="student-bar student-bar--contributor" style="background: linear-gradient(to right, ${this.rgbaFromHexOpacity(colors[chosen_demo],0.27)} 0%, ${this.rgbaFromHexOpacity(colors[chosen_demo],0.27)} ${max_contribs_percent}, ${this.rgbaFromHexOpacity(colors[chosen_demo],0.02)} ${max_contribs_percent}, ${this.rgbaFromHexOpacity(colors[chosen_demo],0.02)} 100%)">
     ${student.info.name} (${student.relevant_contributions.length})
     </span>`
     }).join('');

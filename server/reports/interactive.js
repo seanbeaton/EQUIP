@@ -108,7 +108,7 @@ let compileContributionData = function (parameters) {
     Sequences.find({obsId: obsId}).forEach(function (sequence) {
       let sequence_y;
 
-      if (yParams.selected_value === "Total Contributions" || yParams.selected_value === "All Students") {
+      if (yParams.selected_value === "All Contributions" || yParams.selected_value === "All Students") {
         sequence_y = yParams.selected_value
       }
       else if (yParams.param_type === 'demographics') {
@@ -120,7 +120,7 @@ let compileContributionData = function (parameters) {
 
       let sequence_x;
 
-      if (xParams.selected_value === "Total Contributions" || xParams.selected_value === "All Students") {
+      if (xParams.selected_value === "All Contributions" || xParams.selected_value === "All Students") {
         sequence_x = xParams.selected_value
       }
       else if (xParams.param_type === 'demographics') {
