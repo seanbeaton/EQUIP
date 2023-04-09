@@ -21,7 +21,6 @@ Template.histogramReportNew.onRendered(function rendered() {
       let env_options = this.getEnvironments();
       if (env_options.findIndex(e => !e.disabled) !== -1) {
         let default_env_id = env_options[env_options.findIndex(e => !e.disabled)]._id;
-        console.log('default_env_id', default_env_id)
 
         this.state.set('selectedEnvironment', default_env_id)
         // // let obs_ids = env_options
@@ -160,42 +159,43 @@ Template.histogramReportNew.onCreated(function created() {
   this.initHistogram = (data, selector) => {
     let d3 = require('d3');
     let container = this.$(selector + '');
-    console.log('data', data);
-
     let selectedDemo = this.state.get('selectedDemographic')
     let selectedDemographicOptions = this.getSelectedDemographicOptions();
-    console.log('selectedDemo', selectedDemo);
-    console.log('selectedDemographicOptions', selectedDemographicOptions);
 
 
     let markup = $('<table class="histogramv2-table"><tbody></tbody></table>');
 
 
     let key_options = this.getDemographics().find(i => i.label === selectedDemo);
-    console.log('this.getDemographics()', this.getDemographics());
-    console.log('this.getDemographics()find(i => i.label === selectedDemo)', this.getDemographics().find(i => i.label === selectedDemo));
     let color_scale = undefined;
     if (typeof key_options !== 'undefined') {
       key_options.options
       let key_colors = getLabelColors(key_options.options);
-      console.log('key_options.options', key_options.options);
-      console.log('key_colors', key_colors);
       color_scale = d3.scaleOrdinal().range(Object.values(key_colors))
+      let student_demo_counts = {};
 
-      this.updateHistogramDemoKey('.histogram-d3-wrapper__key', key_options.options, color_scale);
-
-      let all_students = this.state.get('students');
-      let demo = this.state.get('selectedDemographic');
-      let student_boxes = $('.student-box');
-      student_boxes.each(function (box_index) {
-        let $box = $($('.student-box')[box_index]);
-        console_log_conditional('box', $box);
-        console_log_conditional('getting students');
-        let student = all_students.filter(stud => stud._id === $box.attr('id'))[0]
-        console_log_conditional('student', student);
-        console.log('color_scale(student.info.demographics[demo])', color_scale(student.info.demographics[demo]));
-        $box.attr('style', `background-color: ${color_scale(student.info.demographics[demo])}`);
+      data.students.forEach(s => {
+        let student_demo = s.student.info.demographics[selectedDemo];
+        if (!student_demo_counts.hasOwnProperty(student_demo)) {
+          student_demo_counts[student_demo] = 1;
+        }
+        else {
+          student_demo_counts[student_demo] += 1
+        }
       })
+      this.updateHistogramDemoKey('.histogram-d3-wrapper__key', key_options.options, color_scale, student_demo_counts);
+
+      // let all_students = this.state.get('students');
+      // let demo = this.state.get('selectedDemographic');
+      // let student_boxes = $('.student-box');
+      // student_boxes.each(function (box_index) {
+      //   let $box = $($('.student-box')[box_index]);
+      //   console_log_conditional('box', $box);
+      //   console_log_conditional('getting students');
+      //   let student = all_students.filter(stud => stud._id === $box.attr('id'))[0]
+      //   console_log_conditional('student', student);
+      //   $box.attr('style', `background-color: ${color_scale(student.info.demographics[demo])}`);
+      // })
     }
     else {
       $('.histogram-d3-wrapper__key').html('');
@@ -213,7 +213,6 @@ Template.histogramReportNew.onCreated(function created() {
     }).forEach(function (student) {
       let line_markup = $("<tr class='student-line'></tr>")
       line_markup.append('<td class="student-line__name">' + student.name + '</td>')
-      console.log('color_scale', color_scale);
       let student_color = (color_scale) ? color_scale(student.student.info.demographics[selectedDemo]) : '#333333';
       line_markup.append('<td class="student-line__data"><div class="student-line__bar-container"><div class="student-line__bar-inner" style="background-color: ' + student_color + '; width: ' + student.count / data.max * 100 + '%"></div></div></td>')
       markup.append(line_markup);
@@ -232,7 +231,6 @@ Template.histogramReportNew.onCreated(function created() {
 
   this.getSelectedDemographicOptions = () => {
     let options = this.getDemographics();
-    console.log('getselectedDemographicOptions', this.state);
     let selected_demo = this.state.get('selectedDemographic');
     if (!selected_demo) {
       return [];
@@ -241,9 +239,9 @@ Template.histogramReportNew.onCreated(function created() {
     return opt.options
   };
 
-  this.updateHistogramDemoKey = (key_wrapper, y_values, color_axis) => {
+  this.updateHistogramDemoKey = (key_wrapper, y_values, color_axis, student_counts) => {
     let key_chunks = y_values.map(function (label) {
-      return `<span class="key--label"><span class="key--color" style="background-color: ${color_axis(label)}"></span><span class="key--text">${label}</span></span>`
+      return `<span class="key--label"><span class="key--color" style="background-color: ${color_axis(label)}"></span><span class="key--text">${label} - ${(student_counts[label] === 1 ? student_counts[label] + " Student" : student_counts[label] + " Students")}</span></span>`
     })
 
     let html = `${key_chunks.join('')}`;
@@ -347,7 +345,6 @@ Template.histogramReportNew.helpers({
   },
   discourseparams: function () {
     let instance = Template.instance();
-    console.log('getting disc params', instance)
     return instance.getDiscourseDimensions();
   },
   demo_available: function () {
