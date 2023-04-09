@@ -8,7 +8,7 @@ Template.reportSettingsSelection.events({
 })
 
 Template.reportSettingsSelection.onCreated(function created() {
-
+  console.log('additionalSelect', this)
 })
 
 Template.reportSettingsSelection.helpers({
@@ -42,9 +42,9 @@ Template.reportSettingsSelection.helpers({
 
 })
 
-Template.additionalSelect.onCreated(function created() {
-  console.log('this', this)
-})
+// Template.additionalSelect.onCreated(function created() {
+//   console.log('this', this)
+// })
 
 Template.additionalSelect.helpers({
   cssClass: function () {
@@ -65,14 +65,24 @@ Template.additionalSelect.helpers({
 })
 
 
-Template.additionalSelect.onCreated(function() {
-  console.log('this is the additional select')
-  this.$('select')[0].selectedIndex = 0;
-  this.data.setterCallback(this.$('select').val())
-})
+Template.additionalSelect.onRendered(function() {
+  let $select = this.$('select');
+  let select = $select[0];
+  let changeWhenRendered = () => {
+    if ($select.find('option').length > 0) {
+      select.selectedIndex = 0;
+      $select.change();
+    }
+    else {
+      setTimeout(changeWhenRendered, 100)
+    }
+  }
+  changeWhenRendered();
+});
 
 Template.additionalSelect.events({
   'change .additional-select': function(e, instance) {
+    console.log('additional select', instance);
     instance.data.setterCallback(instance.$(e.target).val())
   }
 })

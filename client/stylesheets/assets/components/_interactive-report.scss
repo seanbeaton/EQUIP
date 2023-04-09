@@ -110,6 +110,12 @@ $light-grid-color: #ddd;
   }
 }
 
+.histogram-d3-wrapper__key {
+  .key--label {
+    display: flex;
+  }
+}
+
 .key--text {
   display: inline-block;
   line-height: 1;

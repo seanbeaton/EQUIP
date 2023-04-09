@@ -116,7 +116,7 @@ Template.histogramReportNew.onCreated(function created() {
 
   this.updateGraph = async (refresh) => {
     let histogram_wrapper = this.$('.histogramv2-report-wrapper');
-    let histogram_selector = '#histogram-d3-wrapper';
+    let histogram_selector = '.histogram-d3-wrapper__graph';
 
     let histogram_params = {
       obsIds: this.state.get('selectedObservationIds'),
@@ -170,28 +170,19 @@ Template.histogramReportNew.onCreated(function created() {
 
     let markup = $('<table class="histogramv2-table"><tbody></tbody></table>');
 
-    data.students.sort((s_1, s_2) => {
-      // if (s_1.student.info.demographics[selectedDemo])
-    }).forEach(function (student) {
-      let line_markup = $("<tr class='student-line'></tr>")
-      line_markup.append('<td class="student-line__name">' + student.name + '</td>')
-      line_markup.append('<td class="student-line__data"><div class="student-line__bar-container"><div class="student-line__bar-inner" style="width: ' + student.count / data.max * 100 + '%"></div></div></td>')
-      markup.append(line_markup);
-    })
-    container.html(markup);
 
-    $('.student-box').on('click', function () {
-      this.selectStudentForModal($(this).attr('id'));
-    });
+    let key_options = this.getDemographics().find(i => i.label === selectedDemo);
+    console.log('this.getDemographics()', this.getDemographics());
+    console.log('this.getDemographics()find(i => i.label === selectedDemo)', this.getDemographics().find(i => i.label === selectedDemo));
+    let color_scale = undefined;
+    if (typeof key_options !== 'undefined') {
+      key_options.options
+      let key_colors = getLabelColors(key_options.options);
+      console.log('key_options.options', key_options.options);
+      console.log('key_colors', key_colors);
+      color_scale = d3.scaleOrdinal().range(Object.values(key_colors))
 
-    // let dim = selectedDemographic.get();
-
-    if (key_options.length > 0) {
-      let key_colors = getLabelColors(key_options);
-      let color_scale = d3.scaleOrdinal()
-        .range(Object.values(key_colors))
-
-      this.updateHistogramDemoKey('.histogram-report__graph-key', key_options, color_scale);
+      this.updateHistogramDemoKey('.histogram-d3-wrapper__key', key_options.options, color_scale);
 
       let all_students = this.state.get('students');
       let demo = this.state.get('selectedDemographic');
@@ -207,13 +198,41 @@ Template.histogramReportNew.onCreated(function created() {
       })
     }
     else {
-      $('.histogram-report__graph-key').html('');
+      $('.histogram-d3-wrapper__key').html('');
     }
+
+
+    data.students.sort((s_1, s_2) => {
+      if (s_1.student.info.demographics[selectedDemo] !== s_2.student.info.demographics[selectedDemo]) {
+        return selectedDemographicOptions.indexOf(s_2.student.info.demographics[selectedDemo]) >
+          selectedDemographicOptions.indexOf(s_1.student.info.demographics[selectedDemo])
+      }
+      else {
+        return s_2.count > s_1.count;
+      }
+    }).forEach(function (student) {
+      let line_markup = $("<tr class='student-line'></tr>")
+      line_markup.append('<td class="student-line__name">' + student.name + '</td>')
+      console.log('color_scale', color_scale);
+      let student_color = (color_scale) ? color_scale(student.student.info.demographics[selectedDemo]) : '#333333';
+      line_markup.append('<td class="student-line__data"><div class="student-line__bar-container"><div class="student-line__bar-inner" style="background-color: ' + student_color + '; width: ' + student.count / data.max * 100 + '%"></div></div></td>')
+      markup.append(line_markup);
+    })
+    container.html(markup);
+
+    $('.student-box').on('click',(el) => {
+      this.selectStudentForModal($(el.target).attr('id'));
+    });
+
+
+    // let dim = selectedDemographic.get();
+
 
   }
 
   this.getSelectedDemographicOptions = () => {
     let options = this.getDemographics();
+    console.log('getselectedDemographicOptions', this.state);
     let selected_demo = this.state.get('selectedDemographic');
     if (!selected_demo) {
       return [];
