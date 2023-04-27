@@ -111,13 +111,14 @@ Template.dataTypeSelectV2.events({
 
 Template.visObservationsSelector.onCreated(function created() {
   this.visRef = undefined;
-
+  this.initialRenderComplete = false;
   this.setupVis = () => {
+    console.log('setupVis')
     import vis from "vis";
 
     let visParams = this.data.visSetupParams;
     let selectedObservationIds = this.data.visSetupParams.reportState.get('selectedObservationIds')
-    console.log('this', this)
+    // console.log('this', this)
     let observations = visParams.getObsOptions();
 
     if (!observations) {
@@ -213,10 +214,13 @@ Template.visObservationsSelector.onCreated(function created() {
   }
 
   this.updateVis = () => {
+    console.log('updateVis')
+
     this.visRef.setSelection(this.data.visSetupParams.reportState.get('selectedObservationIds'))
   }
 
   this.autorun(() => {
+    console.log('autorun', this)
     // watch these
     this.data.visSetupParams.reportState.get('selectedEnvironment');
     // this.data.visSetupParams.reportState.get('selectedObservationIds');
@@ -236,12 +240,17 @@ Template.visObservationsSelector.onCreated(function created() {
 
 Template.visObservationsSelector.onRendered(function created() {
   this.autorun(() => {
-    let obs_options = this.data.visSetupParams.getObsOptions();
-    let default_obs_ids = obs_options.filter(o => (this.data.visSetupParams.visClassType === 'all' || this.data.visSetupParams.visClassType === o.observationType))
-      .map(o => o._id)
-    this.data.visSetupParams.setSelectedObservationIds(default_obs_ids)
-    console.log('visObservationsSelector.onRendered, selectedObservationIds', default_obs_ids)
-    this.setupVis();
+    if (this.initialRenderComplete) {
+      this.updateVis();
+    }
+    else {
+      let obs_options = this.data.visSetupParams.getObsOptions();
+      let default_obs_ids = obs_options.filter(o => (this.data.visSetupParams.visClassType === 'all' || this.data.visSetupParams.visClassType === o.observationType))
+        .map(o => o._id)
+      this.data.visSetupParams.setSelectedObservationIds(default_obs_ids)
+      this.setupVis();
+      this.initialRenderComplete = true;
+    }
   })
 })
 

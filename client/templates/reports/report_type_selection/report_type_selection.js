@@ -8,7 +8,7 @@ Template.reportsSelection.events({
       Router.go('staticReport')
   },
   'click .option--interactive': function () {
-    Router.go('interactiveReport')
+    Router.go('interactiveReportNew')
   },
   'click .option--timeline': function () {
     Router.go('timelineReport')
@@ -17,7 +17,7 @@ Template.reportsSelection.events({
     Router.go('heatmapReport')
   },
   'click .option--student-histogram': function () {
-    Router.go('histogramReport')
+    Router.go('histogramReportNew')
   },
   'click .option--group-work': function () {
     Router.go('groupWorkReport')

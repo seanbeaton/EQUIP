@@ -1,6 +1,6 @@
 import {Sidebar} from '../../../../helpers/graph_sidebar';
 import {setupVis} from '../../../../helpers/timeline';
-import {clearGraph, resetParameters, getLabelColors, xor} from '../../../../helpers/graphsv2';
+import {clearGraph, resetParameters, getLabelColors, xor, invertColor} from '../../../../helpers/graphsv2';
 import {console_log_conditional} from "/helpers/logging"
 import {getEnvironments, getObsOptions, getDiscourseDimensions, getParamOptions, getDemographics, getSelectedObservations} from "../../../../helpers/environmentsv2";
 
@@ -214,7 +214,8 @@ Template.histogramReportNew.onCreated(function created() {
       let line_markup = $("<tr class='student-line'></tr>")
       line_markup.append('<td class="student-line__name">' + student.name + '</td>')
       let student_color = (color_scale) ? color_scale(student.student.info.demographics[selectedDemo]) : '#333333';
-      line_markup.append('<td class="student-line__data"><div class="student-line__bar-container"><div class="student-line__bar-inner" style="background-color: ' + student_color + '; width: ' + student.count / data.max * 100 + '%"></div></div></td>')
+      let student_count_text_color = invertColor(student_color, true)
+      line_markup.append('<td class="student-line__data"><div class="student-line__bar-container"><div class="student-line__bar-inner" style="background-color: ' + student_color + '; width: ' + student.count / data.max * 100 + '%"></div><div class="student-line__bar-count-wrapper" style="left: ' + student.count / data.max * 100 + '%"><div class="student-line__bar-count student-line__bar-count--' + ((student.count / data.max > .5) ? "inside" : "outside") + '" style="color: ' + ((student.count / data.max <= .5) ? "#333" : student_count_text_color ) + '">' + student.count + '</div></div></div></td>')
       markup.append(line_markup);
     })
     container.html(markup);

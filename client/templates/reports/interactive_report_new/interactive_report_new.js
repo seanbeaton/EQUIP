@@ -149,7 +149,7 @@ Template.interactiveReportNew.onCreated(function created() {
     let selected_value = selected.val();
     let param_type = select_list.attr('data-param-type');
     let options = this.getParamOptions(param_type);
-    console.log('getAxisSelection options, selected_value', options, selected_value);
+    // console.log('getAxisSelection options, selected_value', options, selected_value);
     let selected_option = options.filter(opt => opt.label === selected_value)[0];
     if (typeof selected_option === 'undefined') {
       return false;
@@ -332,9 +332,9 @@ Template.interactiveReportNew.onCreated(function created() {
     else {
       colors_reverse = true
     }
-    console.log('colors_reverse', colors_reverse);
+    // console.log('colors_reverse', colors_reverse);
     let key_colors = this.getLabelColors(keys, colors_reverse);
-    console.log('createGraph key_colors', key_colors)
+    // console.log('createGraph key_colors', key_colors)
     var z = d3.scaleOrdinal()
       .range(Object.values(key_colors));
 

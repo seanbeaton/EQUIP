@@ -63,7 +63,7 @@ export const getDiscourseDimensions = function () {
   let ret = SequenceParameters.findOne({envId: envId}).parameters;
   ret.forEach(s => s.selected = "")
   ret.unshift({'label': 'All Contributions', 'options': ['All Contributions'], 'selected': 'selected'})
-  console.log('getDiscourseDimensions ret', ret)
+  // console.log('getDiscourseDimensions ret', ret)
 
   return ret
 };
@@ -86,7 +86,7 @@ export const getDemographics = function (args) {
 
   args = Object.assign({aggregate: true}, args)
 
-  console.log('getDemographics');
+  // console.log('getDemographics');
   let envId = this.instance.state.get('selectedEnvironment');
   if (!envId) {
     return []
