@@ -54,32 +54,19 @@ export const getLabelColors = function (labels, reverse_colors, colors) {
 
 
 export const invertColor = function(hex, bw) {
-  console.log('invert color', hex, bw)
-  if (hex.indexOf('#') === 0) {
-    hex = hex.slice(1);
-  }
-  // convert 3-digit hex to 6-digits.
-  if (hex.length === 3) {
-    hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
-  }
-  if (hex.length !== 6) {
-    throw new Error('Invalid HEX color.');
-  }
-  var r = parseInt(hex.slice(0, 2), 16),
-    g = parseInt(hex.slice(2, 4), 16),
-    b = parseInt(hex.slice(4, 6), 16);
-  if (bw) {
-    // https://stackoverflow.com/a/3943023/112731
-    return (r * 0.299 + g * 0.587 + b * 0.114) > 186
-      ? '#000000'
-      : '#FFFFFF';
-  }
-  // invert color components
-  r = (255 - r).toString(16);
-  g = (255 - g).toString(16);
-  b = (255 - b).toString(16);
-  // pad each with zeros and return
-  return "#" + padZero(r) + padZero(g) + padZero(b);
+  let color = (hex.charAt(0) === '#') ? hex.substring(1, 7) : hex;
+  let r = parseInt(color.substring(0, 2), 16); // hexToR
+  let g = parseInt(color.substring(2, 4), 16); // hexToG
+  let b = parseInt(color.substring(4, 6), 16); // hexToB
+  let uicolors = [r / 255, g / 255, b / 255];
+  let c = uicolors.map((col) => {
+    if (col <= 0.03928) {
+      return col / 12.92;
+    }
+    return Math.pow((col + 0.055) / 1.055, 2.4);
+  });
+  let L = (0.2126 * c[0]) + (0.7152 * c[1]) + (0.0722 * c[2]);
+  return (L > 0.179) ? '#000' : '#fff';
 }
 
 export const padZero = function(str, len) {
