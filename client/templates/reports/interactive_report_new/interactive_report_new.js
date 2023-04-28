@@ -616,10 +616,14 @@ Template.interactiveReportNew.helpers({
       observationChosen: !!(instance.state.get('selectedObservationIds').length),
       reportState: instance.state,
       selectedEnvironment: instance.state.get('selectedEnvironment'),
+      getSelectedEnvironment: () => {
+        return instance.state.get('selectedEnvironment')
+      },
       selectedObservationIds: instance.state.get('selectedObservationIds'),
       selectedObservations: instance.getSelectedObservations(),
       setSelectedEnvironment(id) {
         instance.state.set('selectedEnvironment', id);
+        instance.state.set('selectedDemographic', instance.getDemographics({aggregate: false})[0].label)
       },
       setSelectedObservationIds(id) {
         instance.state.set('selectedObservationIds', id);

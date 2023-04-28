@@ -237,12 +237,15 @@ Template.histogramReportNew.onCreated(function created() {
       return [];
     }
     let opt = options.find(opt => opt.label === selected_demo);
+    if (typeof opt === "undefined") {
+      return []
+    }
     return opt.options
   };
 
   this.updateHistogramDemoKey = (key_wrapper, y_values, color_axis, student_counts) => {
     let key_chunks = y_values.map(function (label) {
-      return `<span class="key--label"><span class="key--color" style="background-color: ${color_axis(label)}"></span><span class="key--text">${label} - ${(student_counts[label] === 1 ? student_counts[label] + " Student" : student_counts[label] + " Students")}</span></span>`
+      return `<span class="key--label"><span class="key--color" style="background-color: ${color_axis(label)}"></span><span class="key--text">${label} - ${(student_counts[label] === 1 ? student_counts[label] + " Student" : (typeof student_counts[label] !== 'undefined' ? student_counts[label] : 0) + " Students")}</span></span>`
     })
 
     let html = `${key_chunks.join('')}`;
@@ -304,7 +307,7 @@ Template.histogramReportNew.helpers({
         {
           label: 'Demographic',
           options: instance.getDemographics({aggregate: false}),
-          autoselectType: 'first_item',
+          autoselectType: 'first_item', // todo use this
           setterCallback: (id) => {
             instance.state.set('selectedDemographic', id);
             instance.updateReport();
@@ -315,10 +318,14 @@ Template.histogramReportNew.helpers({
       observationChosen: !!(instance.state.get('selectedObservationIds').length),
       reportState: instance.state,
       selectedEnvironment: instance.state.get('selectedEnvironment'),
+      getSelectedEnvironment: () => {
+        return instance.state.get('selectedEnvironment')
+      },
       selectedObservationIds: instance.state.get('selectedObservationIds'),
       selectedObservations: instance.getSelectedObservations(),
       setSelectedEnvironment(id) {
         instance.state.set('selectedEnvironment', id);
+        instance.state.set('selectedDemographic', instance.getDemographics({aggregate: false})[0].label)
       },
       setSelectedObservationIds(id) {
         instance.state.set('selectedObservationIds', id);

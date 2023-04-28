@@ -33,6 +33,7 @@ Template.reportSettingsSelection.helpers({
       getObsOptions: this.reportSettings.getObsOptions,
       reportState: this.reportSettings.reportState,
       selectedEnvironment: this.reportSettings.selectedEnvironment,
+      getSelectedEnvironment: this.reportSettings.getSelectedEnvironment,
       visSelectionCallback: this.reportSettings.visSelectionCallback,
       visClassType: this.reportSettings.visClassType,
       selectedObservationIds: this.reportSettings.selectedObservationIds,

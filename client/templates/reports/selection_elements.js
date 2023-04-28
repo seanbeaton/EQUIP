@@ -112,8 +112,10 @@ Template.dataTypeSelectV2.events({
 Template.visObservationsSelector.onCreated(function created() {
   this.visRef = undefined;
   this.initialRenderComplete = false;
+  this.lastRenderEnv = undefined
   this.setupVis = () => {
     console.log('setupVis')
+    this.lastRenderEnv = this.data.visSetupParams.getSelectedEnvironment();
     import vis from "vis";
 
     let visParams = this.data.visSetupParams;
@@ -240,7 +242,11 @@ Template.visObservationsSelector.onCreated(function created() {
 
 Template.visObservationsSelector.onRendered(function created() {
   this.autorun(() => {
-    if (this.initialRenderComplete) {
+    console.log('this.lastRenderEnv', this.lastRenderEnv);
+    console.log('this.data.visSetupParams.getSelectedEnvironment()', this.data.visSetupParams.getSelectedEnvironment());
+
+    if (this.initialRenderComplete && this.lastRenderEnv === this.data.visSetupParams.getSelectedEnvironment()) {
+
       this.updateVis();
     }
     else {
