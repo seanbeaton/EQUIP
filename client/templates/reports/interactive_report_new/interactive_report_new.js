@@ -534,8 +534,11 @@ Template.interactiveReportNew.onCreated(function created() {
 
     let chosen_demo = (group_type === 'demographics') ? group : bar;
     let chosen_discourse = (bar_type === 'discourse') ? bar : group;
+    let students_in_demo = contribData.students;
 
-    let students_in_demo = contribData.students.filter(student => student.info.demographics[contribData.selected_demographic] === chosen_demo);
+    if (contribData.selected_demographic !== 'All Students') {
+      students_in_demo = students_in_demo.filter(student => student.info.demographics[contribData.selected_demographic] === chosen_demo)
+    }
 
     let students_in_demo_contribs_updated = students_in_demo.map(function (student) {
       if (chosen_discourse === "All Contributions") {
