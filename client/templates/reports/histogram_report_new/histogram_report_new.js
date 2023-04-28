@@ -204,11 +204,11 @@ Template.histogramReportNew.onCreated(function created() {
 
     data.students.sort((s_1, s_2) => {
       if (s_1.student.info.demographics[selectedDemo] !== s_2.student.info.demographics[selectedDemo]) {
-        return selectedDemographicOptions.indexOf(s_2.student.info.demographics[selectedDemo]) >
-          selectedDemographicOptions.indexOf(s_1.student.info.demographics[selectedDemo])
+        return selectedDemographicOptions.indexOf(s_1.student.info.demographics[selectedDemo]) -
+          selectedDemographicOptions.indexOf(s_2.student.info.demographics[selectedDemo])
       }
       else {
-        return s_2.count > s_1.count;
+        return s_2.count - s_1.count;
       }
     }).forEach(function (student) {
       let line_markup = $("<tr class='student-line'></tr>")

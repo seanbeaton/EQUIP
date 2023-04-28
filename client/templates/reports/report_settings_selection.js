@@ -82,7 +82,7 @@ Template.additionalSelect.onRendered(function() {
 
 Template.additionalSelect.events({
   'change .additional-select': function(e, instance) {
-    console.log('additional select', instance);
+    // console.log('additional select', instance);
     instance.data.setterCallback(instance.$(e.target).val())
   }
 })
