@@ -222,21 +222,21 @@ Template.visObservationsSelector.onCreated(function created() {
   }
 
   this.autorun(() => {
-    console.log('autorun', this)
+    // console.log('autorun', this)
     // watch these
     this.data.visSetupParams.reportState.get('selectedEnvironment');
     // this.data.visSetupParams.reportState.get('selectedObservationIds');
-
-    if (this.view.isRendered) {
-      let obs_options = this.data.visSetupParams.getObsOptions();
-      let default_obs_ids = obs_options.filter(o => (this.data.visSetupParams.visClassType === 'all' || this.data.visSetupParams.visClassType === o.observationType))
-        .map(o => o._id)
-      this.data.visSetupParams.setSelectedObservationIds(default_obs_ids)
-
-
-      this.updateVis();
-      // this.setupVis();
-    }
+    //
+    // if (this.view.isRendered) {
+    //   // let obs_options = this.data.visSetupParams.getObsOptions();
+    //   // let default_obs_ids = obs_options.filter(o => (this.data.visSetupParams.visClassType === 'all' || this.data.visSetupParams.visClassType === o.observationType))
+    //   //   .map(o => o._id)
+    //   // this.data.visSetupParams.setSelectedObservationIds(default_obs_ids)
+    //
+    //
+    //   this.updateVis();
+    //   // this.setupVis();
+    // }
   });
 })
 
@@ -246,7 +246,6 @@ Template.visObservationsSelector.onRendered(function created() {
     console.log('this.data.visSetupParams.getSelectedEnvironment()', this.data.visSetupParams.getSelectedEnvironment());
 
     if (this.initialRenderComplete && this.lastRenderEnv === this.data.visSetupParams.getSelectedEnvironment()) {
-
       this.updateVis();
     }
     else {
