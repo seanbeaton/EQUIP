@@ -409,7 +409,11 @@ Template.interactiveReportNew.onCreated(function created() {
       .selectAll('text')
       .data(function (d) {
         return keys.map(function (key) {
-          return {key: key, value: d[key]};
+          let val = d[key];
+          if (isNaN(val)) {
+            val = 0;
+          }
+          return {key: key, value: val};
         });
       })
       .enter()
