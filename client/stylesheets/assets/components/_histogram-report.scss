@@ -195,8 +195,12 @@ $light-grid-color: #ddd;
   }
 }
 
+.student-line--group-even {
+  background: #eee;
+}
+
 .student-line__name {
-  padding: 5px 5px 5px 0;
+  padding: 5px 5px 5px 5px;
   text-align: right;
   font-weight: bold;
 }
@@ -208,13 +212,13 @@ $light-grid-color: #ddd;
 }
 
 .student-line__bar-inner {
-  height: 20px;
+  height: 24px;
   background-color: grey;
 }
 
 .student-line__bar-count {
   position: absolute;
-  line-height: 16px;
+  line-height: 20px;
   font-size: 16px;
   font-weight: bold;
   padding: 2px 4px;
@@ -228,4 +232,8 @@ $light-grid-color: #ddd;
 .student-line__bar-count-wrapper {
   position: absolute;
   top: 5px;
+}
+
+.histogram-d3-wrapper__key {
+  padding-left: 10px;
 }

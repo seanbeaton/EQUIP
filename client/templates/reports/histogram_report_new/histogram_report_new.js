@@ -173,17 +173,20 @@ Template.histogramReportNew.onCreated(function created() {
       let key_colors = getLabelColors(key_options.options);
       color_scale = d3.scaleOrdinal().range(Object.values(key_colors))
       let student_demo_counts = {};
+      let demo_contrib_counts = {};
 
       data.students.forEach(s => {
         let student_demo = s.student.info.demographics[selectedDemo];
         if (!student_demo_counts.hasOwnProperty(student_demo)) {
           student_demo_counts[student_demo] = 1;
+          demo_contrib_counts[student_demo] = s.count;
         }
         else {
           student_demo_counts[student_demo] += 1
+          demo_contrib_counts[student_demo] += s.count;
         }
       })
-      this.updateHistogramDemoKey('.histogram-d3-wrapper__key', key_options.options, color_scale, student_demo_counts);
+      this.updateHistogramDemoKey('.histogram-d3-wrapper__key', key_options.options, color_scale, student_demo_counts, demo_contrib_counts);
 
       // let all_students = this.state.get('students');
       // let demo = this.state.get('selectedDemographic');
@@ -202,6 +205,8 @@ Template.histogramReportNew.onCreated(function created() {
     }
 
 
+    let groupIndex = 0;
+    let lastGroup = '';
     data.students.sort((s_1, s_2) => {
       if (s_1.student.info.demographics[selectedDemo] !== s_2.student.info.demographics[selectedDemo]) {
         return selectedDemographicOptions.indexOf(s_1.student.info.demographics[selectedDemo]) -
@@ -210,8 +215,13 @@ Template.histogramReportNew.onCreated(function created() {
       else {
         return s_2.count - s_1.count;
       }
-    }).forEach(function (student) {
+    }).forEach(function (student, i) {
+      if (lastGroup !== student.student.info.demographics[selectedDemo]) {
+        lastGroup = student.student.info.demographics[selectedDemo];
+        groupIndex += 1;
+      }
       let line_markup = $("<tr class='student-line'></tr>")
+        .addClass('student-line--group-' + ((groupIndex % 2) ? 'odd' : 'even'))
       line_markup.append('<td class="student-line__name">' + student.name + '</td>')
       let student_color = (color_scale) ? color_scale(student.student.info.demographics[selectedDemo]) : '#333333';
       let student_count_text_color = invertColor(student_color, true)
@@ -243,9 +253,13 @@ Template.histogramReportNew.onCreated(function created() {
     return opt.options
   };
 
-  this.updateHistogramDemoKey = (key_wrapper, y_values, color_axis, student_counts) => {
+  this.updateHistogramDemoKey = (key_wrapper, y_values, color_axis, student_counts, demo_contrib_counts) => {
+    console.log('y_values', y_values);
+    console.log('demo_contrib_counts', demo_contrib_counts);
     let key_chunks = y_values.map(function (label) {
-      return `<span class="key--label"><span class="key--color" style="background-color: ${color_axis(label)}"></span><span class="key--text">${label} - ${(student_counts[label] === 1 ? student_counts[label] + " Student" : (typeof student_counts[label] !== 'undefined' ? student_counts[label] : 0) + " Students")}</span></span>`
+      return `<span class="key--label"><span class="key--color" style="background-color: ${color_axis(label)}"></span>
+<span class="key--text">${label} - ${(student_counts[label] === 1 ? student_counts[label] + " Student" : (typeof student_counts[label] !== 'undefined' ? student_counts[label] : 0) + " Students")} 
+- ${(demo_contrib_counts[label] === 1 ? demo_contrib_counts[label] + " Contribution" : (typeof demo_contrib_counts[label] !== 'undefined' ? demo_contrib_counts[label] : 0) + " Contributions")}</span></span>`
     })
 
     let html = `${key_chunks.join('')}`;
