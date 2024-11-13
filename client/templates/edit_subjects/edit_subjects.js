@@ -21,7 +21,7 @@ const grid_size = {
   x: 230,
   y: 60,
   width: 920,
-  height: 1200,
+  height: 2200,
   // grid_start_x: 82.5,
   // grid_start_y: 19,
   vert_offset: 12,

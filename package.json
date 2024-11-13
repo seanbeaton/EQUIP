@@ -23,7 +23,7 @@
   },
   "homepage": "https://github.com/simmeringc/meteor-dataObs#readme",
   "dependencies": {
-    "@babel/runtime": "^7.19.4",
+    "@babel/runtime": "^7.26.0",
     "babel-runtime": "^6.18.0",
     "bulma_scss": "^0.3.0",
     "chosen-js": "^1.8.7",
