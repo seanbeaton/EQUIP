@@ -369,6 +369,7 @@ Template.observatory.events({
     Meteor.call('observationModifyAbsentStudent', {
       obsId: observation.get()._id,
       studentId: target_id,
+      envId: observation.get().envId,
       action: $('#' + target_id).hasClass('enabled') ? 'mark' : 'unmark',
     });
   },
@@ -391,10 +392,10 @@ Template.observatory.events({
     $('#seq-data-modal').removeClass('is-active');
   },
   'click .edit-observation-name': function (e) {
-    editObservationName(observation.get()._id);
+    editObservationName(observation.get());
   },
   'click .edit-observation-date': function (e) {
-    editObservationDate(observation.get()._id);
+    editObservationDate(observation.get());
   },
   'click #delete-observation': function (e) {
     deleteObservation(observation.get()._id);
@@ -532,7 +533,8 @@ Template.observatory.events({
     let $desc = $('.observation__description', e.target);
     Meteor.call('observationUpdateDescription', {
       obsId: observation.get()._id,
-      description: $desc.val()
+      description: $desc.val(),
+      envId: observation.get().envId,
     }, function (err, res) {
       if (err) {
         alert(err)
@@ -549,7 +551,7 @@ Template.observatory.events({
     e.preventDefault();
 
     let $notes = $('.observation__notes', e.target);
-    Meteor.call('observationUpdateNotes', {obsId: observation.get()._id, notes: $notes.val()}, function (err, res) {
+    Meteor.call('observationUpdateNotes', {obsId: observation.get()._id, notes: $notes.val(), envId: observation.get().envId}, function (err, res) {
       if (err) {
         alert(err)
       }
@@ -594,7 +596,9 @@ Template.registerHelper('math', function () {
 });
 
 
-function editObservationName(obsId) {
+function editObservationName(obs) {
+  let obsId = obs._id;
+
   let context = $('.observation[data-obs-id="' + obsId + '"]');
 
   var obs_name = $('.observation-name', context);
@@ -620,6 +624,7 @@ function editObservationName(obsId) {
       var args = {
         'obsId': obsId,
         'obsName': new_name,
+        'envId': obs.envId,
       };
 
       Meteor.call('observationRename', args, function (error, result) {
@@ -671,7 +676,9 @@ function editObservationName(obsId) {
   save_button.removeClass('is-loading');
 }
 
-function editObservationDate(obsId) {
+function editObservationDate(obs) {
+  let obsId = obs._id;
+
   let context = $('.observation[data-obs-id="' + obsId + '"]');
 
   var obs_date = $('.observation-date--iso', context);
@@ -705,6 +712,7 @@ function editObservationDate(obsId) {
       var args = {
         'obsId': obsId,
         'observationDate': new_date,
+        'envId': obs.envId,
       };
 
       Meteor.call('observationUpdateDate', args, function (error, result) {
