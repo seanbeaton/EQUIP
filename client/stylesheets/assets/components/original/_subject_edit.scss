@@ -57,7 +57,7 @@
 .subjects {
   border: 1px solid rgba(0, 0, 0, 0.3);
   height: 1200px;
-  padding: 12px 25px;
+  padding: 10px 10px;
 }
 
 .c--student-body__wrapper {
@@ -99,12 +99,18 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 220px;
-  height: 50px;
+  width: 100px;
+  height: 40px;
+  gap: 5px;
   text-align: center;
   position: absolute;
   background-color: #898989;
   transition: 1s cubic-bezier(0, 2.5, 1, -1.5) background-color;
+  font-size: 16px;
+  p {
+    font-size: 16px;
+    flex-grow: 1;
+  }
 }
 
 .just-added {
@@ -219,8 +225,8 @@
 
 .student-edit-button {
   color: white;
-  position: absolute;
-  right: 10px;
+  //position: absolute;
+  padding-right: 5px;
   transition: 0.25s ease opacity;
 }
 

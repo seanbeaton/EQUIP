@@ -17,30 +17,41 @@ Template.editSubjects.helpers({
   }
 });
 
+let cols = 9;
+let rows = 30;
+let row_height = 40;
+let col_width = 100;
+let gap = 6;
+
 const grid_size = {
-  x: 230,
-  y: 60,
-  width: 920,
-  height: 2200,
+  x: col_width + gap,
+  y: row_height + gap,
+  width: cols * (col_width + gap) - gap,
+  height: rows * (row_height + gap) - gap,
   // grid_start_x: 82.5,
   // grid_start_y: 19,
-  vert_offset: 12,
-  horiz_offset: 25,
+  gap: gap,
+  vert_offset: gap,
+  horiz_offset: gap,
 };
 
 //Used to set up interactJS and get labels for students
 Template.editSubjects.created = function () {
   // target elements with the "draggable" class
+
   interact('.draggable')
     .draggable({
       // disable inertial throwing
       snap: {
         targets: [
           function (xPos, yPos) {
-            let parent_rect = $('.c--student-body__container')[0].getBoundingClientRect();
+            let $students_area = $('.c--student-body__container');
+            $students_area.height(grid_size.height);
+            $students_area.width(grid_size.width);
+            let parent_rect = $students_area[0].getBoundingClientRect();
             let top_left = {
-              x: parent_rect.x + window.scrollX + grid_size.horiz_offset,
-              y: parent_rect.y + window.scrollY + grid_size.vert_offset,
+              x: parent_rect.x + window.scrollX + grid_size.gap,
+              y: parent_rect.y + window.scrollY + grid_size.gap,
             };
             let f = interact.createSnapGrid({x: grid_size.x, y: grid_size.y, range: Infinity, offset: top_left});
             return f(xPos, yPos);
