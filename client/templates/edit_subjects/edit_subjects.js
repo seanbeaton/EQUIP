@@ -70,9 +70,14 @@ Template.editSubjects.created = function () {
       }
     })
     .on('dragend', function (e) {
-      const students = Subjects.find({envId: Router.current().params._envId}).fetch();
-
       let target = e.target;
+      if (!target.classList.contains('dragging')) {
+        // pseudo once to stop this event triggering multiple times causing issues.
+        return;
+      }
+      target.classList.remove('dragging');
+
+      const students = Subjects.find({envId: Router.current().params._envId}).fetch();
       let dest_x = (parseFloat(target.getAttribute('data-x')) || 0);
       let dest_y = (parseFloat(target.getAttribute('data-y')) || 0);
 
@@ -90,7 +95,6 @@ Template.editSubjects.created = function () {
         }
         moveStudent(occupying_student._id, new_pos.x, new_pos.y)
       }
-      target.classList.remove('dragging');
       target.removeAttribute('data-orig-x');
       target.removeAttribute('data-orig-y');
       saveStudentLocations();
