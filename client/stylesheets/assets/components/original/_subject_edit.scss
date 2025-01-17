@@ -110,6 +110,10 @@
   p {
     font-size: 16px;
     flex-grow: 1;
+    overflow: hidden;
+    line-height: 1;
+    white-space: break-spaces;
+    text-overflow: ellipsis;
   }
 }
 
@@ -120,6 +124,8 @@
 .c--student-body__container-drag-label {
   color: var(--white);
 }
+
+
 
 .modal {
   margin: 0;
