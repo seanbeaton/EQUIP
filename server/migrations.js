@@ -10,7 +10,7 @@ import {import_data} from "../sample_data/all";
 import {updateSequence} from "../helpers/sequences";
 
 Meteor.startup(function () {
-  Migrations.migrateTo('7');
+  Migrations.migrateTo('8');
 });
 
 
@@ -358,5 +358,42 @@ Migrations.add({
 
     Config.remove({label: 'example_classroom_gid'});
     Config.remove({label: 'example_classroom_envId'});
+  }
+});
+
+
+
+Migrations.add({
+  version: 8,
+  name: 'Move all student positions to fit in new 9-width grid.',
+  up: function () {
+    const old_spacing_x = 230;
+    const old_spacing_y = 60;
+
+    const new_spacing_x = 106;
+    const new_spacing_y = 46;
+    Subjects.find().forEach(function (subject) {
+      let original_x_cardinal = Math.round(subject.data_x / old_spacing_x);
+      let original_y_cardinal = Math.round(subject.data_y / old_spacing_y);
+      Subjects.update({'_id': subject._id}, {$set: {
+        'data_x': original_x_cardinal * new_spacing_x * 2,
+        'data_y': original_y_cardinal * new_spacing_y * 2
+      }});
+    });
+  },
+  down: function () {
+    const old_spacing_x = 230;
+    const old_spacing_y = 60;
+
+    const new_spacing_x = 106;
+    const new_spacing_y = 46;
+    Subjects.find().forEach(function (subject) {
+      let original_x_cardinal = Math.round(subject.data_x / new_spacing_x);
+      let original_y_cardinal = Math.round(subject.data_y / new_spacing_y);
+      Subjects.update({'_id': subject._id}, {$set: {
+          'data_x': original_x_cardinal * old_spacing_x / 2,
+          'data_y': original_y_cardinal * old_spacing_y / 2
+        }});
+    });
   }
 });
