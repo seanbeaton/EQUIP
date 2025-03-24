@@ -23,7 +23,7 @@ let row_height = 40;
 let col_width = 100;
 let gap = 6;
 
-const grid_size = {
+export const subject_grid_size = {
   x: col_width + gap,
   y: row_height + gap,
   width: cols * (col_width + gap) - gap,
@@ -46,14 +46,14 @@ Template.editSubjects.created = function () {
         targets: [
           function (xPos, yPos) {
             let $students_area = $('.c--student-body__container');
-            $students_area.height(grid_size.height);
-            $students_area.width(grid_size.width);
+            $students_area.height(subject_grid_size.height);
+            $students_area.width(subject_grid_size.width);
             let parent_rect = $students_area[0].getBoundingClientRect();
             let top_left = {
-              x: parent_rect.x + window.scrollX + grid_size.gap,
-              y: parent_rect.y + window.scrollY + grid_size.gap,
+              x: parent_rect.x + window.scrollX + subject_grid_size.gap,
+              y: parent_rect.y + window.scrollY + subject_grid_size.gap,
             };
-            let f = interact.createSnapGrid({x: grid_size.x, y: grid_size.y, range: Infinity, offset: top_left});
+            let f = interact.createSnapGrid({x: subject_grid_size.x, y: subject_grid_size.y, range: Infinity, offset: top_left});
             return f(xPos, yPos);
           }
         ],
@@ -81,8 +81,8 @@ Template.editSubjects.created = function () {
       let dest_x = (parseFloat(target.getAttribute('data-x')) || 0);
       let dest_y = (parseFloat(target.getAttribute('data-y')) || 0);
 
-      dest_x = Math.round(dest_x / parseFloat(grid_size.x)) * parseFloat(grid_size.x);
-      dest_y = Math.round(dest_y / parseFloat(grid_size.y)) * parseFloat(grid_size.y);
+      dest_x = Math.round(dest_x / parseFloat(subject_grid_size.x)) * parseFloat(subject_grid_size.x);
+      dest_y = Math.round(dest_y / parseFloat(subject_grid_size.y)) * parseFloat(subject_grid_size.y);
 
       let occupying_student = findStudentAtLocation(students, dest_x, dest_y);
       if (occupying_student) {
@@ -113,8 +113,8 @@ Template.editSubjects.created = function () {
     let y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
 
     // get the closest valid coords:
-    x = Math.round(x / parseFloat(grid_size.x)) * parseFloat(grid_size.x);
-    y = Math.round(y / parseFloat(grid_size.y)) * parseFloat(grid_size.y);
+    x = Math.round(x / parseFloat(subject_grid_size.x)) * parseFloat(subject_grid_size.x);
+    y = Math.round(y / parseFloat(subject_grid_size.y)) * parseFloat(subject_grid_size.y);
 
     moveStudent(target.getAttribute('data-id'), x, y);
   }
@@ -128,7 +128,7 @@ Template.editSubjects.rendered = function () {
       $('#stud-data-modal').removeClass('is-active');
     }
   });
-  ensure_student_alignment();
+  // ensure_student_alignment();
 
 }
 
@@ -311,12 +311,12 @@ export let find_open_position = function (students) {
       complete = true;
     }
     else {
-      if (x + grid_size.x >= grid_size.width) {
+      if (x + subject_grid_size.x >= subject_grid_size.width) {
         x = 0;
-        y += grid_size.y;
+        y += subject_grid_size.y;
       }
       else {
-        x += grid_size.x
+        x += subject_grid_size.x
       }
       if (x > 2000) {
         complete = true
@@ -338,35 +338,35 @@ export let student_is_aligned_to_grid = function(student) {
   }
   return !(student.data_x % new_spacing_x !== 0 || student.data_y % new_spacing_y !== 0 );
 }
-
-export let ensure_student_alignment = function() {
-  const old_spacing_x = 230;
-  const old_spacing_y = 60;
-
-  const new_spacing_x = col_width + gap;
-  const new_spacing_y = row_height + gap;
-
-  let students_updated = 0;
-  Subjects.find().forEach(function(subject) {
-    if (student_is_aligned_to_grid(subject)) {
-      return;
-    }
-    students_updated++;
-    let original_x_cardinal = Math.round(subject.data_x / old_spacing_x);
-    let original_y_cardinal = Math.round(subject.data_y / old_spacing_y);
-    let new_x = original_x_cardinal * new_spacing_x * 2;
-    let new_y = original_y_cardinal * new_spacing_y * 2;
-    moveStudent(subject._id, new_x, new_y)
-    // Subjects.update({'_id': subject._id}, {$set: {
-    //     'data_x': original_x_cardinal * new_spacing_x * 2,
-    //     'data_y': original_y_cardinal * new_spacing_y * 2
-    //   }});
-  });
-  if (students_updated > 0) {
-    alert('Your student positions have been updated to match the new grid layout.')
-    saveStudentLocations();
-  }
-}
+//
+// export let ensure_student_alignment = function() {
+//   const old_spacing_x = 230;
+//   const old_spacing_y = 60;
+//
+//   const new_spacing_x = col_width + gap;
+//   const new_spacing_y = row_height + gap;
+//
+//   let students_updated = 0;
+//   Subjects.find().forEach(function(subject) {
+//     if (student_is_aligned_to_grid(subject)) {
+//       return;
+//     }
+//     students_updated++;
+//     let original_x_cardinal = Math.round(subject.data_x / old_spacing_x);
+//     let original_y_cardinal = Math.round(subject.data_y / old_spacing_y);
+//     let new_x = original_x_cardinal * new_spacing_x * 2;
+//     let new_y = original_y_cardinal * new_spacing_y * 2;
+//     moveStudent(subject._id, new_x, new_y)
+//     // Subjects.update({'_id': subject._id}, {$set: {
+//     //     'data_x': original_x_cardinal * new_spacing_x * 2,
+//     //     'data_y': original_y_cardinal * new_spacing_y * 2
+//     //   }});
+//   });
+//   if (students_updated > 0) {
+//     alert('Your student positions have been updated to match the new grid layout.')
+//     saveStudentLocations();
+//   }
+// }
 
 export let align_all_students = function (students, alphabetically, callback) {
   console_log_conditional('students', students);
@@ -425,9 +425,8 @@ function moveStudent(subId, x, y) {
   // }
 
   // translate the element
-  student.style.webkitTransform =
-    student.style.transform =
-      'translate(' + x + 'px, ' + y + 'px)';
+  student.style.transform =
+    'translate(' + x + 'px, ' + y + 'px)';
   // update the posiion attributes
 
   student.setAttribute('data-x', x);

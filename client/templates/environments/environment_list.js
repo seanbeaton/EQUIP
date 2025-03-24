@@ -3,6 +3,7 @@
 */
 
 import {console_log_conditional} from "/helpers/logging"
+import {subject_grid_size} from "../edit_subjects/edit_subjects";
 
 export const smallGroupStudentSelectActive = new ReactiveVar(false);
 export const absentStudentSelectActive = new ReactiveVar(false);
@@ -23,6 +24,9 @@ Template.environmentList.rendered = function () {
   //     document.querySelectorAll('.toggle-accordion')[0].click(); // main
   //     document.querySelectorAll('.toggle-accordion')[1].click(); // observations
   // }
+
+  console.log('ensure_student_alignment');
+  ensure_student_alignment();
 
   var urlParams = new URLSearchParams(window.location.search);
   if (urlParams.has("onboarding")) {
@@ -397,4 +401,45 @@ function processDatepickers() {
     altField: '#altObservationDate',
     altFormat: 'yy-mm-dd'
   })
+}
+
+
+
+export let student_is_aligned_to_grid = function(student) {
+  const old_spacing_x = 230;
+  const old_spacing_y = 60;
+
+  const new_spacing_x = subject_grid_size.x;
+  const new_spacing_y = subject_grid_size.y;
+
+  if (student.data_x % new_spacing_x !== 0 || student.data_y % new_spacing_y !== 0) {
+    console.log('student not aligned to grid', 'student.data_x / new_spacing_x !== 0 ', student.data_x / new_spacing_x, student.data_y / new_spacing_y)
+  }
+  return !(student.data_x % new_spacing_x !== 0 || student.data_y % new_spacing_y !== 0 );
+}
+
+export let ensure_student_alignment = function() {
+  const old_spacing_x = 230;
+  const old_spacing_y = 60;
+
+  const new_spacing_x = subject_grid_size.x;
+  const new_spacing_y = subject_grid_size.y;
+
+  let updated_subjects = [];
+  Subjects.find().forEach(function(subject) {
+    if (student_is_aligned_to_grid(subject)) {
+      return;
+    }
+    let original_x_cardinal = Math.round(subject.data_x / old_spacing_x);
+    let original_y_cardinal = Math.round(subject.data_y / old_spacing_y);
+    let new_x = original_x_cardinal * new_spacing_x * 2;
+    let new_y = original_y_cardinal * new_spacing_y * 2;
+    updated_subjects.push({'id': subject._id, 'x': new_x + "", 'y': new_y + ""})
+  });
+  if (updated_subjects.length > 0) {
+    // saveStudentLocations();
+    Meteor.call('subjectPositionUpdate', updated_subjects, function (error, result) {
+      alert('Your student positions have been updated to match the new grid layout.')
+    })
+  }
 }

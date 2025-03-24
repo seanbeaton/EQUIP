@@ -367,9 +367,9 @@ Migrations.add({
   version: 8,
   name: 'Move all student positions to fit in new 9-width grid.',
   up: function () {
-    console.log('This migration is handled on load of edit_subjects.js')
+    console.log('This migration is handled on load of environment_list.js')
   },
   down: function () {
-    console.log('This migration is handled on load of edit_subjects.js')
+    console.log('This migration is handled on load of environment_list.js')
   }
 });
