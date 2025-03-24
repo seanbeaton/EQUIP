@@ -308,7 +308,6 @@ Template.demographicHeatmapFilter.rendered = function () {
     .filter(':not(.chosen--processed)').addClass('chosen--processed')
     .chosen({disable_search_threshold: 10, width: "240px", placeholder_text_multiple: "Choose Multiple Options"});
   addSelectMutationObserver($('.filter.chosen-select')[0]);
-
 }
 
 
@@ -319,15 +318,24 @@ Template.spotlightDiscourseSelect.rendered = function () {
   addSelectMutationObserver($('.disc-select-chosen')[0]);
 }
 
+Template.heatmapReportSort.events({
+  'change #students-sort': function (e) {
+    let selected = $('option:selected', e.target);
+    showDemoSelect.set(selected.val() === 'buckets');
+    heatmapReportSortType.set(selected.val());
+    $(window).trigger('heatmap_student_sort_updated', selected.val())
+  }
+})
 
 Template.heatmapReportSort.rendered = function () {
   console_log_conditional('rendered run');
+  console.log('heatmapReportSort');
   $('.students-select-sort')
-    .trigger('change')
+    // .trigger('change')
     .filter(':not(.chosen--processed)').addClass('chosen--processed')
     .chosen({disable_search_threshold: 10, width: "300px", placeholder_text_multiple: "Choose Multiple Options"});
-  addSelectMutationObserver($('.students-select-sort')[0]);
 
+  addSelectMutationObserver($('.students-select-sort')[0]);
 }
 
 
@@ -339,6 +347,13 @@ Template.heatmapReportSortDemo.rendered = function () {
   addSelectMutationObserver($('.students-select-buckets-demo')[0]);
 }
 
+Template.heatmapReportSortDemo.events({
+  'change #students-buckets-demo': function (e) {
+    let selected = $('option:selected', e.target);
+    heatmapReportSortDemoChosen.set(selected.val());
+    $(window).trigger('heatmap_student_sort_demo_updated', selected.val())
+  }
+})
 
 Template.histogramDemoSelect.rendered = function () {
   $('.' + this.data.class_prefix + '-demographic-chosen')
@@ -357,35 +372,6 @@ Template.heatmapReportSort.helpers({
   }
 })
 
-
-Template.heatmapReportSort.events({
-  'DOMSubtreeModified select.chosen-select': handleChosenUpdates,
-})
-Template.heatmapReportSort.events({
-  'change #students-sort': function (e) {
-    let selected = $('option:selected', e.target);
-    showDemoSelect.set(selected.val() === 'buckets');
-    heatmapReportSortType.set(selected.val());
-    $(window).trigger('heatmap_student_sort_updated', selected.val())
-  }
-})
-
-
-Template.heatmapReportSortDemo.events({
-  'DOMSubtreeModified select.chosen-select': handleChosenUpdates,
-})
-Template.heatmapReportSortDemo.events({
-  'change #students-buckets-demo': function (e) {
-    let selected = $('option:selected', e.target);
-    heatmapReportSortDemoChosen.set(selected.val());
-    $(window).trigger('heatmap_student_sort_demo_updated', selected.val())
-  }
-})
-
-
-Template.studentSpotlight.events({
-  'DOMSubtreeModified select.chosen-select': handleChosenUpdates,
-})
 Template.studentSpotlight.helpers({
   arrayify: function (obj) {
     let result = [];

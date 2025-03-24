@@ -55,12 +55,12 @@ export let getEnvironments = function (selectedEnvironment, minObservations, onl
 }
 
 export let getObsOptions = function (selectedEnvironment, envId) {
-  console.log('getobsoptions', selectedEnvironment, envId);
+  // console.log('getobsoptions', selectedEnvironment, envId);
 
   if (typeof envId === 'undefined') {
     envId = selectedEnvironment.get();
   }
-  console.log('getobsoptions', selectedEnvironment, envId);
+  // console.log('getobsoptions', selectedEnvironment, envId);
 
   if (!!envId) {
     return Observations.find({envId: envId}).fetch();
