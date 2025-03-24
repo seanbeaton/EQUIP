@@ -412,9 +412,6 @@ export let student_is_aligned_to_grid = function(student) {
   const new_spacing_x = subject_grid_size.x;
   const new_spacing_y = subject_grid_size.y;
 
-  if (student.data_x % new_spacing_x !== 0 || student.data_y % new_spacing_y !== 0) {
-    console.log('student not aligned to grid', 'student.data_x / new_spacing_x !== 0 ', student.data_x / new_spacing_x, student.data_y / new_spacing_y)
-  }
   return !(student.data_x % new_spacing_x !== 0 || student.data_y % new_spacing_y !== 0 );
 }
 
