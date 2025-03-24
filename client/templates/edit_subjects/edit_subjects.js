@@ -128,6 +128,8 @@ Template.editSubjects.rendered = function () {
       $('#stud-data-modal').removeClass('is-active');
     }
   });
+  ensure_student_alignment();
+
 }
 
 //
@@ -322,6 +324,48 @@ export let find_open_position = function (students) {
     }
   }
   return {x: x, y: y};
+}
+
+export let student_is_aligned_to_grid = function(student) {
+  const old_spacing_x = 230;
+  const old_spacing_y = 60;
+
+  const new_spacing_x = col_width + gap;
+  const new_spacing_y = row_height + gap;
+
+  if (student.data_x % new_spacing_x !== 0 || student.data_y % new_spacing_y !== 0) {
+    console.log('student not aligned to grid', 'student.data_x / new_spacing_x !== 0 ', student.data_x / new_spacing_x, student.data_y / new_spacing_y)
+  }
+  return !(student.data_x % new_spacing_x !== 0 || student.data_y % new_spacing_y !== 0 );
+}
+
+export let ensure_student_alignment = function() {
+  const old_spacing_x = 230;
+  const old_spacing_y = 60;
+
+  const new_spacing_x = col_width + gap;
+  const new_spacing_y = row_height + gap;
+
+  let students_updated = 0;
+  Subjects.find().forEach(function(subject) {
+    if (student_is_aligned_to_grid(subject)) {
+      return;
+    }
+    students_updated++;
+    let original_x_cardinal = Math.round(subject.data_x / old_spacing_x);
+    let original_y_cardinal = Math.round(subject.data_y / old_spacing_y);
+    let new_x = original_x_cardinal * new_spacing_x * 2;
+    let new_y = original_y_cardinal * new_spacing_y * 2;
+    moveStudent(subject._id, new_x, new_y)
+    // Subjects.update({'_id': subject._id}, {$set: {
+    //     'data_x': original_x_cardinal * new_spacing_x * 2,
+    //     'data_y': original_y_cardinal * new_spacing_y * 2
+    //   }});
+  });
+  if (students_updated > 0) {
+    alert('Your student positions have been updated to match the new grid layout.')
+    saveStudentLocations();
+  }
 }
 
 export let align_all_students = function (students, alphabetically, callback) {
